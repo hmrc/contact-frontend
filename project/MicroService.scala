@@ -17,6 +17,7 @@ trait MicroService {
   lazy val plugins : Seq[Plugins] = Seq(play.PlayScala)
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
+  def unitFilter(name: String): Boolean = !funFilter(name) && !smokeFilter(name)
   def funFilter(name: String): Boolean = name endsWith "Feature"
   def smokeFilter(name: String): Boolean = name endsWith "SmokeTest"
 
@@ -36,6 +37,7 @@ trait MicroService {
     )
     .settings(Repositories.playPublishingSettings : _*)
     .settings(inConfig(TemplateTest)(Defaults.testSettings): _*)
+    .settings(testOptions in Test := Seq(Tests.Filter(unitFilter)))
     .configs(IntegrationTest)
     .settings(inConfig(TemplateItTest)(Defaults.itSettings): _*)
     .settings(
@@ -49,6 +51,8 @@ trait MicroService {
     .settings(inConfig(FunTest)(Defaults.testSettings): _*)
     .settings(
       testOptions in FunTest := Seq(Tests.Filter(funFilter)),
+      unmanagedSourceDirectories in FunTest <<= (baseDirectory in FunTest)(base => Seq(base / "test")),
+      unmanagedResourceDirectories in FunTest <<= (baseDirectory in FunTest)(base => Seq(base / "test")),
       Keys.fork in FunTest := false,
       parallelExecution in FunTest := false,
       addTestReportOption(FunTest, "fun-test-reports")
