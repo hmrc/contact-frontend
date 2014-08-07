@@ -165,5 +165,13 @@ object Deskpro extends Stub {
           .withStatus(200)
           .withBody("""{"ticket_id": 1}""")
       ))
+
+
+    stubFor(post(urlEqualTo("/deskpro/feedback"))
+      .willReturn(
+        aResponse()
+          .withStatus(200)
+          .withBody("""{"ticket_id": 10}""")
+      ))
   }
 }

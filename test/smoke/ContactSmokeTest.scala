@@ -53,7 +53,8 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSteps with Observat
       go to feedbackPage
 
       When("He fills out and sends the contact form")
-      feedbackPage.sendFeedbackForm(5, Name, Email, Comment)
+      feedbackPage.fillOutFeedbackForm(5, Name, Email, Comment)
+      feedbackPage.submitFeedbackForm()
 
       Then("He sees a success message")
       i_see("Thank you",

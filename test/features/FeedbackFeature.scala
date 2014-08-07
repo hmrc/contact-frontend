@@ -1,5 +1,10 @@
 package features
 
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock._
+import org.skyscreamer.jsonassert.JSONCompareMode
+import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
+import support.page.{UnauthenticatedFeedbackPage, FeedbackPage}
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs.StubbedFeature
 
@@ -15,23 +20,48 @@ class FeedbackFeature extends StubbedFeature with NavigationSteps with ApiSteps 
 
     Background {
       Given("I go to the 'Feedback' page")
+      go to new UnauthenticatedFeedbackPage
+      i_am_on_the_page("Send your feedback")
     }
 
 
     Scenario("Submit feedback successfully") {
       When("I fill the feedback form correctly")
-      And("I send the feedback form")
-      Then("I see:")
-//      i_see(
-//        "Thank you ",
-//        "Your feedback has been received."
-//      )
-      And("the Deskpro endpoint '/deskpro/ticket' has received the following payload:")
+      val page = new UnauthenticatedFeedbackPage
+      page.fillOutFeedbackForm(1, Name, Email, Comment)
 
-      pending
+      And("I send the feedback form")
+      page.submitFeedbackForm()
+
+      Then("I am on the 'Your feedback' page")
+      i_am_on_the_page("Your feedback")
+
+      Then("I see:")
+      i_see(
+        "Thank you",
+        "Your feedback has been received."
+      )
+
+      And("the Deskpro endpoint '/deskpro/feedback' has received the following payload:")
+      verify_post(to = "/deskpro/feedback", body =
+        s"""
+          |{
+          |   "name":"$Name",
+          |   "email":"$Email",
+          |   "subject":"Beta feedback submission",
+          |   "rating":"1",
+          |   "message":"$Comment",
+          |   "referrer":"n/a",
+          |   "javascriptEnabled":"Y",
+          |   "authId":"n/a",
+          |   "areaOfTax":"n/a",
+          |   "sessionId":"n/a",
+          |   "userTaxIdentifiers":{}
+          |}
+        """.stripMargin, LENIENT)
     }
 
-    Scenario("Feedback form sent successfully when signed in") {
+    /*Scenario("Feedback form sent successfully when signed in") {
       pending
     }
 
@@ -108,5 +138,10 @@ class FeedbackFeature extends StubbedFeature with NavigationSteps with ApiSteps 
         pending
       }
     }
+    */
   }
+
+  private val Name = "Grumpy Bear"
+  private val Email = "grumpy@carebears.com"
+  private val Comment = "I am writing a comment"
 }

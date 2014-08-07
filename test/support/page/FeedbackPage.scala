@@ -14,7 +14,7 @@ class FeedbackPage extends WebPage with SharedPageModules {
   def commentsField = textArea("feedback-comments")
   def submitBtn = cssSelector("button[type=submit]")
 
-  def sendFeedbackForm(rating: Int, name: String, email: String, comment: String) = {
+  def fillOutFeedbackForm(rating: Int, name: String, email: String, comment: String) = {
     val wait = new WebDriverWait(webDriver, 15)
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-rating")))
 
@@ -22,7 +22,13 @@ class FeedbackPage extends WebPage with SharedPageModules {
     nameField.value = name
     emailField.value = email
     commentsField.value = comment
+  }
 
+  def submitFeedbackForm() = {
     click on submitBtn
   }
+}
+
+class UnauthenticatedFeedbackPage extends FeedbackPage {
+  override val url = Env.host + "/beta-feedback-unauthenticated"
 }

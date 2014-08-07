@@ -1,6 +1,8 @@
 package support.steps
 
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
+import org.skyscreamer.jsonassert.JSONCompareMode
 
 trait ApiSteps extends BaseSteps {
 
@@ -19,4 +21,8 @@ trait ApiSteps extends BaseSteps {
             .withStatus(status)))
     }
 
+  def verify_post(to: String, body: String, compareMode: JSONCompareMode) = {
+    verify(postRequestedFor(urlEqualTo(to))
+      .withRequestBody(equalToJson(body, compareMode)))
+  }
 }
