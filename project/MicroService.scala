@@ -17,6 +17,9 @@ trait MicroService {
   lazy val plugins : Seq[Plugins] = Seq(play.PlayScala)
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
+  def funFilter(name: String): Boolean = name endsWith "Feature"
+  def smokeFilter(name: String): Boolean = name endsWith "SmokeTest"
+
   lazy val microservice = Project(appName, file("."))
     .enablePlugins(plugins : _*)
     .settings(playSettings : _*)
@@ -42,6 +45,23 @@ trait MicroService {
       testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
       parallelExecution in IntegrationTest := false)
     .settings(SbtBuildInfo(): _*)
+    .configs(FunTest)
+    .settings(inConfig(FunTest)(Defaults.testSettings): _*)
+    .settings(
+      testOptions in FunTest := Seq(Tests.Filter(funFilter)),
+      Keys.fork in FunTest := false,
+      parallelExecution in FunTest := false,
+      addTestReportOption(FunTest, "fun-test-reports")
+    )
+    .configs(SmokeTest)
+    .settings(inConfig(SmokeTest)(Defaults.testSettings): _*)
+    .settings(
+      javaOptions in SmokeTest := Seq("-Denvironment=qa"),
+      testOptions in SmokeTest := Seq(Tests.Filter(smokeFilter)),
+      Keys.fork in SmokeTest := true,
+      parallelExecution in SmokeTest := false,
+      addTestReportOption(SmokeTest, "smoke-test-reports")
+    )
 }
 
 private object TestPhases {
@@ -51,6 +71,8 @@ private object TestPhases {
 
   lazy val TemplateTest = config("tt") extend Test
   lazy val TemplateItTest = config("tit") extend IntegrationTest
+  lazy val FunTest = config("fun") extend Test
+  lazy val SmokeTest = config("smoke") extend Test
 
   def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
     tests map {

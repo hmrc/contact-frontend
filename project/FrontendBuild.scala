@@ -30,7 +30,8 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
 
     "com.kenshoo" %% "metrics-play" % "2.3.0_0.1.6",
-    "com.codahale.metrics" % "metrics-graphite" % "3.0.1"
+    "com.codahale.metrics" % "metrics-graphite" % "3.0.1",
+    "org.apache.httpcomponents" % "httpclient" % "4.3.1"
   )
 
   trait TestDependencies {
@@ -46,7 +47,11 @@ private object AppDependencies {
         "org.scalatest" %% "scalatest" % "2.2.0" % scope,
         "org.pegdown" % "pegdown" % "1.4.2" % scope,
         "org.jsoup" % "jsoup" % "1.7.2" % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
+        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+
+        "com.github.tomakehurst" % "wiremock" % "1.46" % "test",
+        "org.seleniumhq.selenium" % "selenium-java" % "2.41.0" % "test",
+        "uk.gov.hmrc" %% "scala-webdriver" % "4.0.0" % "test"
       )
     }.test
   }
