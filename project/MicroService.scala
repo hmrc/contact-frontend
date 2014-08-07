@@ -51,7 +51,7 @@ trait MicroService {
     .settings(inConfig(FunTest)(Defaults.testSettings): _*)
     .settings(
       testOptions in FunTest := Seq(Tests.Filter(funFilter)),
-      unmanagedSourceDirectories in FunTest <<= (baseDirectory in FunTest)(base => Seq(base / "test")),
+      unmanagedSourceDirectories   in FunTest <<= (baseDirectory in FunTest)(base => Seq(base / "test")),
       unmanagedResourceDirectories in FunTest <<= (baseDirectory in FunTest)(base => Seq(base / "test")),
       Keys.fork in FunTest := false,
       parallelExecution in FunTest := false,
@@ -62,6 +62,8 @@ trait MicroService {
     .settings(
       javaOptions in SmokeTest := Seq("-Denvironment=qa"),
       testOptions in SmokeTest := Seq(Tests.Filter(smokeFilter)),
+      unmanagedSourceDirectories   in SmokeTest <<= (baseDirectory in SmokeTest)(base => Seq(base / "test")),
+      unmanagedResourceDirectories in SmokeTest <<= (baseDirectory in SmokeTest)(base => Seq(base / "test")),
       Keys.fork in SmokeTest := true,
       parallelExecution in SmokeTest := false,
       addTestReportOption(SmokeTest, "smoke-test-reports")
