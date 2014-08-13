@@ -42,7 +42,7 @@ class FeedbackFeature extends StubbedFeature with NavigationSteps with ApiSteps 
         "Your feedback has been received."
       )
 
-      And("the Deskpro endpoint '/deskpro/feedback' has received the following payload:")
+      And("the Deskpro endpoint '/deskpro/feedback' has received the following POST request:")
       verify_post(to = "/deskpro/feedback", body =
         s"""
           |{

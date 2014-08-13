@@ -15,7 +15,7 @@ Feature: Feedback about the beta
     Then I see:
       | Thank you                        |
       | Your feedback has been received. |
-    And the Deskpro endpoint '/deskpro/ticket' has received the following payload:
+    And the Deskpro endpoint '/deskpro/ticket' has received the following POST request:
     """
     {}
     """

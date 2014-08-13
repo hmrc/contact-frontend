@@ -21,7 +21,7 @@ Feature: Get help with this page
     Then I see:
       | Thank you |
       | Your message has been sent, and the team will get back to you within 2 working days. |
-    And the Deskpro endpoint '/deskpro/ticket' has received the following request:
+    And the Deskpro endpoint '/deskpro/ticket' has received the following POST request:
     """
     {}
     """

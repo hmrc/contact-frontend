@@ -1,7 +1,7 @@
 package smoke
 
 import org.scalatest.AcceptanceSpec
-import support.page.{UnauthenticatedFeedbackPage, ContactHmrcPage, FeedbackPage}
+import support.page.{UnauthenticatedFeedbackPage, ContactHmrcPage}
 import support.steps.{DeskproSteps, NavigationSteps, ObservationSteps, SmokeSteps}
 
 class ContactSmokeTest extends AcceptanceSpec with NavigationSteps with ObservationSteps with SmokeSteps with DeskproSteps {
@@ -50,6 +50,7 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSteps with Observat
 
     Scenario("Contact HMRC") {
       Given("Tax payer Bill goes to the Contact HMRC page")
+      i_sign_in()
       val contactHmrcPage = new ContactHmrcPage
       go to contactHmrcPage
 
