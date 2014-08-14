@@ -23,12 +23,12 @@ trait Stubs {
 trait Stub {
   def create(): Unit
 
-  def stubForPage(urlMatchingStrategy: UrlMatchingStrategy, heading: String, prodUrl: Option[String] = None) = {
+  def stubForPage(urlMatchingStrategy: UrlMatchingStrategy, heading: String)(body: String = "This is a stub") = {
     stubFor(get(urlMatchingStrategy)
       .willReturn(
         aResponse()
           .withStatus(200)
-          .withBody(s"<html><body><h1>$heading</h1>This is a stub</body></html>")
+          .withBody(s"<html><body><h1>$heading</h1>$body</body></html>")
       ))
   }
 }
@@ -157,7 +157,7 @@ object Login extends Stub with SessionCookieBaker {
 }
 
 object Deskpro extends Stub {
-  override def create() {
+  override def create() = {
 
     stubFor(post(urlEqualTo("/deskpro/ticket"))
       .willReturn(
@@ -173,5 +173,13 @@ object Deskpro extends Stub {
           .withStatus(200)
           .withBody("""{"ticket_id": 10}""")
       ))
+  }
+}
+
+object ExternalPages extends Stub {
+  override def create() = {
+    stubForPage(urlEqualTo("/external/page-to-feedback"), "Page with feedback") {
+      """<a href="http://localhost:9000/beta-feedback-unauthenticated">Link to feedback</a>"""
+    }
   }
 }

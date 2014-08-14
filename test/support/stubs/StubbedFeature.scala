@@ -40,6 +40,7 @@ object Common extends Stubs {
     stubFor(Auditing)
     stubFor(Login)
     stubFor(Deskpro)
+    stubFor(ExternalPages)
   }
 
   def after() = {

@@ -1,9 +1,9 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
-import support.page.UnauthenticatedFeedbackPage
+import support.page.{ExternalPageToFeedback, UnauthenticatedFeedbackPage}
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
-import support.stubs.StubbedFeature
+import support.stubs.{Stubs, StubbedFeature}
 
 class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps with ApiSteps with ObservationSteps {
 
@@ -49,6 +49,38 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
           |   "rating":"1",
           |   "message":"$Comment",
           |   "referrer":"n/a",
+          |   "javascriptEnabled":"Y",
+          |   "authId":"n/a",
+          |   "areaOfTax":"n/a",
+          |   "sessionId":"n/a",
+          |   "userTaxIdentifiers":{}
+          |}
+        """.stripMargin, LENIENT)
+    }
+
+
+    Scenario("The referrer URL is sent to Deskpro") {
+      Given("I come from a page that links to the beta feedback")
+      go to ExternalPageToFeedback
+      ExternalPageToFeedback.clickOnLinkToFeedback()
+
+      When("I fill the feedback form correctly")
+      val page = new UnauthenticatedFeedbackPage
+      page.fillOutFeedbackForm(1, Name, Email, Comment)
+
+      And("I send the feedback form")
+      page.submitFeedbackForm()
+
+      Then("the Deskpro endpoint '/deskpro/feedback' has received the following POST request:")
+      verify_post(to = "/deskpro/feedback", body =
+        s"""
+          |{
+          |   "name":"$Name",
+          |   "email":"$Email",
+          |   "subject":"Beta feedback submission",
+          |   "rating":"1",
+          |   "message":"$Comment",
+          |   "referrer":"http://localhost:11111/external/page-to-feedback",
           |   "javascriptEnabled":"Y",
           |   "authId":"n/a",
           |   "areaOfTax":"n/a",
