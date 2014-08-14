@@ -18,7 +18,6 @@ trait SharedPageModules {
     def clickOnFeedbackLink() = {
       click on feedbackLink
       webDriver.switchTo().window(windowHandles.last)
-      new FeedbackPage
     }
   }
 

@@ -1,1 +1,4 @@
-->     /                          common.Routes
+GET        /beta-feedback-local        @controllers.FeedbackController.feedbackForm
+
+->         /template                   template.Routes
+->         /                           common.Routes

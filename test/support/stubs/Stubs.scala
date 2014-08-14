@@ -83,11 +83,11 @@ object Login extends Stub with SessionCookieBaker {
     )
 
 
-    stubFor(get(urlEqualTo("/account/sign-in?continue=/account"))
+    stubFor(get(urlEqualTo("/stub/sign-in"))
       .willReturn(aResponse()
       .withStatus(303)
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
-      .withHeader(HeaderNames.LOCATION, "http://localhost:9000/account")))
+      .withHeader(HeaderNames.LOCATION, "http://localhost:9000/beta-feedback-local")))
 
 
     stubFor(post(urlEqualTo("/login"))

@@ -5,8 +5,7 @@ import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 import support.modules.SharedPageModules
 import support.steps.Env
 
-class FeedbackPage extends WebPage with SharedPageModules {
-  override val url = Env.host + "/beta-feedback"
+trait FeedbackPage extends WebPage with SharedPageModules {
 
   def ratingRadioGroup = radioButtonGroup("feedback-rating")
   def nameField = textField("feedback-name")
@@ -30,5 +29,9 @@ class FeedbackPage extends WebPage with SharedPageModules {
 }
 
 class UnauthenticatedFeedbackPage extends FeedbackPage {
-  override val url = Env.host + "/beta-feedback-unauthenticated"
+  val url = Env.host + "/beta-feedback-unauthenticated"
+}
+
+class AuthenticatedFeedbackPage extends FeedbackPage {
+  val url = Env.host + "/beta-feedback-local"
 }

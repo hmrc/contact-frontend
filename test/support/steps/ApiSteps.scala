@@ -6,23 +6,44 @@ import org.skyscreamer.jsonassert.JSONCompareMode
 
 trait ApiSteps extends BaseSteps {
 
-    def the_call_to_url_will_return_payload(url: String)(payload: String) = {
+    def service_will_return_payload_for_get_request(url: String, delayMillis: Int = 0)(payload: String) = {
       stubFor(get(urlEqualTo(url))
         .willReturn(
           aResponse()
             .withStatus(200)
+            .withFixedDelay(delayMillis)
             .withBody(payload)))
     }
 
-    def the_call_to_url_fails_with_status(url: String, status: Int) = {
+  def service_will_return_payload_for_POST_request(url: String, delayMillis: Int = 0)(payload: String) = {
+    stubFor(post(urlEqualTo(url))
+      .willReturn(
+        aResponse()
+          .withStatus(200)
+          .withFixedDelay(delayMillis)
+          .withBody(payload)))
+  }
+
+    def service_will_fail_on_get_request(url: String, status: Int) = {
       stubFor(get(urlEqualTo(url))
         .willReturn(
           aResponse()
             .withStatus(status)))
     }
 
+  def service_will_fail_on_POST_request(url: String, status: Int) = {
+    stubFor(post(urlEqualTo(url))
+      .willReturn(
+        aResponse()
+          .withStatus(status)))
+  }
+
+
   def verify_post(to: String, body: String, compareMode: JSONCompareMode) = {
     verify(postRequestedFor(urlEqualTo(to))
       .withRequestBody(equalToJson(body, compareMode)))
   }
+
+  def verify_post_no_hit(to: String) = WireMock.findAll(postRequestedFor(urlEqualTo(to))) should be('isEmpty)
+
 }
