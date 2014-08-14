@@ -1,6 +1,6 @@
 package support.page
 
-import org.openqa.selenium.By
+import org.openqa.selenium.{WebDriver, By}
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 import support.modules.SharedPageModules
 import support.steps.Env
@@ -14,7 +14,7 @@ trait FeedbackPage extends WebPage with SharedPageModules {
   def submitBtn = cssSelector("button[type=submit]")
 
   def fillOutFeedbackForm(rating: Int, name: String, email: String, comment: String) = {
-    val wait = new WebDriverWait(webDriver, 15)
+    val wait = new WebDriverWait(Env.driver, 15)
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-rating")))
 
     ratingRadioGroup.value = rating.toString

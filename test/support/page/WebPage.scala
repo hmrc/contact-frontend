@@ -5,7 +5,7 @@ import org.scalatest.selenium.{WebBrowser, Page}
 import support.steps.Env
 
 trait WebPage extends Page with WebBrowser {
-  implicit val webDriver: WebDriver = Env.driver
+  implicit def webDriver: WebDriver = Env.driver
 
   def isCurrentPage: Boolean = false
   def heading = tagName("h1").element.text

@@ -10,34 +10,33 @@ import scala.util.Try
 
 
 object Env {
-
   var host = Option(System.getProperty("environment")) match {
     case Some("qa") => "https://web-qa.tax.service.gov.uk"
     case _ => Option(System.getProperty("host")).getOrElse("http://localhost:9000")
   }
 
+
   val stubPort = 11111
+
   val stubHost = "localhost"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 
   wireMockServer.start()
+  var driver: WebDriver = SingletonDriver.getInstance()
 
-
-  val dc = DesiredCapabilities.firefox()
-
-  private val proxyPort: String = System.getProperty("http.proxyPort")
-  if (proxyPort != null) {
-    val proxy = new org.openqa.selenium.Proxy()
-    proxy.setHttpProxy(s"localhost:$proxyPort")
-    dc.setCapability(CapabilityType.PROXY, proxy)
+  def enableJavascript() =  {
+    SingletonDriver.setJavascript(true)
+    driver = SingletonDriver.getInstance()
   }
 
-  val driver: WebDriver = SingletonDriver.getInstance()
+  def disableJavascript() = {
+    SingletonDriver.setJavascript(false)
+    driver = SingletonDriver.getInstance()
+  }
 
 
   def addShutdownHook(body: => Unit) =
     Runtime.getRuntime addShutdownHook new Thread { override def run { body } }
-
   addShutdownHook {
     Try(driver.quit())
     wireMockServer.stop()

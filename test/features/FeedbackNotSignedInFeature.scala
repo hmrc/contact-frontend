@@ -1,10 +1,7 @@
 package features
 
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock._
-import org.skyscreamer.jsonassert.JSONCompareMode
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
-import support.page.{UnauthenticatedFeedbackPage, FeedbackPage}
+import support.page.UnauthenticatedFeedbackPage
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs.StubbedFeature
 
@@ -60,11 +57,6 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
           |}
         """.stripMargin, LENIENT)
     }
-
-    Scenario("Feedback form sent successfully when signed in") {
-      pending
-    }
-
 
 
     Scenario("All fields are mandatory") {

@@ -8,7 +8,7 @@ import scala.util.Try
 
 trait Section extends WebBrowser {
 
-  implicit val webDriver: WebDriver = Env.driver
+  implicit def webDriver: WebDriver = Env.driver
 
   def sectionQuery: Query
 

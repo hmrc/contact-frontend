@@ -1,32 +1,30 @@
 package features
 
-import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
-import support.page.AuthenticatedFeedbackPage
+import org.skyscreamer.jsonassert.JSONCompareMode
+import support.page.UnauthenticatedFeedbackPage
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
-import support.stubs.StubbedFeature
-
-class FeedbackSignedInFeature extends StubbedFeature with NavigationSteps with ApiSteps with ObservationSteps  {
+import support.stubs._
 
 
-  Feature("Feedback about the beta when signed in") {
+class FeedbackNotSignedIn_NoJavascriptFeature extends NoJsFeature with NavigationSteps with ApiSteps with ObservationSteps {
+
+  Feature("Feedback about the beta when not signed in") {
 
     info("In order to make my views known about the beta")
-    info("As an authenticated user")
+    info("As an unauthenticated user")
     info("I want to leave my feedback")
 
 
     Background {
-      Given("I am signed in")
-
-      And("I go to the 'Feedback' page")
-      go to new AuthenticatedFeedbackPage
+      Given("I go to the 'Feedback' page")
+      go to new UnauthenticatedFeedbackPage
       i_am_on_the_page("Send your feedback")
     }
 
 
     Scenario("Submit feedback successfully") {
       When("I fill the feedback form correctly")
-      val page = new AuthenticatedFeedbackPage
+      val page = new UnauthenticatedFeedbackPage
       page.fillOutFeedbackForm(1, Name, Email, Comment)
 
       And("I send the feedback form")
@@ -50,20 +48,18 @@ class FeedbackSignedInFeature extends StubbedFeature with NavigationSteps with A
           |   "subject":"Beta feedback submission",
           |   "rating":"1",
           |   "message":"$Comment",
-          |   "referrer":"",
-          |   "javascriptEnabled":"Y",
-          |   "authId":"/auth/oid/1234567890",
-          |   "areaOfTax":"biztax",
+          |   "referrer":"n/a",
+          |   "javascriptEnabled":"N",
+          |   "authId":"n/a",
+          |   "areaOfTax":"n/a",
+          |   "sessionId":"n/a",
           |   "userTaxIdentifiers":{}
           |}
-        """.stripMargin, LENIENT)
+        """.stripMargin, JSONCompareMode.LENIENT)
     }
-
-
   }
 
   private val Name = "Grumpy Bear"
   private val Email = "grumpy@carebears.com"
   private val Comment = "I am writing a comment"
-
 }
