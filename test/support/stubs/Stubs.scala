@@ -89,69 +89,6 @@ object Login extends Stub with SessionCookieBaker {
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
       .withHeader(HeaderNames.LOCATION, "http://localhost:9000/beta-feedback")))
 
-
-    stubFor(post(urlEqualTo("/login"))
-      .willReturn(
-        aResponse()
-          .withStatus(200)
-          .withBody(
-            """
-              |{
-              |    "authId": "/auth/oid/1234567890",
-              |    "credId": "cred-id-12345",
-              |    "name": "JOHN THE SAINSBURY",
-              |    "affinityGroup": "Organisation",
-              |    "encodedGovernmentGatewayToken": "PGdhdGV3YXk6R2F0ZXdheVRva2VuIHhtbG5zOndzdD0iaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNC8wNC90cnVzdCIgeG1sbnM6d3NhPSJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA0LzAzL2FkZHJlc3NpbmciIHhtbG5zOndzc2U9Imh0dHA6Ly9kb2NzLm9hc2lzLW9wZW4ub3JnL3dzcy8yMDA0LzAxL29hc2lzLTIwMDQwMS13c3Mtd3NzZWN1cml0eS1zZWNleHQtMS4wLnhzZCIgeG1sbnM6d3N1PSJodHRwOi8vZG9jcy5vYXNpcy1vcGVuLm9yZy93c3MvMjAwNC8wMS9vYXNpcy0yMDA0MDEtd3NzLXdzc2VjdXJpdHktdXRpbGl0eS0xLjAueHNkIiB4bWxuczpzb2FwPSJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy9zb2FwL2VudmVsb3BlLyI+PGdhdGV3YXk6Q3JlYXRlZD4yMDE0LTA2LTA5VDA5OjM5OjA2WjwvZ2F0ZXdheTpDcmVhdGVkPjxnYXRld2F5OkV4cGlyZXM+MjAxNC0wNi0wOVQxMzozOTowNlo8L2dhdGV3YXk6RXhwaXJlcz48Z2F0ZXdheTpVc2FnZT5TdGFuZGFyZDwvZ2F0ZXdheTpVc2FnZT48Z2F0ZXdheTpPcGFxdWU+ZXlKamNtVmtTV1FpT2lKamNtVmtMV2xrTFRVME16SXhNak13TURBeE9TSXNJbU55WldGMGFXOXVWR2x0WlNJNklqSXdNVFF0TURZdE1EbFVNRGs2TXprNk1EWXVNREF3V2lJc0ltVjRjR2x5ZVZScGJXVWlPaUl5TURFMExUQTJMVEE1VkRFek9qTTVPakEyTGpBd01Gb2lmUT09PC9nYXRld2F5Ok9wYXF1ZT48L2dhdGV3YXk6R2F0ZXdheVRva2VuPg=="
-              |}|
-            """.stripMargin
-          )))
-
-
-    stubFor(post(urlEqualTo("/auth/cred-id/cred-id-12345/exchange"))
-      .willReturn(
-        aResponse()
-          .withStatus(200)
-          .withBody(
-            s"""
-              |{
-              |    "authToken": {
-              |        "authToken": "Bearer JV5QMvw5jffiTpVBWigC0u//y0NAgJwSEO/jDALEotc="
-              |    },
-              |    "authority": {
-              |        "uri": "/auth/oid/1234567890",
-              |        "loggedInAt": "2014-06-09T14:57:09.522Z",
-              |        "previouslyLoggedInAt": "2014-06-09T14:48:24.841Z",
-              |        "credentials": {
-              |            "gatewayId": "cred-id-12345",
-              |            "idaPids": []
-              |        },
-              |        "accounts": {
-              |        }
-              |    }
-              |}
-            """.stripMargin
-          )))
-
-    stubFor(get(urlEqualTo("/auth/authority"))
-      .willReturn(
-        aResponse()
-          .withStatus(200)
-          .withBody(
-            s"""
-             |{
-              |    "uri": "/auth/oid/1234567890",
-              |    "loggedInAt": "2014-06-09T14:57:09.522Z",
-              |    "previouslyLoggedInAt": "2014-06-09T14:48:24.841Z",
-              |    "credentials": {
-              |        "gatewayId": "cred-id-12345",
-              |        "idaPids": []
-              |    },
-              |    "accounts": {
-              |    }
-              |}
-              |
-            """.stripMargin
-          )))
   }
 
 }
