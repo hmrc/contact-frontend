@@ -33,5 +33,5 @@ class UnauthenticatedFeedbackPage extends FeedbackPage {
 }
 
 class AuthenticatedFeedbackPage extends FeedbackPage {
-  val url = Env.host + "/beta-feedback-local"
+  val url = Env.host + "/beta-feedback"
 }

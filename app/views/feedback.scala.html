@@ -1,12 +1,12 @@
 @(feedbackForm: Form[controllers.FeedbackForm], user: Option[uk.gov.hmrc.common.microservice.domain.User])(implicit request : Request[_])
 @import views.helpers._
-@import controllers.common.support.FeedbackFormConfig._
+@import controllers.FeedbackFormConfig._
 @main(title = Messages("common.feedback.heading"), userLoggedIn = user.isDefined) {
 <header class="page-header">
     <h1>@Messages("common.feedback.heading")</h1>
 </header>
 
-    @defining(user.map{_ => common.support.routes.FeedbackController.submit}.getOrElse(common.support.routes.FeedbackController.submitUnauthenticated))  { call =>
+    @defining(user.map{_ => routes.FeedbackController.submit}.getOrElse(routes.FeedbackController.submitUnauthenticated))  { call =>
 
         @helpers.form(action = call, 'id -> "feedback-form", 'class -> "form--feedback") {
             <fieldset>

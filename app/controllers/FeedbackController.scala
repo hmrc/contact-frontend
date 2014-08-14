@@ -1,20 +1,33 @@
 package controllers
 
-import controllers.common.{GovernmentGateway, AuthenticationProvider, AnyAuthenticationProvider}
+import controllers.common.{GovernmentGateway, AnyAuthenticationProvider}
 import controllers.common.actions.Actions
 import controllers.common.validators.Validators._
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.Controller
+import play.api.mvc.{Result, Request, Controller}
 import uk.gov.hmrc.common.microservice.auth.AuthConnector
+import uk.gov.hmrc.common.microservice.deskpro.HmrcDeskproConnector
+import uk.gov.hmrc.common.microservice.domain.User
+import uk.gov.hmrc.play.connectors.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
 
-class FeedbackController extends Controller with Actions {
+
+class FeedbackController
+  extends Controller
+  with Actions {
+
   override protected implicit def authConnector = new AuthConnector()
+  lazy val hmrcDeskproConnector = new HmrcDeskproConnector()
+
+  implicit def hc(implicit request: Request[_]): HeaderCarrier = HeaderCarrier.fromSessionAndHeaders(request.session, request.headers)
 
   import FeedbackFormConfig._
+
+  val formId = "FeedbackForm"
 
   val form = Form[FeedbackForm](mapping(
     "feedback-rating" -> optional(text)
@@ -34,16 +47,68 @@ class FeedbackController extends Controller with Actions {
     Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer))
   }))
 
-  def feedbackForm = WithNewSessionTimeout(AuthenticatedBy(AuthProvider).async { implicit user => implicit request =>
+  def feedbackForm = WithNewSessionTimeout(AuthenticatedBy(new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm().url)).async {
+    implicit user => implicit request =>
     Future.successful(
-      Ok(views.html.feedback(form, Some(user)))
+      Ok(views.html.feedback(emptyForm, Some(user)))
     )
   })
 
-}
+  def unauthenticatedFeedbackForm = UnauthorisedAction.async { implicit request =>
+    Future.successful(
+      Ok(views.html.feedback(emptyForm, None))
+    )
+  }
 
-object AuthProvider extends GovernmentGateway {
-  override def login: String = "http://localhost:11111/stub/sign-in"
+  def submit = WithNewSessionTimeout {
+    AuthenticatedBy(new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm().url)).async {
+      implicit user => implicit request =>
+      doSubmit(Some(user))
+    }
+  }
+
+  def submitUnauthenticated = UnauthorisedAction.async {
+    implicit request => doSubmit(None)
+  }
+
+  def thanks = WithNewSessionTimeout {
+    AuthenticatedBy(AnyAuthenticationProvider).async {
+      implicit user => implicit request => doThanks(Some(user), request)
+    }
+  }
+
+  def unauthenticatedThanks = UnauthorisedAction.async {
+    implicit request => doThanks(None, request)
+  }
+
+  private def doSubmit(user: Option[User])(implicit request: Request[AnyRef]): Future[Result] =
+    form.bindFromRequest()(request).fold(
+      error => Future.successful(BadRequest(feedbackView(user, error))),
+      data => {
+        import data._
+
+        val ticketIdF = hmrcDeskproConnector.createFeedback(name, email, experienceRating, "Beta feedback submission", comments, referrer, javascriptEnabled, request, user)
+
+        ticketIdF map {
+          case Some(ticketId) => Redirect(user.map(_ => routes.FeedbackController.thanks()).getOrElse(routes.FeedbackController.unauthenticatedThanks())).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+          case None => InternalServerError("Deskpro failure")
+        }
+      }
+    )
+
+  private def feedbackView(user: Option[User], form: Form[FeedbackForm])(implicit request: Request[AnyRef]) = {
+    views.html.feedback(form, user)
+  }
+
+  private def doThanks(implicit user: Option[User], request: Request[AnyRef]): Future[Result] = {
+    val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
+      Ok(views.html.feedback_confirmation(ticketId, user))
+    }
+    Future.successful(result)
+  }
+
+  private def emptyForm(implicit request: Request[AnyRef]) = form.fill(FeedbackForm(request.headers.get("Referer").getOrElse("n/a")))
+
 }
 
 case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String)

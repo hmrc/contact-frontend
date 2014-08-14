@@ -16,11 +16,10 @@ class FeedbackSignedInFeature extends StubbedFeature with NavigationSteps with A
 
 
     Background {
-      Given("I am signed in")
-
-      And("I go to the 'Feedback' page")
+      Given("I go to the 'Send your feedback' page")
       go to new AuthenticatedFeedbackPage
       i_am_on_the_page("Send your feedback")
+
     }
 
 
@@ -50,7 +49,7 @@ class FeedbackSignedInFeature extends StubbedFeature with NavigationSteps with A
           |   "subject":"Beta feedback submission",
           |   "rating":"1",
           |   "message":"$Comment",
-          |   "referrer":"",
+          |   "referrer":"n/a",
           |   "javascriptEnabled":"Y",
           |   "authId":"/auth/oid/1234567890",
           |   "areaOfTax":"biztax",

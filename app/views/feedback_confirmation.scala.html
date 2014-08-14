@@ -1,0 +1,15 @@
+@(ticketId:String, user: Option[uk.gov.hmrc.common.microservice.domain.User])(implicit request : Request[_])
+@main(title = Messages("common.feedback.heading"), userLoggedIn = user.isDefined) {
+<header class="page-header">
+    <h1>@Messages("common.feedback.confirmation.heading")</h1>
+</header>
+<section id="content" class="l-constrained--topBordered">
+
+        <article id="report-confirmation">
+            <h2 id="feedback-thank-you-header">@Messages("common.thank.you")</h2>
+             <input id="ticketId" type="hidden" value="@ticketId"/>
+            <p>@Messages("common.feedback.confirmation.message")</p>
+        </article>
+</section>
+
+}

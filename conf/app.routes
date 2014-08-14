@@ -1,4 +1,9 @@
-GET        /beta-feedback-local        @controllers.FeedbackController.feedbackForm
+GET     /beta-feedback                                  @controllers.FeedbackController.feedbackForm
+GET     /beta-feedback-unauthenticated                  @controllers.FeedbackController.unauthenticatedFeedbackForm
+POST    /beta-feedback/submit                           @controllers.FeedbackController.submit
+POST    /beta-feedback/submit-unauthenticated           @controllers.FeedbackController.submitUnauthenticated
+GET     /beta-feedback/thanks                           @controllers.FeedbackController.thanks
+GET     /beta-feedback/thanks-unauthenticated           @controllers.FeedbackController.unauthenticatedThanks
+
 
 ->         /template                   template.Routes
-->         /                           common.Routes

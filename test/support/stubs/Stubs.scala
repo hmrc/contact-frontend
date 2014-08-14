@@ -8,7 +8,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.libs.Crypto
 import play.mvc.Http.HeaderNames
 import support.steps.Env
-import uk.gov.hmrc.play.crypto.CompositeSymmetricCrypto
+import uk.gov.hmrc.crypto.CompositeSymmetricCrypto
 import uk.gov.hmrc.play.http.SessionKeys
 
 
@@ -83,11 +83,11 @@ object Login extends Stub with SessionCookieBaker {
     )
 
 
-    stubFor(get(urlEqualTo("/stub/sign-in"))
+    stubFor(get(urlEqualTo("/sign-in?continue=/beta-feedback"))
       .willReturn(aResponse()
       .withStatus(303)
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
-      .withHeader(HeaderNames.LOCATION, "http://localhost:9000/beta-feedback-local")))
+      .withHeader(HeaderNames.LOCATION, "http://localhost:9000/beta-feedback")))
 
 
     stubFor(post(urlEqualTo("/login"))

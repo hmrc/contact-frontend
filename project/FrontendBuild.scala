@@ -16,7 +16,7 @@ private object AppDependencies {
   private val playMicroServiceVersion = "3.0.0" //"2.0.0"
   private val playHealthVersion = "0.4.0" //"0.2.0"    
 
-  private val playFrontendVersion =  "6.5.0" //"5.5.1"
+  private val playFrontendVersion =  "999-SNAPSHOT" //"5.5.1"
   private val govukTemplateVersion =  "2.0.1" //"1.7.0"
   
   private val scalatestVersion = "2.2.0"
