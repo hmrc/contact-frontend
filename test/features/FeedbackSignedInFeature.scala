@@ -3,7 +3,7 @@ package features
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import support.page.AuthenticatedFeedbackPage
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
-import support.stubs.StubbedFeature
+import support.stubs.{Login, StubbedFeature}
 
 class FeedbackSignedInFeature extends StubbedFeature with NavigationSteps with ApiSteps with ObservationSteps  {
 
@@ -53,6 +53,7 @@ class FeedbackSignedInFeature extends StubbedFeature with NavigationSteps with A
           |   "javascriptEnabled":"Y",
           |   "authId":"/auth/oid/1234567890",
           |   "areaOfTax":"biztax",
+          |   "sessionId": "${Login.SessionId}",
           |   "userTaxIdentifiers":{}
           |}
         """.stripMargin, LENIENT)

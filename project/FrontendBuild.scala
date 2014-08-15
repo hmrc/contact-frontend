@@ -13,11 +13,11 @@ private object AppDependencies {
   import play.PlayImport._
   import play.core.PlayVersion
 
-  private val playMicroServiceVersion = "3.0.0" //"2.0.0"
-  private val playHealthVersion = "0.4.0" //"0.2.0"    
+  private val playMicroServiceVersion = "3.0.0"
+  private val playHealthVersion = "0.4.0"
 
-  private val playFrontendVersion =  "999-SNAPSHOT" //"5.5.1"
-  private val govukTemplateVersion =  "2.0.1" //"1.7.0"
+  private val playFrontendVersion =  "7.2.0"
+  private val govukTemplateVersion =  "2.0.1"
   
   private val scalatestVersion = "2.2.0"
   private val pegdownVersion = "1.4.2"

@@ -67,13 +67,15 @@ object Auditing extends Stub {
 
 object Login extends Stub with SessionCookieBaker {
 
+  val SessionId = s"stubbed-${UUID.randomUUID}"
+
   def create() = {
-    stubSuccessfulLogin()    
+    stubSuccessfulLogin()
   }
 
   def stubSuccessfulLogin() = {
     val data = Map(
-      SessionKeys.sessionId -> s"session-${UUID.randomUUID}",
+      SessionKeys.sessionId -> SessionId,
       SessionKeys.userId -> "/auth/oid/1234567890",
       SessionKeys.authToken -> "PGdhdGV3YXk6R2F0ZXdheVRva2VuIHhtbG5zOndzdD0iaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNC8wNC90cnVzdCIgeG1sbnM6d3NhPSJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA0LzAzL2FkZHJlc3NpbmciIHhtbG5zOndzc2U9Imh0dHA6Ly9kb2NzLm9hc2lzLW9wZW4ub3JnL3dzcy8yMDA0LzAxL29hc2lzLTIwMDQwMS13c3Mtd3NzZWN1cml0eS1zZWNleHQtMS4wLnhzZCIgeG1sbnM6d3N1PSJodHRwOi8vZG9jcy5vYXNpcy1vcGVuLm9yZy93c3MvMjAwNC8wMS9vYXNpcy0yMDA0MDEtd3NzLXdzc2VjdXJpdHktdXRpbGl0eS0xLjAueHNkIiB4bWxuczpzb2FwPSJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy9zb2FwL2VudmVsb3BlLyI",
       SessionKeys.name -> "JOHN THE SAINSBURY",
@@ -88,6 +90,28 @@ object Login extends Stub with SessionCookieBaker {
       .withStatus(303)
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
       .withHeader(HeaderNames.LOCATION, "http://localhost:9000/beta-feedback")))
+
+
+    stubFor(get(urlEqualTo("/auth/authority"))
+      .willReturn(
+        aResponse()
+          .withStatus(200)
+          .withBody(
+            s"""
+             |{
+              |    "uri": "/auth/oid/1234567890",
+              |    "loggedInAt": "2014-06-09T14:57:09.522Z",
+              |    "previouslyLoggedInAt": "2014-06-09T14:48:24.841Z",
+              |    "credentials": {
+              |        "gatewayId": "cred-id-12345",
+              |        "idaPids": []
+              |    },
+              |    "accounts": {
+              |    }
+              |}
+              |
+            """.stripMargin
+          )))
 
   }
 
