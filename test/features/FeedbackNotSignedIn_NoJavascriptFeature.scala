@@ -8,10 +8,10 @@ import support.stubs._
 
 class FeedbackNotSignedIn_NoJavascriptFeature extends NoJsFeature with NavigationSteps with ApiSteps with ObservationSteps {
 
-  Feature("Feedback about the beta when not signed in") {
+  Feature("Feedback about the beta when not signed and with Javascript disabled") {
 
     info("In order to make my views known about the beta")
-    info("As an unauthenticated user")
+    info("As an unauthenticated user with Javascript disabled")
     info("I want to leave my feedback")
 
 

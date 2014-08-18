@@ -91,6 +91,12 @@ object Login extends Stub with SessionCookieBaker {
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
       .withHeader(HeaderNames.LOCATION, "http://localhost:9000/beta-feedback")))
 
+    stubFor(get(urlEqualTo("/sign-in?continue=/contact-hmrc"))
+      .willReturn(aResponse()
+      .withStatus(303)
+      .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
+      .withHeader(HeaderNames.LOCATION, "http://localhost:9000/contact-hmrc")))
+
 
     stubFor(get(urlEqualTo("/auth/authority"))
       .willReturn(

@@ -12,11 +12,15 @@ class ContactHmrcPage extends WebPage with SharedPageModules {
   def commentsField = textArea("contact-comments")
   def submitBtn = cssSelector("button[type=submit]")
 
-  def sendContactForm(name: String, email: String, comment: String) = {
+  def fillContactForm(name: String, email: String, comment: String) = {
     nameField.value = name
     emailField.value = email
     commentsField.value = comment
+  }
 
-    click on submitBtn
+  def submitContactForm() = click on submitBtn
+
+  def sendContactForm(name: String, email: String, comment: String) = {
+    fillContactForm(name, email, comment)
   }
 }

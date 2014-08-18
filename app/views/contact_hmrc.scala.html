@@ -1,0 +1,42 @@
+@(contactForm: Form[controllers.ContactForm])(implicit request : Request[_])
+@import views.helpers._
+@import controllers.common.FrontEndRedirect._
+@main(title = Messages("contact.heading"), headerNav = Some(HeaderNav.yta), supportLinkEnabled = false, userLoggedIn = true) {
+    <header class="page-header">
+        <h1>@Messages("contact.heading")</h1>
+    </header>
+    <p>If you have a specific tax query @Link.toExternalPage(url = "http://search2.hmrc.gov.uk/kb5/hmrc/contactus/home.page", value = Some("contact HMRC")).toHtml.</p>
+    <p>If you need help using your tax account please fill in this form.</p>
+    @helpers.form(action = common.support.routes.ContactController.submit, 'class -> "form--feedback") {
+        <fieldset>
+            <legend class="h2-heading">How can we help you?</legend>
+            @helpers.input(
+            contactForm("contact-name"),
+            '_label -> "Your name",
+            '_divClass -> "form-field",
+            '_inputClass -> "input--fullwidth"
+            )
+            @helpers.input(
+            contactForm("contact-email"),
+            '_label -> "Email address",
+            '_divClass -> "form-field",
+            '_inputClass -> "input--fullwidth"
+            )
+            @helpers.textArea(
+            contactForm("contact-comments"),
+            '_label -> "Your comments",
+            '_divClass -> "form-field",
+            '_inputClass -> "input--fullwidth",
+            '_help -> "2000 Characters max"
+            )
+            <input type="hidden" name="isJavascript" id="isJavascript" value="@contactForm.data.get("isJavascript")">
+            <input type="hidden" name="referer" id="referer" value="@contactForm.data.get("referer")">
+
+            <div class="form-field">
+                <button class="button" type="submit">Send</button>
+            </div>
+
+        </fieldset>
+    }
+
+}
