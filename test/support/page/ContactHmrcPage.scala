@@ -11,6 +11,7 @@ class ContactHmrcPage extends WebPage with SharedPageModules {
   def emailField = textField("contact-email")
   def commentsField = textArea("contact-comments")
   def submitBtn = cssSelector("button[type=submit]")
+  def contactHmrcLink = linkText("contact HMRC")
 
   def fillContactForm(name: String, email: String, comment: String) = {
     nameField.value = name
@@ -24,4 +25,6 @@ class ContactHmrcPage extends WebPage with SharedPageModules {
     fillContactForm(name, email, comment)
     submitContactForm()
   }
+
+  def clickOnContactHmrcLink() = click on contactHmrcLink
 }

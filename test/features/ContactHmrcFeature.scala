@@ -1,7 +1,7 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode._
-import support.page.ContactHmrcPage
+import support.page.{UnauthenticatedFeedbackPage, ExternalPage, ContactHmrcPage}
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs.{Login, StubbedFeature}
 
@@ -158,7 +158,53 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
         i_see("Please try again in a few minutes.")
       }
     }
+
+
+    Scenario("Link to contact HMRC about tax queries") {
+      When("I click on the 'contact HMRC' link")
+      val page = new ContactHmrcPage
+      page.clickOnContactHmrcLink()
+
+      Then("another tab is opened")
+      another_tab_is_opened()
+      switch_tab()
+
+      And("I am on the 'Contact us' page")
+      i_am_on_the_page("Contact us")
+    }
+
+
+    Scenario("The referrer URL is sent to Deskpro") {
+      Given("I come from a page that links to Contact HMRC")
+      go to ExternalPage
+      ExternalPage.clickOnContactHmrcLink()
+
+      When("I fill the contact form correctly")
+      val page = new ContactHmrcPage
+      page.fillContactForm(Name, Email, Comment)
+
+      And("I try to send the contact form")
+      page.submitContactForm()
+
+      Then("the Deskpro endpoint '/deskpro/ticket' has received the following POST request:")
+      verify_post(to = "/deskpro/ticket", body =
+        s"""
+          |{
+          |   "name":"$Name",
+          |   "email":"$Email",
+          |   "subject":"Contact form submission",
+          |   "message":"$Comment",
+          |   "referrer":"http://localhost:11111/external/page",
+          |   "javascriptEnabled":"Y",
+          |   "authId":"/auth/oid/1234567890",
+          |   "areaOfTax":"biztax",
+          |   "sessionId": "${Login.SessionId}",
+          |   "userTaxIdentifiers":{}
+          |}
+        """.stripMargin, LENIENT)
+    }
   }
+
 
   private val Name = "Grumpy Bear"
   private val Email = "grumpy@carebears.com"

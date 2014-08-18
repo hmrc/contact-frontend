@@ -145,8 +145,10 @@ object Deskpro extends Stub {
 
 object ExternalPages extends Stub {
   override def create() = {
-    stubForPage(urlEqualTo("/external/page-to-feedback"), "Page with feedback") {
-      """<a href="http://localhost:9000/beta-feedback-unauthenticated">Link to feedback</a>"""
+    stubForPage(urlEqualTo("/external/page"), "Page with links") {
+      """<a href="http://localhost:9000/beta-feedback-unauthenticated">Leave feedback</a>
+        |<a href="http://localhost:9000/contact-hmrc">Contact HMRC</a>
+      """.stripMargin
     }
   }
 }

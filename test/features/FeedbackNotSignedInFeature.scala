@@ -1,7 +1,7 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
-import support.page.{ExternalPageToFeedback, UnauthenticatedFeedbackPage}
+import support.page.{ExternalPage, UnauthenticatedFeedbackPage}
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs.{Stubs, StubbedFeature}
 
@@ -61,8 +61,8 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
 
     Scenario("The referrer URL is sent to Deskpro") {
       Given("I come from a page that links to the beta feedback")
-      go to ExternalPageToFeedback
-      ExternalPageToFeedback.clickOnLinkToFeedback()
+      go to ExternalPage
+      ExternalPage.clickOnFeedbackLink()
 
       When("I fill the feedback form correctly")
       val page = new UnauthenticatedFeedbackPage
@@ -80,7 +80,7 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
           |   "subject":"Beta feedback submission",
           |   "rating":"1",
           |   "message":"$Comment",
-          |   "referrer":"http://localhost:11111/external/page-to-feedback",
+          |   "referrer":"http://localhost:11111/external/page",
           |   "javascriptEnabled":"Y",
           |   "authId":"n/a",
           |   "areaOfTax":"n/a",
