@@ -7,7 +7,7 @@
     </header>
     <p>If you have a specific tax query @Link.toExternalPage(url = "http://search2.hmrc.gov.uk/kb5/hmrc/contactus/home.page", value = Some("contact HMRC")).toHtml.</p>
     <p>If you need help using your tax account please fill in this form.</p>
-    @helpers.form(action = common.support.routes.ContactController.submit, 'class -> "form--feedback") {
+    @helpers.form(action = routes.ContactHmrcController.submit, 'class -> "form--feedback") {
         <fieldset>
             <legend class="h2-heading">How can we help you?</legend>
             @helpers.input(
