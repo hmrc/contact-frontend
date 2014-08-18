@@ -22,5 +22,6 @@ class ContactHmrcPage extends WebPage with SharedPageModules {
 
   def sendContactForm(name: String, email: String, comment: String) = {
     fillContactForm(name, email, comment)
+    submitContactForm()
   }
 }

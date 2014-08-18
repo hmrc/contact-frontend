@@ -25,7 +25,7 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
     Scenario("Contact form sent successfully") {
       When("I fill the contact form correctly")
       val page = new ContactHmrcPage
-      page.sendContactForm(Name, Email, Comment)
+      page.fillContactForm(Name, Email, Comment)
 
       And("I send the contact form")
       page.submitContactForm()
@@ -52,73 +52,121 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
         """.stripMargin, LENIENT)
     }
 
-//    Scenario("All fields are mandatory") {
-//      When("I fill the form with empty values")
-//      And("I try to send the contact form")
-//      Then("I am on the 'Contact' page")
-//      And("I see:")
-//      //    i_see(
-//      //      "Please provide your name",
-//      //      "Enter a valid email address",
-//      //      "Enter your comments")
-//      And("the Deskpro enpoint '/deskpro/ticket' has not been hit")
-//      pending
-//    }
-//
-//
-//    Scenario("Fields have a size limit") {
-//      Given("the 'name' cannot be longer than 70 characters")
-//      And("the 'email' cannot be longer than 255 characters")
-//      And("the 'comment' cannot be longer than 2000 characters")
-//      When("I fill the contact form with values that are too long")
-//      Then("I am on the 'Contact' page")
-//      And("I see:")
-//      //    i_see(
-//      //      "Your name cannot be longer than 70 characters",
-//      //      "The email cannot be longer than 255 characters",
-//      //      "The comment cannot be longer than 2000 characters")
-//      pending
-//    }
-//
-//
-//    Scenario("Invalid email address") {
-//      When("I fill the form with an invalid email address")
-//      And("I try to send the contact form")
-//      Then("I am on the 'Contact' page")
-//      And("I see:")
-//      //    i_see(
-//      //      "Enter a valid email address")
-//      pending
-//    }
-//
-//
-//    Scenario("Deskpro times out") {
-//      Given("the call to Deskpro endpoint '/deskpro/ticket' will take XXX seconds")
-//      When("I fill the contact form correctly")
-//      And("I try to send the contact form")
-//      Then("I am on the 'Contact' page")
-//      And("I see:")
-//      //      | .... |
-//      pending
-//    }
-//
-//
-//    val statuses = Seq("404", "500")
-//
-//    statuses.foreach { status =>
-//      Scenario(s"Deskpro fails with $status") {
-//        Given(s"the call to Deskpro endpoint '/deskpro/ticket' will fail with status $status")
-//        When("I fill the contact form correctly")
-//        And("I try to send the contact form")
-//        Then("I am on the 'Contact' page")
-//        And("I see:")
-//
-//        pending
-//      }
-//    }
+    Scenario("All fields are mandatory") {
+      When("I fill the form with empty values")
+      val page = new ContactHmrcPage
+
+      And("I try to send the contact form")
+      page.submitContactForm()
+
+      Then("I am on the 'Contact HMRC' page")
+      i_am_on_the_page("Contact HMRC")
+
+      And("I see:")
+      i_see(
+        "Please provide your name",
+        "Enter a valid email address",
+        "Enter your comments")
+
+      And("the Deskpro enpoint '/deskpro/ticket' has not been hit")
+      verify_post_no_hit("/deskpro/ticket")
+    }
+
+
+    Scenario("Fields have a size limit") {
+      Given("the 'name' cannot be longer than 70 characters")
+      And("the 'email' cannot be longer than 255 characters")
+      And("the 'comment' cannot be longer than 2000 characters")
+
+      When("I fill the contact form with values that are too long")
+      val page = new ContactHmrcPage
+      page.fillContactForm(TooLongName, TooLongEmail, TooLongComment)
+
+      And("I try to send the contact form")
+      page.submitContactForm()
+
+      Then("I am on the 'Contact HMRC' page")
+      i_am_on_the_page("Contact HMRC")
+
+      And("I see:")
+      i_see(
+        "Your name cannot be longer than 70 characters",
+        "The email cannot be longer than 255 characters",
+        "The comment cannot be longer than 2000 characters")
+
+      And("the Deskpro enpoint '/deskpro/ticket' has not been hit")
+      verify_post_no_hit("/deskpro/ticket")
+    }
+
+
+    Scenario("Invalid email address") {
+      val page = new ContactHmrcPage
+      page.fillContactForm(Name, InvalidEmailAddress, Comment)
+
+      And("I try to send the contact form")
+      page.submitContactForm()
+
+      Then("I am on the 'Contact HMRC' page")
+      i_am_on_the_page("Contact HMRC")
+
+      And("I see:")
+      i_see(
+        "Enter a valid email address")
+
+      And("the Deskpro enpoint '/deskpro/ticket' has not been hit")
+      verify_post_no_hit("/deskpro/ticket")
+    }
+
+
+    Scenario("Deskpro times out") {
+      Given("the call to Deskpro endpoint '/deskpro/ticket' will take too much time")
+      service_will_return_payload_for_POST_request("/deskpro/ticket", delayMillis = 10000)("")
+
+      When("I fill the contact form correctly")
+      val page = new ContactHmrcPage
+      page.fillContactForm(Name, Email, Comment)
+
+      And("I try to send the contact form")
+      page.submitContactForm()
+
+      Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
+      i_am_on_the_page("Sorry, we’re experiencing technical difficulties")
+
+      And("I see:")
+      i_see("Please try again in a few minutes.")
+    }
+
+
+    val statuses = Seq("404", "500")
+
+    statuses.foreach { status =>
+      Scenario(s"Deskpro fails with $status") {
+        Given(s"the call to Deskpro endpoint '/deskpro/ticket' will fail with status $status")
+        service_will_fail_on_POST_request("/deskpro/ticket", status.toInt)
+
+        When("I fill the contact form correctly")
+        val page = new ContactHmrcPage
+        page.fillContactForm(Name, Email, Comment)
+
+        And("I try to send the contact form")
+        page.submitContactForm()
+
+        Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
+        i_am_on_the_page("Sorry, we’re experiencing technical difficulties")
+
+        And("I see:")
+        i_see("Please try again in a few minutes.")
+      }
+    }
   }
 
   private val Name = "Grumpy Bear"
   private val Email = "grumpy@carebears.com"
   private val Comment = "I am writing a comment"
+
+  private val InvalidEmailAddress = "grumpycarebears.com"
+
+  private val TooLongName = "G"*71
+  private val TooLongEmail = "g"*255 + "@x.com"
+  private val TooLongComment = "I"*2001
 }
