@@ -5,7 +5,7 @@ import play.api.Play
 import uk.gov.hmrc.play.config.RunMode
 
 class GovernmentGatewayAuthProvider(continueUrl: String) extends GovernmentGateway {
-  lazy val companyAuthUrl = Play.current.configuration.getString(s"govuk-tax.${RunMode.env}.company-auth.host").getOrElse("")
+  lazy val companyAuthUrl = Play.current.configuration.getString(s"govuk-tax.${RunMode.env}.company-auth.host").getOrElse("/account")
 
   override def login: String = s"$companyAuthUrl/sign-in?continue=$continueUrl"
 }
