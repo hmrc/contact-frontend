@@ -29,9 +29,9 @@ trait FeedbackPage extends WebPage with SharedPageModules {
 }
 
 class UnauthenticatedFeedbackPage extends FeedbackPage {
-  val url = Env.host + "/beta-feedback-unauthenticated"
+  val url = Env.host + "/contact/beta-feedback-unauthenticated"
 }
 
 class AuthenticatedFeedbackPage extends FeedbackPage {
-  val url = Env.host + "/beta-feedback"
+  val url = Env.host + "/contact/beta-feedback"
 }

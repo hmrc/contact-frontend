@@ -85,17 +85,17 @@ object Login extends Stub with SessionCookieBaker {
     )
 
 
-    stubFor(get(urlEqualTo("/sign-in?continue=/beta-feedback"))
+    stubFor(get(urlEqualTo("/sign-in?continue=/contact/beta-feedback"))
       .willReturn(aResponse()
       .withStatus(303)
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
-      .withHeader(HeaderNames.LOCATION, "http://localhost:9000/beta-feedback")))
+      .withHeader(HeaderNames.LOCATION, "http://localhost:9000/contact/beta-feedback")))
 
-    stubFor(get(urlEqualTo("/sign-in?continue=/contact-hmrc"))
+    stubFor(get(urlEqualTo("/sign-in?continue=/contact/contact-hmrc"))
       .willReturn(aResponse()
       .withStatus(303)
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
-      .withHeader(HeaderNames.LOCATION, "http://localhost:9000/contact-hmrc")))
+      .withHeader(HeaderNames.LOCATION, "http://localhost:9000/contact/contact-hmrc")))
 
 
     stubFor(get(urlEqualTo("/auth/authority"))
@@ -146,8 +146,8 @@ object Deskpro extends Stub {
 object ExternalPages extends Stub {
   override def create() = {
     stubForPage(urlEqualTo("/external/page"), "Page with links") {
-      """<a href="http://localhost:9000/beta-feedback-unauthenticated">Leave feedback</a>
-        |<a href="http://localhost:9000/contact-hmrc">Contact HMRC</a>
+      """<a href="http://localhost:9000/contact/beta-feedback-unauthenticated">Leave feedback</a>
+        |<a href="http://localhost:9000/contact/contact-hmrc">Contact HMRC</a>
       """.stripMargin
     }
   }

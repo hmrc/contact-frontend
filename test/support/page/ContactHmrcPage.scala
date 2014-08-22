@@ -5,7 +5,7 @@ import support.steps.Env
 
 class ContactHmrcPage extends WebPage with SharedPageModules {
 
-  override val url = Env.host + "/contact-hmrc"
+  override val url = Env.host + "/contact/contact-hmrc"
 
   def nameField = textField("contact-name")
   def emailField = textField("contact-email")
