@@ -12,3 +12,4 @@ GET         /contact-hmrc/thanks                         @controllers.ContactHmr
 ->          /template                                    template.Routes
 
 ->          /                                            support.Routes
+GET         /admin/metrics                               com.kenshoo.play.metrics.MetricsController.metrics
