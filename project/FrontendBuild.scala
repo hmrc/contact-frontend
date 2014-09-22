@@ -47,7 +47,7 @@ private object AppDependencies {
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
 
         "com.github.tomakehurst" % "wiremock" % "1.46" % "test",
-        "org.seleniumhq.selenium" % "selenium-java" % "2.41.0" % "test",
+        "org.seleniumhq.selenium" % "selenium-java" % "2.43.1" % "test",
         "uk.gov.hmrc" %% "scala-webdriver" % "4.0.0" % "test"
       )
     }.test

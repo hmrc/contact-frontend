@@ -61,7 +61,7 @@ class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with I
 
   }
 
-  private val Name = "Grumpy Bear <>"
+  private val Name = "Grumpy Bear"
   private val Email = "grumpy@carebears.com"
   private val WhatWhereYouDoing = "Something"
   private val WhatDoYouNeedHelpWith = "Nothing"
