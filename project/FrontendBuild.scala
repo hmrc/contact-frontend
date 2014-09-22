@@ -13,18 +13,16 @@ private object AppDependencies {
   import play.PlayImport._
   import play.core.PlayVersion
 
-  private val playMicroServiceVersion = "3.0.0"
   private val playHealthVersion = "0.4.0"
 
-  private val playFrontendVersion =  "7.6.0"
+  private val playFrontendVersion =  "8.3.0"
   private val govukTemplateVersion =  "2.0.1"
-  
+
   private val scalatestVersion = "2.2.0"
   private val pegdownVersion = "1.4.2"
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "play-microservice" % playMicroServiceVersion,
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
     "uk.gov.hmrc" %% "play-frontend" % playFrontendVersion,
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
@@ -42,7 +40,6 @@ private object AppDependencies {
   object Test {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
-        "uk.gov.hmrc" %% "play-microservice" % playMicroServiceVersion % scope classifier "tests",
         "uk.gov.hmrc" %% "play-frontend" % playFrontendVersion % scope classifier "tests",
         "org.scalatest" %% "scalatest" % "2.2.0" % scope,
         "org.pegdown" % "pegdown" % "1.4.2" % scope,

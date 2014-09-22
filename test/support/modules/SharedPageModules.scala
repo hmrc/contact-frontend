@@ -39,18 +39,25 @@ trait SharedPageModules {
 
     def ticketId = id("ticketId").element.attribute("value")
 
-    def sendProblemReport(name: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String): Unit = {
+    def fillProblemReport(name: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String): Unit = {
       click on linkText("Get help with this page.")
 
       nameField.value = name
       emailField.value = email
       whatWereYouDoingField.value = whatWereYouDoing
       whatDoYouNeedHelpWithField.value = whatDoYouNeedHelpWith
+    }
 
+    def submitProblemReport(): Unit = {
       click on sendBtn
 
       val wait = new WebDriverWait(webDriver, 15)
       wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-thank-you-header")))
+    }
+
+    def sendProblemReport(name: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String): Unit = {
+      fillProblemReport(name, email, whatWereYouDoing, whatDoYouNeedHelpWith)
+      submitProblemReport()
     }
   }
 

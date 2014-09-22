@@ -1,4 +1,4 @@
-@(feedbackForm: Form[controllers.FeedbackForm], user: Option[uk.gov.hmrc.common.microservice.domain.User])(implicit request : Request[_])
+ @(feedbackForm: Form[controllers.FeedbackForm], user: Option[uk.gov.hmrc.common.microservice.domain.User])(implicit request : Request[_])
 @import views.helpers._
 @import controllers.FeedbackFormConfig._
 @main(title = Messages("common.feedback.heading"), userLoggedIn = user.isDefined) {
