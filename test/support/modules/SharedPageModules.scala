@@ -48,11 +48,13 @@ trait SharedPageModules {
       whatDoYouNeedHelpWithField.value = whatDoYouNeedHelpWith
     }
 
-    def submitProblemReport(): Unit = {
+    def submitProblemReport(javascriptEnabled: Boolean = true): Unit = {
       click on sendBtn
 
-      val wait = new WebDriverWait(webDriver, 15)
-      wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-thank-you-header")))
+      if (javascriptEnabled) {
+        val wait = new WebDriverWait(webDriver, 15)
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-thank-you-header")))
+      }
     }
 
     def sendProblemReport(name: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String): Unit = {
