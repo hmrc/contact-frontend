@@ -1,6 +1,6 @@
 package support.page
 
-class DeskproSignInPage extends WebPage {
+object DeskproSignInPage extends WebPage {
   override val url = "https://deskpro-qa.tax.service.gov.uk/index.php/agent/"
 
   override def isCurrentPage: Boolean = pageTitle == "Log In"
@@ -21,4 +21,6 @@ class DeskproViewTicketPage(ticketId: String) extends WebPage {
 
   def messageBody = className("body-text-message")
   def profile = xpath("//*[contains(@id,'profile_link')]/span")
+
+  override def isCurrentPage: Boolean = heading=="somthing"
 }

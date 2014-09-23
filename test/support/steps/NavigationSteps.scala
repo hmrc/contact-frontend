@@ -4,7 +4,7 @@ import org.openqa.selenium.By.ByLinkText
 import org.scalatest.time.{Span, Seconds}
 import support.page.WebPage
 
-trait NavigationSteps extends BaseSteps {
+trait NavigationSteps extends BaseSteps  {
 
   def i_click_on(text: String) = {
     click on linkText(text)

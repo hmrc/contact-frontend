@@ -7,4 +7,6 @@ object ExternalPage extends WebPage {
   def contactHmrcLink = linkText("Contact HMRC")
   def clickOnFeedbackLink() = click on feedbackLink
   def clickOnContactHmrcLink() = click on contactHmrcLink
+
+  override def isCurrentPage: Boolean = heading =="Page with links"
 }

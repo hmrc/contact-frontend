@@ -1,11 +1,12 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
-import support.page.{ExternalPage, UnauthenticatedFeedbackPage}
+import support.behaviour.NavigationSugar
+import support.page.{FeedbackSuccessPage, TechnicalDifficultiesPage, ExternalPage, UnauthenticatedFeedbackPage}
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs.{Stubs, StubbedFeature}
 
-class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps with ApiSteps with ObservationSteps {
+class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSugar with ApiSteps with ObservationSteps {
 
 
   Feature("Feedback about the beta when not signed in") {
@@ -17,21 +18,19 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
 
     Background {
       Given("I go to the 'Feedback' page")
-      go to new UnauthenticatedFeedbackPage
-      i_am_on_the_page("Send your feedback")
+      goOn(UnauthenticatedFeedbackPage)
     }
 
 
     Scenario("Submit feedback successfully") {
       When("I fill the feedback form correctly")
-      val page = new UnauthenticatedFeedbackPage
-      page.fillOutFeedbackForm(1, Name, Email, Comment)
+      UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
 
       And("I send the feedback form")
-      page.submitFeedbackForm()
+      UnauthenticatedFeedbackPage.submitFeedbackForm()
 
       Then("I am on the 'Your feedback' page")
-      i_am_on_the_page("Your feedback")
+      on(FeedbackSuccessPage)
 
       Then("I see:")
       i_see(
@@ -61,15 +60,14 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
 
     Scenario("The referrer URL is sent to Deskpro") {
       Given("I come from a page that links to the beta feedback")
-      go to ExternalPage
+      goOn(ExternalPage)
       ExternalPage.clickOnFeedbackLink()
 
       When("I fill the feedback form correctly")
-      val page = new UnauthenticatedFeedbackPage
-      page.fillOutFeedbackForm(1, Name, Email, Comment)
+      UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
 
       And("I send the feedback form")
-      page.submitFeedbackForm()
+      UnauthenticatedFeedbackPage.submitFeedbackForm()
 
       Then("the Deskpro endpoint '/deskpro/feedback' has received the following POST request:")
       verify_post(to = "/deskpro/feedback", body =
@@ -93,13 +91,12 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
 
     Scenario("All fields are mandatory") {
       When("I don't fill the form")
-      val page = new UnauthenticatedFeedbackPage
 
       And("I try to send the feedback form")
-      page.submitFeedbackForm()
+      UnauthenticatedFeedbackPage.submitFeedbackForm()
 
       Then("I am on the 'Send your feedback' page")
-      i_am_on_the_page("Send your feedback")
+      on(UnauthenticatedFeedbackPage)
 
       And("I see:")
       i_see(
@@ -122,15 +119,14 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
       And("the 'comment' cannot be longer than 2000 characters")
 
       When("I fill the form with values that are too long")
-      val page = new UnauthenticatedFeedbackPage
-      page.fillOutFeedbackForm(1, TooLongName, TooLongEmail, TooLongComment)
+      UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, TooLongName, TooLongEmail, TooLongComment)
 
 
       And("I try to send the feedback form")
-      page.submitFeedbackForm()
+      UnauthenticatedFeedbackPage.submitFeedbackForm()
 
       Then("I am on the 'Send your feedback' page")
-      i_am_on_the_page("Send your feedback")
+      on(UnauthenticatedFeedbackPage)
 
       And("I see:")
       i_see(
@@ -143,14 +139,13 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
 
     Scenario("Invalid email address") {
       When("I fill the form with an invalid email address")
-      val page = new UnauthenticatedFeedbackPage
-      page.fillOutFeedbackForm(1, Name, InvalidEmailAddress, Comment)
+      UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, InvalidEmailAddress, Comment)
 
       And("I try to send the feedback form")
-      page.submitFeedbackForm()
+      UnauthenticatedFeedbackPage.submitFeedbackForm()
 
       Then("I am on the 'Send your feedback' page")
-      i_am_on_the_page("Send your feedback")
+      on(UnauthenticatedFeedbackPage)
 
       And("I see:")
       i_see("Enter a valid email address")
@@ -163,15 +158,14 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
       service_will_return_payload_for_POST_request("/deskpro/feedback", delayMillis = 10000)("")
 
       When("I fill the feedback form correctly")
-      val page = new UnauthenticatedFeedbackPage
-      page.fillOutFeedbackForm(1, Name, Email, Comment)
+      UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
 
 
       And("I try to send the feedback form")
-      page.submitFeedbackForm()
+      UnauthenticatedFeedbackPage.submitFeedbackForm()
 
       Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
-      i_am_on_the_page("Sorry, we’re experiencing technical difficulties")
+      on(TechnicalDifficultiesPage)
 
       And("I see:")
       i_see("Please try again in a few minutes.")
@@ -187,14 +181,13 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSteps wit
         service_will_fail_on_POST_request("/deskpro/feedback", status.toInt)
 
         When("I fill the contact form correctly")
-        val page = new UnauthenticatedFeedbackPage
-        page.fillOutFeedbackForm(1, Name, Email, Comment)
+        UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
 
         And("I try to send the feedback form")
-        page.submitFeedbackForm()
+        UnauthenticatedFeedbackPage.submitFeedbackForm()
 
         Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
-        i_am_on_the_page("Sorry, we’re experiencing technical difficulties")
+        on(TechnicalDifficultiesPage)
 
         And("I see:")
         i_see("Please try again in a few minutes.")

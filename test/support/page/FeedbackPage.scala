@@ -26,12 +26,21 @@ trait FeedbackPage extends WebPage with SharedPageModules {
   def submitFeedbackForm() = {
     click on submitBtn
   }
+  override def isCurrentPage: Boolean = heading == "Send your feedback"
 }
 
-class UnauthenticatedFeedbackPage extends FeedbackPage {
-  val url = Env.host + "/contact/beta-feedback-unauthenticated"
+object UnauthenticatedFeedbackPage extends FeedbackPage {
+  override val url = Env.host + "/contact/beta-feedback-unauthenticated"
 }
 
-class AuthenticatedFeedbackPage extends FeedbackPage {
-  val url = Env.host + "/contact/beta-feedback"
+object AuthenticatedFeedbackPage extends FeedbackPage {
+  override val url = Env.host + "/contact/beta-feedback"
+
+}
+
+
+object FeedbackSuccessPage extends  WebPage with SharedPageModules {
+  override def isCurrentPage: Boolean = heading=="Your feedback"
+
+  override val url: String = Env.host + "/contact/???"
 }

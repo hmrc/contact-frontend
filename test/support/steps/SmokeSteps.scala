@@ -12,10 +12,9 @@ trait SmokeSteps extends BaseSteps {
   }
 
   def i_sign_in(user: TestUser): Unit = {
-    val signInPage = new SignInLocalPage
-    go to signInPage
+    go(SignInLocalPage)
 
-    signInPage.signIn(user.username, user.password)
+    SignInLocalPage.signIn(user.username, user.password)
   }
 
 }

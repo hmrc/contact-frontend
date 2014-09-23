@@ -1,11 +1,12 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
-import support.page.AuthenticatedFeedbackPage
+import support.behaviour.NavigationSugar
+import support.page.{FeedbackSuccessPage, AuthenticatedFeedbackPage}
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs.{Login, StubbedFeature}
 
-class FeedbackSignedInFeature extends StubbedFeature with NavigationSteps with ApiSteps with ObservationSteps  {
+class FeedbackSignedInFeature extends StubbedFeature with NavigationSugar with ApiSteps with ObservationSteps  {
 
 
   Feature("Feedback about the beta when signed in") {
@@ -17,22 +18,19 @@ class FeedbackSignedInFeature extends StubbedFeature with NavigationSteps with A
 
     Background {
       Given("I go to the 'Send your feedback' page")
-      go to new AuthenticatedFeedbackPage
-      i_am_on_the_page("Send your feedback")
-
+      goOn(AuthenticatedFeedbackPage)
     }
 
 
     Scenario("Submit feedback successfully") {
       When("I fill the feedback form correctly")
-      val page = new AuthenticatedFeedbackPage
-      page.fillOutFeedbackForm(1, Name, Email, Comment)
+      AuthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
 
       And("I send the feedback form")
-      page.submitFeedbackForm()
+      AuthenticatedFeedbackPage.submitFeedbackForm()
 
       Then("I am on the 'Your feedback' page")
-      i_am_on_the_page("Your feedback")
+      on(FeedbackSuccessPage)
 
       Then("I see:")
       i_see(

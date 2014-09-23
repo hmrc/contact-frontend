@@ -1,11 +1,12 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode._
-import support.page.{UnauthenticatedFeedbackPage, ExternalPage, ContactHmrcPage}
-import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
+import support.behaviour.NavigationSugar
+import support.page.{TechnicalDifficultiesPage, ContactHmrcPage, ExternalPage}
+import support.steps.{NavigationSteps, ApiSteps, ObservationSteps}
 import support.stubs.{Login, StubbedFeature}
 
-class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSteps with ObservationSteps {
+class ContactHmrcFeature extends StubbedFeature with NavigationSugar with NavigationSteps with ApiSteps with ObservationSteps {
 
   Feature("Contact HMRC") {
 
@@ -18,17 +19,15 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
       Given("I am logged in")
 
       And("I go to the 'Contact HMRC' page")
-      go to new ContactHmrcPage
-      i_am_on_the_page("Contact HMRC")
+      goOn(ContactHmrcPage)
     }
 
     Scenario("Contact form sent successfully") {
       When("I fill the contact form correctly")
-      val page = new ContactHmrcPage
-      page.fillContactForm(Name, Email, Comment)
+      ContactHmrcPage.fillContactForm(Name, Email, Comment)
 
       And("I send the contact form")
-      page.submitContactForm()
+      ContactHmrcPage.submitContactForm()
 
       Then("I see:")
       i_see("Thank you",
@@ -54,13 +53,12 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
 
     Scenario("All fields are mandatory") {
       When("I fill the form with empty values")
-      val page = new ContactHmrcPage
 
       And("I try to send the contact form")
-      page.submitContactForm()
+      ContactHmrcPage.submitContactForm()
 
       Then("I am on the 'Contact HMRC' page")
-      i_am_on_the_page("Contact HMRC")
+      on(ContactHmrcPage)
 
       And("I see:")
       i_see(
@@ -79,14 +77,13 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
       And("the 'comment' cannot be longer than 2000 characters")
 
       When("I fill the contact form with values that are too long")
-      val page = new ContactHmrcPage
-      page.fillContactForm(TooLongName, TooLongEmail, TooLongComment)
+      ContactHmrcPage.fillContactForm(TooLongName, TooLongEmail, TooLongComment)
 
       And("I try to send the contact form")
-      page.submitContactForm()
+      ContactHmrcPage.submitContactForm()
 
       Then("I am on the 'Contact HMRC' page")
-      i_am_on_the_page("Contact HMRC")
+      on(ContactHmrcPage)
 
       And("I see:")
       i_see(
@@ -100,14 +97,13 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
 
 
     Scenario("Invalid email address") {
-      val page = new ContactHmrcPage
-      page.fillContactForm(Name, InvalidEmailAddress, Comment)
+      ContactHmrcPage.fillContactForm(Name, InvalidEmailAddress, Comment)
 
       And("I try to send the contact form")
-      page.submitContactForm()
+      ContactHmrcPage.submitContactForm()
 
       Then("I am on the 'Contact HMRC' page")
-      i_am_on_the_page("Contact HMRC")
+      on(ContactHmrcPage)
 
       And("I see:")
       i_see(
@@ -123,14 +119,13 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
       service_will_return_payload_for_POST_request("/deskpro/ticket", delayMillis = 10000)("")
 
       When("I fill the contact form correctly")
-      val page = new ContactHmrcPage
-      page.fillContactForm(Name, Email, Comment)
+      ContactHmrcPage.fillContactForm(Name, Email, Comment)
 
       And("I try to send the contact form")
-      page.submitContactForm()
+      ContactHmrcPage.submitContactForm()
 
       Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
-      i_am_on_the_page("Sorry, we’re experiencing technical difficulties")
+      on(TechnicalDifficultiesPage)
 
       And("I see:")
       i_see("Please try again in a few minutes.")
@@ -145,14 +140,13 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
         service_will_fail_on_POST_request("/deskpro/ticket", status.toInt)
 
         When("I fill the contact form correctly")
-        val page = new ContactHmrcPage
-        page.fillContactForm(Name, Email, Comment)
+        ContactHmrcPage.fillContactForm(Name, Email, Comment)
 
         And("I try to send the contact form")
-        page.submitContactForm()
+        ContactHmrcPage.submitContactForm()
 
         Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
-        i_am_on_the_page("Sorry, we’re experiencing technical difficulties")
+        on(TechnicalDifficultiesPage)
 
         And("I see:")
         i_see("Please try again in a few minutes.")
@@ -162,8 +156,7 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
 
     Scenario("Link to contact HMRC about tax queries") {
       When("I click on the 'contact HMRC' link")
-      val page = new ContactHmrcPage
-      page.clickOnContactHmrcLink()
+      ContactHmrcPage.clickOnContactHmrcLink()
 
       Then("another tab is opened")
       another_tab_is_opened()
@@ -176,15 +169,14 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSteps with ApiSte
 
     Scenario("The referrer URL is sent to Deskpro") {
       Given("I come from a page that links to Contact HMRC")
-      go to ExternalPage
+      goOn(ExternalPage)
       ExternalPage.clickOnContactHmrcLink()
 
       When("I fill the contact form correctly")
-      val page = new ContactHmrcPage
-      page.fillContactForm(Name, Email, Comment)
+      ContactHmrcPage.fillContactForm(Name, Email, Comment)
 
       And("I try to send the contact form")
-      page.submitContactForm()
+      ContactHmrcPage.submitContactForm()
 
       Then("the Deskpro endpoint '/deskpro/ticket' has received the following POST request:")
       verify_post(to = "/deskpro/ticket", body =

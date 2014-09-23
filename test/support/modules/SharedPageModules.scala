@@ -9,7 +9,7 @@ import support.steps.Env
 trait SharedPageModules {
 
 
-  object BetaBanner extends WebBrowser {
+  object betaBanner extends WebBrowser {
 
     implicit def webDriver: WebDriver = Env.driver
 
@@ -21,7 +21,7 @@ trait SharedPageModules {
     }
   }
 
-  object GetHelpWithThisPage extends WebBrowser {
+  object getHelpWithThisPage extends WebBrowser {
 
     implicit def webDriver: WebDriver = Env.driver
 

@@ -3,7 +3,7 @@ package support.page
 import support.modules.SharedPageModules
 import support.steps.Env
 
-class ContactHmrcPage extends WebPage with SharedPageModules {
+object ContactHmrcPage extends WebPage with SharedPageModules {
 
   override val url = Env.host + "/contact/contact-hmrc"
 
@@ -27,4 +27,6 @@ class ContactHmrcPage extends WebPage with SharedPageModules {
   }
 
   def clickOnContactHmrcLink() = click on contactHmrcLink
+
+  override def isCurrentPage: Boolean = heading=="Contact HMRC"
 }

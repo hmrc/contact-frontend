@@ -1,23 +1,23 @@
 package support.steps
 
 import org.scalatest.time.{Seconds, Span}
+import support.behaviour.NavigationSugar
 import support.page.{DeskproSignInPage, DeskproViewTicketPage}
 
-trait DeskproSteps extends BaseSteps {
+trait DeskproSteps extends NavigationSugar with BaseSteps {
 
   def ticket_in_deskpro_exists(ticketId: String, name: String, email: String, textInMessageBody: Seq[String]) = {
     val ticketPage = new DeskproViewTicketPage(ticketId)
-    go to ticketPage
+    go(ticketPage)
 
-    val deskproSignInPage = new DeskproSignInPage()
 
     eventually(timeout(Span(10, Seconds))) {
       withClue(s"Expected to be in the DeskPro Log In page, but was on page: $currentUrl - ") {
-        deskproSignInPage should be('isCurrentPage)
+        DeskproSignInPage should be('isCurrentPage)
       }
     }
 
-    deskproSignInPage.signIn("tim.britten@digital.cabinet-office.gov.uk", "Skanpowv7")
+    DeskproSignInPage.signIn("tim.britten@digital.cabinet-office.gov.uk", "changemenow")
 
     eventually(timeout(Span(10, Seconds))) {
       ticketPage.profile.element.text should be(s"$name ($email)")

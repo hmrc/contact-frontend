@@ -1,12 +1,13 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode
-import support.page.UnauthenticatedFeedbackPage
+import support.behaviour.NavigationSugar
+import support.page.{FeedbackSuccessPage, UnauthenticatedFeedbackPage}
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs._
 
 
-class FeedbackNotSignedIn_NoJavascriptFeature extends NoJsFeature with NavigationSteps with ApiSteps with ObservationSteps {
+class FeedbackNotSignedIn_NoJavascriptFeature extends NoJsFeature with NavigationSugar with ApiSteps with ObservationSteps {
 
   Feature("Feedback about the beta when not signed and with Javascript disabled") {
 
@@ -17,21 +18,19 @@ class FeedbackNotSignedIn_NoJavascriptFeature extends NoJsFeature with Navigatio
 
     Background {
       Given("I go to the 'Feedback' page")
-      go to new UnauthenticatedFeedbackPage
-      i_am_on_the_page("Send your feedback")
+      goOn(UnauthenticatedFeedbackPage)
     }
 
 
     Scenario("Submit feedback successfully") {
       When("I fill the feedback form correctly")
-      val page = new UnauthenticatedFeedbackPage
-      page.fillOutFeedbackForm(1, Name, Email, Comment)
+      UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
 
       And("I send the feedback form")
-      page.submitFeedbackForm()
+      UnauthenticatedFeedbackPage.submitFeedbackForm()
 
       Then("I am on the 'Your feedback' page")
-      i_am_on_the_page("Your feedback")
+      on(FeedbackSuccessPage)
 
       Then("I see:")
       i_see(

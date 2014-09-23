@@ -1,11 +1,12 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode
+import support.behaviour.NavigationSugar
 import support.page.ContactHmrcPage
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs.{NoJsFeature, Login, StubbedFeature}
 
-class ContactHmrc_NoJavascriptFeature extends NoJsFeature with NavigationSteps with ApiSteps with ObservationSteps {
+class ContactHmrc_NoJavascriptFeature extends NoJsFeature with NavigationSugar with ApiSteps with ObservationSteps {
 
   Feature("Contact HMRC with Javascript disabled") {
 
@@ -18,17 +19,15 @@ class ContactHmrc_NoJavascriptFeature extends NoJsFeature with NavigationSteps w
       Given("I am logged in")
 
       And("I go to the 'Contact HMRC' page")
-      go to new ContactHmrcPage
-      i_am_on_the_page("Contact HMRC")
+      goOn(ContactHmrcPage)
     }
 
     Scenario("Contact form sent successfully") {
       When("I fill the contact form correctly")
-      val page = new ContactHmrcPage
-      page.fillContactForm(Name, Email, Comment)
+      ContactHmrcPage.fillContactForm(Name, Email, Comment)
 
       And("I send the contact form")
-      page.submitContactForm()
+      ContactHmrcPage.submitContactForm()
 
       Then("I see:")
       i_see("Thank you",
