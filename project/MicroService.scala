@@ -17,9 +17,9 @@ trait MicroService {
   lazy val plugins : Seq[Plugins] = Seq(play.PlayScala)
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
-  def unitFilter(name: String): Boolean = !funFilter(name) && !smokeFilter(name)
-  def funFilter(name: String): Boolean = name endsWith "Feature"
-  def smokeFilter(name: String): Boolean = name endsWith "SmokeTest"
+  def unitFilter(name: String): Boolean = name startsWith "unit"
+  def funFilter(name: String): Boolean = name startsWith "features"
+  def smokeFilter(name: String): Boolean = name startsWith "smoke"
 
   lazy val microservice = Project(appName, file("."))
     .enablePlugins(plugins : _*)
