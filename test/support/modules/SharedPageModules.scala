@@ -1,7 +1,7 @@
 package support.modules
 
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
-import org.openqa.selenium.{By, WebDriver}
+import org.openqa.selenium.{Keys, By, WebDriver}
 import org.scalatest.selenium.WebBrowser
 import support.page._
 import support.steps.Env
@@ -39,13 +39,30 @@ trait SharedPageModules {
 
     def ticketId = id("ticketId").element.attribute("value")
 
+    def problemReportHidden: Boolean = {
+      val hidden = webDriver.findElements(By.xpath("//*[contains(@class, 'report-error') and contains(@class, 'hidden')]"))
+      return hidden.size().equals(1)
+    }
+
+    def toggleProblemReport = {click on linkText("Get help with this page.")}
+
     def fillProblemReport(name: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String): Unit = {
-      click on linkText("Get help with this page.")
+      toggleProblemReport
 
       nameField.value = name
       emailField.value = email
       whatWereYouDoingField.value = whatWereYouDoing
       whatDoYouNeedHelpWithField.value = whatDoYouNeedHelpWith
+    }
+
+    def typeEmail(email: String) {
+      webDriver.findElement(By.id("report-email")).sendKeys(email)
+      click on nameField
+    }
+
+    def typeName(name: String) {
+      webDriver.findElement(By.id("report-name")).sendKeys(name)
+      click on emailField
     }
 
     def submitProblemReport(javascriptEnabled: Boolean = true): Unit = {

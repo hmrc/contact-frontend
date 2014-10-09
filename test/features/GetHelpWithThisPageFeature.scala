@@ -57,8 +57,8 @@ class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with I
       eventualResponse.futureValue.body shouldBe "No CSRF token found in headers"
     }
 
-
-    Scenario("Only these characters are allowed for the name: letters (lower and upper case), space, comma, period, braces and hyphen") {
+    //TODO move test to the non js version of form (it's server side validation)
+/*    Scenario("Only these characters are allowed for the name: letters (lower and upper case), space, comma, period, braces and hyphen") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
 
@@ -71,9 +71,51 @@ class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with I
       Then("I see an error message")
       on(UnauthenticatedFeedbackPage)
       i_see("Sorry, we're unable to receive your message right now.")
+    }*/
+
+    Scenario("The problem report form toggles") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
+
+      Then("The get 'Get help with this page' form is hidden")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden should be (true)
+
+      When("I open the 'Get help with this page' form")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      Then("The 'Get help with this page' form is visible")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden should be (false)
+
+      When("I close the 'Get help with this page' form")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      Then("The get 'Get help with this page' form is hidden")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden should be (true)
     }
 
+    Scenario("Invalid name error if you entered anything other than letters (lower and upper case), space, comma, period, braces and hyphen") {
+      Given("I have the 'Get help with this page' form open")
+      goOn(UnauthenticatedFeedbackPage)
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
 
+      When("I fill in an invalid email address")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeName("<")
+
+      Then("I see an error for invalid name")
+      UnauthenticatedFeedbackPage.bodyText should include ("Letters or punctuation only please")
+    }
+
+    Scenario("Invalid email error if you entered a badly formed email") {
+      Given("I have the 'Get help with this page' form open")
+      goOn(UnauthenticatedFeedbackPage)
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      When("I fill in an invalid email address")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeEmail("not@valid.")
+
+      Then("I see an error for invalid email")
+      UnauthenticatedFeedbackPage.bodyText should include ("Please enter a valid email address.")
+    }
   }
 
   private val Name = "Grumpy Bear"
