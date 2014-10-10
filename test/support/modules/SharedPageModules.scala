@@ -65,8 +65,12 @@ trait SharedPageModules {
       click on emailField
     }
 
-    def submitProblemReport(javascriptEnabled: Boolean = true): Unit = {
+    def clickSubmitButton() {
       click on sendBtn
+    }
+
+    def submitProblemReport(javascriptEnabled: Boolean = true): Unit = {
+      clickSubmitButton
 
       if (javascriptEnabled) {
         val wait = new WebDriverWait(webDriver, 15)

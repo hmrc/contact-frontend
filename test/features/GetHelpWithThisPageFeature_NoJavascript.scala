@@ -40,7 +40,6 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
       )
     }
 
-
     Scenario("Only these characters are allowed for the name: letters (lower and upper case), space, comma, period, braces and hyphen") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -55,6 +54,18 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
       on(PleaseTryAgainPage)
 
       And("I see an error message")
+      i_see("Sorry, we're unable to send your message as you haven't given us any information.")
+    }
+
+    Scenario("All fields are mandatory") {
+      Given("I have the 'Get help with this page' form open")
+      goOn(UnauthenticatedFeedbackPage)
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      When("I fill in an invalid email address")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.clickSubmitButton()
+
+      Then("I see an error for invalid name")
       i_see("Sorry, we're unable to send your message as you haven't given us any information.")
     }
 

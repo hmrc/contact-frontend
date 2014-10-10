@@ -21,7 +21,6 @@ class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with I
     info("I want to ask for help to HMRC")
 
 
-
     Scenario("Successful form submission") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -56,22 +55,6 @@ class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with I
       eventualResponse.futureValue.status shouldBe 403
       eventualResponse.futureValue.body shouldBe "No CSRF token found in headers"
     }
-
-    //TODO move test to the non js version of form (it's server side validation)
-/*    Scenario("Only these characters are allowed for the name: letters (lower and upper case), space, comma, period, braces and hyphen") {
-      Given("I go to the 'Feedback' page")
-      goOn(UnauthenticatedFeedbackPage)
-
-      When("I fill the Get Help with this page' form correctly")
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.fillProblemReport("Hello <&^$%£", Email, WhatWhereYouDoing, WhatDoYouNeedHelpWith)
-
-      And("I send the 'Get help with this page' form")
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.submitProblemReport(javascriptEnabled = false)
-
-      Then("I see an error message")
-      on(UnauthenticatedFeedbackPage)
-      i_see("Sorry, we're unable to receive your message right now.")
-    }*/
 
     Scenario("The problem report form toggles") {
       Given("I go to the 'Feedback' page")
@@ -115,6 +98,21 @@ class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with I
 
       Then("I see an error for invalid email")
       UnauthenticatedFeedbackPage.bodyText should include ("Please enter a valid email address.")
+    }
+
+    Scenario("All fields are mandatory") {
+      Given("I have the 'Get help with this page' form open")
+      goOn(UnauthenticatedFeedbackPage)
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      When("I fill in an invalid email address")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.clickSubmitButton()
+
+      Then("I see an error for invalid name")
+      UnauthenticatedFeedbackPage.bodyText should include ("Please provide your name.")
+      UnauthenticatedFeedbackPage.bodyText should include ("Please provide your email address.")
+      UnauthenticatedFeedbackPage.bodyText should include ("Please enter details of what you were doing.")
+      UnauthenticatedFeedbackPage.bodyText should include ("Please enter details of what went wrong.")
     }
   }
 
