@@ -1,28 +1,29 @@
 @(contactForm: Form[controllers.ContactForm])(implicit request : Request[_])
-@import views.helpers._
+
+@import uk.gov.hmrc.play.views.html.helpers._
 @import controllers.common.FrontEndRedirect._
-@main(title = Messages("contact.heading"), headerNav = Some(HeaderNav.yta), supportLinkEnabled = false, userLoggedIn = true) {
+@main(title = Messages("contact.heading"), headerNav = Some(views.helpers.HeaderNav.yta), supportLinkEnabled = false, userLoggedIn = true) {
     <header class="page-header">
         <h1>@Messages("contact.heading")</h1>
     </header>
-    <p>If you have a specific tax query @Link.toExternalPage(url = "http://search2.hmrc.gov.uk/kb5/hmrc/contactus/home.page", value = Some("contact HMRC")).toHtml.</p>
+    <p>If you have a specific tax query @uk.gov.hmrc.play.views.helpers.Link.toExternalPage(url = "http://search2.hmrc.gov.uk/kb5/hmrc/contactus/home.page", value = Some("contact HMRC")).toHtml.</p>
     <p>If you need help using your tax account please fill in this form.</p>
-    @helpers.form(action = routes.ContactHmrcController.submit, 'class -> "form--feedback") {
+    @form(action = routes.ContactHmrcController.submit, 'class -> "form--feedback") {
         <fieldset>
             <legend class="h2-heading">How can we help you?</legend>
-            @helpers.input(
+            @input(
             contactForm("contact-name"),
             '_label -> "Your name",
             '_divClass -> "form-field",
             '_inputClass -> "input--fullwidth"
             )
-            @helpers.input(
+            @input(
             contactForm("contact-email"),
             '_label -> "Email address",
             '_divClass -> "form-field",
             '_inputClass -> "input--fullwidth"
             )
-            @helpers.textArea(
+            @textArea(
             contactForm("contact-comments"),
             '_label -> "Your comments",
             '_divClass -> "form-field",
