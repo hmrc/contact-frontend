@@ -15,7 +15,7 @@ import scala.concurrent.Future
 
 class ContactHmrcController extends Controller with Actions {
 
-  override implicit def authConnector: AuthConnector.type = Connectors.authConnector
+  override implicit def authConnector: AuthConnector = Connectors.authConnector
 
   lazy val hmrcDeskproConnector = Connectors.hmrcDeskproConnector
 

@@ -18,7 +18,7 @@ class FeedbackController
   extends Controller
   with Actions {
 
-  override implicit def authConnector: AuthConnector.type = Connectors.authConnector
+  override implicit def authConnector: AuthConnector = Connectors.authConnector
 
   lazy val hmrcDeskproConnector = Connectors.hmrcDeskproConnector
 
