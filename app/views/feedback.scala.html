@@ -1,5 +1,5 @@
  @(feedbackForm: Form[controllers.FeedbackForm], user: Option[uk.gov.hmrc.common.microservice.domain.User])(implicit request : Request[_])
-@import views.helpers._
+@import uk.gov.hmrc.play.views.html.helpers._
 @import controllers.FeedbackFormConfig._
 @main(title = Messages("common.feedback.heading"), userLoggedIn = user.isDefined) {
 <header class="page-header">
@@ -8,29 +8,29 @@
 
     @defining(user.map{_ => routes.FeedbackController.submit}.getOrElse(routes.FeedbackController.submitUnauthenticated))  { call =>
 
-        @helpers.form(action = call, 'id -> "feedback-form", 'class -> "form--feedback") {
+        @form(action = call, 'id -> "feedback-form", 'class -> "form--feedback") {
             <fieldset>
-                @helpers.inputRadioGroup(
+                @inputRadioGroup(
                 feedbackForm("feedback-rating"),
                 feedbackRatings,
                 '_legend -> "What do you think of this online service?",
                 '_stackedLabel -> true,
                 '_labelClass -> "label--inlineRadio--overhead"
                 )
-                @helpers.input(
+                @input(
                 feedbackForm("feedback-name"),
                 '_label -> "Name",
                 '_divClass -> "form-field",
                 '_inputClass -> "input--fullwidth"
                 )
-                @helpers.input(
+                @input(
                 feedbackForm("feedback-email"),
                 '_label -> "Email address",
                 '_divClass -> "form-field",
                 '_inputClass -> "input--fullwidth"
                 )
 
-                @helpers.textArea(
+                @textArea(
                 feedbackForm("feedback-comments"),
                 '_label -> "Comments",
                 '_info -> Messages("common.feedback.information.warning") ,

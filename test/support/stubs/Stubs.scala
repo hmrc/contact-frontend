@@ -8,7 +8,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.libs.Crypto
 import play.mvc.Http.HeaderNames
 import support.steps.Env
-import uk.gov.hmrc.crypto.CompositeSymmetricCrypto
+import uk.gov.hmrc.crypto.{PlainText, CompositeSymmetricCrypto}
 import uk.gov.hmrc.play.http.SessionKeys
 
 
@@ -35,15 +35,16 @@ trait Stub {
 
 trait SessionCookieBaker {
   def cookieValue(sessionData: Map[String,String]) = {
-    def encode(data: Map[String, String]): String = {
+    def encode(data: Map[String, String]): PlainText = {
       val encoded = data.map {
         case (k, v) => URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v, "UTF-8")
       }.mkString("&")
-      Crypto.sign(encoded, "yNhI04vHs9<_HWbC`]20u`37=NGLGYY5:0Tg5?y`W<NoJnXWqmjcgZBec@rOxb^G".getBytes) + "-" + encoded
+      val key = "yNhI04vHs9<_HWbC`]20u`37=NGLGYY5:0Tg5?y`W<NoJnXWqmjcgZBec@rOxb^G".getBytes
+      PlainText(Crypto.sign(encoded, key) + "-" + encoded)
     }
 
     val encodedCookie = encode(sessionData)
-    val encrypted = CompositeSymmetricCrypto.aes("gvBoGdgzqG1AarzF1LY0zQ==", Seq()).encrypt(encodedCookie)
+    val encrypted = CompositeSymmetricCrypto.aes("gvBoGdgzqG1AarzF1LY0zQ==", Seq()).encrypt(encodedCookie).value
 
     s"""mdtp="$encrypted"; Path=/; HTTPOnly"; Path=/; HTTPOnly"""
   }

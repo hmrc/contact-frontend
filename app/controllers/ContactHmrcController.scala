@@ -1,22 +1,23 @@
 package controllers
 
 import controllers.common.actions.Actions
-import controllers.common.validators.Validators._
+import controllers.common.service.Connectors
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Controller, Request}
 import uk.gov.hmrc.common.microservice.auth.AuthConnector
-import uk.gov.hmrc.common.microservice.deskpro.HmrcDeskproConnector
 import uk.gov.hmrc.common.microservice.domain.User
 import uk.gov.hmrc.play.connectors.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.play.validators.Validators
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ContactHmrcController extends Controller with Actions {
 
-  override protected implicit def authConnector = new AuthConnector()
-  lazy val hmrcDeskproConnector = new HmrcDeskproConnector()
+  override implicit def authConnector: AuthConnector.type = Connectors.authConnector
+
+  lazy val hmrcDeskproConnector = Connectors.hmrcDeskproConnector
 
   implicit def hc(implicit request: Request[_]): HeaderCarrier = HeaderCarrier.fromSessionAndHeaders(request.session, request.headers)
 
@@ -31,7 +32,7 @@ class ContactHmrcController extends Controller with Actions {
       "contact-name" -> text
         .verifying("error.common.problem_report.name_mandatory", name => !name.trim.isEmpty)
         .verifying("error.common.problem_report.name_too_long", name => name.size <= 70),
-      "contact-email" -> emailWithDomain.verifying("deskpro.email_too_long", email => email.size <= 255),
+      "contact-email" -> Validators.emailWithDomain.verifying("deskpro.email_too_long", email => email.size <= 255),
       "contact-comments" -> text
         .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)
         .verifying("error.common.comments_too_long", comment => comment.size <= 2000),
