@@ -163,7 +163,7 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
       switch_tab()
 
       And("I am on the 'Contact us' page")
-      i_am_on_the_page("Contact us")
+      i_am_on_the_page("HM Revenue & Customs Contacts")
     }
 
 
