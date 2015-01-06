@@ -14,7 +14,7 @@ private object AppDependencies {
   import play.core.PlayVersion
 
   private val playHealthVersion = "0.4.0"
-  private val playFrontendVersion =  "8.19.0"
+  private val playFrontendVersion =  "9.9.0"
   private val playUiVersion = "1.0.0"
   private val govUkTemplateVersion =  "2.1.0"
 
@@ -27,6 +27,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-frontend" % playFrontendVersion,
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
     "uk.gov.hmrc" %% "govuk-template" % govUkTemplateVersion,
+    "uk.gov.hmrc" %% "url-builder" % "0.3.0",
 
     "com.kenshoo" %% "metrics-play" % "2.3.0_0.1.6",
     "com.codahale.metrics" % "metrics-graphite" % "3.0.1",

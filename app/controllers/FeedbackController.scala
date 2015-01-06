@@ -6,9 +6,9 @@ import controllers.common.service.Connectors
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Controller, Request, Result}
-import uk.gov.hmrc.common.microservice.auth.AuthConnector
-import uk.gov.hmrc.common.microservice.domain.User
-import uk.gov.hmrc.play.connectors.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.HeaderCarrier
+import uk.gov.hmrc.play.microservice.auth.AuthConnector
+import uk.gov.hmrc.play.microservice.domain.User
 import uk.gov.hmrc.play.validators.Validators
 
 import scala.concurrent.ExecutionContext.Implicits.global
