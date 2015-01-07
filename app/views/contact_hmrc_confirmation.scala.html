@@ -1,5 +1,5 @@
-@(ticketId: String)(implicit user: uk.gov.hmrc.common.microservice.domain.User, request : Request[_])
-@main(title = Messages("contact.heading"), headerNav = Some(views.helpers.HeaderNav.yta), supportLinkEnabled = false, userLoggedIn = true) {
+@(ticketId: String)(implicit user: uk.gov.hmrc.play.microservice.domain.User, request : Request[_])
+@main(title = Messages("contact.heading"), headerNav = Some(views.html.YtaHeaderNav()), supportLinkEnabled = false, userLoggedIn = true) {
 <header class="page-header">
     <h1>@Messages("contact.heading")</h1>
 </header>
