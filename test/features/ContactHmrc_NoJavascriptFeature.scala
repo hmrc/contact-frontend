@@ -18,7 +18,7 @@ class ContactHmrc_NoJavascriptFeature extends NoJsFeature with NavigationSugar w
     Background {
       Given("I am logged in")
 
-      And("I go to the 'Contact HMRC' page")
+      And("I go to the 'Help' page")
       goOn(ContactHmrcPage)
     }
 
