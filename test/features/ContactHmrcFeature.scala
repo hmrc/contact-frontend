@@ -8,17 +8,17 @@ import support.stubs.{Login, StubbedFeature}
 
 class ContactHmrcFeature extends StubbedFeature with NavigationSugar with NavigationSteps with ApiSteps with ObservationSteps {
 
-  Feature("Contact HMRC") {
+  Feature("Help") {
 
     info("In order to make my views known")
     info("As a Tax Payer")
-    info("I want to contact HMRC")
+    info("I need Help")
 
 
     Background {
       Given("I am logged in")
 
-      And("I go to the 'Contact HMRC' page")
+      And("I go to the 'Help' page")
       goOn(ContactHmrcPage)
     }
 
@@ -57,7 +57,7 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
       And("I try to send the contact form")
       ContactHmrcPage.submitContactForm()
 
-      Then("I am on the 'Contact HMRC' page")
+      Then("I am on the 'Help' page")
       on(ContactHmrcPage)
 
       And("I see:")
@@ -82,7 +82,7 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
       And("I try to send the contact form")
       ContactHmrcPage.submitContactForm()
 
-      Then("I am on the 'Contact HMRC' page")
+      Then("I am on the 'Help' page")
       on(ContactHmrcPage)
 
       And("I see:")
@@ -102,7 +102,7 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
       And("I try to send the contact form")
       ContactHmrcPage.submitContactForm()
 
-      Then("I am on the 'Contact HMRC' page")
+      Then("I am on the 'Help' page")
       on(ContactHmrcPage)
 
       And("I see:")

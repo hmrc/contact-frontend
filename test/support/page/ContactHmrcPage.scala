@@ -28,5 +28,5 @@ object ContactHmrcPage extends WebPage with SharedPageModules {
 
   def clickOnContactHmrcLink() = click on contactHmrcLink
 
-  override def isCurrentPage: Boolean = heading=="Contact HMRC"
+  override def isCurrentPage: Boolean = heading=="Help"
 }
