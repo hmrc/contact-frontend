@@ -1,13 +1,10 @@
 package features
 
-import com.ning.http.client.AsyncHttpClientConfig
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import play.api.libs.ws.WS
-import play.api.libs.ws.ning.NingWSClient
 import support.behaviour.NavigationSugar
-import support.page.{ThankYouPage, PleaseTryAgainPage, UnauthenticatedFeedbackPage}
+import support.page.{PleaseTryAgainPage, ThankYouPage, UnauthenticatedFeedbackPage}
 import support.steps.ObservationSteps
-import support.stubs.{NoJsFeature, StubbedFeature}
+import support.stubs.NoJsFeature
 
 class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutures with IntegrationPatience with NavigationSugar with ObservationSteps {
 
@@ -54,7 +51,12 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
       on(PleaseTryAgainPage)
 
       And("I see an error message")
-      i_see("Sorry, we're unable to send your message as you haven't given us any information.")
+      i_see("Please try again",
+            "There was a problem sending your query. Please try again later or or use one of the support options below.")
+      i_see_links("https://www.gov.uk/personal-tax/self-assessment",
+        "https://www.gov.uk/government/organisations/hm-revenue-customs/about/social-media-use",
+        "https://www.gov.uk/government/news/new-self-assessment-online-chat-service",
+        "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment")
     }
 
     Scenario("All fields are mandatory") {
@@ -66,10 +68,13 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
       UnauthenticatedFeedbackPage.getHelpWithThisPage.clickSubmitButton()
 
       Then("I see an error for invalid name")
-      i_see("Sorry, we're unable to send your message as you haven't given us any information.")
+      i_see("Please try again",
+        "There was a problem sending your query. Please try again later or or use one of the support options below.")
+      i_see_links("https://www.gov.uk/personal-tax/self-assessment",
+        "https://www.gov.uk/government/organisations/hm-revenue-customs/about/social-media-use",
+        "https://www.gov.uk/government/news/new-self-assessment-online-chat-service",
+        "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment")
     }
-
-
   }
 
   private val Name = "Grumpy Bear"
