@@ -46,7 +46,9 @@ class FeedbackController
     Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer))
   }))
 
-  def feedbackForm = WithNewSessionTimeout(AuthenticatedBy(new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm().url)).async {
+  val ggAuthProvider = new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm().url)
+
+  def feedbackForm = WithNewSessionTimeout(AuthenticatedBy(ggAuthProvider).async {
     implicit user => implicit request =>
     Future.successful(
       Ok(views.html.feedback(emptyForm, Some(user)))
@@ -60,7 +62,7 @@ class FeedbackController
   }
 
   def submit = WithNewSessionTimeout {
-    AuthenticatedBy(new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm().url)).async {
+    AuthenticatedBy(ggAuthProvider).async {
       implicit user => implicit request =>
       doSubmit(Some(user))
     }
@@ -70,8 +72,10 @@ class FeedbackController
     implicit request => doSubmit(None)
   }
 
+  val ggAuthProviderThanks = new GovernmentGatewayAuthProvider(routes.FeedbackController.thanks().url)
+
   def thanks = WithNewSessionTimeout {
-    AuthenticatedBy(new GovernmentGatewayAuthProvider(routes.FeedbackController.thanks().url)).async {
+    AuthenticatedBy(ggAuthProviderThanks).async {
       implicit user => implicit request => doThanks(Some(user), request)
     }
   }
