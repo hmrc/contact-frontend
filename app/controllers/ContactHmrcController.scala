@@ -7,8 +7,10 @@ import play.api.data.Forms._
 import play.api.mvc.{Controller, Request}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.auth.AuthConnector
+import uk.gov.hmrc.play.microservice.deskpro.domain.TicketId
 import uk.gov.hmrc.play.microservice.domain.User
 import uk.gov.hmrc.play.validators.Validators
+import views.html.deskpro_error
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -57,11 +59,13 @@ class ContactHmrcController extends Controller with Actions {
         data => {
           import data._
 
-          val ticketIdF = hmrcDeskproConnector.createTicket(contactName, contactEmail, Subject, contactComments, referer, data.isJavascript, request, Some(user))
+          val ticketIdF: Future[Option[TicketId]] = hmrcDeskproConnector.createTicket(contactName, contactEmail, Subject, contactComments, referer, data.isJavascript, request, Some(user))
 
-          ticketIdF map {
-            case Some(ticketId) => Redirect(routes.ContactHmrcController.thanks()).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+          ticketIdF.map{
+            case Some(x:TicketId) => Redirect(routes.ContactHmrcController.thanks()).withSession(request.session + ("ticketId" -> x.ticket_id.toString))
             case None => InternalServerError("Deskpro failure")
+          }.recover {
+            case _ => InternalServerError(deskpro_error())
           }
         })
   })
