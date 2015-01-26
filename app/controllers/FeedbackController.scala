@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.common.AnyAuthenticationProvider
+import controllers.common.{FrontEndRedirect, GovernmentGateway, AnyAuthenticationProvider}
 import controllers.common.actions.Actions
 import controllers.common.service.Connectors
 import play.api.data.Form
@@ -71,7 +71,7 @@ class FeedbackController
   }
 
   def thanks = WithNewSessionTimeout {
-    AuthenticatedBy(AnyAuthenticationProvider).async {
+    AuthenticatedBy(new GovernmentGatewayAuthProvider(routes.FeedbackController.thanks().url)).async {
       implicit user => implicit request => doThanks(Some(user), request)
     }
   }
