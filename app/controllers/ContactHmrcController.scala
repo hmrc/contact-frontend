@@ -63,7 +63,7 @@ class ContactHmrcController extends Controller with Actions {
 
           ticketIdF.map{
             case Some(x:TicketId) => Redirect(routes.ContactHmrcController.thanks()).withSession(request.session + ("ticketId" -> x.ticket_id.toString))
-            case None => InternalServerError("Deskpro failure")
+            case None => InternalServerError(deskpro_error())
           }.recover {
             case _ => InternalServerError(deskpro_error())
           }
