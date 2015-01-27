@@ -113,6 +113,22 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
       verify_post_no_hit("/deskpro/ticket")
     }
 
+    Scenario("Deskpro fails with 404") {
+      Given("the call to Deskpro endpoint '/deskpro/ticket' will fail with status 404")
+      service_will_fail_on_POST_request("/deskpro/ticket", 404)
+
+      When("I fill the contact form correctly")
+      ContactHmrcPage.fillContactForm(Name, Email, Comment)
+
+      And("I try to send the contact form")
+      ContactHmrcPage.submitContactForm()
+
+      Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
+      on(TechnicalDifficultiesPage)
+
+      And("I see:")
+      i_see("There was a problem sending your query.")
+    }
 
     Scenario("Deskpro times out") {
       Given("the call to Deskpro endpoint '/deskpro/ticket' will take too much time")
@@ -128,29 +144,24 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
       on(TechnicalDifficultiesPage)
 
       And("I see:")
-      i_see("Please try again in a few minutes.")
+      i_see("There was a problem sending your query.")
     }
 
+    Scenario("Deskpro fails with 500") {
+      Given("the call to Deskpro endpoint '/deskpro/ticket' will fail with status 500")
+      service_will_fail_on_POST_request("/deskpro/ticket", 500)
 
-    val statuses = Seq("404", "500")
+      When("I fill the contact form correctly")
+      ContactHmrcPage.fillContactForm(Name, Email, Comment)
 
-    statuses.foreach { status =>
-      Scenario(s"Deskpro fails with $status") {
-        Given(s"the call to Deskpro endpoint '/deskpro/ticket' will fail with status $status")
-        service_will_fail_on_POST_request("/deskpro/ticket", status.toInt)
+      And("I try to send the contact form")
+      ContactHmrcPage.submitContactForm()
 
-        When("I fill the contact form correctly")
-        ContactHmrcPage.fillContactForm(Name, Email, Comment)
+      Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
+      on(TechnicalDifficultiesPage)
 
-        And("I try to send the contact form")
-        ContactHmrcPage.submitContactForm()
-
-        Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
-        on(TechnicalDifficultiesPage)
-
-        And("I see:")
-        i_see("Please try again in a few minutes.")
-      }
+      And("I see:")
+      i_see("There was a problem sending your query.")
     }
 
 

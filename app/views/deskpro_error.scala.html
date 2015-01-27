@@ -1,0 +1,33 @@
+@()(implicit request : Request[_])
+
+@import uk.gov.hmrc.play.views.html.helpers._
+@import controllers.common.FrontEndRedirect._
+@main(title = Messages("contact.heading"), headerNav = Some(views.html.YtaHeaderNav()), supportLinkEnabled = false, userLoggedIn = true) {
+
+<header class="page-header">
+    <h1>Sorry, we’re experiencing technical difficulties</h1>
+</header>
+
+<article id="report-confirmation-no-data">
+    <p>There was a problem sending your query. Please try again later or or use one of the support options below.</p>
+    <h3>Technical help with this website</h3>
+    <p>For technical help using this website email <a href="mailto:hmrcsupport@@tax.service.gov.uk">hmrcsupport@@tax.service.gov.uk</a></p>
+    <h3>Help filing your Self Assessment return</h3>
+    <ul>
+        <li>
+            <a href="https://www.gov.uk/personal-tax/self-assessment">Self Assessment guidance</a> which will also give details of how to pay
+        </li>
+        <li>
+            <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/about/social-media-use">Social media pages</a> including Twitter and Facebook
+        </li>
+        <li>
+            <a href="https://www.gov.uk/government/news/new-self-assessment-online-chat-service">Self Assessment online chat service</a>
+        </li>
+        <li>Check the 'help icons' as you go through your tax return - they may cover your query</li>
+        <li>
+            <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment">Self Assessment Helpline</a>
+        </li>
+    </ul>
+</article>
+
+}
