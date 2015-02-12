@@ -1,5 +1,7 @@
 package controllers
 
+import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.domain.TicketId
 import org.jsoup.Jsoup
 import org.mockito.Matchers
 import org.mockito.Matchers.{eq => meq, _}
@@ -13,8 +15,6 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.microservice.auth.AuthConnector
 import uk.gov.hmrc.play.microservice.auth.domain.{Accounts, Authority}
-import uk.gov.hmrc.play.microservice.deskpro.HmrcDeskproConnector
-import uk.gov.hmrc.play.microservice.deskpro.domain.TicketId
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.Future

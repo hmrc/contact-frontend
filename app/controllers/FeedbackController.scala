@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.common.{FrontEndRedirect, GovernmentGateway, AnyAuthenticationProvider}
+import connectors.deskpro.HmrcDeskproConnector
 import controllers.common.actions.Actions
 import controllers.common.service.Connectors
 import play.api.data.Form
@@ -20,7 +20,7 @@ class FeedbackController
 
   override implicit def authConnector: AuthConnector = Connectors.authConnector
 
-  lazy val hmrcDeskproConnector = Connectors.hmrcDeskproConnector
+  lazy val hmrcDeskproConnector = HmrcDeskproConnector
 
   implicit def hc(implicit request: Request[_]): HeaderCarrier = HeaderCarrier.fromSessionAndHeaders(request.session, request.headers)
 

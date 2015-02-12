@@ -1,5 +1,7 @@
 package controllers
 
+import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.domain.TicketId
 import controllers.common.actions.Actions
 import controllers.common.service.Connectors
 import play.api.data.Form
@@ -7,7 +9,6 @@ import play.api.data.Forms._
 import play.api.mvc.{Controller, Request}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.auth.AuthConnector
-import uk.gov.hmrc.play.microservice.deskpro.domain.TicketId
 import uk.gov.hmrc.play.microservice.domain.User
 import uk.gov.hmrc.play.validators.Validators
 import views.html.deskpro_error
@@ -19,7 +20,7 @@ class ContactHmrcController extends Controller with Actions {
 
   override implicit def authConnector: AuthConnector = Connectors.authConnector
 
-  lazy val hmrcDeskproConnector = Connectors.hmrcDeskproConnector
+  lazy val hmrcDeskproConnector = HmrcDeskproConnector
 
   implicit def hc(implicit request: Request[_]): HeaderCarrier = HeaderCarrier.fromSessionAndHeaders(request.session, request.headers)
 

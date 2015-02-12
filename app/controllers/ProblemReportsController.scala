@@ -1,5 +1,6 @@
 package controllers
 
+import connectors.deskpro.HmrcDeskproConnector
 import controllers.common.BaseController
 import controllers.common.actions.Actions
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -13,7 +14,6 @@ import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.play.microservice.UnauthorizedException
 import uk.gov.hmrc.play.microservice.auth.AuthConnector
 import uk.gov.hmrc.play.microservice.auth.domain.Accounts
-import uk.gov.hmrc.play.microservice.deskpro.HmrcDeskproConnector
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.http.SessionKeys
 
@@ -21,9 +21,9 @@ import scala.concurrent.Future
 
 trait ProblemReportsController extends BaseController with Actions {
 
-  lazy val auditConnector: AuditConnector = ???
-  lazy val hmrcDeskproConnector: HmrcDeskproConnector = ???
-  lazy val authConnector: AuthConnector = ???
+  def auditConnector: AuditConnector
+  def hmrcDeskproConnector: HmrcDeskproConnector
+  def authConnector: AuthConnector
 
   val form = Form[ProblemReport](
     mapping(
@@ -112,7 +112,7 @@ case class ProblemReport(reportName: String, reportEmail: String, reportAction: 
 
 
 object ProblemReportsController extends ProblemReportsController {
-  override lazy val auditConnector: AuditConnector = AuditConnector
-  override lazy val hmrcDeskproConnector: HmrcDeskproConnector = HmrcDeskproConnector
-  override lazy val authConnector: AuthConnector = AuthConnector
+  override lazy val auditConnector = AuditConnector
+  override lazy val hmrcDeskproConnector = HmrcDeskproConnector
+  override lazy val authConnector = AuthConnector
 }
