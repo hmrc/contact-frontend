@@ -1,7 +1,6 @@
 @(contactForm: Form[controllers.ContactForm])(implicit request : Request[_])
 
 @import uk.gov.hmrc.play.views.html.helpers._
-@import controllers.common.FrontEndRedirect._
 @main(title = Messages("contact.heading"), headerNav = Some(views.html.YtaHeaderNav()), supportLinkEnabled = false, userLoggedIn = true) {
     <header class="page-header">
         <h1>@Messages("contact.heading")</h1>
