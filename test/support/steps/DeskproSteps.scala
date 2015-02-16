@@ -17,7 +17,7 @@ trait DeskproSteps extends NavigationSugar with BaseSteps {
       }
     }
 
-    DeskproSignInPage.signIn("tim.britten@digital.cabinet-office.gov.uk", "changemenow")
+    DeskproSignInPage.signIn("haroon.rasheed@digital.hmrc.gov.uk", "phep-hiro-hicl-ames")
 
     eventually(timeout(Span(10, Seconds))) {
       ticketPage.profile.element.text should be(s"$name ($email)")
