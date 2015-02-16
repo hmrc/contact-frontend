@@ -15,7 +15,7 @@ class SignInPage extends WebPage {
 }
 
 object SignInLocalPage extends WebPage {
-  override val url: String = Env.host + "/account/sign-in-local?continue=/account"
+  override val url: String = Env.host + "/account/sign-in?continue=/account"
 
   override def isCurrentPage: Boolean = find(className("button")).fold(false)(_.text == "Sign in")
 
