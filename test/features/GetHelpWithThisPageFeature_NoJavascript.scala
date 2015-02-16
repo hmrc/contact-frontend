@@ -52,11 +52,8 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
 
       And("I see an error message")
       i_see("Please try again",
-            "There was a problem sending your query. Please try again later or or use one of the support options below.")
-      i_see_links("https://www.gov.uk/personal-tax/self-assessment",
-        "https://www.gov.uk/government/organisations/hm-revenue-customs/about/social-media-use",
-        "https://www.gov.uk/government/news/new-self-assessment-online-chat-service",
-        "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment")
+            "There was a problem sending your query.",
+            "Please try again later or email hmrcsupport@tax.service.gov.uk if you need technical help with this website.")
     }
 
     Scenario("All fields are mandatory") {
@@ -69,11 +66,8 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
 
       Then("I see an error for invalid name")
       i_see("Please try again",
-        "There was a problem sending your query. Please try again later or or use one of the support options below.")
-      i_see_links("https://www.gov.uk/personal-tax/self-assessment",
-        "https://www.gov.uk/government/organisations/hm-revenue-customs/about/social-media-use",
-        "https://www.gov.uk/government/news/new-self-assessment-online-chat-service",
-        "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment")
+        "There was a problem sending your query.",
+        "Please try again later or email hmrcsupport@tax.service.gov.uk if you need technical help with this website.")
     }
   }
 
