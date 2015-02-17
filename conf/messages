@@ -21,7 +21,7 @@ error.common.comments_mandatory=Enter your comments.!
 error.common.comments_too_long=The comment cannot be longer than 2000 characters
 problem_report.action=What were you doing?
 problem_report.error=What do you need help with?
-common.problem_report.error_nojavascript_title=Please try again
+common.problem_report.error_nojavascript_title=There was a problem sending your query
 
 contact.heading=Help
 contact.confirmation.message=Your message has been sent, and the team will get back to you within 2 working days.
