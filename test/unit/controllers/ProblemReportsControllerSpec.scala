@@ -104,6 +104,18 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
       page.getElementById("report-confirmation-no-data") should not be null
     }
 
+    "Return error page if the Deskpro ticket creation fails - Javascript disabled" in new ProblemReportsControllerApplication {
+      when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.failed(new Exception("failed")))
+
+      val result = controller.doReport()(request)
+      status(result) should be(200)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementById("report-confirmation-no-data") should not be null
+      document.text() should include("There was a problem sending your query.")
+      document.text() should include("Please try again later or email hmrcsupport@tax.service.gov.uk if you need technical help with this website.")
+    }
+
     "render the thank you message given" in new ProblemReportsControllerApplication {
       hrmcConnectorWillReturnTheTicketId
 
@@ -134,25 +146,43 @@ class ProblemReportsControllerApplication extends MockitoSugar {
     override lazy val authConnector: AuthConnector = mock[AuthConnector]
   }
 
+  val deskproName: String = "John Densmore"
+  val deskproEmail: String = "name@mail.com"
+  val deskproSubject: String = "Support Request"
+  val deskproProblemMessage: String = controller.problemMessage("Some Action", "Some Error")
+  val deskproReferrer: String = "/contact/problem_reports"
+
   val auditConnector: AuditConnector = controller.auditConnector
   val hmrcDeskproConnector: HmrcDeskproConnector = controller.hmrcDeskproConnector
   val authConnector: AuthConnector = controller.authConnector
 
   val accounts = Some(Accounts())
 
-  def generateRequest(javascriptEnabled: Boolean = true, name:String = "John Densmore", email: String = "name@mail.com") = FakeRequest()
-    .withHeaders(("referer", "/contact/problem_reports"), ("User-Agent", "iAmAUserAgent"))
+  def generateRequest(javascriptEnabled: Boolean = true, name:String = deskproName, email: String = deskproEmail) = FakeRequest()
+    .withHeaders(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent"))
     .withFormUrlEncodedBody("report-name" -> name, "report-email" -> email,
       "report-action" -> "Some Action", "report-error" -> "Some Error", "isJavascript" -> javascriptEnabled.toString)
 
   def generateInvalidRequest(javascriptEnabled: Boolean = true) = FakeRequest()
-    .withHeaders(("referer", "/contact/problem_reports"), ("User-Agent", "iAmAUserAgent"))
+    .withHeaders(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent"))
     .withFormUrlEncodedBody("isJavascript" -> javascriptEnabled.toString)
-
 
   val request = generateRequest(javascriptEnabled = false)
 
-  def hrmcConnectorWillReturnTheTicketId = {
-    when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(TicketId(123))))
+  def hmrcConnectorWillFail = mockHmrcConnector(Future.failed(new Exception("failed")))
+
+  def hrmcConnectorWillReturnTheTicketId = mockHmrcConnector(Future.successful(Some(TicketId(123))))
+
+  private def mockHmrcConnector(result: Future[Option[TicketId]]) = {
+    when(hmrcDeskproConnector.createDeskProTicket(
+      meq(deskproName),
+      meq(deskproEmail),
+      meq(deskproSubject),
+      meq(deskproProblemMessage),
+      meq(deskproReferrer),
+      meq(false),
+      any[Request[AnyRef]](),
+      meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(result)
   }
+
 }
