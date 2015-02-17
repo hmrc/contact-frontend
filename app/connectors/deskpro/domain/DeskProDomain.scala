@@ -1,10 +1,10 @@
 package connectors.deskpro.domain
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.microservice.auth.domain.Accounts
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import play.api.mvc.Request
 import uk.gov.hmrc.domain._
+import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
 import uk.gov.hmrc.play.microservice.domain.User
 import uk.gov.hmrc.play.http.SessionKeys
 
