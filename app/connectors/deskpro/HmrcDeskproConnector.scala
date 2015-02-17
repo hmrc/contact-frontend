@@ -17,7 +17,7 @@ object HmrcDeskproConnector extends HmrcDeskproConnector with ServicesConfig {
 trait HmrcDeskproConnector {
 
   import play.api.libs.json.Json
-  import uk.gov.hmrc.play.microservice.auth.domain.Accounts
+  import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
   import uk.gov.hmrc.play.microservice.domain.User
 
   import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._

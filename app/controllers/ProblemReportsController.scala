@@ -4,6 +4,8 @@ import connectors.deskpro.HmrcDeskproConnector
 import controllers.common.BaseController
 import controllers.common.actions.Actions
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
+import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
 import uk.gov.hmrc.play.validators.Validators._
 import play.api.Logger
 import play.api.data.Forms._
@@ -12,8 +14,6 @@ import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.play.microservice.UnauthorizedException
-import uk.gov.hmrc.play.microservice.auth.AuthConnector
-import uk.gov.hmrc.play.microservice.auth.domain.Accounts
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.http.SessionKeys
 

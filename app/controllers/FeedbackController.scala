@@ -2,12 +2,11 @@ package controllers
 
 import connectors.deskpro.HmrcDeskproConnector
 import controllers.common.actions.Actions
-import controllers.common.service.Connectors
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Controller, Request, Result}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.microservice.auth.AuthConnector
+import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
 import uk.gov.hmrc.play.microservice.domain.User
 import uk.gov.hmrc.play.validators.Validators
 
@@ -18,7 +17,7 @@ class FeedbackController
   extends Controller
   with Actions {
 
-  override implicit def authConnector: AuthConnector = Connectors.authConnector
+  override implicit val authConnector = AuthConnector
 
   lazy val hmrcDeskproConnector = HmrcDeskproConnector
 
