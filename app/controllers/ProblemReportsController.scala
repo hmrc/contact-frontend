@@ -54,14 +54,15 @@ trait ProblemReportsController extends BaseController with Actions {
         }
       },
       problemReport => {
-        for {
+        (for {
           maybeUserAccounts <- accounts.fold(ifEmpty = maybeAuthenticatedUserAccounts)(_ => Future.successful(accounts))
           ticketIdOption <- createTicket(problemReport, request, maybeUserAccounts)
-        }
-        yield {
+        } yield {
           val ticketId: String = ticketIdOption.map(_.ticket_id.toString).getOrElse("Unknown")
           if (!problemReport.isJavascript) Ok(views.html.support.problem_reports_confirmation_nonjavascript(ticketId, thankYouMessage))
           else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.support.ticket_created_body(ticketId, thankYouMessage).toString())))
+        }) recover {
+          case _ if !problemReport.isJavascript => Ok(views.html.support.problem_reports_error_nonjavascript(referrerFrom(request)))
         }
       })
   }
