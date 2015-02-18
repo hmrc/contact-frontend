@@ -51,8 +51,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
       on(PleaseTryAgainPage)
 
       And("I see an error message")
-      i_see("Please try again",
-            "There was a problem sending your query.",
+      i_see("There was a problem sending your query",
             "Please try again later or email hmrcsupport@tax.service.gov.uk if you need technical help with this website.")
     }
 
@@ -65,8 +64,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
       UnauthenticatedFeedbackPage.getHelpWithThisPage.clickSubmitButton()
 
       Then("I see an error for invalid name")
-      i_see("Please try again",
-        "There was a problem sending your query.",
+      i_see("There was a problem sending your query",
         "Please try again later or email hmrcsupport@tax.service.gov.uk if you need technical help with this website.")
     }
   }
