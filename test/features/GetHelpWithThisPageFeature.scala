@@ -13,7 +13,6 @@ import support.stubs.StubbedFeature
 
 class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with IntegrationPatience with NavigationSugar with ObservationSteps {
 
-
   Feature("Get help with this page form") {
 
     info("In order to get help with a specific page")

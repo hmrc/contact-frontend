@@ -14,8 +14,8 @@ private object AppDependencies {
   import play.core.PlayVersion
 
   private val playHealthVersion = "0.7.0"
-  private val playFrontendVersion =  "11.1.0"
-  private val playUiVersion = "1.0.0"
+  private val playFrontendVersion =  "13.0.0"
+  private val playUiVersion = "1.5.0"
   private val govUkTemplateVersion =  "2.1.0"
 
   private val scalatestVersion = "2.2.0"
@@ -49,8 +49,7 @@ private object AppDependencies {
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
 
         "com.github.tomakehurst" % "wiremock" % "1.46" % "test",
-        "org.seleniumhq.selenium" % "selenium-java" % "2.43.1" % "test",
-        "uk.gov.hmrc" %% "scala-webdriver" % "4.0.0" % "test",
+        "uk.gov.hmrc" %% "scala-webdriver" % "4.17.0" % "test",
         "uk.gov.hmrc" %% "hmrctest" % "0.1.0" % "test"
       )
     }.test

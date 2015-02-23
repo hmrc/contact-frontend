@@ -15,7 +15,7 @@ trait FeedbackPage extends WebPage with SharedPageModules {
 
   def fillOutFeedbackForm(rating: Int, name: String, email: String, comment: String) = {
     val wait = new WebDriverWait(Env.driver, 15)
-    wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-rating")))
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-name")))
 
     ratingRadioGroup.value = rating.toString
     nameField.value = name

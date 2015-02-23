@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{CapabilityType, DesiredCapabilities}
+import org.scalatest.AcceptanceSpec
 import uk.gov.hmrc.integration.framework.SingletonDriver
 
 import scala.util.Try
@@ -38,7 +39,6 @@ object Env {
   def addShutdownHook(body: => Unit) =
     Runtime.getRuntime addShutdownHook new Thread { override def run { body } }
   addShutdownHook {
-    Try(driver.quit())
     wireMockServer.stop()
   }
 
