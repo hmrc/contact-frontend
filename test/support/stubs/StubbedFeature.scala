@@ -15,23 +15,30 @@ trait StubbedFeature extends AcceptanceSpec with Stubs {
     Common.after()
   }
 
+  protected override def beforeAll() {
+    super.beforeAll()
+
+    Env.enableJavascript()
+  }
+
 }
 
 
 trait NoJsFeature extends AcceptanceSpec with Stubs {
 
   Before {
-    Env.disableJavascript()
-
     Common.before()
   }
 
   After {
     Common.after()
-
-    Env.enableJavascript()
   }
 
+  protected override def beforeAll() {
+    super.beforeAll()
+
+    Env.disableJavascript()
+  }
 }
 
 

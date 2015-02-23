@@ -109,10 +109,6 @@ object Login extends Stub with SessionCookieBaker {
               |    "uri": "/auth/oid/1234567890",
               |    "loggedInAt": "2014-06-09T14:57:09.522Z",
               |    "previouslyLoggedInAt": "2014-06-09T14:48:24.841Z",
-              |    "credentials": {
-              |        "gatewayId": "cred-id-12345",
-              |        "idaPids": []
-              |    },
               |    "accounts": {
               |    }
               |}

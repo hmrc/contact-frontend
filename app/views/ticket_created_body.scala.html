@@ -1,5 +1,5 @@
-@(ticketId: String)
+@(ticketId: String, thankYouMessage: Option[String])
 <h2 id="feedback-thank-you-header">@Messages("common.thank.you")</h2>
 
 <input id="ticketId" type="hidden" value="@ticketId"/>
-<p>@Messages("contact.confirmation.message")</p>
+<p>@Html(Messages(thankYouMessage.getOrElse("contact.confirmation.message")))</p>

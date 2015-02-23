@@ -3,19 +3,17 @@ package controllers
 import connectors.deskpro.HmrcDeskproConnector
 import controllers.common.BaseController
 import controllers.common.actions.Actions
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
-import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
-import uk.gov.hmrc.play.validators.Validators._
-import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.{Action, Request}
-import uk.gov.hmrc.play.microservice.UnauthorizedException
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
+import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
 import uk.gov.hmrc.play.http.SessionKeys
+import uk.gov.hmrc.play.validators.Validators._
 
 import scala.concurrent.Future
 
@@ -60,7 +58,7 @@ trait ProblemReportsController extends BaseController with Actions {
         } yield {
           val ticketId: String = ticketIdOption.map(_.ticket_id.toString).getOrElse("Unknown")
           if (!problemReport.isJavascript) Ok(views.html.support.problem_reports_confirmation_nonjavascript(ticketId, thankYouMessage))
-          else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.support.ticket_created_body(ticketId, thankYouMessage).toString())))
+          else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId, thankYouMessage).toString())))
         }) recover {
           case _ if !problemReport.isJavascript => Ok(views.html.support.problem_reports_error_nonjavascript(referrerFrom(request)))
         }
@@ -69,12 +67,7 @@ trait ProblemReportsController extends BaseController with Actions {
 
   private def maybeAuthenticatedUserAccounts()(implicit request: Request[AnyRef]): Future[Option[Accounts]] = {
     if (request.session.get(SessionKeys.authToken).isDefined) {
-      authConnector.currentAuthority.map(authorityOption => authorityOption.map(_.accounts)).recover {
-        case _: UnauthorizedException => {
-          Logger.info(s"unauthorized from auth, expected for TCR")
-          None
-        }
-      }
+      authConnector.currentAuthority.map(authorityOption => authorityOption.map(_.accounts))
     } else {
       Future.successful(None)
     }
