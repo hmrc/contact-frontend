@@ -1,13 +1,12 @@
 package connectors.deskpro.domain
 
-import controllers.common.AuthenticationProviderIds
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain._
 import uk.gov.hmrc.play.audit.http.{HeaderCarrier, UserId}
 import uk.gov.hmrc.play.auth.frontend.connectors.domain._
 import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.http.logging.SessionId
-import uk.gov.hmrc.play.microservice.domain.User
+import uk.gov.hmrc.play.frontend.auth.{AuthenticationProviderIds, User}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 class FieldTransformerSpec extends UnitSpec with WithFakeApplication {

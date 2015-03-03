@@ -1,4 +1,4 @@
-@(ticketId: String)(implicit user: uk.gov.hmrc.play.microservice.domain.User, request : Request[_])
+@(ticketId: String)(implicit user: uk.gov.hmrc.play.frontend.auth.User, request : Request[_])
 @main(title = Messages("contact.heading"), headerNav = Some(views.html.YtaHeaderNav()), supportLinkEnabled = false, userLoggedIn = true) {
 <header class="page-header">
     <h1>@Messages("contact.heading")</h1>

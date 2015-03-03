@@ -1,4 +1,4 @@
-@(ticketId:String, user: Option[uk.gov.hmrc.play.microservice.domain.User])(implicit request : Request[_])
+@(ticketId:String, user: Option[uk.gov.hmrc.play.frontend.auth.User])(implicit request : Request[_])
 @main(title = Messages("common.feedback.heading"), userLoggedIn = user.isDefined) {
 <header class="page-header">
     <h1>@Messages("common.feedback.confirmation.heading")</h1>

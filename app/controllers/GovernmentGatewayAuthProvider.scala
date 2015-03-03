@@ -1,8 +1,8 @@
 package controllers
 
-import controllers.common.GovernmentGateway
 import play.api.Play
 import uk.gov.hmrc.play.config.RunMode
+import uk.gov.hmrc.play.frontend.auth.GovernmentGateway
 
 class GovernmentGatewayAuthProvider(continueUrl: String) extends GovernmentGateway {
   //todo move the URL login to ExternalUrls

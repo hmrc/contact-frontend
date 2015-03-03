@@ -1,13 +1,12 @@
 package controllers
 
 import connectors.deskpro.HmrcDeskproConnector
-import controllers.common.actions.Actions
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Controller, Request, Result}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
-import uk.gov.hmrc.play.microservice.domain.User
+import uk.gov.hmrc.play.frontend.auth.{Actions, User}
 import uk.gov.hmrc.play.validators.Validators
 
 import scala.concurrent.ExecutionContext.Implicits.global
