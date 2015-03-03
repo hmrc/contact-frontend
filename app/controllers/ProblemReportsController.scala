@@ -2,7 +2,6 @@ package controllers
 
 import connectors.deskpro.HmrcDeskproConnector
 import controllers.common.BaseController
-import controllers.common.actions.Actions
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.Messages
@@ -12,6 +11,7 @@ import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
+import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.validators.Validators._
 
