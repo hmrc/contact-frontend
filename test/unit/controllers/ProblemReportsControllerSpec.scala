@@ -11,10 +11,9 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
-import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.auth.frontend.connectors.domain._
+import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.Future
@@ -140,7 +139,6 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
 class ProblemReportsControllerApplication extends MockitoSugar {
 
   val controller = new ProblemReportsController {
-    override lazy val auditConnector = mock[AuditConnector]
     override lazy val hmrcDeskproConnector = mock[HmrcDeskproConnector]
     override lazy val authConnector = mock[AuthConnector]
   }
@@ -151,7 +149,6 @@ class ProblemReportsControllerApplication extends MockitoSugar {
   val deskproProblemMessage: String = controller.problemMessage("Some Action", "Some Error")
   val deskproReferrer: String = "/contact/problem_reports"
 
-  val auditConnector = controller.auditConnector
   val hmrcDeskproConnector = controller.hmrcDeskproConnector
   val authConnector = controller.authConnector
 

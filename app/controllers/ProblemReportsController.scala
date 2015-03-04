@@ -8,7 +8,6 @@ import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
 import uk.gov.hmrc.play.frontend.auth.Actions
@@ -19,7 +18,6 @@ import scala.concurrent.Future
 
 trait ProblemReportsController extends BaseController with Actions {
 
-  def auditConnector: AuditConnector
   def hmrcDeskproConnector: HmrcDeskproConnector
   def authConnector: AuthConnector
 
@@ -106,7 +104,6 @@ case class ProblemReport(reportName: String, reportEmail: String, reportAction: 
 
 
 object ProblemReportsController extends ProblemReportsController {
-  override lazy val auditConnector = AuditConnector
   override lazy val hmrcDeskproConnector = HmrcDeskproConnector
   override lazy val authConnector = AuthConnector
 }
