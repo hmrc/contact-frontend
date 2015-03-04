@@ -3,9 +3,8 @@ package connectors.deskpro
 import connectors.deskpro.domain.{Feedback, TicketId, Ticket}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.config.{WSHttp, ServicesConfig}
 import uk.gov.hmrc.play.http.HttpPost
-import uk.gov.hmrc.play.http.ws.WSHttp
 
 import scala.concurrent.Future
 
