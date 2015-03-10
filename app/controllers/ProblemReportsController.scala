@@ -38,13 +38,17 @@ trait ProblemReportsController extends BaseController with Actions {
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
-  def report = Action.async(doReport()(_))
+  def reportForm = Action { implicit request =>
+    Ok(views.html.partials.error_feedback())
+  }
 
-  def doReport(thankYouMessage: Option[String] = None, accounts: Option[Accounts] = None)(implicit request: Request[AnyRef]) = {
+  def submit = Action.async(doReport()(_))
+
+  private[controllers] def doReport(thankYouMessage: Option[String] = None, accounts: Option[Accounts] = None)(implicit request: Request[AnyRef]) = {
     form.bindFromRequest.fold(
       error => {
         if (!error.data.getOrElse("isJavascript", "true").toBoolean) {
-          Future.successful(Ok(views.html.support.problem_reports_error_nonjavascript(referrerFrom(request))))
+          Future.successful(Ok(views.html.problem_reports_error_nonjavascript(referrerFrom(request))))
         } else {
           Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
         }
@@ -55,10 +59,10 @@ trait ProblemReportsController extends BaseController with Actions {
           ticketIdOption <- createTicket(problemReport, request, maybeUserAccounts)
         } yield {
           val ticketId: String = ticketIdOption.map(_.ticket_id.toString).getOrElse("Unknown")
-          if (!problemReport.isJavascript) Ok(views.html.support.problem_reports_confirmation_nonjavascript(ticketId, thankYouMessage))
+          if (!problemReport.isJavascript) Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId, thankYouMessage))
           else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId, thankYouMessage).toString())))
         }) recover {
-          case _ if !problemReport.isJavascript => Ok(views.html.support.problem_reports_error_nonjavascript(referrerFrom(request)))
+          case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript(referrerFrom(request)))
         }
       })
   }
