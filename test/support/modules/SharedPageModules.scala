@@ -29,7 +29,7 @@ trait SharedPageModules {
 
     def nameField = textField("report-name")
 
-    def emailField = textField("report-email")
+    def emailInput = emailField("report-email")
 
     def whatWereYouDoingField = textField("report-action")
 
@@ -50,7 +50,7 @@ trait SharedPageModules {
       toggleProblemReport
 
       nameField.value = name
-      emailField.value = email
+      emailInput.value = email
       whatWereYouDoingField.value = whatWereYouDoing
       whatDoYouNeedHelpWithField.value = whatDoYouNeedHelpWith
     }
@@ -62,7 +62,7 @@ trait SharedPageModules {
 
     def typeName(name: String) {
       webDriver.findElement(By.id("report-name")).sendKeys(name)
-      click on emailField
+      click on emailInput
     }
 
     def clickSubmitButton() {
