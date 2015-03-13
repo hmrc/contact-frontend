@@ -16,7 +16,7 @@ private object AppDependencies {
   private val playUiVersion = "1.5.0"
   private val govUkTemplateVersion =  "2.1.0"
 
-  private val scalatestVersion = "2.2.0"
+  private val scalatestVersion = "2.2.2"
   private val pegdownVersion = "1.4.2"
 
   val compile = Seq(
@@ -41,8 +41,8 @@ private object AppDependencies {
         "org.jsoup" % "jsoup" % "1.7.3" % scope,
 
         "com.github.tomakehurst" % "wiremock" % "1.48" % "test",
-        "uk.gov.hmrc" %% "scala-webdriver" % "4.18.0" % "test",
-        "uk.gov.hmrc" %% "hmrctest" % "0.3.0" % "test"
+        "uk.gov.hmrc" %% "scala-webdriver" % "4.22.0" % "test",
+        "uk.gov.hmrc" %% "hmrctest" % "0.4.0" % "test"
       )
     }.test
   }

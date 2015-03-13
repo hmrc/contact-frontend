@@ -3,12 +3,12 @@ package support.stubs
 import java.net.URLEncoder
 import java.util.UUID
 
-import com.github.tomakehurst.wiremock.client.{WireMock, UrlMatchingStrategy}
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.{UrlMatchingStrategy, WireMock}
 import play.api.libs.Crypto
 import play.mvc.Http.HeaderNames
 import support.steps.Env
-import uk.gov.hmrc.crypto.{PlainText, CompositeSymmetricCrypto}
+import uk.gov.hmrc.crypto.{CompositeSymmetricCrypto, PlainText}
 import uk.gov.hmrc.play.http.SessionKeys
 
 
