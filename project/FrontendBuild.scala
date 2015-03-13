@@ -24,7 +24,8 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-frontend" % playFrontendVersion,
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
     "uk.gov.hmrc" %% "govuk-template" % govUkTemplateVersion,
-    "uk.gov.hmrc" %% "url-builder" % "0.3.0"
+    "uk.gov.hmrc" %% "url-builder" % "0.3.0",
+    "org.apache.httpcomponents" % "httpclient" % "4.3.1"
   )
 
   trait TestDependencies {
