@@ -8,14 +8,14 @@ object ContactHmrcPage extends WebPage with SharedPageModules {
   override val url = Env.host + "/contact/contact-hmrc"
 
   def nameField = textField("contact-name")
-  def emailField = textField("contact-email")
-  def emailInput = emailField("contact-comments")
+  def emailInput = emailField("contact-email")
+  def commentsField = textArea("contact-comments")
   def submitBtn = cssSelector("button[type=submit]")
   def contactHmrcLink = linkText("contact HMRC")
 
   def fillContactForm(name: String, email: String, comment: String) = {
     nameField.value = name
-    emailField.value = email
+    emailInput.value = email
     commentsField.value = comment
   }
 
