@@ -9,7 +9,7 @@ trait FeedbackPage extends WebPage with SharedPageModules {
 
   def ratingRadioGroup = radioButtonGroup("feedback-rating")
   def nameField = textField("feedback-name")
-  def emailField = textField("feedback-email")
+  def emailInput = emailField("feedback-email")
   def commentsField = textArea("feedback-comments")
   def submitBtn = cssSelector("button[type=submit]")
 
@@ -19,7 +19,7 @@ trait FeedbackPage extends WebPage with SharedPageModules {
 
     ratingRadioGroup.value = rating.toString
     nameField.value = name
-    emailField.value = email
+    emailInput.value = email
     commentsField.value = comment
   }
 

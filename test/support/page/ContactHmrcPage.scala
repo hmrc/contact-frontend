@@ -9,7 +9,7 @@ object ContactHmrcPage extends WebPage with SharedPageModules {
 
   def nameField = textField("contact-name")
   def emailField = textField("contact-email")
-  def commentsField = textArea("contact-comments")
+  def emailInput = emailField("contact-comments")
   def submitBtn = cssSelector("button[type=submit]")
   def contactHmrcLink = linkText("contact HMRC")
 
