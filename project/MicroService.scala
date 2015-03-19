@@ -72,6 +72,7 @@ trait MicroService {
       addTestReportOption(SmokeTest, "smoke-test-reports")
     )
     .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
+    .settings(resolvers += Resolver.bintrayRepo("hmrc", "releases"))
 }
 
 private object TestPhases {

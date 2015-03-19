@@ -5,7 +5,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Controller, Request, Result}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
+import uk.gov.hmrc.play.config.FrontendAuthConnector
 import uk.gov.hmrc.play.frontend.UnauthorisedAction
 import uk.gov.hmrc.play.frontend.auth.{Actions, User}
 import uk.gov.hmrc.play.validators.Validators
@@ -17,7 +17,7 @@ class FeedbackController
   extends Controller
   with Actions {
 
-  override implicit val authConnector = AuthConnector
+  override implicit val authConnector = FrontendAuthConnector
 
   lazy val hmrcDeskproConnector = HmrcDeskproConnector
 

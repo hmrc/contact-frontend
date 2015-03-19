@@ -10,6 +10,7 @@ import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
+import uk.gov.hmrc.play.config.FrontendAuthConnector
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.validators.Validators._
@@ -109,5 +110,5 @@ case class ProblemReport(reportName: String, reportEmail: String, reportAction: 
 
 object ProblemReportsController extends ProblemReportsController {
   override lazy val hmrcDeskproConnector = HmrcDeskproConnector
-  override lazy val authConnector = AuthConnector
+  override lazy val authConnector = FrontendAuthConnector
 }
