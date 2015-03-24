@@ -47,8 +47,6 @@ trait SharedPageModules {
     def toggleProblemReport = {click on linkText("Get help with this page.")}
 
     def fillProblemReport(name: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String): Unit = {
-      toggleProblemReport
-
       nameField.value = name
       emailInput.value = email
       whatWereYouDoingField.value = whatWereYouDoing

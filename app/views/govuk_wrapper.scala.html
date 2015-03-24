@@ -1,0 +1,82 @@
+@(appConfig: config.AppConfig,
+  title: String,
+  contentHeader: Option[Html] = None,
+  mainContent: Html = HtmlFormat.empty,
+  userLoggedIn: Boolean = true,
+  getHelpForm: Html  = HtmlFormat.empty)
+
+@import layouts.{govuk_template => hmrcGovUkTemplate}
+@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
+
+@head = {
+    @uiLayouts.head(
+      assetsPrefix = appConfig.assetsPrefix,
+      linkElem = None,
+      headScripts = None)
+    <meta name="format-detection" content="telephone=no" />
+}
+
+@headerNavLinks = {
+  <li><a id="homeNavHref" href="@appConfig.homeUrl"
+         data-journey-click="primary-navigation:Click:Home">Home</a></li>
+  <li><a id="accountDetailsNavHref" href="@appConfig.accountDetailsUrl"
+         data-journey-click="primary-navigation:Click:Your details">Your details</a></li>
+  <li><a href="@appConfig.helpUrl"
+         data-journey-click="primary-navigation:Click:Help">Help and contact</a></li>
+  <li><a id="logOutNavHref" href="@appConfig.signOutUrl"
+         data-journey-click="primary-navigation:Click:Sign out">Sign out</a></li>
+}
+
+@insideHeader = {
+    @uiLayouts.header_nav(
+      navTitle = Some("Your tax account"),
+      navTitleLink = None,
+      showBetaLink = false,
+      navLinks = Some(headerNavLinks))
+}
+
+@afterHeader = {}
+
+@bodyEnd = {
+    @uiLayouts.footer(
+      analyticsToken = Some(appConfig.analyticsToken),
+      analyticsHost = appConfig.analyticsHost,
+      assetsPrefix = appConfig.assetsPrefix,
+      ssoUrl = None,
+      scriptElem = None,
+      gaCalls = None)
+}
+
+@footerTop = {}
+@footerLinks = {}
+
+@betaBanner = {
+    @uiLayouts.betaBanner(
+      userLoggedIn = userLoggedIn,
+      betaFeedbackUrl = appConfig.betaFeedbackUrl,
+      betaFeedbackUnauthenticatedUrl = appConfig.betaFeedbackUnauthenticatedUrl,
+      showFeedbackLinkInBetaBanner = true)
+}
+
+@serviceInfo = {
+    @uiLayouts.serviceInfo(
+      betaBanner = betaBanner,
+      includeGridWrapper = false,
+      serviceInfoContent = None)
+}
+
+@mainContentHeader = {
+    @if(contentHeader.isDefined) {
+        @uiLayouts.main_content_header(contentHeader = contentHeader.get)
+    }
+}
+
+@content = {
+    @uiLayouts.main_content(
+      article = mainContent,
+      mainContentHeader = mainContentHeader,
+      serviceInfo = serviceInfo,
+      getHelpForm = getHelpForm)
+}
+
+@hmrcGovUkTemplate(Some(title), None)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links()), true)(content)

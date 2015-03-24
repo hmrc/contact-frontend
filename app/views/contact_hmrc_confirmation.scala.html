@@ -1,10 +1,9 @@
-@(ticketId: String)(implicit user: uk.gov.hmrc.play.frontend.auth.User, request : Request[_])
-@main(title = Messages("contact.heading"), headerNav = Some(views.html.YtaHeaderNav()), supportLinkEnabled = false, userLoggedIn = true) {
-<header class="page-header">
-    <h1>@Messages("contact.heading")</h1>
-</header>
+@(ticketId: String)(implicit request : Request[_])
 
-            @ticket_created_body(ticketId, None)
+@main(title = Messages("contact.heading"), supportLinkEnabled = false) {
+  <header class="page-header">
+      <h1>@Messages("contact.heading")</h1>
+  </header>
 
-
+  @ticket_created_body(ticketId, None)
 }

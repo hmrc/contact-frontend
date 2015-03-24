@@ -1,0 +1,16 @@
+@(title: String, userLoggedIn: Boolean = true, supportLinkEnabled: Boolean = true)(mainContent: Html)(implicit request : Request[_])
+
+@import uk.gov.hmrc.play.views.html.layouts
+
+@getHelpForm = {
+  @if(supportLinkEnabled) {
+    @partials.error_feedback()
+  }
+}
+
+@govuk_wrapper(
+  appConfig = config.YtaConfig,
+  title = title,
+  mainContent = layouts.article(mainContent),
+  userLoggedIn = userLoggedIn,
+  getHelpForm = getHelpForm)
