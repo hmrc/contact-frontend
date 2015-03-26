@@ -24,6 +24,8 @@ class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with I
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
 
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
       When("I fill the Get Help with this page' form correctly")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.fillProblemReport(Name, Email, WhatWhereYouDoing, WhatDoYouNeedHelpWith)
 

@@ -18,6 +18,8 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
       Given("Tax payer Bill goes to the Feedback page")
       goOn(UnauthenticatedFeedbackPage)
 
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
       When("He fills out and sends the problem report")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.sendProblemReport(Name, Email, WhatIWasDoing, WhatWentWrong)
 

@@ -58,7 +58,6 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
     Scenario("All fields are mandatory") {
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
 
       When("I fill in an invalid email address")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.clickSubmitButton()
