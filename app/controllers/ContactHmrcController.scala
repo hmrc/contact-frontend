@@ -1,12 +1,12 @@
 package controllers
 
+import config.FrontendAuthConnector
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Controller, Request}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.config.FrontendAuthConnector
 import uk.gov.hmrc.play.frontend.auth.{Actions, User}
 import uk.gov.hmrc.play.validators.Validators
 import views.html.deskpro_error

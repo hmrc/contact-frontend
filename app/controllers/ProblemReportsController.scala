@@ -1,5 +1,6 @@
 package controllers
 
+import config.FrontendAuthConnector
 import connectors.deskpro.HmrcDeskproConnector
 import play.api.data.Forms._
 import play.api.data._
@@ -9,7 +10,6 @@ import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
-import uk.gov.hmrc.play.config.FrontendAuthConnector
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import uk.gov.hmrc.play.http.SessionKeys
