@@ -16,8 +16,15 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
     info("I want to ask for help to HMRC")
 
 
+    Scenario("I don't see the open help form link without Javascript") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
 
-    Scenario("Successful form submission without JavaScript") {
+      Then("I don't see:")
+      i_dont_see("Get help with this page.")
+    }
+
+    Scenario("Successful form submission without Javascript") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
 
