@@ -1,10 +1,10 @@
 package controllers
 
+import config.FrontendAuthConnector
 import connectors.deskpro.HmrcDeskproConnector
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Request, Result}
-import uk.gov.hmrc.play.config.FrontendAuthConnector
 import uk.gov.hmrc.play.frontend.auth.{Actions, User}
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.validators.Validators

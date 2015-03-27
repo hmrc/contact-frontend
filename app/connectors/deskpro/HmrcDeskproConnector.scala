@@ -1,11 +1,12 @@
 package connectors.deskpro
 
+import config.WSHttp
 import connectors.deskpro.domain.{Feedback, Ticket, TicketId}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.config.{ServicesConfig, WSHttp}
-import uk.gov.hmrc.play.http.{Upstream5xxResponse, NotFoundException, HttpPost}
+import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
+import uk.gov.hmrc.play.http.{HttpPost, NotFoundException, Upstream5xxResponse}
 
 import scala.concurrent.Future
 
