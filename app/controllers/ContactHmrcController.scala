@@ -58,11 +58,10 @@ class ContactHmrcController extends Controller with Actions {
         data => {
           import data._
 
-          val ticketIdF: Future[Option[TicketId]] = hmrcDeskproConnector.createTicket(contactName, contactEmail, Subject, contactComments, referer, data.isJavascript, request, Some(user))
+          val ticketIdF: Future[TicketId] = hmrcDeskproConnector.createTicket(contactName, contactEmail, Subject, contactComments, referer, data.isJavascript, request, Some(user))
 
-          ticketIdF.map{
-            case Some(x:TicketId) => Redirect(routes.ContactHmrcController.thanks()).withSession(request.session + ("ticketId" -> x.ticket_id.toString))
-            case None => InternalServerError(deskpro_error())
+          ticketIdF.map{ ticketId =>
+            Redirect(routes.ContactHmrcController.thanks()).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
           }.recover {
             case _ => InternalServerError(deskpro_error())
           }

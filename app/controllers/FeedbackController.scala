@@ -3,25 +3,21 @@ package controllers
 import connectors.deskpro.HmrcDeskproConnector
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.{Controller, Request, Result}
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
+import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.play.config.FrontendAuthConnector
-import uk.gov.hmrc.play.frontend.UnauthorisedAction
 import uk.gov.hmrc.play.frontend.auth.{Actions, User}
+import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.validators.Validators
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FeedbackController
-  extends Controller
+  extends FrontendController
   with Actions {
 
   override implicit val authConnector = FrontendAuthConnector
 
   lazy val hmrcDeskproConnector = HmrcDeskproConnector
-
-  implicit def hc(implicit request: Request[_]): HeaderCarrier = HeaderCarrier.fromSessionAndHeaders(request.session, request.headers)
 
   import controllers.FeedbackFormConfig._
 
@@ -91,9 +87,8 @@ class FeedbackController
 
         val ticketIdF = hmrcDeskproConnector.createFeedback(name, email, experienceRating, "Beta feedback submission", comments, referrer, javascriptEnabled, request, user)
 
-        ticketIdF map {
-          case Some(ticketId) => Redirect(user.map(_ => routes.FeedbackController.thanks()).getOrElse(routes.FeedbackController.unauthenticatedThanks())).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
-          case None => InternalServerError("Deskpro failure")
+        ticketIdF map { ticketId =>
+          Redirect(user.map(_ => routes.FeedbackController.thanks()).getOrElse(routes.FeedbackController.unauthenticatedThanks())).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
         }
       }
     )

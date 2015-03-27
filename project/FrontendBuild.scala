@@ -12,7 +12,6 @@ object FrontendBuild extends Build with MicroService {
 private object AppDependencies {
 
   private val playHealthVersion = "0.7.0"
-  private val playFrontendVersion =  "17.0.0"
   private val playUiVersion = "1.8.0"
   private val govUkTemplateVersion =  "2.6.0"
 
@@ -20,11 +19,12 @@ private object AppDependencies {
   private val pegdownVersion = "1.4.2"
 
   val compile = Seq(
+    "uk.gov.hmrc" %% "frontend-wiring" % "0.1.0",
+    "uk.gov.hmrc" %% "play-json-logger" % "1.0.0",
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
-    "uk.gov.hmrc" %% "play-frontend" % playFrontendVersion,
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
     "uk.gov.hmrc" %% "govuk-template" % govUkTemplateVersion,
-    "uk.gov.hmrc" %% "url-builder" % "0.3.0",
+    "uk.gov.hmrc" %% "url-builder" % "0.5.0",
     "org.apache.httpcomponents" % "httpclient" % "4.3.1"
   )
 
@@ -36,14 +36,13 @@ private object AppDependencies {
   object Test {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
-        "uk.gov.hmrc" %% "play-frontend" % playFrontendVersion % scope classifier "tests",
         "org.scalatest" %% "scalatest" % "2.2.2" % scope,
         "org.pegdown" % "pegdown" % "1.4.2" % scope,
         "org.jsoup" % "jsoup" % "1.7.3" % scope,
 
         "com.github.tomakehurst" % "wiremock" % "1.48" % "test",
         "uk.gov.hmrc" %% "scala-webdriver" % "4.22.0" % "test",
-        "uk.gov.hmrc" %% "hmrctest" % "0.4.0" % "test"
+        "uk.gov.hmrc" %% "hmrctest" % "1.0.0" % "test"
       )
     }.test
   }
