@@ -8,7 +8,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Request
-import play.api.test.FakeRequest
+import play.api.test.{FakeApplication, FakeRequest}
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
@@ -19,6 +19,13 @@ import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import scala.concurrent.Future
 
 class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
+
+  override lazy val fakeApplication = FakeApplication(additionalConfiguration = Map(
+    "govuk-tax.Test.assets.url" -> "",
+    "govuk-tax.Test.assets.version" -> "",
+    "govuk-tax.Test.google-analytics.token" -> "",
+    "govuk-tax.Test.google-analytics.host" -> ""
+  ))
 
   "Reporting a problem" should {
 
@@ -37,7 +44,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
 
     "return 200 and a valid html page for a valid request and js is not enabled for an authenticated user" in new ProblemReportsControllerApplication {
       when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(Authority("uri", Accounts(), None, None))))
-      when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(accounts))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(TicketId(123))))
+      when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(accounts))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
       val result = controller.doReport()(request.withSession(SessionKeys.authToken -> "authToken"))
 
@@ -48,7 +55,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
     }
 
     "return 200 and a valid json for a valid request and js is enabled" in new ProblemReportsControllerApplication {
-      when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(true), any[Request[AnyRef]](), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(TicketId(123))))
+      when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(true), any[Request[AnyRef]](), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
       val result = controller.doReport()(generateRequest())
 
@@ -167,9 +174,9 @@ class ProblemReportsControllerApplication extends MockitoSugar {
 
   def hmrcConnectorWillFail = mockHmrcConnector(Future.failed(new Exception("failed")))
 
-  def hrmcConnectorWillReturnTheTicketId = mockHmrcConnector(Future.successful(Some(TicketId(123))))
+  def hrmcConnectorWillReturnTheTicketId = mockHmrcConnector(Future.successful(TicketId(123)))
 
-  private def mockHmrcConnector(result: Future[Option[TicketId]]) = {
+  private def mockHmrcConnector(result: Future[TicketId]) = {
     when(hmrcDeskproConnector.createDeskProTicket(
       meq(deskproName),
       meq(deskproEmail),

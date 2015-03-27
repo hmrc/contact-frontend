@@ -1,7 +1,6 @@
 package controllers
 
 import connectors.deskpro.HmrcDeskproConnector
-import controllers.common.BaseController
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.Messages
@@ -12,12 +11,13 @@ import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
 import uk.gov.hmrc.play.config.FrontendAuthConnector
 import uk.gov.hmrc.play.frontend.auth.Actions
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.validators.Validators._
 
 import scala.concurrent.Future
 
-trait ProblemReportsController extends BaseController with Actions {
+trait ProblemReportsController extends FrontendController with Actions {
 
   def hmrcDeskproConnector: HmrcDeskproConnector
   def authConnector: AuthConnector
@@ -57,11 +57,10 @@ trait ProblemReportsController extends BaseController with Actions {
       problemReport => {
         (for {
           maybeUserAccounts <- accounts.fold(ifEmpty = maybeAuthenticatedUserAccounts)(_ => Future.successful(accounts))
-          ticketIdOption <- createTicket(problemReport, request, maybeUserAccounts)
+          ticketId <- createTicket(problemReport, request, maybeUserAccounts)
         } yield {
-          val ticketId: String = ticketIdOption.map(_.ticket_id.toString).getOrElse("Unknown")
-          if (!problemReport.isJavascript) Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId, thankYouMessage))
-          else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId, thankYouMessage).toString())))
+          if (!problemReport.isJavascript) Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
+          else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
         }) recover {
           case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript(referrerFrom(request)))
         }
