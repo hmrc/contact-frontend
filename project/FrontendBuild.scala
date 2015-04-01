@@ -16,8 +16,8 @@ private object AppDependencies {
   private val govUkTemplateVersion =  "2.6.0"
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "frontend-bootstrap" % "0.1.0",
-    "uk.gov.hmrc" %% "play-authorised-frontend" % "0.6.0",
+    "uk.gov.hmrc" %% "frontend-bootstrap" % "0.2.0",
+    "uk.gov.hmrc" %% "play-authorised-frontend" % "0.7.0",
     "uk.gov.hmrc" %% "play-config" % "1.0.0",
     "uk.gov.hmrc" %% "play-json-logger" % "1.0.0",
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
