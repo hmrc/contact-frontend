@@ -1,4 +1,4 @@
-@()(implicit request : Request[_])
+@(actionUrl: String, csrfToken: Option[String])(implicit request : Request[_])
 @import uk.gov.hmrc.play.views.html._
 
 <div class="report-error">
@@ -8,7 +8,11 @@
         <p>
             @Messages("common.feedback.information.warning")
         </p>
-        @helpers.form(action = play.api.mvc.Call("POST", config.CFConfig.externalReportProblemUrl), 'class -> "form--feedback") {
+
+        <form action="@actionUrl" method="POST" class="form--feedback">
+            @if(csrfToken.isDefined) {
+                <input type="hidden" name="csrfToken" value="@{csrfToken.get}"/>
+            }
             <fieldset>
                 <div class="form-group-compound">
                     <label for="report-name" class="form-label">Name</label>
@@ -31,6 +35,6 @@
                     <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">Send</button>
                 </div>
             </fieldset>
-        }
+        </form>
     </div>
 </div>

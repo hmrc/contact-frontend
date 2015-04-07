@@ -5,6 +5,7 @@ import java.io.File
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
 import play.api.Mode._
+import play.api.mvc.Request
 import play.api.{Application, Configuration, Play}
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
@@ -30,7 +31,7 @@ object ContactFrontendGlobal extends DefaultFrontendGlobal with RunMode {
     super.onLoadConfig(config, path, classloader, mode)
   }
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String): Html =
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: Request[_]): Html =
     views.html.error_template(pageTitle, heading, message)
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"$env.microservice.metrics")

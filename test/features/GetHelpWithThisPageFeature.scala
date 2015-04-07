@@ -42,22 +42,19 @@ class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with I
       )
     }
 
-    //TODO currently CSRF token is disabled for this endpoint ()see the CSFRExceptionFilter because we return a cached version of the HTML
-    // which includes the token value. We should re-enable this if we can get around this issue.
+    Scenario("External posts to form are not allowed") {
+      When("I post to the form using external rest client")
+      val baseUrl = "http://localhost:9000"
+      implicit val wsClient = new NingWSClient(new AsyncHttpClientConfig.Builder().build())
 
-//    Scenario("External posts to form are not allowed") {
-//      When("I post to the form using external rest client")
-//      val baseUrl = "http://localhost:9000"
-//      implicit val wsClient = new NingWSClient(new AsyncHttpClientConfig.Builder().build())
-//
-//      val eventualResponse = WS.clientUrl(s"$baseUrl/contact/problem_reports")
-//        .withHeaders("Content-Type" -> "application/x-www-form-urlencoded")
-//        .post(s"report-name=Mike&report-email=mike@example.com&report-action=Action&report-error=error")
-//
-//      And("I get a bad request error")
-//      eventualResponse.futureValue.status shouldBe 403
-//      eventualResponse.futureValue.body shouldBe "No CSRF token found in headers"
-//    }
+      val eventualResponse = WS.clientUrl(s"$baseUrl/contact/problem_reports_secure")
+        .withHeaders("Content-Type" -> "application/x-www-form-urlencoded")
+        .post(s"report-name=Mike&report-email=mike@example.com&report-action=Action&report-error=error")
+
+      And("I get a bad request error")
+      eventualResponse.futureValue.status shouldBe 403
+      eventualResponse.futureValue.body shouldBe "No CSRF token found in headers"
+    }
 
     Scenario("The problem report form toggles") {
       Given("I go to the 'Feedback' page")
