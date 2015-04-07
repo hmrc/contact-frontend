@@ -4,7 +4,7 @@
 
 @getHelpForm = {
   @if(supportLinkEnabled) {
-    @partials.error_feedback()
+    @partials.error_feedback(config.CFConfig.externalReportProblemSecureUrl, play.filters.csrf.CSRF.getToken(request).map(_.value))
   }
 }
 

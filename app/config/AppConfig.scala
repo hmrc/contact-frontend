@@ -14,6 +14,7 @@ trait AppConfig {
   val helpUrl: String
   val signOutUrl: String
   val externalReportProblemUrl: String
+  val externalReportProblemSecureUrl: String
 }
 
 object CFConfig extends AppConfig with ServicesConfig {
@@ -24,6 +25,7 @@ object CFConfig extends AppConfig with ServicesConfig {
   private val contactHost = configuration.getString(s"govuk-tax.$env.contact-frontend.host").getOrElse("")
 
   override lazy val externalReportProblemUrl = s"$contactHost/contact/problem_reports"
+  override lazy val externalReportProblemSecureUrl = s"$contactHost/contact/problem_reports_secure"
   override lazy val assetsPrefix = loadConfig(s"govuk-tax.$env.assets.url") + loadConfig(s"govuk-tax.$env.assets.version")
   override lazy val analyticsToken = loadConfig(s"govuk-tax.$env.google-analytics.token")
   override lazy val analyticsHost = loadConfig(s"govuk-tax.$env.google-analytics.host")

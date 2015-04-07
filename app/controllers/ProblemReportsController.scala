@@ -7,6 +7,7 @@ import play.api.data._
 import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.{Action, Request}
+import play.filters.csrf.CSRF
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
@@ -39,10 +40,16 @@ trait ProblemReportsController extends FrontendController with Actions {
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
-  def reportForm = Action { implicit request =>
-    Ok(views.html.partials.error_feedback())
+  //TODO default to true once everyone is off play-frontend so that we use the CSRF check
+  def reportForm(secure: Boolean = false) = Action { implicit request =>
+    val postEndpoint = if(secure) config.CFConfig.externalReportProblemSecureUrl else config.CFConfig.externalReportProblemUrl
+    val csrfToken = if(secure) Some("{{csrfToken}}") else None
+    Ok(views.html.partials.error_feedback(postEndpoint, csrfToken))
   }
 
+  def submitSecure = submit
+
+  //TODO remove once everyone is off play-frontend as this doesn't have CSRF check
   def submit = Action.async(doReport()(_))
 
   private[controllers] def doReport(thankYouMessage: Option[String] = None, accounts: Option[Accounts] = None)(implicit request: Request[AnyRef]) = {
