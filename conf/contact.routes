@@ -9,6 +9,6 @@ GET         /contact-hmrc                                @controllers.ContactHmr
 POST        /contact-hmrc                                @controllers.ContactHmrcController.submit
 GET         /contact-hmrc/thanks                         @controllers.ContactHmrcController.thanks
 
-GET         /problem_reports                             controllers.ProblemReportsController.reportForm(secure: Boolean)
+GET         /problem_reports                             controllers.ProblemReportsController.reportForm(secure: Option[Boolean])
 POST        /problem_reports                             controllers.ProblemReportsController.submit
 POST        /problem_reports_secure                      controllers.ProblemReportsController.submitSecure

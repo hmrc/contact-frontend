@@ -41,9 +41,10 @@ trait ProblemReportsController extends FrontendController with Actions {
   )
 
   //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
-  def reportForm(secure: Boolean = false) = Action { implicit request =>
-    val postEndpoint = if(secure) config.CFConfig.externalReportProblemSecureUrl else config.CFConfig.externalReportProblemUrl
-    val csrfToken = if(secure) Some("{{csrfToken}}") else None
+  def reportForm(secure: Option[Boolean]) = Action { implicit request =>
+    val isSecure = secure.getOrElse(false)
+    val postEndpoint = if(isSecure) config.CFConfig.externalReportProblemSecureUrl else config.CFConfig.externalReportProblemUrl
+    val csrfToken = if(isSecure) Some("{{csrfToken}}") else None
     Ok(views.html.partials.error_feedback(postEndpoint, csrfToken))
   }
 
