@@ -12,8 +12,8 @@ import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.auth.controllers.AuthParamsConfigurationValidator
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
-import uk.gov.hmrc.play.filters.LoggingFilter
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
+import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 
 object ContactFrontendGlobal extends DefaultFrontendGlobal with RunMode {
 
@@ -41,7 +41,7 @@ object ControllerConfiguration extends ControllerConfig {
   lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
 }
 
-object CFLoggingFilter extends LoggingFilter {
+object CFLoggingFilter extends FrontendLoggingFilter {
   override def controllerNeedsLogging(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsLogging
 }
 
