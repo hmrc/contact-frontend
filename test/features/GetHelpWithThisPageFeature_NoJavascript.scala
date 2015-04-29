@@ -47,7 +47,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
       Then("I see:")
       i_see(
         "Thank you",
-        "Your message has been sent, and the team will get back to you within 2 working days."
+        "Someone will get back to you within 2 working days."
       )
     }
 
