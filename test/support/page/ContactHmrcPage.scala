@@ -3,7 +3,7 @@ package support.page
 import support.modules.SharedPageModules
 import support.steps.Env
 
-object ContactHmrcPage extends WebPage with SharedPageModules {
+trait ContactHmrcPage extends WebPage with SharedPageModules {
 
   override val url = Env.host + "/contact/contact-hmrc"
 
@@ -30,3 +30,5 @@ object ContactHmrcPage extends WebPage with SharedPageModules {
 
   override def isCurrentPage: Boolean = heading=="Help and contact"
 }
+
+object ContactHmrcPage extends ContactHmrcPage

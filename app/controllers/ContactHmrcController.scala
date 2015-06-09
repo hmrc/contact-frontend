@@ -6,6 +6,7 @@ import connectors.deskpro.domain.TicketId
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Controller, Request}
+import play.filters.csrf.CSRF
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.{Actions, User}
 import uk.gov.hmrc.play.validators.Validators
@@ -14,20 +15,7 @@ import views.html.deskpro_error
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ContactHmrcController extends Controller with Actions {
-
-  override implicit val authConnector = FrontendAuthConnector
-
-  lazy val hmrcDeskproConnector = HmrcDeskproConnector
-
-  implicit def hc(implicit request: Request[_]): HeaderCarrier = HeaderCarrier.fromSessionAndHeaders(request.session, request.headers)
-
-  lazy val GovernmentGateway: GovernmentGatewayAuthProvider = {
-    new GovernmentGatewayAuthProvider(routes.ContactHmrcController.index().url)
-  }
-
-  val Subject = "Contact form submission"
-
+object ContactHmrcForm {
   val form = Form[ContactForm](
     mapping(
       "contact-name" -> text
@@ -38,27 +26,38 @@ class ContactHmrcController extends Controller with Actions {
         .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)
         .verifying("error.common.comments_too_long", comment => comment.size <= 2000),
       "isJavascript" -> boolean,
-      "referer" -> text
+      "referer" -> text,
+      "csrfToken" -> text
     )(ContactForm.apply)(ContactForm.unapply)
   )
+}
+
+trait ContactHmrcController extends Controller with Actions with DeskproSubmission {
+
+  override implicit val authConnector = FrontendAuthConnector
+
+  implicit def hc(implicit request: Request[_]): HeaderCarrier = HeaderCarrier.fromSessionAndHeaders(request.session, request.headers)
+
+  lazy val GovernmentGateway: GovernmentGatewayAuthProvider = {
+    new GovernmentGatewayAuthProvider(routes.ContactHmrcController.index().url)
+  }
 
   def index = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway).async {
     implicit user => implicit request =>
       Future.successful {
-        Ok(views.html.contact_hmrc(form.fill(ContactForm(request.headers.get("Referer").getOrElse("n/a")))))
+        Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(request.headers.get("Referer").getOrElse("n/a"), CSRF.getToken(request).map{ _.value }.getOrElse("")))
+        ))
       }
   })
 
   def submit = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway).async {
     implicit user => implicit request =>
-      form.bindFromRequest()(request).fold(
+      ContactHmrcForm.form.bindFromRequest()(request).fold(
         error => {
           Future.successful(BadRequest(views.html.contact_hmrc(error)))
         },
         data => {
-          import data._
-
-          val ticketIdF: Future[TicketId] = hmrcDeskproConnector.createTicket(contactName, contactEmail, Subject, contactComments, referer, data.isJavascript, request, Some(user))
+          val ticketIdF: Future[TicketId] = createDeskproTicket(data, Some(user.userAuthority.accounts))
 
           ticketIdF.map{ ticketId =>
             Redirect(routes.ContactHmrcController.thanks()).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
@@ -81,11 +80,14 @@ class ContactHmrcController extends Controller with Actions {
 
   }
 
-
 }
 
-case class ContactForm(contactName: String, contactEmail: String, contactComments: String, isJavascript: Boolean, referer: String)
+object ContactHmrcController extends ContactHmrcController {
+  override val hmrcDeskproConnector = HmrcDeskproConnector
+}
+
+case class ContactForm(contactName: String, contactEmail: String, contactComments: String, isJavascript: Boolean, referer: String, csrfToken: String)
 
 object ContactForm {
-  def apply(referer: String): ContactForm = ContactForm("", "", "", isJavascript = false, referer)
+  def apply(referer: String, csrfToken: String): ContactForm = ContactForm("", "", "", isJavascript = false, referer, csrfToken)
 }
