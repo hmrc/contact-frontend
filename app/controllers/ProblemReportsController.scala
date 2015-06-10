@@ -12,7 +12,7 @@ import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
 import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.frontend.controller.{UnauthorisedAction, FrontendController}
 import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.validators.Validators._
 
@@ -41,7 +41,7 @@ trait ProblemReportsController extends FrontendController with Actions {
   )
 
   //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
-  def reportForm(secure: Option[Boolean]) = Action { implicit request =>
+  def reportForm(secure: Option[Boolean]) = UnauthorisedAction { implicit request =>
     val isSecure = secure.getOrElse(false)
     val postEndpoint = if(isSecure) config.CFConfig.externalReportProblemSecureUrl else config.CFConfig.externalReportProblemUrl
     val csrfToken = if(isSecure) Some("{{csrfToken}}") else None
