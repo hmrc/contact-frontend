@@ -28,12 +28,17 @@ trait PartialsController extends FrontendController with DeskproSubmission with 
             accounts <- maybeAuthenticatedUserAccounts()
             ticketId <- createDeskproTicket(data, accounts)
           } yield {
-            Ok.withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+            Ok(ticketId.ticket_id.toString)
           }).recover {
             case _ => InternalServerError(deskpro_error())
           }
         }
       )
+  }
+
+  def contactHmrcFormConfirmation(ticketId: String) = UnauthorisedAction {
+    implicit request =>
+      Ok(views.html.partials.contact_hmrc_form_confirmation(ticketId))
   }
 
 }

@@ -1,9 +1,5 @@
 @(ticketId: String)(implicit request : Request[_])
 
 @main(title = Messages("contact.heading"), supportLinkEnabled = false) {
-  <header class="page-header">
-      <h1>@Messages("contact.heading")</h1>
-  </header>
-
-  @ticket_created_body(ticketId, None)
+  @views.html.partials.contact_hmrc_form_confirmation(ticketId)
 }

@@ -9,9 +9,10 @@ GET         /contact-hmrc                                controllers.ContactHmrc
 POST        /contact-hmrc                                controllers.ContactHmrcController.submit
 GET         /contact-hmrc/thanks                         controllers.ContactHmrcController.thanks
 
-GET         /problem_reports                             controllers.ProblemReportsController.reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String])
+GET         /problem_reports                             controllers.ProblemReportsController.reportForm(secure: Option[Boolean], csrfToken: Option[String])
 POST        /problem_reports                             controllers.ProblemReportsController.submit
 POST        /problem_reports_secure                      controllers.ProblemReportsController.submitSecure
 
 GET         /contact-hmrc/form                           controllers.PartialsController.contactHmrcForm(submitUrl: String, csrfToken: String)
 POST        /contact-hmrc/form                           controllers.PartialsController.submitContactHmrcForm(resubmitUrl: String)
+GET         /contact-hmrc/form/confirmation              controllers.PartialsController.contactHmrcFormConfirmation(ticketId: String)
