@@ -24,9 +24,9 @@ trait HmrcDeskproConnector {
 
   def http: HttpPost
 
-  def createTicket(name: String, email: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], userOption: Option[User])(implicit hc: HeaderCarrier): Future[TicketId] = {
+  def createTicket(name: String, email: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], accountsOption: Option[Accounts])(implicit hc: HeaderCarrier): Future[TicketId] = {
 
-    createDeskProTicket(name, email, subject, message, referrer, isJavascript, request, userOption.map(_.userAuthority.accounts))
+    createDeskProTicket(name, email, subject, message, referrer, isJavascript, request, accountsOption)
   }
 
   def createDeskProTicket(name: String, email: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], accountsOption: Option[Accounts])(implicit hc: HeaderCarrier): Future[TicketId] = {

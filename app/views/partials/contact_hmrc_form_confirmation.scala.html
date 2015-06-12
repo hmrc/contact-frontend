@@ -1,0 +1,7 @@
+@(ticketId: String)(implicit request : Request[_])
+
+<header class="page-header">
+  <h1>@Messages("contact.heading")</h1>
+</header>
+
+@ticket_created_body(ticketId, None)

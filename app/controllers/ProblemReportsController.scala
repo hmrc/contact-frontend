@@ -7,18 +7,15 @@ import play.api.data._
 import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.{Action, Request}
-import play.filters.csrf.CSRF
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
 import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
-import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.{UnauthorisedAction, FrontendController}
-import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.validators.Validators._
 
 import scala.concurrent.Future
 
-trait ProblemReportsController extends FrontendController with Actions {
+trait ProblemReportsController extends FrontendController with ContactFrontendActions {
 
   def hmrcDeskproConnector: HmrcDeskproConnector
   def authConnector: AuthConnector
@@ -41,17 +38,19 @@ trait ProblemReportsController extends FrontendController with Actions {
   )
 
   //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
-  def reportForm(secure: Option[Boolean]) = UnauthorisedAction { implicit request =>
+  def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String]) = UnauthorisedAction { implicit request =>
     val isSecure = secure.getOrElse(false)
     val postEndpoint = if(isSecure) config.CFConfig.externalReportProblemSecureUrl else config.CFConfig.externalReportProblemUrl
-    val csrfToken = if(isSecure) Some("{{csrfToken}}") else None
+    val csrfToken = preferredCsrfToken.orElse { if(isSecure) Some("{{csrfToken}}") else None }
     Ok(views.html.partials.error_feedback(postEndpoint, csrfToken))
   }
 
   def submitSecure = submit
 
   //TODO remove once everyone is off play-frontend as this doesn't have CSRF check
-  def submit = Action.async(doReport()(_))
+  def submit = Action.async { implicit request =>
+    doReport()
+  }
 
   private[controllers] def doReport(thankYouMessage: Option[String] = None, accounts: Option[Accounts] = None)(implicit request: Request[AnyRef]) = {
     form.bindFromRequest.fold(
@@ -73,14 +72,6 @@ trait ProblemReportsController extends FrontendController with Actions {
           case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript(referrerFrom(request)))
         }
       })
-  }
-
-  private def maybeAuthenticatedUserAccounts()(implicit request: Request[AnyRef]): Future[Option[Accounts]] = {
-    if (request.session.get(SessionKeys.authToken).isDefined) {
-      authConnector.currentAuthority.map(authorityOption => authorityOption.map(_.accounts))
-    } else {
-      Future.successful(None)
-    }
   }
 
   private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], accountsOption: Option[Accounts]) = {
