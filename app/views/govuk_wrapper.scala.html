@@ -16,24 +16,7 @@
     <meta name="format-detection" content="telephone=no" />
 }
 
-@headerNavLinks = {
-  <li><a id="homeNavHref" href="@appConfig.homeUrl"
-         data-journey-click="primary-navigation:Click:Home">Home</a></li>
-  <li><a id="accountDetailsNavHref" href="@appConfig.accountDetailsUrl"
-         data-journey-click="primary-navigation:Click:Your details">Your details</a></li>
-  <li><a href="@appConfig.helpUrl"
-         data-journey-click="primary-navigation:Click:Help">Help and contact</a></li>
-  <li><a id="logOutNavHref" href="@appConfig.signOutUrl"
-         data-journey-click="primary-navigation:Click:Sign out">Sign out</a></li>
-}
-
-@insideHeader = {
-    @uiLayouts.header_nav(
-      navTitle = Some("Your tax account"),
-      navTitleLink = None,
-      showBetaLink = false,
-      navLinks = Some(headerNavLinks))
-}
+@insideHeader = {}
 
 @afterHeader = {}
 
