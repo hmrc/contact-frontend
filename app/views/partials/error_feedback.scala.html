@@ -9,7 +9,7 @@
             @Messages("common.feedback.information.warning")
         </p>
 
-        <form action="@actionUrl" method="POST" class="form--feedback">
+        <form action="@actionUrl" method="POST" class="form--feedback" novalidate>
             @if(csrfToken.isDefined) {
                 <input type="hidden" name="csrfToken" value="@{csrfToken.get}"/>
             }

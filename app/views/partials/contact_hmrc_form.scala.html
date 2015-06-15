@@ -11,7 +11,7 @@
 <h2>How can we help you?</h2>
 <p>Don't include any personal or financial information. For example, your National Insurance or credit card numbers.</p>
 
-<form action="@externalContactHmrcUrl" method="POST" class="form--feedback">
+<form action="@externalContactHmrcUrl" method="POST" class="form--feedback" novalidate>
     <input type="hidden" name="csrfToken" value="@contactForm("csrfToken").value"/>
 
     <fieldset>

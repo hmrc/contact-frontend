@@ -81,11 +81,16 @@ class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with I
       goOn(UnauthenticatedFeedbackPage)
       UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
 
-      When("I fill in an invalid email address")
+      When("I fill in an invalid name")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.typeName("<")
 
+      And("Change focus to trigger validation")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeEmail("some@validemail.com")
+
       Then("I see an error for invalid name")
-      UnauthenticatedFeedbackPage.bodyText should include ("Letters or punctuation only please")
+      eventually {
+        UnauthenticatedFeedbackPage.bodyText should include ("Letters or punctuation only please")
+      }
     }
 
     Scenario("Invalid email error if you entered a badly formed email") {
@@ -96,8 +101,13 @@ class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with I
       When("I fill in an invalid email address")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.typeEmail("not@valid.")
 
+      And("Change focus to trigger validation")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeName("Validname")
+
       Then("I see an error for invalid email")
-      UnauthenticatedFeedbackPage.bodyText should include ("Please enter a valid email address.")
+      eventually {
+        UnauthenticatedFeedbackPage.bodyText should include ("Please enter a valid email address.")
+      }
     }
 
     Scenario("All fields are mandatory") {

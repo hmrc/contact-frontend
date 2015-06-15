@@ -106,9 +106,7 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
       on(ContactHmrcPage)
 
       And("I see:")
-
-      pendingUntilFixed(i_see(
-        "Enter a valid email address"))
+      i_see("Enter a valid email address")
 
       And("the Deskpro endpoint '/deskpro/ticket' has not been hit")
       verify_post_no_hit("/deskpro/ticket")
