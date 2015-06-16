@@ -2,6 +2,8 @@ package controllers
 
 import config.FrontendAuthConnector
 import connectors.deskpro.HmrcDeskproConnector
+import play.api.mvc.{Result, Request}
+import uk.gov.hmrc.play.frontend.auth.User
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import views.html.deskpro_error
 
@@ -39,6 +41,37 @@ trait PartialsController extends FrontendController with DeskproSubmission with 
   def contactHmrcFormConfirmation(ticketId: String) = UnauthorisedAction {
     implicit request =>
       Ok(views.html.partials.contact_hmrc_form_confirmation(ticketId))
+  }
+
+  def feedbackForm(submitUrl: String, csrfToken: String) = UnauthorisedAction.async {
+    implicit request =>
+      Future.successful {
+        Ok(views.html.partials.feedback_form(FeedbackForm.emptyForm(csrfToken), submitUrl))
+      }
+  }
+
+  def submitFeedbackForm(resubmitUrl: String) = UnauthorisedAction.async {
+    implicit request =>
+      FeedbackFormBind.form.bindFromRequest()(request).fold(
+        error => {
+          Future.successful(BadRequest(views.html.partials.feedback_form(error, resubmitUrl)))
+        },
+        data => {
+          (for {
+            accounts <- maybeAuthenticatedUserAccounts()
+            ticketId <- createDeskproFeedback(data, accounts)
+          } yield {
+            Ok(ticketId.ticket_id.toString)
+          }).recover {
+            case _ => InternalServerError
+          }
+        }
+      )
+  }
+
+  def feedbackFormConfirmation(ticketId: String) = UnauthorisedAction {
+    implicit request =>
+      Ok(views.html.partials.feedback_form_confirmation(ticketId))
   }
 
 }

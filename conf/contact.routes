@@ -1,9 +1,9 @@
-GET         /beta-feedback                               @controllers.FeedbackController.feedbackForm
-GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.unauthenticatedFeedbackForm
-POST        /beta-feedback/submit                        @controllers.FeedbackController.submit
-POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackController.submitUnauthenticated
-GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks
-GET         /beta-feedback/thanks-unauthenticated        @controllers.FeedbackController.unauthenticatedThanks
+GET         /beta-feedback                               controllers.FeedbackController.feedbackForm
+GET         /beta-feedback-unauthenticated               controllers.FeedbackController.unauthenticatedFeedbackForm
+POST        /beta-feedback/submit                        controllers.FeedbackController.submit
+POST        /beta-feedback/submit-unauthenticated        controllers.FeedbackController.submitUnauthenticated
+GET         /beta-feedback/thanks                        controllers.FeedbackController.thanks
+GET         /beta-feedback/thanks-unauthenticated        controllers.FeedbackController.unauthenticatedThanks
 
 GET         /contact-hmrc                                controllers.ContactHmrcController.index
 POST        /contact-hmrc                                controllers.ContactHmrcController.submit
@@ -16,3 +16,7 @@ POST        /problem_reports_secure                      controllers.ProblemRepo
 GET         /contact-hmrc/form                           controllers.PartialsController.contactHmrcForm(submitUrl: String, csrfToken: String)
 POST        /contact-hmrc/form                           controllers.PartialsController.submitContactHmrcForm(resubmitUrl: String)
 GET         /contact-hmrc/form/confirmation              controllers.PartialsController.contactHmrcFormConfirmation(ticketId: String)
+GET         /beta-feedback/form                          controllers.PartialsController.feedbackForm(submitUrl: String, csrfToken: String)
+POST        /beta-feedback/form                          controllers.PartialsController.submitFeedbackForm(resubmitUrl: String)
+GET         /beta-feedback/form/confirmation             controllers.PartialsController.feedbackFormConfirmation(ticketId: String)
+

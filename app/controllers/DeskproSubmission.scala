@@ -26,4 +26,16 @@ trait DeskproSubmission {
       accountsOption = accounts)
   }
 
+  def createDeskproFeedback(data: FeedbackForm, accounts: Option[Accounts])(implicit request: Request[AnyContent], hc: HeaderCarrier) : Future[TicketId] = {
+    hmrcDeskproConnector.createFeedback(
+      name = data.name,
+      email = data.email,
+      rating = data.experienceRating,
+      subject = "Beta feedback submission",
+      message = data.comments,
+      referrer = data.referrer,
+      isJavascript = data.javascriptEnabled,
+      request = request,
+      accountsOption = accounts)
+  }
 }

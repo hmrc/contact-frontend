@@ -1,55 +1,11 @@
 @(feedbackForm: Form[controllers.FeedbackForm], user: Option[uk.gov.hmrc.play.frontend.auth.User])(implicit request : Request[_])
 
 @import uk.gov.hmrc.play.views.html.helpers._
-@import controllers.FeedbackFormConfig._
 
 @main(title = Messages("common.feedback.heading"), userLoggedIn = user.isDefined) {
-<header class="page-header">
-    <h1>@Messages("common.feedback.heading")</h1>
-</header>
 
     @defining(user.map{_ => routes.FeedbackController.submit}.getOrElse(routes.FeedbackController.submitUnauthenticated))  { call =>
-
-        @form(action = call, 'id -> "feedback-form", 'class -> "form--feedback") {
-            <fieldset>
-                @inputRadioGroup(
-                feedbackForm("feedback-rating"),
-                feedbackRatings,
-                '_legend -> "What do you think of this online service?",
-                '_stackedLabel -> true,
-                '_labelClass -> "label--inlineRadio--overhead"
-                )
-                @input(
-                feedbackForm("feedback-name"),
-                '_label -> "Name",
-                '_divClass -> "form-field",
-                '_inputClass -> "input--fullwidth"
-                )
-                @input(
-                feedbackForm("feedback-email"),
-                '_label -> "Email address",
-                '_divClass -> "form-field",
-                '_inputClass -> "input--fullwidth",
-                '_type -> "email"
-                )
-
-                @textArea(
-                feedbackForm("feedback-comments"),
-                '_label -> "Comments",
-                '_info -> Messages("common.feedback.information.warning") ,
-                '_divClass -> "form-field",
-                '_inputClass -> "input--fullwidth",
-                '_help -> "Limit is 2000 characters"
-                )
-                <input type="hidden" name="isJavascript" id="isJavascript" value="@feedbackForm.data.get("isJavascript")">
-                <input type="hidden" name="referer" id="referer" value="@feedbackForm.data.get("referer")">
-
-                <div class="form-field">
-                    <button class="button" type="submit">Send</button>
-                </div>
-
-            </fieldset>
-        }
+        @views.html.partials.feedback_form(feedbackForm, call.url)
     }
 
 }
