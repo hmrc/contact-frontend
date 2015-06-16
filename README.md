@@ -29,6 +29,8 @@ These are the URLs to retrieve and submit the forms. The idea is to have the for
 
 `POST /problem_reports_secure`
 
+An example client controller is in [YTA](https://github.tools.tax.service.gov.uk/HMRC/business-tax-account/blob/master/app/controllers/ContactHmrcController.scala).
+
 Vanila screens (now deprecated)
 -------------------------------
 
