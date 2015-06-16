@@ -11,6 +11,8 @@ Partial HTML providers
 
 These are the URLs to retrieve and submit the forms. The idea is to have the form and confirmation page (and the related controller) in your own app (using your base template, incl. header, side bars, etc.) and suck in the form part from contact-frontend. Here is a simple sequence how it works.
 
+![alt tag](docs/partials.png)
+
 `GET /contact-hmrc/form?submitUrl=<url_of_your_contact_form>&csrfToken=<csrf_token>`
 
 `POST /contact-hmrc/form?resubmitUrl=<url_of_your_contact_form>`
