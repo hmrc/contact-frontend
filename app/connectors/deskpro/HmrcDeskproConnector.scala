@@ -24,13 +24,8 @@ trait HmrcDeskproConnector {
 
   def http: HttpPost
 
-  def createTicket(name: String, email: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], accountsOption: Option[Accounts])(implicit hc: HeaderCarrier): Future[TicketId] = {
-
-    createDeskProTicket(name, email, subject, message, referrer, isJavascript, request, accountsOption)
-  }
-
-  def createDeskProTicket(name: String, email: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], accountsOption: Option[Accounts])(implicit hc: HeaderCarrier): Future[TicketId] = {
-    http.POST[Ticket, TicketId](requestUrl("/deskpro/ticket"), Ticket.create(name, email, subject, message, referrer, isJavascript, hc, request, accountsOption)) recover {
+  def createDeskProTicket(name: String, email: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], accountsOption: Option[Accounts], service: Option[String])(implicit hc: HeaderCarrier): Future[TicketId] = {
+    http.POST[Ticket, TicketId](requestUrl("/deskpro/ticket"), Ticket.create(name, email, subject, message, referrer, isJavascript, hc, request, accountsOption, service)) recover {
       case nf: NotFoundException => throw new Upstream5xxResponse(nf.getMessage, 404, 500)
     }
   }

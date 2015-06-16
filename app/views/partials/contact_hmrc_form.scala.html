@@ -14,6 +14,8 @@
 <form action="@externalContactHmrcUrl" method="POST" class="form--feedback" novalidate>
     <input type="hidden" name="csrfToken" value="@contactForm("csrfToken").value"/>
 
+    <input type="hidden" name="service" value="@contactForm("service").value"/>
+
     <fieldset>
         @input(
         contactForm("contact-name"),

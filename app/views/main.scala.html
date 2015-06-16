@@ -1,10 +1,10 @@
-@(title: String, userLoggedIn: Boolean = true, supportLinkEnabled: Boolean = true)(mainContent: Html)(implicit request : Request[_])
+@(title: String, userLoggedIn: Boolean = true, supportLinkEnabled: Boolean = true, service: Option[String] = None)(mainContent: Html)(implicit request : Request[_])
 
 @import uk.gov.hmrc.play.views.html.layouts
 
 @getHelpForm = {
   @if(supportLinkEnabled) {
-    @partials.error_feedback(config.CFConfig.externalReportProblemSecureUrl, play.filters.csrf.CSRF.getToken(request).map(_.value))
+    @partials.error_feedback(config.CFConfig.externalReportProblemSecureUrl, play.filters.csrf.CSRF.getToken(request).map(_.value), service)
   }
 }
 

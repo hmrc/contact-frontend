@@ -1,4 +1,4 @@
-@(actionUrl: String, csrfToken: Option[String])(implicit request : Request[_])
+@(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_])
 @import uk.gov.hmrc.play.views.html._
 
 <div class="report-error">
@@ -13,6 +13,11 @@
             @if(csrfToken.isDefined) {
                 <input type="hidden" name="csrfToken" value="@{csrfToken.get}"/>
             }
+
+            @if(service.isDefined) {
+                <input type="hidden" name="service" value="@{service.get}"/>
+            }
+
             <fieldset>
                 <div class="form-group-compound">
                     <label for="report-name" class="form-label">Name</label>

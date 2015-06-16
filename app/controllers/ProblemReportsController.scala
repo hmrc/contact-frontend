@@ -33,16 +33,18 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
       "report-error" -> text
         .verifying("error.common.problem_report.action_mandatory", error => !error.isEmpty)
         .verifying("error.common.comments_too_long", error => error.size <= 1000),
-      "isJavascript" -> boolean
+      "isJavascript" -> boolean,
+      "service" -> optional(text)
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
   //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
-  def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String]) = UnauthorisedAction { implicit request =>
+  def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String], service: Option[String]) = UnauthorisedAction { implicit request =>
     val isSecure = secure.getOrElse(false)
     val postEndpoint = if(isSecure) config.CFConfig.externalReportProblemSecureUrl else config.CFConfig.externalReportProblemUrl
     val csrfToken = preferredCsrfToken.orElse { if(isSecure) Some("{{csrfToken}}") else None }
-    Ok(views.html.partials.error_feedback(postEndpoint, csrfToken))
+
+    Ok(views.html.partials.error_feedback(postEndpoint, csrfToken, service))
   }
 
   def submitSecure = submit
@@ -84,7 +86,8 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
       referrerFrom(request),
       problemReport.isJavascript,
       request,
-      accountsOption
+      accountsOption,
+      problemReport.service
     )
   }
 
@@ -103,7 +106,7 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
   }
 }
 
-case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean)
+case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String])
 
 
 object ProblemReportsController extends ProblemReportsController {
