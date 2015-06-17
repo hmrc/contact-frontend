@@ -1,28 +1,31 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode
-import support.behaviour.NavigationSugar
+import support.StubbedFeatureSpec
 import support.page.ContactHmrcPage
-import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
-import support.stubs.{NoJsFeature, Login, StubbedFeature}
+import support.steps.Env
+import support.stubs.Login
 
-class ContactHmrc_NoJavascriptFeature extends NoJsFeature with NavigationSugar with ApiSteps with ObservationSteps {
+class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
 
-  Feature("Contact HMRC with Javascript disabled") {
+  feature("Contact HMRC with Javascript disabled") {
 
     info("In order to make my views known")
     info("As a Tax Payer with Javascript disabled in my browser")
     info("I want to contact HMRC")
 
+    scenario("Contact form sent successfully") {
 
-    Background {
-      Given("I am logged in")
+      val Name = "Grumpy Bear"
+      val Email = "grumpy@carebears.com"
+      val Comment = "I am writing a comment"
+
+      Given("JavaScript is disabled")
+      Env.disableJavascript()
 
       And("I go to the 'Help' page")
       goOn(ContactHmrcPage)
-    }
 
-    Scenario("Contact form sent successfully") {
       When("I fill the contact form correctly")
       ContactHmrcPage.fillContactForm(Name, Email, Comment)
 
@@ -53,8 +56,4 @@ class ContactHmrc_NoJavascriptFeature extends NoJsFeature with NavigationSugar w
 
   }
 
-
-  private val Name = "Grumpy Bear"
-  private val Email = "grumpy@carebears.com"
-  private val Comment = "I am writing a comment"
 }

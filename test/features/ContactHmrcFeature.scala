@@ -1,28 +1,22 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode._
-import support.behaviour.NavigationSugar
-import support.page.{TechnicalDifficultiesPage, ContactHmrcPage, ExternalPage}
-import support.steps.{NavigationSteps, ApiSteps, ObservationSteps}
-import support.stubs.{Login, StubbedFeature}
+import support.StubbedFeatureSpec
+import support.page.{ContactHmrcPage, ExternalPage, TechnicalDifficultiesPage}
+import support.stubs._
 
-class ContactHmrcFeature extends StubbedFeature with NavigationSugar with NavigationSteps with ApiSteps with ObservationSteps {
+class ContactHmrcFeature extends StubbedFeatureSpec {
 
-  Feature("Help") {
+  feature("Help") {
 
     info("In order to make my views known")
     info("As a Tax Payer")
     info("I need Help")
 
-
-    Background {
-      Given("I am logged in")
-
-      And("I go to the 'Help' page")
+    scenario("Contact form sent successfully") {
+      Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
-    }
 
-    Scenario("Contact form sent successfully") {
       When("I fill the contact form correctly")
       ContactHmrcPage.fillContactForm(Name, Email, Comment)
 
@@ -51,7 +45,10 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
         """.stripMargin, LENIENT)
     }
 
-    Scenario("All fields are mandatory") {
+    scenario("All fields are mandatory") {
+      Given("I am logged in and I go to the 'Help' page")
+      goOn(ContactHmrcPage)
+
       When("I fill the form with empty values")
 
       And("I try to send the contact form")
@@ -71,7 +68,10 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
     }
 
 
-    Scenario("Fields have a size limit") {
+    scenario("Fields have a size limit") {
+      Given("I am logged in and I go to the 'Help' page")
+      goOn(ContactHmrcPage)
+
       Given("the 'name' cannot be longer than 70 characters")
       And("the 'email' cannot be longer than 255 characters")
       And("the 'comment' cannot be longer than 2000 characters")
@@ -96,7 +96,10 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
     }
 
 
-    Scenario("Invalid email address")  {
+    scenario("Invalid email address")  {
+      Given("I am logged in and I go to the 'Help' page")
+      goOn(ContactHmrcPage)
+
       ContactHmrcPage.fillContactForm(Name, InvalidEmailAddress, Comment)
 
       And("I try to send the contact form")
@@ -112,7 +115,10 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
       verify_post_no_hit("/deskpro/ticket")
     }
 
-    Scenario("Deskpro fails with 404") {
+    scenario("Deskpro fails with 404") {
+      Given("I am logged in and I go to the 'Help' page")
+      goOn(ContactHmrcPage)
+
       Given("the call to Deskpro endpoint '/deskpro/ticket' will fail with status 404")
       service_will_fail_on_POST_request("/deskpro/ticket", 404)
 
@@ -129,7 +135,10 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
       i_see("There was a problem sending your query.")
     }
 
-    Scenario("Deskpro times out") {
+    scenario("Deskpro times out") {
+      Given("I am logged in and I go to the 'Help' page")
+      goOn(ContactHmrcPage)
+
       Given("the call to Deskpro endpoint '/deskpro/ticket' will take too much time")
       service_will_return_payload_for_POST_request("/deskpro/ticket", delayMillis = 10000)("")
 
@@ -146,7 +155,10 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
       i_see("There was a problem sending your query.")
     }
 
-    Scenario("Deskpro fails with 500") {
+    scenario("Deskpro fails with 500") {
+      Given("I am logged in and I go to the 'Help' page")
+      goOn(ContactHmrcPage)
+
       Given("the call to Deskpro endpoint '/deskpro/ticket' will fail with status 500")
       service_will_fail_on_POST_request("/deskpro/ticket", 500)
 
@@ -164,7 +176,10 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
     }
 
 
-    Scenario("Link to contact HMRC about tax queries") {
+    scenario("Link to contact HMRC about tax queries") {
+      Given("I am logged in and I go to the 'Help' page")
+      goOn(ContactHmrcPage)
+
       When("I click on the 'contact HMRC' link")
       ContactHmrcPage.clickOnContactHmrcLink()
 
@@ -177,7 +192,10 @@ class ContactHmrcFeature extends StubbedFeature with NavigationSugar with Naviga
     }
 
 
-    Scenario("The referrer URL is sent to Deskpro") {
+    scenario("The referrer URL is sent to Deskpro") {
+      Given("I am logged in and I go to the 'Help' page")
+      goOn(ContactHmrcPage)
+
       Given("I come from a page that links to Contact HMRC")
       goOn(ExternalPage)
       ExternalPage.clickOnContactHmrcLink()

@@ -1,28 +1,29 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
-import support.behaviour.NavigationSugar
-import support.page.{FeedbackSuccessPage, TechnicalDifficultiesPage, ExternalPage, UnauthenticatedFeedbackPage}
-import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
-import support.stubs.{Stubs, StubbedFeature}
+import support.StubbedFeatureSpec
+import support.page.{ExternalPage, FeedbackSuccessPage, TechnicalDifficultiesPage, UnauthenticatedFeedbackPage}
 
-class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSugar with ApiSteps with ObservationSteps {
+class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
 
-
-  Feature("Feedback about the beta when not signed in") {
+  val Name = "Grumpy Bear"
+  val Email = "grumpy@carebears.com"
+  val Comment = "I am writing a comment"
+  val InvalidEmailAddress = "grumpycarebears.com"
+  val TooLongName = "G"*71
+  val TooLongEmail = "g"*255 + "@x.com"
+  val TooLongComment = "I"*2001
+  
+  feature("Feedback about the beta when not signed in") {
 
     info("In order to make my views known about the beta")
     info("As an unauthenticated user")
     info("I want to leave my feedback")
 
-
-    Background {
+    scenario("Submit feedback successfully") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
-    }
 
-
-    Scenario("Submit feedback successfully") {
       When("I fill the feedback form correctly")
       UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
 
@@ -57,8 +58,10 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSugar wit
         """.stripMargin, LENIENT)
     }
 
+    scenario("The referrer URL is sent to Deskpro") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
 
-    Scenario("The referrer URL is sent to Deskpro") {
       Given("I come from a page that links to the beta feedback")
       goOn(ExternalPage)
       ExternalPage.clickOnFeedbackLink()
@@ -88,8 +91,10 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSugar wit
         """.stripMargin, LENIENT)
     }
 
+    scenario("All fields are mandatory") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
 
-    Scenario("All fields are mandatory") {
       When("I don't fill the form")
 
       And("I try to send the feedback form")
@@ -110,8 +115,10 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSugar wit
       verify_post_no_hit("/deskpro/feedback")
     }
 
+    scenario("Fields have a size limit") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
 
-    Scenario("Fields have a size limit") {
       Given("the 'name' cannot be longer than 70 characters")
 
       And("the 'email' cannot be longer than 255 characters")
@@ -120,7 +127,6 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSugar wit
 
       When("I fill the form with values that are too long")
       UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, TooLongName, TooLongEmail, TooLongComment)
-
 
       And("I try to send the feedback form")
       UnauthenticatedFeedbackPage.submitFeedbackForm()
@@ -136,8 +142,10 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSugar wit
       )
     }
 
+    scenario("Invalid email address") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
 
-    Scenario("Invalid email address") {
       When("I fill the form with an invalid email address")
       UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, InvalidEmailAddress, Comment)
 
@@ -149,17 +157,17 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSugar wit
 
       And("I see:")
       i_see("Enter a valid email address")
-
     }
 
+    scenario("Call to Deskpro times out after several seconds") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
 
-    Scenario("Call to Deskpro times out after several seconds") {
       Given("the call to Deskpro endpoint '/deskpro/feedback' will take too much time")
       service_will_return_payload_for_POST_request("/deskpro/feedback", delayMillis = 10000)("")
 
       When("I fill the feedback form correctly")
       UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
-
 
       And("I try to send the feedback form")
       UnauthenticatedFeedbackPage.submitFeedbackForm()
@@ -171,38 +179,46 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSugar wit
       i_see("Please try again in a few minutes.")
     }
 
+    scenario("Deskpro fails with status 404") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
 
+      Given(s"the call to Deskpro endpoint '/deskpro/feedback' will fail with status 404")
+      service_will_fail_on_POST_request("/deskpro/feedback", 404)
 
-    val statuses = Seq("404", "500")
+      When("I fill the contact form correctly")
+      UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
 
-    statuses foreach { status =>
-      Scenario(s"Deskpro fails with status $status") {
-        Given(s"the call to Deskpro endpoint '/deskpro/feedback' will fail with status $status")
-        service_will_fail_on_POST_request("/deskpro/feedback", status.toInt)
+      And("I try to send the feedback form")
+      UnauthenticatedFeedbackPage.submitFeedbackForm()
 
-        When("I fill the contact form correctly")
-        UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
+      Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
+      on(TechnicalDifficultiesPage)
 
-        And("I try to send the feedback form")
-        UnauthenticatedFeedbackPage.submitFeedbackForm()
+      And("I see:")
+      i_see("Please try again in a few minutes.")
+    }
 
-        Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
-        on(TechnicalDifficultiesPage)
+    scenario("Deskpro fails with status 500") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
 
-        And("I see:")
-        i_see("Please try again in a few minutes.")
-      }
+      Given(s"the call to Deskpro endpoint '/deskpro/feedback' will fail with status 500")
+      service_will_fail_on_POST_request("/deskpro/feedback", 500)
+
+      When("I fill the contact form correctly")
+      UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
+
+      And("I try to send the feedback form")
+      UnauthenticatedFeedbackPage.submitFeedbackForm()
+
+      Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
+      on(TechnicalDifficultiesPage)
+
+      And("I see:")
+      i_see("Please try again in a few minutes.")
     }
 
   }
 
-  private val Name = "Grumpy Bear"
-  private val Email = "grumpy@carebears.com"
-  private val Comment = "I am writing a comment"
-
-  private val InvalidEmailAddress = "grumpycarebears.com"
-
-  private val TooLongName = "G"*71
-  private val TooLongEmail = "g"*255 + "@x.com"
-  private val TooLongComment = "I"*2001
 }

@@ -54,6 +54,7 @@ trait ContactHmrcController extends Controller with Actions with DeskproSubmissi
 
   def submit = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway).async {
     implicit user => implicit request =>
+
       ContactHmrcForm.form.bindFromRequest()(request).fold(
         error => {
           Future.successful(BadRequest(views.html.contact_hmrc(error)))

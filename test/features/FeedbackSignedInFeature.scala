@@ -1,28 +1,26 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
-import support.behaviour.NavigationSugar
-import support.page.{FeedbackSuccessPage, AuthenticatedFeedbackPage}
-import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
-import support.stubs.{Login, StubbedFeature}
+import support.StubbedFeatureSpec
+import support.page.{AuthenticatedFeedbackPage, FeedbackSuccessPage}
+import support.stubs.Login
 
-class FeedbackSignedInFeature extends StubbedFeature with NavigationSugar with ApiSteps with ObservationSteps  {
+class FeedbackSignedInFeature extends StubbedFeatureSpec {
 
-
-  Feature("Feedback about the beta when signed in") {
+  feature("Feedback about the beta when signed in") {
 
     info("In order to make my views known about the beta")
     info("As an authenticated user")
     info("I want to leave my feedback")
 
+    scenario("Submit feedback successfully") {
+      val Name = "Grumpy Bear"
+      val Email = "grumpy@carebears.com"
+      val Comment = "I am writing a comment"
 
-    Background {
       Given("I go to the 'Send your feedback' page")
       goOn(AuthenticatedFeedbackPage)
-    }
 
-
-    Scenario("Submit feedback successfully") {
       When("I fill the feedback form correctly")
       AuthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
 
@@ -57,11 +55,6 @@ class FeedbackSignedInFeature extends StubbedFeature with NavigationSugar with A
         """.stripMargin, LENIENT)
     }
 
-
   }
-
-  private val Name = "Grumpy Bear"
-  private val Email = "grumpy@carebears.com"
-  private val Comment = "I am writing a comment"
 
 }

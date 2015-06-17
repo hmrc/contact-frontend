@@ -1,28 +1,26 @@
 package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode
-import support.behaviour.NavigationSugar
+import support.StubbedFeatureSpec
 import support.page.{FeedbackSuccessPage, UnauthenticatedFeedbackPage}
-import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
-import support.stubs._
+import support.steps.Env
 
 
-class FeedbackNotSignedIn_NoJavascriptFeature extends NoJsFeature with NavigationSugar with ApiSteps with ObservationSteps {
+class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
 
-  Feature("Feedback about the beta when not signed and with Javascript disabled") {
+  feature("Feedback about the beta when not signed and with Javascript disabled") {
 
     info("In order to make my views known about the beta")
     info("As an unauthenticated user with Javascript disabled")
     info("I want to leave my feedback")
 
+    scenario("Submit feedback successfully") {
+      Given("JavaScript is disabled")
+      Env.disableJavascript()
 
-    Background {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
-    }
 
-
-    Scenario("Submit feedback successfully") {
       When("I fill the feedback form correctly")
       UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
 
