@@ -3,18 +3,14 @@ package support.stubs
 import java.net.URLEncoder
 import java.util.UUID
 
+import com.github.tomakehurst.wiremock.client.UrlMatchingStrategy
 import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.client.{UrlMatchingStrategy, WireMock}
 import play.api.libs.Crypto
 import play.mvc.Http.HeaderNames
-import support.steps.Env
 import uk.gov.hmrc.crypto.{CompositeSymmetricCrypto, PlainText}
 import uk.gov.hmrc.play.http.SessionKeys
 
-
 trait Stubs {
-  WireMock.configureFor(Env.stubHost, Env.stubPort)
-
   def stubFor(stub: Stub) {
     stub.create()
   }
@@ -98,7 +94,6 @@ object Login extends Stub with SessionCookieBaker {
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
       .withHeader(HeaderNames.LOCATION, "http://localhost:9000/contact/contact-hmrc")))
 
-
     stubFor(get(urlEqualTo("/auth/authority"))
       .willReturn(
         aResponse()
@@ -115,7 +110,6 @@ object Login extends Stub with SessionCookieBaker {
               |
             """.stripMargin
           )))
-
   }
 
 }
@@ -129,7 +123,6 @@ object Deskpro extends Stub {
           .withStatus(200)
           .withBody("""{"ticket_id": 1}""")
       ))
-
 
     stubFor(post(urlEqualTo("/deskpro/feedback"))
       .willReturn(

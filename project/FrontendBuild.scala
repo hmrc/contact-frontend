@@ -27,26 +27,17 @@ private object AppDependencies {
     "org.apache.httpcomponents" % "httpclient" % "4.3.1"
   )
 
-  trait TestDependencies {
-    lazy val scope: String = "test"
-    lazy val test : Seq[ModuleID] = ???
-  }
+  val test = Seq(
+    "org.scalatest" %% "scalatest" % "2.2.2" % "test",
+    "org.scalatestplus" %% "play" % "1.2.0" % "test",
+    "org.pegdown" % "pegdown" % "1.4.2" % "test",
+    "org.jsoup" % "jsoup" % "1.7.3" % "test",
+    "com.github.tomakehurst" % "wiremock" % "1.48" % "test",
+    "uk.gov.hmrc" %% "scala-webdriver" % "4.22.0" % "test",
+    "uk.gov.hmrc" %% "hmrctest" % "1.0.0" % "test"
+  )
 
-  object Test {
-    def apply() = new TestDependencies {
-      override lazy val test = Seq(
-        "org.scalatest" %% "scalatest" % "2.2.2" % scope,
-        "org.pegdown" % "pegdown" % "1.4.2" % scope,
-        "org.jsoup" % "jsoup" % "1.7.3" % scope,
-
-        "com.github.tomakehurst" % "wiremock" % "1.48" % "test",
-        "uk.gov.hmrc" %% "scala-webdriver" % "4.22.0" % "test",
-        "uk.gov.hmrc" %% "hmrctest" % "1.0.0" % "test"
-      )
-    }.test
-  }
-
-  def apply() = compile ++ Test()
+  def apply() = compile ++ test
 }
 
 

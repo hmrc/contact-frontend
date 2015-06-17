@@ -1,22 +1,26 @@
 package features
 
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import support.behaviour.NavigationSugar
+import support.StubbedFeatureSpec
 import support.page.{PleaseTryAgainPage, ThankYouPage, UnauthenticatedFeedbackPage}
-import support.steps.ObservationSteps
-import support.stubs.NoJsFeature
+import support.steps.Env
 
-class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutures with IntegrationPatience with NavigationSugar with ObservationSteps {
+class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
+  val Name = "Grumpy Bear"
+  val Email = "grumpy@carebears.com"
+  val WhatWhereYouDoing = "Something"
+  val WhatDoYouNeedHelpWith = "Nothing"
 
-  Feature("Get help with this page form") {
+  feature("Get help with this page form") {
 
     info("In order to get help with a specific page")
     info("As a tax payer with Javascript disabled")
     info("I want to ask for help to HMRC")
 
+    scenario("I don't see the open help form link without Javascript") {
+      Given("JavaScript is disabled")
+      Env.disableJavascript()
 
-    Scenario("I don't see the open help form link without Javascript") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
 
@@ -24,7 +28,10 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
       i_dont_see("Get help with this page.")
     }
 
-    Scenario("Successful form submission without Javascript") {
+    scenario("Successful form submission without Javascript") {
+      Given("JavaScript is disabled")
+      Env.disableJavascript()
+
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
 
@@ -44,7 +51,10 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
       )
     }
 
-    Scenario("Only these characters are allowed for the name: letters (lower and upper case), space, comma, period, braces and hyphen") {
+    scenario("Only these characters are allowed for the name: letters (lower and upper case), space, comma, period, braces and hyphen") {
+      Given("JavaScript is disabled")
+      Env.disableJavascript()
+
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
 
@@ -62,7 +72,10 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
             "Please try again later or email hmrcsupport@tax.service.gov.uk if you need technical help with this website.")
     }
 
-    Scenario("All fields are mandatory") {
+    scenario("All fields are mandatory") {
+      Given("JavaScript is disabled")
+      Env.disableJavascript()
+
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)
 
@@ -74,10 +87,5 @@ class GetHelpWithThisPageFeature_NoJavascript extends NoJsFeature with ScalaFutu
         "Please try again later or email hmrcsupport@tax.service.gov.uk if you need technical help with this website.")
     }
   }
-
-  private val Name = "Grumpy Bear"
-  private val Email = "grumpy@carebears.com"
-  private val WhatWhereYouDoing = "Something"
-  private val WhatDoYouNeedHelpWith = "Nothing"
 
 }
