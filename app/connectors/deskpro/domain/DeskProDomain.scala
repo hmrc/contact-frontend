@@ -18,7 +18,8 @@ case class Ticket private(name: String,
                           authId: String,
                           areaOfTax: String,
                           sessionId: String,
-                          userTaxIdentifiers: UserTaxIdentifiers)
+                          userTaxIdentifiers: UserTaxIdentifiers,
+                          service: Option[String])
 
 
 object UserTaxIdentifiers {
@@ -29,7 +30,16 @@ object Ticket extends FieldTransformer {
 
   implicit val formats = Json.format[Ticket]
 
-  def create(name: String, email: String, subject: String, message: String, referrer: String, isJavascript: Boolean, hc: HeaderCarrier, request: Request[AnyRef], accountsOption: Option[Accounts]): Ticket =
+  def create(name: String,
+             email: String,
+             subject: String,
+             message: String,
+             referrer: String,
+             isJavascript: Boolean,
+             hc: HeaderCarrier,
+             request: Request[AnyRef],
+             accountsOption: Option[Accounts],
+             service: Option[String]): Ticket =
     Ticket(
       name.trim,
       email,
@@ -41,7 +51,8 @@ object Ticket extends FieldTransformer {
       userIdFrom(request, hc),
       areaOfTaxOf(request),
       sessionIdFrom(hc),
-      userTaxIdentifiersFromAccounts(accountsOption))
+      userTaxIdentifiersFromAccounts(accountsOption),
+      service)
 }
 
 object TicketId {

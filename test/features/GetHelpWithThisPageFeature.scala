@@ -2,13 +2,11 @@ package features
 
 import com.ning.http.client.AsyncHttpClientConfig
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.selenium.WebBrowser.go
-import org.skyscreamer.jsonassert.JSONCompareMode._
 import play.api.libs.ws.WS
 import play.api.libs.ws.ning.NingWSClient
 import support.behaviour.NavigationSugar
 import support.page.UnauthenticatedFeedbackPage
-import support.steps.{ObservationSteps, ApiSteps, NavigationSteps}
+import support.steps.ObservationSteps
 import support.stubs.StubbedFeature
 
 class GetHelpWithThisPageFeature extends StubbedFeature with ScalaFutures with IntegrationPatience with NavigationSugar with ObservationSteps {

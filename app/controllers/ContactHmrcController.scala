@@ -27,7 +27,8 @@ object ContactHmrcForm {
         .verifying("error.common.comments_too_long", comment => comment.size <= 2000),
       "isJavascript" -> boolean,
       "referer" -> text,
-      "csrfToken" -> text
+      "csrfToken" -> text,
+      "service" -> optional(text)
     )(ContactForm.apply)(ContactForm.unapply)
   )
 }
@@ -45,8 +46,9 @@ trait ContactHmrcController extends Controller with Actions with DeskproSubmissi
   def index = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway).async {
     implicit user => implicit request =>
       Future.successful {
-        Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(request.headers.get("Referer").getOrElse("n/a"), CSRF.getToken(request).map{ _.value }.getOrElse("")))
-        ))
+        val referer = request.headers.get("Referer").getOrElse("n/a")
+        val csrfToken = CSRF.getToken(request).map{ _.value }.getOrElse("")
+        Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None))))
       }
   })
 
@@ -72,12 +74,10 @@ trait ContactHmrcController extends Controller with Actions with DeskproSubmissi
   }))
 
   def doThanks(implicit user: User, request: Request[AnyRef]) = {
-
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
       Ok(views.html.contact_hmrc_confirmation(ticketId))
     }
     Future.successful(result)
-
   }
 
 }
@@ -86,8 +86,8 @@ object ContactHmrcController extends ContactHmrcController {
   override val hmrcDeskproConnector = HmrcDeskproConnector
 }
 
-case class ContactForm(contactName: String, contactEmail: String, contactComments: String, isJavascript: Boolean, referer: String, csrfToken: String)
+case class ContactForm(contactName: String, contactEmail: String, contactComments: String, isJavascript: Boolean, referer: String, csrfToken: String, service: Option[String])
 
 object ContactForm {
-  def apply(referer: String, csrfToken: String): ContactForm = ContactForm("", "", "", isJavascript = false, referer, csrfToken)
+  def apply(referer: String, csrfToken: String, service: Option[String]): ContactForm = ContactForm("", "", "", isJavascript = false, referer, csrfToken, service)
 }

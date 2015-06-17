@@ -15,7 +15,7 @@ trait DeskproSubmission {
   protected def hmrcDeskproConnector: HmrcDeskproConnector
 
   def createDeskproTicket(data: ContactForm, accounts: Option[Accounts])(implicit request: Request[AnyContent], hc: HeaderCarrier) : Future[TicketId] = {
-    hmrcDeskproConnector.createTicket(
+    hmrcDeskproConnector.createDeskProTicket(
       name = data.contactName,
       email = data.contactEmail,
       subject = Subject,
@@ -23,7 +23,8 @@ trait DeskproSubmission {
       referrer = data.referer,
       isJavascript = data.isJavascript,
       request = request,
-      accountsOption = accounts)
+      accountsOption = accounts,
+      service = data.service)
   }
 
   def createDeskproFeedback(data: FeedbackForm, accounts: Option[Accounts])(implicit request: Request[AnyContent], hc: HeaderCarrier) : Future[TicketId] = {

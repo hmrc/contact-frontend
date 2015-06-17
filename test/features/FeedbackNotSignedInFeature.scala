@@ -147,9 +147,8 @@ class FeedbackNotSignedInFeature extends StubbedFeature with NavigationSugar wit
       Then("I am on the 'Send your feedback' page")
       on(UnauthenticatedFeedbackPage)
 
-
       And("I see:")
-      pendingUntilFixed(i_see("Enter a valid email address"))
+      i_see("Enter a valid email address")
 
     }
 
