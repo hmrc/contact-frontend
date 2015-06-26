@@ -10,6 +10,7 @@ POST        /contact-hmrc                                controllers.ContactHmrc
 GET         /contact-hmrc/thanks                         controllers.ContactHmrcController.thanks
 
 GET         /problem_reports                             controllers.ProblemReportsController.reportForm(secure: Option[Boolean], csrfToken: Option[String], service: Option[String])
+GET         /problem_reports_ajax                        controllers.ProblemReportsController.reportFormAjax(service: Option[String])
 POST        /problem_reports                             controllers.ProblemReportsController.submit
 POST        /problem_reports_secure                      controllers.ProblemReportsController.submitSecure
 
@@ -19,4 +20,6 @@ GET         /contact-hmrc/form/confirmation              controllers.PartialsCon
 GET         /beta-feedback/form                          controllers.PartialsController.feedbackForm(submitUrl: String, csrfToken: String)
 POST        /beta-feedback/form                          controllers.PartialsController.submitFeedbackForm(resubmitUrl: String)
 GET         /beta-feedback/form/confirmation             controllers.PartialsController.feedbackFormConfirmation(ticketId: String)
+
+OPTIONS /*path                                           controllers.ApplicationController.options(path)
 
