@@ -11,6 +11,7 @@ GET         /contact-hmrc/thanks                         controllers.ContactHmrc
 
 GET         /problem_reports                             controllers.ProblemReportsController.reportForm(secure: Option[Boolean], csrfToken: Option[String], service: Option[String])
 GET         /problem_reports_ajax                        controllers.ProblemReportsController.reportFormAjax(service: Option[String])
+GET         /problem_reports_nonjs                       controllers.ProblemReportsController.reportFormNonJavaScript(service: Option[String])
 POST        /problem_reports                             controllers.ProblemReportsController.submit
 POST        /problem_reports_secure                      controllers.ProblemReportsController.submitSecure
 

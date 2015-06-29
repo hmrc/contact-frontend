@@ -11,6 +11,7 @@ trait AppConfig {
   val betaFeedbackUnauthenticatedUrl: String
   val externalReportProblemUrl: String
   val externalReportProblemSecureUrl: String
+  def loginCallback(continueUrl: String): String
 }
 
 object CFConfig extends AppConfig with ServicesConfig {
@@ -26,4 +27,5 @@ object CFConfig extends AppConfig with ServicesConfig {
   override lazy val analyticsHost = loadConfig(s"govuk-tax.$env.google-analytics.host")
   override lazy val betaFeedbackUrl = controllers.routes.FeedbackController.feedbackForm().url
   override lazy val betaFeedbackUnauthenticatedUrl = controllers.routes.FeedbackController.unauthenticatedFeedbackForm().url
+  override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
 }

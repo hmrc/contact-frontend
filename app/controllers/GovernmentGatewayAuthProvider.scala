@@ -1,12 +1,13 @@
 package controllers
 
+import config.CFConfig
 import play.api.Play
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.frontend.auth.GovernmentGateway
 
 class GovernmentGatewayAuthProvider(continueUrl: String) extends GovernmentGateway {
   //todo move the URL login to ExternalUrls
-  lazy val companyAuthUrl = Play.current.configuration.getString(s"govuk-tax.${RunMode.env}.company-auth.host").getOrElse("/account")
+  lazy val companyAuthUrl = Play.current.configuration.getString(s"govuk-tax.${RunMode.env}.company-auth.host").getOrElse("")
 
-  override def login: String = s"$companyAuthUrl/sign-in?continue=$continueUrl"
+  override def login: String = s"$companyAuthUrl/account/sign-in?continue=${CFConfig.loginCallback(continueUrl)}"
 }

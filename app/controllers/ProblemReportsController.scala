@@ -51,6 +51,10 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
     Ok(views.html.partials.error_feedback_inner(config.CFConfig.externalReportProblemSecureUrl, None, service))
   }
 
+  def reportFormNonJavaScript(service: Option[String]) = UnauthorisedAction { implicit request =>
+    Ok(views.html.problem_reports_nonjavascript(config.CFConfig.externalReportProblemSecureUrl, service))
+  }
+
   def submitSecure = submit
 
   //TODO remove once everyone is off play-frontend as this doesn't have CSRF check
