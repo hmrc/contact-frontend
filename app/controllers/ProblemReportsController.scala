@@ -8,8 +8,8 @@ import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.auth.frontend.connectors.AuthConnector
-import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import uk.gov.hmrc.play.frontend.controller.{UnauthorisedAction, FrontendController}
 import uk.gov.hmrc.play.validators.Validators._
 
@@ -34,7 +34,8 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
         .verifying("error.common.problem_report.action_mandatory", error => !error.isEmpty)
         .verifying("error.common.comments_too_long", error => error.size <= 1000),
       "isJavascript" -> boolean,
-      "service" -> optional(text)
+      "service" -> optional(text),
+      "referrer" -> optional(text)
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
@@ -66,32 +67,33 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
     form.bindFromRequest.fold(
       error => {
         if (!error.data.getOrElse("isJavascript", "true").toBoolean) {
-          Future.successful(Ok(views.html.problem_reports_error_nonjavascript(referrerFrom(request))))
+          Future.successful(Ok(views.html.problem_reports_error_nonjavascript()))
         } else {
           Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
         }
       },
       problemReport => {
+        val referrer = if(problemReport.referrer.exists(_.trim.length > 0)) problemReport.referrer.get else referrerFrom(request)
         (for {
           maybeUserAccounts <- accounts.fold(ifEmpty = maybeAuthenticatedUserAccounts)(_ => Future.successful(accounts))
-          ticketId <- createTicket(problemReport, request, maybeUserAccounts)
+          ticketId <- createTicket(problemReport, request, maybeUserAccounts, referrer)
         } yield {
           if (!problemReport.isJavascript) Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
           else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
         }) recover {
-          case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript(referrerFrom(request)))
+          case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript())
         }
       })
   }
 
-  private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], accountsOption: Option[Accounts]) = {
-    implicit val hc = HeaderCarrier.fromSessionAndHeaders(request.session, request.headers)
+  private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], accountsOption: Option[Accounts], referrer: String) = {
+    implicit val hc = HeaderCarrier.fromHeadersAndSession(request.headers, Some(request.session))
     hmrcDeskproConnector.createDeskProTicket(
       problemReport.reportName,
       problemReport.reportEmail,
       "Support Request",
       problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrerFrom(request),
+      referrer,
       problemReport.isJavascript,
       request,
       accountsOption,
@@ -114,7 +116,7 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
   }
 }
 
-case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String])
+case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referrer: Option[String])
 
 
 object ProblemReportsController extends ProblemReportsController {

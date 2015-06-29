@@ -10,8 +10,8 @@ import play.api.{Application, Configuration, Play}
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
-import uk.gov.hmrc.play.auth.controllers.AuthParamsConfigurationValidator
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
+import uk.gov.hmrc.play.frontend.auth.controllers.AuthParamsConfigurationValidator
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 
@@ -20,7 +20,7 @@ object ContactFrontendGlobal extends DefaultFrontendGlobal with RunMode {
   override val auditConnector = AuditConnector
   override val loggingFilter = CFLoggingFilter
   override val frontendAuditFilter = ContactFrontendAuditFilter
-  private lazy val filters = frontendFilters ++ Seq(CorsFilter)
+  override lazy val frontendFilters = defaultFrontendFilters ++ Seq(CorsFilter)
 
 
   override def onStart(app: Application) {
@@ -38,9 +38,6 @@ object ContactFrontendGlobal extends DefaultFrontendGlobal with RunMode {
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"$env.microservice.metrics")
 
-  override def doFilter(a: EssentialAction): EssentialAction = {
-    Filters(super.doFilter(a), filters: _*)
-  }
 }
 
 object ControllerConfiguration extends ControllerConfig {

@@ -4,8 +4,8 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import play.api.mvc.Request
 import uk.gov.hmrc.domain._
-import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
-import uk.gov.hmrc.play.frontend.auth.User
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import uk.gov.hmrc.play.http.SessionKeys
 
 case class Ticket private(name: String,
@@ -127,8 +127,8 @@ trait FieldTransformer {
 
   def ynValueOf(javascript: Boolean) = if (javascript) "Y" else "N"
 
-  def userTaxIdentifiersOf(userOption: Option[User]) = {
-    userTaxIdentifiersFromAccounts(userOption.map(_.userAuthority.accounts))
+  def userTaxIdentifiersOf(userOption: Option[AuthContext]) = {
+    userTaxIdentifiersFromAccounts(userOption.map(_.principal.accounts))
   }
 
   def userTaxIdentifiersFromAccounts(accountsOption: Option[Accounts]) = {

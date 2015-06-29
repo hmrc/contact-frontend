@@ -6,7 +6,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{AnyContent, Request, Result}
 import play.filters.csrf.CSRF
-import uk.gov.hmrc.play.frontend.auth.{Actions, User}
+import uk.gov.hmrc.play.frontend.auth.{Actions, AuthContext}
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.validators.Validators
 
@@ -80,22 +80,22 @@ trait FeedbackController
     implicit request => doThanks(None, request)
   }
 
-  private def doSubmit(user: Option[User])(implicit request: Request[AnyContent]): Future[Result] =
+  private def doSubmit(user: Option[AuthContext])(implicit request: Request[AnyContent]): Future[Result] =
     FeedbackFormBind.form.bindFromRequest()(request).fold(
       error => Future.successful(BadRequest(feedbackView(user, error))),
       data => {
-        val ticketIdF = createDeskproFeedback(data, user.map(_.userAuthority.accounts))
+        val ticketIdF = createDeskproFeedback(data, user.map(_.principal.accounts))
         ticketIdF map { ticketId =>
           Redirect(user.map(_ => routes.FeedbackController.thanks()).getOrElse(routes.FeedbackController.unauthenticatedThanks())).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
         }
       }
     )
 
-  private def feedbackView(user: Option[User], form: Form[FeedbackForm])(implicit request: Request[AnyRef]) = {
+  private def feedbackView(user: Option[AuthContext], form: Form[FeedbackForm])(implicit request: Request[AnyRef]) = {
     views.html.feedback(form, user)
   }
 
-  private def doThanks(implicit user: Option[User], request: Request[AnyRef]): Future[Result] = {
+  private def doThanks(implicit user: Option[AuthContext], request: Request[AnyRef]): Future[Result] = {
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
       Ok(views.html.feedback_confirmation(ticketId, user))
     }

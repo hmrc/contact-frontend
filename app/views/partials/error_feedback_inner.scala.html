@@ -33,6 +33,7 @@
             <input id="report-error" maxlength="1000" class="input--fullwidth form-control" name="report-error"  type="text" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.error_mandatory")'>
         </div>
         <input type="hidden" name="isJavascript" value="false"/>
+        <input type="hidden" name="referrer" value="@{request.headers.get("referer").getOrElse("")}"/>
         <div class="form-field">
             <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">Send</button>
         </div>

@@ -5,6 +5,7 @@ import connectors.deskpro.domain.{Feedback, Ticket, TicketId}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 import uk.gov.hmrc.play.http.{HttpPost, NotFoundException, Upstream5xxResponse}
 
@@ -16,9 +17,6 @@ object HmrcDeskproConnector extends HmrcDeskproConnector with ServicesConfig {
 }
 
 trait HmrcDeskproConnector {
-
-  import uk.gov.hmrc.play.auth.frontend.connectors.domain.Accounts
-  import uk.gov.hmrc.play.frontend.auth.User
 
   def serviceUrl: String
 

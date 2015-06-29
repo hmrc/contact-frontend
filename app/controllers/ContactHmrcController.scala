@@ -8,11 +8,11 @@ import play.api.data.Forms._
 import play.api.mvc.{Controller, Request}
 import play.filters.csrf.CSRF
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.{Actions, User}
+import uk.gov.hmrc.play.frontend.auth.{Actions, AuthContext}
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 import uk.gov.hmrc.play.validators.Validators
 import views.html.deskpro_error
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object ContactHmrcForm {
@@ -33,11 +33,9 @@ object ContactHmrcForm {
   )
 }
 
-trait ContactHmrcController extends Controller with Actions with DeskproSubmission {
+trait ContactHmrcController extends FrontendController with Actions with DeskproSubmission {
 
   override implicit val authConnector = FrontendAuthConnector
-
-  implicit def hc(implicit request: Request[_]): HeaderCarrier = HeaderCarrier.fromSessionAndHeaders(request.session, request.headers)
 
   lazy val GovernmentGateway: GovernmentGatewayAuthProvider = {
     new GovernmentGatewayAuthProvider(routes.ContactHmrcController.index().url)
@@ -60,7 +58,7 @@ trait ContactHmrcController extends Controller with Actions with DeskproSubmissi
           Future.successful(BadRequest(views.html.contact_hmrc(error)))
         },
         data => {
-          val ticketIdF: Future[TicketId] = createDeskproTicket(data, Some(user.userAuthority.accounts))
+          val ticketIdF: Future[TicketId] = createDeskproTicket(data, Some(user.principal.accounts))
 
           ticketIdF.map{ ticketId =>
             Redirect(routes.ContactHmrcController.thanks()).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
@@ -74,7 +72,7 @@ trait ContactHmrcController extends Controller with Actions with DeskproSubmissi
     implicit user => implicit request => doThanks(user, request)
   }))
 
-  def doThanks(implicit user: User, request: Request[AnyRef]) = {
+  def doThanks(implicit user: AuthContext, request: Request[AnyRef]) = {
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
       Ok(views.html.contact_hmrc_confirmation(ticketId))
     }
