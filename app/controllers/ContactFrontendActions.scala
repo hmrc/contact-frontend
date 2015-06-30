@@ -13,7 +13,11 @@ trait ContactFrontendActions extends Actions {
 
   protected def maybeAuthenticatedUserAccounts()(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[Accounts]] = {
     if (request.session.get(SessionKeys.authToken).isDefined) {
-      authConnector.currentAuthority.map(authorityOption => authorityOption.map(_.accounts))
+      authConnector.currentAuthority.map(
+        authorityOption => authorityOption.map(_.accounts)
+      ).recover {
+        case _: Throwable => None
+      }
     } else {
       Future.successful(None)
     }
