@@ -3,10 +3,10 @@ package connectors.deskpro.domain
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain._
 import uk.gov.hmrc.play.audit.http.{HeaderCarrier, UserId}
-import uk.gov.hmrc.play.auth.frontend.connectors.domain._
+import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.http.logging.SessionId
-import uk.gov.hmrc.play.frontend.auth.{AuthenticationProviderIds, User}
+import uk.gov.hmrc.play.frontend.auth.{AuthenticationProviderIds, AuthContext}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 class FieldTransformerSpec extends UnitSpec with WithFakeApplication {
@@ -98,11 +98,11 @@ class FieldTransformerScope {
   val epayeAccount = Some(EpayeAccount("epayeRoot", EmpRef("officeNum", "officeRef")))
   
   val userId = UserId("456")
-  val payeUser = User(userId.value, Authority(s"/auth/oid/$userId",  Accounts(Some(PayeAccount("payeRoot", Nino("SH233544B")))), None, None))
-  val bizTaxUser = payeUser.copy(userAuthority = Authority(s"/auth/oid/$userId",  Accounts(sa = saAccount, ct = ctAccount, vat = vatAccount, epaye = epayeAccount), None, None))
+  val payeUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(Some(PayeAccount("payeRoot", Nino("SH233544B")))), None, None))
+  val bizTaxUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(sa = saAccount, ct = ctAccount, vat = vatAccount, epaye = epayeAccount), None, None))
 
   val sessionId: String = "sessionIdValue"
-  val hc = HeaderCarrier(userId = Some(UserId(payeUser.userId)), sessionId = Some(SessionId(sessionId)))
+  val hc = HeaderCarrier(userId = Some(userId), sessionId = Some(SessionId(sessionId)))
   val userAgent: String = "Mozilla"
   val name: String = "name"
   val email: String = "email"

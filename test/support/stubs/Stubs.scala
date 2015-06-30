@@ -81,14 +81,13 @@ object Login extends Stub with SessionCookieBaker {
       SessionKeys.authProvider -> "GGW"
     )
 
-
-    stubFor(get(urlEqualTo("/account/sign-in?continue=/contact/beta-feedback"))
+    stubFor(get(urlEqualTo("/account/sign-in?continue=http://localhost:9000/contact/beta-feedback"))
       .willReturn(aResponse()
       .withStatus(303)
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
       .withHeader(HeaderNames.LOCATION, "http://localhost:9000/contact/beta-feedback")))
 
-    stubFor(get(urlEqualTo("/account/sign-in?continue=/contact/contact-hmrc"))
+    stubFor(get(urlEqualTo("/account/sign-in?continue=http://localhost:9000/contact/contact-hmrc"))
       .willReturn(aResponse()
       .withStatus(303)
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
@@ -105,7 +104,8 @@ object Login extends Stub with SessionCookieBaker {
               |    "loggedInAt": "2014-06-09T14:57:09.522Z",
               |    "previouslyLoggedInAt": "2014-06-09T14:48:24.841Z",
               |    "accounts": {
-              |    }
+              |    },
+              |    "levelOfAssurance": "2"
               |}
               |
             """.stripMargin

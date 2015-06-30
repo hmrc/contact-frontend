@@ -2,8 +2,6 @@ package controllers
 
 import config.FrontendAuthConnector
 import connectors.deskpro.HmrcDeskproConnector
-import play.api.mvc.{Result, Request}
-import uk.gov.hmrc.play.frontend.auth.User
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import views.html.deskpro_error
 

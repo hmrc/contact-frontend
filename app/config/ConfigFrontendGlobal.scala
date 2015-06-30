@@ -5,13 +5,13 @@ import java.io.File
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
 import play.api.Mode._
-import play.api.mvc.Request
+import play.api.mvc._
 import play.api.{Application, Configuration, Play}
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
-import uk.gov.hmrc.play.auth.controllers.AuthParamsConfigurationValidator
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
+import uk.gov.hmrc.play.frontend.auth.controllers.AuthParamsConfigurationValidator
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 
@@ -20,6 +20,8 @@ object ContactFrontendGlobal extends DefaultFrontendGlobal with RunMode {
   override val auditConnector = AuditConnector
   override val loggingFilter = CFLoggingFilter
   override val frontendAuditFilter = ContactFrontendAuditFilter
+  override lazy val frontendFilters = defaultFrontendFilters ++ Seq(CorsFilter)
+
 
   override def onStart(app: Application) {
     super.onStart(app)
@@ -35,6 +37,7 @@ object ContactFrontendGlobal extends DefaultFrontendGlobal with RunMode {
     views.html.error_template(pageTitle, heading, message)
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"$env.microservice.metrics")
+
 }
 
 object ControllerConfiguration extends ControllerConfig {
