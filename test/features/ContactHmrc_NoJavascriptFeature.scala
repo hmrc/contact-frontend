@@ -47,7 +47,7 @@ class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
           |   "referrer":"n/a",
           |   "javascriptEnabled":"N",
           |   "authId":"/auth/oid/1234567890",
-          |   "areaOfTax":"biztax",
+          |   "areaOfTax":"unknown",
           |   "sessionId": "${Login.SessionId}",
           |   "userTaxIdentifiers":{}
           |}

@@ -48,7 +48,7 @@ class FeedbackSignedInFeature extends StubbedFeatureSpec {
           |   "referrer":"n/a",
           |   "javascriptEnabled":"Y",
           |   "authId":"/auth/oid/1234567890",
-          |   "areaOfTax":"biztax",
+          |   "areaOfTax":"unknown",
           |   "sessionId": "${Login.SessionId}",
           |   "userTaxIdentifiers":{}
           |}

@@ -48,7 +48,7 @@ class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
           |   "referrer":"n/a",
           |   "javascriptEnabled":"N",
           |   "authId":"n/a",
-          |   "areaOfTax":"n/a",
+          |   "areaOfTax":"unknown",
           |   "sessionId":"n/a",
           |   "userTaxIdentifiers":{}
           |}
