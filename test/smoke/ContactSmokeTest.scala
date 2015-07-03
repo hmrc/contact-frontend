@@ -25,7 +25,7 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
 
       Then("He sees a success message")
       i_see("Thank you",
-            "Your message has been sent, and the team will get back to you within 2 working days.")
+            "Someone will get back to you within 2 working days.")
 
       And("Support agent Ann receives a ticket via Deskpro")
       ticket_in_deskpro_exists(UnauthenticatedFeedbackPage.getHelpWithThisPage.ticketId.value, Name, Email, Seq(WhatIWasDoing, WhatWentWrong))
@@ -59,7 +59,7 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
 
       Then("He sees a success message")
       i_see("Thank you",
-        "Your message has been sent, and the team will get back to you within 2 working days.")
+        "Someone will get back to you within 2 working days.")
 
       And("Support agent Ann receives a ticket via Deskpro")
       ticket_in_deskpro_exists(ContactHmrcPage.getHelpWithThisPage.ticketId.value, Name, Email, Seq(Comment))

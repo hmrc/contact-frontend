@@ -65,7 +65,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
       val message = contentAsJson(result).\("message").as[String]
       contentAsJson(result).\("status").as[String] shouldBe "OK"
       message should include("<h2 id=\"feedback-thank-you-header\">Thank you</h2>")
-      message should include("the team will get back to you within 2 working days.")
+      message should include("Someone will get back to you within 2 working days.")
     }
 
     "return 200 and a valid html page for invalid input and js is not enabled" in new ProblemReportsControllerApplication {
@@ -137,7 +137,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
       val submit = controller.doReport()(request)
       val page = Jsoup.parse(contentAsString(submit))
 
-      page.text() should include("Your message has been sent, and the team will get back to you within 2 working days.")
+      page.text() should include("Someone will get back to you within 2 working days.")
     }
 
   }
