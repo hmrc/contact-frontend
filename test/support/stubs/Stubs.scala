@@ -40,7 +40,7 @@ trait SessionCookieBaker {
     }
 
     val encodedCookie = encode(sessionData)
-    val encrypted = CompositeSymmetricCrypto.aes("gvBoGdgzqG1AarzF1LY0zQ==", Seq()).encrypt(encodedCookie).value
+    val encrypted = CompositeSymmetricCrypto.aesGCM("gvBoGdgzqG1AarzF1LY0zQ==", Seq()).encrypt(encodedCookie).value
 
     s"""mdtp="$encrypted"; Path=/; HTTPOnly"; Path=/; HTTPOnly"""
   }

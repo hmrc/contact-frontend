@@ -3,10 +3,10 @@ package connectors.deskpro.domain
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain._
 import uk.gov.hmrc.play.audit.http.{HeaderCarrier, UserId}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.http.logging.SessionId
-import uk.gov.hmrc.play.frontend.auth.{AuthenticationProviderIds, AuthContext}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 class FieldTransformerSpec extends UnitSpec with WithFakeApplication {
@@ -21,20 +21,8 @@ class FieldTransformerSpec extends UnitSpec with WithFakeApplication {
       transformer.ynValueOf(javascript = true) shouldBe "Y"
     }
 
-    "transform session authenticated by Ida to paye" in new FieldTransformerScope {
-      transformer.areaOfTaxOf(requestAuthenticatedByIda) shouldBe "paye"
-    }
-
-    "transforms session authenticated by GGW to biztax" in new FieldTransformerScope {
-      transformer.areaOfTaxOf(requestAuthenticatedByGG) shouldBe "biztax"
-    }
-
-    "transforms session authenticated by NTC to taxcreditrenewals" in new FieldTransformerScope {
-      transformer.areaOfTaxOf(requestAuthenticatedByNTC) shouldBe "taxcreditrenewals"
-    }
-
-    "transforms no user to an unknown area of tax" in new FieldTransformerScope {
-      transformer.areaOfTaxOf(request) shouldBe "n/a"
+    "use area of tax as unknown" in new FieldTransformerScope {
+      transformer.areaOfTaxOf shouldBe "unknown"
     }
 
     "transform userId in the header carrier to user id" in new FieldTransformerScope {
@@ -111,8 +99,6 @@ class FieldTransformerScope {
   val referrer: String = "referer"
   val request = FakeRequest().withHeaders(("User-Agent", userAgent))
   val requestAuthenticatedByIda = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession((SessionKeys.authProvider, "IDA"))
-  val requestAuthenticatedByGG = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession((SessionKeys.authProvider, AuthenticationProviderIds.GovernmentGatewayId))
-  val requestAuthenticatedByNTC = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession((SessionKeys.authProvider, "NTC"))
 
   def expectedUserTaxIdentifiers(nino: Option[Nino] = None,
                                  ctUtr: Option[CtUtr] = None,

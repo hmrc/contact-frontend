@@ -51,7 +51,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
           |   "referrer":"n/a",
           |   "javascriptEnabled":"Y",
           |   "authId":"n/a",
-          |   "areaOfTax":"n/a",
+          |   "areaOfTax":"unknown",
           |   "sessionId":"n/a",
           |   "userTaxIdentifiers":{}
           |}
@@ -84,7 +84,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
           |   "referrer":"http://localhost:11111/external/page",
           |   "javascriptEnabled":"Y",
           |   "authId":"n/a",
-          |   "areaOfTax":"n/a",
+          |   "areaOfTax":"unknown",
           |   "sessionId":"n/a",
           |   "userTaxIdentifiers":{}
           |}

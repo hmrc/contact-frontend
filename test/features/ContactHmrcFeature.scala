@@ -38,7 +38,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
           |   "referrer":"n/a",
           |   "javascriptEnabled":"Y",
           |   "authId":"/auth/oid/1234567890",
-          |   "areaOfTax":"biztax",
+          |   "areaOfTax":"unknown",
           |   "sessionId": "${Login.SessionId}",
           |   "userTaxIdentifiers":{}
           |}
@@ -217,7 +217,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
           |   "referrer":"http://localhost:11111/external/page",
           |   "javascriptEnabled":"Y",
           |   "authId":"/auth/oid/1234567890",
-          |   "areaOfTax":"biztax",
+          |   "areaOfTax":"unknown",
           |   "sessionId": "${Login.SessionId}",
           |   "userTaxIdentifiers":{}
           |}

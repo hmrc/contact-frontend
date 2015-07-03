@@ -49,7 +49,7 @@ object Ticket extends FieldTransformer {
       ynValueOf(isJavascript),
       userAgentOf(request),
       userIdFrom(request, hc),
-      areaOfTaxOf(request),
+      areaOfTaxOf,
       sessionIdFrom(hc),
       userTaxIdentifiersFromAccounts(accountsOption),
       service)
@@ -98,7 +98,7 @@ object Feedback extends FieldTransformer {
       ynValueOf(isJavascript),
       userAgentOf(request),
       userIdFrom(request, hc),
-      areaOfTaxOf(request),
+      areaOfTaxOf,
       sessionIdFrom(hc),
       userTaxIdentifiersFromAccounts(accounts))
 }
@@ -106,17 +106,11 @@ object Feedback extends FieldTransformer {
 
 trait FieldTransformer {
   val NA = "n/a"
-  val taxCreditRenewals = "taxcreditrenewals"
+  val UNKNOWN = "unknown"
 
   def sessionIdFrom(hc: HeaderCarrier) = hc.sessionId.map(_.value).getOrElse("n/a")
 
-  def areaOfTaxOf(request: Request[AnyRef]) = request.session.get(SessionKeys.authProvider) match {
-    // TODO IDA in the future will not only be for PAYE so another way will be required to map to area of tax
-    case Some("IDA") => "paye"
-    case Some("GGW") => "biztax"
-    case Some("NTC") => taxCreditRenewals
-    case _ => NA
-  }
+  def areaOfTaxOf = UNKNOWN
 
   def userIdFrom(request: Request[AnyRef], hc: HeaderCarrier): String = request.session.get(SessionKeys.sensitiveUserId) match {
     case Some("true") => NA
