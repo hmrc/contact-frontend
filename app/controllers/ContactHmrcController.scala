@@ -85,7 +85,7 @@ object ContactHmrcController extends ContactHmrcController {
   override val hmrcDeskproConnector = HmrcDeskproConnector
 }
 
-case class ContactForm(contactName: String, contactEmail: String, contactComments: String, isJavascript: Boolean, referer: String, csrfToken: String, service: Option[String])
+case class ContactForm(contactName: String, contactEmail: String, contactComments: String, isJavascript: Boolean, referer: String, csrfToken: String, service: Option[String] = Some("unknown"))
 
 object ContactForm {
   def apply(referer: String, csrfToken: String, service: Option[String]): ContactForm = ContactForm("", "", "", isJavascript = false, referer, csrfToken, service)

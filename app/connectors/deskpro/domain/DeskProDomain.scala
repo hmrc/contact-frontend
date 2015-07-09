@@ -80,14 +80,25 @@ case class Feedback(name: String,
                     authId: String,
                     areaOfTax: String,
                     sessionId: String,
-                    userTaxIdentifiers: UserTaxIdentifiers)
+                    userTaxIdentifiers: UserTaxIdentifiers,
+                    service: Option[String])
 
 
 object Feedback extends FieldTransformer {
 
   implicit val formats = Json.format[Feedback]
 
-  def create(name: String, email: String, rating: String, subject: String, message: String, referrer: String, isJavascript: Boolean, hc: HeaderCarrier, request: Request[AnyRef], accounts: Option[Accounts]): Feedback =
+  def create(name: String,
+             email: String,
+             rating: String,
+             subject: String,
+             message: String,
+             referrer: String,
+             isJavascript: Boolean,
+             hc: HeaderCarrier,
+             request: Request[AnyRef],
+             accounts: Option[Accounts],
+             service: Option[String]): Feedback =
     Feedback(
       name.trim,
       email,
@@ -100,7 +111,8 @@ object Feedback extends FieldTransformer {
       userIdFrom(request, hc),
       areaOfTaxOf,
       sessionIdFrom(hc),
-      userTaxIdentifiersFromAccounts(accounts))
+      userTaxIdentifiersFromAccounts(accounts),
+      service)
 }
 
 
