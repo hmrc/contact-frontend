@@ -28,8 +28,8 @@ trait HmrcDeskproConnector {
     }
   }
 
-  def createFeedback(name: String, email: String, rating: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], accountsOption: Option[Accounts])(implicit hc: HeaderCarrier): Future[TicketId] = {
-    http.POST[Feedback, TicketId](requestUrl("/deskpro/feedback"), Feedback.create(name, email, rating, subject, message, referrer, isJavascript, hc, request, accountsOption)) recover {
+  def createFeedback(name: String, email: String, rating: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], accountsOption: Option[Accounts], service: Option[String])(implicit hc: HeaderCarrier): Future[TicketId] = {
+    http.POST[Feedback, TicketId](requestUrl("/deskpro/feedback"), Feedback.create(name, email, rating, subject, message, referrer, isJavascript, hc, request, accountsOption, service)) recover {
       case nf: NotFoundException => throw new Upstream5xxResponse(nf.getMessage, 404, 500)
     }
   }

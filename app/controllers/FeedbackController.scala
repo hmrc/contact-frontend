@@ -29,10 +29,11 @@ object FeedbackFormBind {
       .verifying("error.common.comments_too_long", comment => comment.size <= 2000),
     "isJavascript" -> boolean,
     "referer" -> text,
-    "csrfToken" -> text
+    "csrfToken" -> text,
+    "service" -> optional(text)
   )(FeedbackForm.apply)((feedbackForm: FeedbackForm) => {
     import feedbackForm._
-    Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer, csrfToken))
+    Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer, csrfToken, service))
   }))
 }
 
@@ -109,15 +110,16 @@ object FeedbackController extends FeedbackController {
   override val hmrcDeskproConnector = HmrcDeskproConnector
 }
 
-case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String)
+case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"))
 
 object FeedbackForm {
   def apply(referer: String, csrfToken: String): FeedbackForm = FeedbackForm("", "", "", "", javascriptEnabled = false, referer, csrfToken)
 
-  def apply(experienceRating: Option[String], name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String): FeedbackForm =
-    FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken)
+  def apply(experienceRating: Option[String], name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String]): FeedbackForm =
+    FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken, service)
 
-  def emptyForm(csrfToken: String)(implicit request: Request[AnyRef]) = FeedbackFormBind.form.fill(FeedbackForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken))
+  def emptyForm(csrfToken: String)(implicit request: Request[AnyRef]) =
+    FeedbackFormBind.form.fill(FeedbackForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken))
 }
 
 object FeedbackFormConfig {

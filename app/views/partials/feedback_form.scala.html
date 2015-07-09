@@ -9,6 +9,9 @@
 
 <form id="feedback-form" action="@externalFeedbackUrl" method="POST" class="form--feedback" novalidate>
     <input type="hidden" name="csrfToken" value="@feedbackForm("csrfToken").value"/>
+
+    <input type="hidden" name="service" value="@feedbackForm("service").value"/>
+
     <fieldset>
         @inputRadioGroup(
         feedbackForm("feedback-rating"),

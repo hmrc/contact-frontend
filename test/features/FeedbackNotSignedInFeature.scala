@@ -53,7 +53,8 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
           |   "authId":"n/a",
           |   "areaOfTax":"unknown",
           |   "sessionId":"n/a",
-          |   "userTaxIdentifiers":{}
+          |   "userTaxIdentifiers":{},
+          |   "service": "unknown"
           |}
         """.stripMargin, LENIENT)
     }
