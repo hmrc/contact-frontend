@@ -1,7 +1,11 @@
-@(feedbackForm: Form[controllers.FeedbackForm], externalFeedbackUrl: String)(implicit request : Request[_])
+@(feedbackForm: Form[controllers.FeedbackForm],
+  externalFeedbackUrl: String,
+  service: Option[String] = None)(implicit request : Request[_])
 
 @import uk.gov.hmrc.play.views.html.helpers._
 @import controllers.FeedbackFormConfig._
+
+@import views.helpers.ServiceParameter.extractServiceParameter
 
 <header class="page-header">
     <h1>@Messages("common.feedback.heading")</h1>
@@ -10,7 +14,7 @@
 <form id="feedback-form" action="@externalFeedbackUrl" method="POST" class="form--feedback" novalidate>
     <input type="hidden" name="csrfToken" value="@feedbackForm("csrfToken").value"/>
 
-    <input type="hidden" name="service" value="@feedbackForm("service").value"/>
+    <input type="hidden" name="service" value="@extractServiceParameter(feedbackForm, service)"/>
 
     <fieldset>
         @inputRadioGroup(
