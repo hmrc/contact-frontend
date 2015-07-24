@@ -43,18 +43,18 @@ trait FeedbackController
 
   val formId = "FeedbackForm"
 
-  val ggAuthProvider = new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm().url)
+  val ggAuthProvider = new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm(None).url)
 
-  def feedbackForm = WithNewSessionTimeout(AuthenticatedBy(ggAuthProvider).async {
+  def feedbackForm(service: Option[String] = None) = WithNewSessionTimeout(AuthenticatedBy(ggAuthProvider).async {
     implicit user => implicit request =>
     Future.successful(
-      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map{ _.value }.getOrElse("")), Some(user)))
+      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map{ _.value }.getOrElse("")), Some(user), service))
     )
   })
 
-  def unauthenticatedFeedbackForm = UnauthorisedAction.async { implicit request =>
+  def unauthenticatedFeedbackForm(service: Option[String] = None) = UnauthorisedAction.async { implicit request =>
     Future.successful(
-      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map{ _.value }.getOrElse("")), None))
+      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map{ _.value }.getOrElse("")), None, service))
     )
   }
 
