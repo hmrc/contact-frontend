@@ -118,8 +118,8 @@ object FeedbackForm {
   def apply(experienceRating: Option[String], name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String]): FeedbackForm =
     FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken, service)
 
-  def emptyForm(csrfToken: String)(implicit request: Request[AnyRef]) =
-    FeedbackFormBind.form.fill(FeedbackForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken))
+  def emptyForm(csrfToken: String, referer: Option[String] = None)(implicit request: Request[AnyRef]) =
+    FeedbackFormBind.form.fill(FeedbackForm(referer.getOrElse(request.headers.get("Referer").getOrElse("n/a")), csrfToken))
 }
 
 object FeedbackFormConfig {
