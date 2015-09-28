@@ -16,7 +16,7 @@ cd $WORKSPACE
 
 echo "Start functional tests..."
 
-sbt clean test fun:test dist publish
+sbt clean test fun:test dist-tgz publish
 
 echo "Gracefully shutdown server..."
 
