@@ -1,13 +1,14 @@
 #!/bin/bash
 
+cd $WORKSPACE
+rm -rf service-manager-config
+git clone git@github.tools.tax.service.gov.uk:HMRC/service-manager-config.git
+
 echo "Starting ASSETS"
 
-shopt -s expand_aliases
-
-alias smc="sm --config /etc/smserver/conf"
-smc --stop ALL
-smc --cleanlogs
-smc --start ASSETS_FRONTEND -r --wait 60 --noprogress
+sm --stop ALL
+sm --cleanlogs
+sm --start ASSETS_FRONTEND -r --wait 60 --noprogress
 
 echo "Running functional test for contact-frontend..."
 
@@ -19,4 +20,4 @@ sbt clean test fun:test dist publish
 
 echo "Gracefully shutdown server..."
 
-smc --stop ALL
+sm --stop ALL

@@ -11,19 +11,15 @@ object FrontendBuild extends Build with MicroService {
 
 private object AppDependencies {
 
-  private val playHealthVersion = "0.7.0"
-  private val playUiVersion = "1.8.1"
-  private val govUkTemplateVersion =  "2.6.0"
-
   val compile = Seq(
-    "uk.gov.hmrc" %% "frontend-bootstrap" % "0.10.0",
-    "uk.gov.hmrc" %% "play-authorised-frontend" % "1.2.0",
-    "uk.gov.hmrc" %% "play-config" % "1.0.0",
-    "uk.gov.hmrc" %% "play-json-logger" % "1.0.0",
-    "uk.gov.hmrc" %% "play-health" % playHealthVersion,
-    "uk.gov.hmrc" %% "play-ui" % playUiVersion,
-    "uk.gov.hmrc" %% "govuk-template" % govUkTemplateVersion,
-    "uk.gov.hmrc" %% "url-builder" % "0.5.0",
+    "uk.gov.hmrc" %% "frontend-bootstrap" % "2.0.0",
+    "uk.gov.hmrc" %% "play-authorised-frontend" % "3.1.1",
+    "uk.gov.hmrc" %% "play-config" % "2.0.0",
+    "uk.gov.hmrc" %% "play-json-logger" % "2.1.0",
+    "uk.gov.hmrc" %% "play-health" % "1.1.0",
+    "uk.gov.hmrc" %% "play-ui" % "4.1.0",
+    "uk.gov.hmrc" %% "govuk-template" % "4.0.0",
+    "uk.gov.hmrc" %% "url-builder" % "0.8.0",
     "org.apache.httpcomponents" % "httpclient" % "4.3.1"
   )
 
@@ -34,7 +30,7 @@ private object AppDependencies {
     "org.jsoup" % "jsoup" % "1.7.3" % "test",
     "com.github.tomakehurst" % "wiremock" % "1.48" % "test",
     "uk.gov.hmrc" %% "scala-webdriver" % "4.24.0" % "test",
-    "uk.gov.hmrc" %% "hmrctest" % "1.0.0" % "test"
+    "uk.gov.hmrc" %% "hmrctest" % "1.4.0" % "test"
   )
 
   def apply() = compile ++ test
