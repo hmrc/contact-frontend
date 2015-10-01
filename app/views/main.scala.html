@@ -1,4 +1,8 @@
-@(title: String, userLoggedIn: Boolean = true, supportLinkEnabled: Boolean = true, service: Option[String] = None)(mainContent: Html)(implicit request : Request[_])
+@(title: String, 
+  userLoggedIn: Boolean = true, 
+  supportLinkEnabled: Boolean = true, 
+  bodyClasses: Option[String] = None,
+  service: Option[String] = None)(mainContent: Html)(implicit request : Request[_])
 
 @import uk.gov.hmrc.play.views.html.layouts
 
@@ -11,6 +15,7 @@
 @govuk_wrapper(
   appConfig = config.CFConfig,
   title = title,
+  bodyClasses = bodyClasses,
   mainContent = layouts.article(mainContent),
   userLoggedIn = userLoggedIn,
   getHelpForm = getHelpForm)
