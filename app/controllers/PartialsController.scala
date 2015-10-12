@@ -9,10 +9,10 @@ import scala.concurrent.Future
 
 trait PartialsController extends FrontendController with DeskproSubmission with ContactFrontendActions {
 
-  def contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String]) = UnauthorisedAction.async {
+  def contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean]) = UnauthorisedAction.async {
     implicit request =>
       Future.successful {
-        Ok(views.html.partials.contact_hmrc_form(ContactHmrcForm.form.fill(ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service)), submitUrl))
+        Ok(views.html.partials.contact_hmrc_form(ContactHmrcForm.form.fill(ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service)), submitUrl, renderFormOnly))
       }
   }
 
