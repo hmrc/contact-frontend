@@ -15,7 +15,7 @@ GET         /problem_reports_nonjs                       controllers.ProblemRepo
 POST        /problem_reports                             controllers.ProblemReportsController.submit
 POST        /problem_reports_secure                      controllers.ProblemReportsController.submitSecure
 
-GET         /contact-hmrc/form                           controllers.PartialsController.contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String])
+GET         /contact-hmrc/form                           controllers.PartialsController.contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean])
 POST        /contact-hmrc/form                           controllers.PartialsController.submitContactHmrcForm(resubmitUrl: String)
 GET         /contact-hmrc/form/confirmation              controllers.PartialsController.contactHmrcFormConfirmation(ticketId: String)
 GET         /beta-feedback/form                          controllers.PartialsController.feedbackForm(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String])
