@@ -45,7 +45,7 @@ trait FeedbackController
 
   val ggAuthProvider = new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm(None).url)
 
-  def feedbackForm(service: Option[String] = None) = WithNewSessionTimeout(AuthenticatedBy(ggAuthProvider).async {
+  def feedbackForm(service: Option[String] = None) = WithNewSessionTimeout(AuthenticatedBy(ggAuthProvider, pageVisibility = GGConfidence).async {
     implicit user => implicit request =>
     Future.successful(
       Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map{ _.value }.getOrElse("")), Some(user), service))
@@ -59,7 +59,7 @@ trait FeedbackController
   }
 
   def submit = WithNewSessionTimeout {
-    AuthenticatedBy(ggAuthProvider).async {
+    AuthenticatedBy(ggAuthProvider, pageVisibility = GGConfidence).async {
       implicit user => implicit request =>
       doSubmit(Some(user))
     }
@@ -72,7 +72,7 @@ trait FeedbackController
   val ggAuthProviderThanks = new GovernmentGatewayAuthProvider(routes.FeedbackController.thanks().url)
 
   def thanks = WithNewSessionTimeout {
-    AuthenticatedBy(ggAuthProviderThanks).async {
+    AuthenticatedBy(ggAuthProviderThanks, pageVisibility = GGConfidence).async {
       implicit user => implicit request => doThanks(Some(user), request)
     }
   }
