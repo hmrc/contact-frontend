@@ -2,7 +2,7 @@ package connectors.deskpro.domain
 
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain._
-import uk.gov.hmrc.play.audit.http.{HeaderCarrier, UserId}
+import uk.gov.hmrc.play.http.{HeaderCarrier, UserId}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.http.SessionKeys
@@ -86,8 +86,8 @@ class FieldTransformerScope {
   val epayeAccount = Some(EpayeAccount("epayeRoot", EmpRef("officeNum", "officeRef")))
   
   val userId = UserId("456")
-  val payeUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(Some(PayeAccount("payeRoot", Nino("SH233544B")))), None, None))
-  val bizTaxUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(sa = saAccount, ct = ctAccount, vat = vatAccount, epaye = epayeAccount), None, None))
+  val payeUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(Some(PayeAccount("payeRoot", Nino("SH233544B")))), None, None, ConfidenceLevel.L50))
+  val bizTaxUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(sa = saAccount, ct = ctAccount, vat = vatAccount, epaye = epayeAccount), None, None, ConfidenceLevel.L50))
 
   val sessionId: String = "sessionIdValue"
   val hc = HeaderCarrier(userId = Some(userId), sessionId = Some(SessionId(sessionId)))

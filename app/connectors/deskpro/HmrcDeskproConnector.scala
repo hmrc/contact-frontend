@@ -3,7 +3,7 @@ package connectors.deskpro
 import config.WSHttp
 import connectors.deskpro.domain.{Feedback, Ticket, TicketId}
 import play.api.mvc.Request
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
