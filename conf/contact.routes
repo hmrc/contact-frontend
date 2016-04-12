@@ -22,7 +22,10 @@ GET         /beta-feedback/form                          controllers.PartialsCon
 POST        /beta-feedback/form                          controllers.PartialsController.submitFeedbackForm(resubmitUrl: String)
 GET         /beta-feedback/form/confirmation             controllers.PartialsController.feedbackFormConfirmation(ticketId: String)
 
-GET			/survey-unauthenticated				 	     controllers.SurveyController.unauthenticatedSurveyForm()
+GET			/survey				 	                     controllers.SurveyController.survey()
+POST		/submitSurvey                                controllers.SurveyController.submit()
+GET			/survey/confirmation 	                     controllers.SurveyController.confirmation()
+GET			/survey/failure  	                         controllers.SurveyController.failure()
 
 OPTIONS /*path                                           controllers.ApplicationController.options(path)
 
