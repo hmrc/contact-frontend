@@ -1,5 +1,6 @@
 @(appConfig: config.AppConfig,
   title: String,
+  bodyClasses: Option[String] = None,
   contentHeader: Option[Html] = None,
   mainContent: Html = HtmlFormat.empty,
   userLoggedIn: Boolean = true,
@@ -54,4 +55,4 @@
       getHelpForm = getHelpForm)
 }
 
-@hmrcGovUkTemplate(Some(title), None)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links()), true)(content)
+@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links()), true)(content)

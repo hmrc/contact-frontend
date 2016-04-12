@@ -23,3 +23,16 @@ deskpro.email_too_long=The email cannot be longer than 255 characters
 
 contact.heading=Help and contact
 contact.confirmation.message=Someone will get back to you within 2 working days.
+
+survey.title=Survey
+survey.confirmation.title=Thank you, your feedback has been received
+survey.was.answer.helpful.question=Did you find the answer we gave you helpful?
+survey.satisfied.with.speed.question=Were you satisfied with the speed of our reply?
+survey.strongly.agree.response=Strongly Agree
+survey.agree.response=Agree
+survey.neutral.response=Neutral
+survey.disagree.response=Disagree
+survey.strongly.disagree.response=Strongly Disagree
+survey.tell.us.how.we.can.improve=Tell us how we can improve the support we give you.
+survey.2500.characters.or.less=2500 characters or less
+survey.submit=Submit
