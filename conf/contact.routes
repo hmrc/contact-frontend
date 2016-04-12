@@ -25,7 +25,6 @@ GET         /beta-feedback/form/confirmation             controllers.PartialsCon
 GET			/survey				 	                     controllers.SurveyController.survey(ticketId: String)
 POST		/submitSurvey                                controllers.SurveyController.submit()
 GET			/survey/confirmation 	                     controllers.SurveyController.confirmation()
-GET			/survey/failure  	                         controllers.SurveyController.failure()
 
 OPTIONS /*path                                           controllers.ApplicationController.options(path)
 

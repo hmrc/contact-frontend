@@ -37,12 +37,6 @@ trait SurveyController
     )
   }
 
-  def failure() = UnauthorisedAction.async { implicit request =>
-    Future.successful(
-      Ok(views.html.survey_failure())
-    )
-  }
-
   private[controllers] def submitSurveyAction(implicit request: Request[_]): Result = {
     Try {
       surveyForm.bindFromRequest().value.map {
