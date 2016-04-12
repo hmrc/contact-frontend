@@ -27,3 +27,8 @@ trait SurveyPage extends WebPage with SharedPageModules {
 }
 
 object SurveyPage extends SurveyPage
+
+class SurveyPageWithTicketId(ticketId: String) extends SurveyPage {
+
+  override val url = Env.host + s"/contact/survey?ticketId=$ticketId"//&csrfToken=token"
+}

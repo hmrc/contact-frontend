@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.libs.json.Json
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
-import support.page.{SurveyConfirmationPage, SurveyPage}
+import support.page.{SurveyConfirmationPage, SurveyPageWithTicketId}
 
 class SurveyFeature extends StubbedFeatureSpec {
 
@@ -16,7 +16,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
 
       Given("I go to the survey form page")
-        goOn(SurveyPage)
+        goOn(new SurveyPageWithTicketId("12345"))
 
       When("I successfully fill in the form")
         selectHowHelpfulTheResponseWas("strongly-agree")
@@ -37,6 +37,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       fieldShouldBe("helpful", "5")
       fieldShouldBe("speed", "5")
       fieldShouldBe("improve", "Blah blooh blah la dee daaaaa")
+      fieldShouldBe("ticketId", "12345")
 
       And("I should see the confirmation page - happy days")
         on(SurveyConfirmationPage)
@@ -47,7 +48,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
 
       Given("I go to the survey form page")
-        goOn(SurveyPage)
+        goOn(new SurveyPageWithTicketId("12345"))
 
       When("I successfully fill in the form")
         selectHowHelpfulTheResponseWas("strongly-agree")
@@ -68,7 +69,7 @@ class SurveyFeature extends StubbedFeatureSpec {
     scenario("Survey form errors, but still shows confirmation page again") {
 
       Given("I go to the survey form page")
-        goOn(SurveyPage)
+        goOn(new SurveyPageWithTicketId("12345"))
 
       When("I successfully fill in the form")
         selectHowHelpfulTheResponseWas("strongly-agree")

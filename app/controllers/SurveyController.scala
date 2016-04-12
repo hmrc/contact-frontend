@@ -21,9 +21,9 @@ trait SurveyController
 
   def auditConnector: AuditConnector
 
-  def survey() = UnauthorisedAction.async { implicit request =>
+  def survey(ticketId: String) = UnauthorisedAction.async { implicit request =>
     Future.successful(
-      Ok(views.html.survey())
+      Ok(views.html.survey(ticketId))
     )
   }
 
@@ -75,6 +75,7 @@ trait SurveyController
     val helpful = "helpful"
     val speed = "speed"
     val improve = "improve"
+    val ticketId = "ticket-id"
   }
 
   private val ratingScale = optional(number(min = 1, max = 5, strict = false))
@@ -83,7 +84,8 @@ trait SurveyController
     mapping(
       FormFields.helpful -> ratingScale,
       FormFields.speed -> ratingScale,
-      FormFields.improve -> optional(text(maxLength = 2500))
+      FormFields.improve -> optional(text(maxLength = 2500)),
+      FormFields.ticketId -> optional(text(maxLength = 10))
     )(SurveyFormData.apply)(SurveyFormData.unapply)
   )
 }
@@ -91,7 +93,8 @@ trait SurveyController
 case class SurveyFormData(
                            helpful: Option[Int],
                            speed: Option[Int],
-                           improve: Option[String]
+                           improve: Option[String],
+                           ticketId: Option[String]
                          )
 
 
