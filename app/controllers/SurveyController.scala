@@ -79,7 +79,7 @@ trait SurveyController
       FormFields.helpful -> ratingScale,
       FormFields.speed -> ratingScale,
       FormFields.improve -> optional(text(maxLength = 2500)),
-      FormFields.ticketId -> optional(text(maxLength = 10))
+      FormFields.ticketId -> optional(text(maxLength = 20))
     )(SurveyFormData.apply)(SurveyFormData.unapply)
   )
 }
