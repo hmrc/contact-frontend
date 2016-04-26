@@ -2,7 +2,7 @@ package features
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
 import support.page.{SurveyConfirmationPage, SurveyPageWithTicketId}
@@ -64,6 +64,32 @@ class SurveyFeature extends StubbedFeatureSpec {
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
         on(SurveyConfirmationPage)
+    }
+
+    scenario("Survey submitted with no radio button selections, but still shows confirmation page") {
+
+      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
+
+      Given("I go to the survey form page")
+      goOn(new SurveyPageWithTicketId("HMRC-Z2V6DUK5"))
+
+      When("I fill the form in without selecting radio button options")
+      setAdditionalComment("Blah blooh blah la dee daaaaa")
+
+      And("Submit the form")
+      clickSubmitButton()
+
+      Then("The data should not get sent to 'audit land' - but it does")
+      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      val resultJsonString = loggedRequests.get(0).getBodyAsString
+      val resultJson = Json.parse(resultJsonString)
+      (resultJson \ "detail" \ "helpful").asInstanceOf[JsString].value   shouldBe("0")
+      (resultJson \ "detail" \ "speed").asInstanceOf[JsString].value     shouldBe("0")
+      (resultJson \ "detail" \ "ticketId").asInstanceOf[JsString].value  shouldBe("HMRC-Z2V6DUK5")
+      (resultJson \ "detail" \ "improve").asInstanceOf[JsString].value   shouldBe("Blah blooh blah la dee daaaaa")
+
+      And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
+      on(SurveyConfirmationPage)
     }
 
     scenario("Survey form errors, but still shows confirmation page again") {

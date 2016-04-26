@@ -15,6 +15,7 @@ trait MicroService {
   val appVersion: String
 
   lazy val appDependencies : Seq[ModuleID] = ???
+  lazy val appOverrides: Set[ModuleID] = ???
   lazy val plugins : Seq[Plugins] = Seq(play.PlayScala)
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
@@ -33,6 +34,7 @@ trait MicroService {
       targetJvm := "jvm-1.8",
       shellPrompt := ShellPrompt(appVersion),
       libraryDependencies ++= appDependencies,
+      dependencyOverrides ++= appOverrides,
       parallelExecution in Test := false,
       fork in Test := false,
       retrieveManaged := true

@@ -49,20 +49,7 @@ trait SurveyController
   }
 
   private[controllers] def buildAuditEvent(formData: SurveyFormData)(implicit request: Request[_], hc: HeaderCarrier): Future[DataEvent] = {
-    val auditDetail = questionnaireFormDataToMap(formData)
-    Future.successful(DataEvent(auditSource = "frontend", auditType = "DeskproSurvey", tags = hc.headers.toMap, detail = auditDetail))
-  }
-
-  private def questionnaireFormDataToMap(formData: SurveyFormData): Map[String, String] = {
-    formData.getClass.getDeclaredFields.map {
-      field =>
-        field.setAccessible(true)
-        field.getName -> (field.get(formData) match {
-          case Some(x) => x.toString
-          case xs: Seq[Any] => xs.mkString(",")
-          case x => x.toString
-        })
-    }.toMap
+    Future.successful(DataEvent(auditSource = "frontend", auditType = "DeskproSurvey", tags = hc.headers.toMap, detail = formData.toStringMap))
   }
 
   object FormFields {
@@ -89,7 +76,14 @@ case class SurveyFormData(
                            speed: Option[Int],
                            improve: Option[String],
                            ticketId: Option[String]
-                         )
+                         ) {
+  def toStringMap: Map[String, String] = collection.immutable.HashMap(
+    "helpful" -> helpful.getOrElse(0).toString,
+    "speed" -> speed.getOrElse(0).toString,
+    "improve" -> improve.getOrElse(""),
+    "ticketId" -> ticketId.getOrElse("")
+  )
+}
 
 
 object SurveyController extends SurveyController {
