@@ -10,16 +10,31 @@ object Env {
     case _ => Option(System.getProperty("host")).getOrElse("http://localhost:9000")
   }
 
-  var driver: WebDriver = SingletonDriver.getInstance()
+  var driver: WebDriver = {
+    getChromeDriver
+  }
+
+  def getChromeDriver: WebDriver = {
+    val os = System.getProperty("os.name").toLowerCase.replaceAll(" ", "")
+    val chromeDriver = getClass.getResource("/chromedriver/chromedriver_" + os).getPath
+    Runtime.getRuntime.exec("chmod u+x " + chromeDriver)
+    System.setProperty("webdriver.chrome.driver", chromeDriver)
+    System.setProperty("browser", "chrome")
+    SingletonDriver.getInstance()
+  }
 
   def enableJavascript() =  {
     SingletonDriver.setJavascript(true)
-    driver = SingletonDriver.getInstance()
+    driver = getChromeDriver
   }
 
   def disableJavascript() = {
     SingletonDriver.setJavascript(false)
-    driver = SingletonDriver.getInstance()
+    driver = getChromeDriver
+  }
+
+  sys addShutdownHook {
+    driver.quit()
   }
 
 }
