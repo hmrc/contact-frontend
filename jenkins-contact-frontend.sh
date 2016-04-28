@@ -19,9 +19,13 @@ echo "Running functional test for contact-frontend..."
 
 cd $WORKSPACE
 
+
+echo "creating TMPDIR as $TMPDIR"
+mkdir -p ${TMPDIR}
+
 echo "Start functional tests..."
 
-sbt clean test fun:test dist-tgz publish -Dbrowser=chrome -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
+sbt -Djava.io.tmpdir=${TMPDIR} -Dbrowser=chrome -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver clean test fun:test dist-tgz publish
 
 echo "Gracefully shutdown server..."
 
