@@ -16,7 +16,7 @@ cd $WORKSPACE
 
 echo "Start functional tests..."
 
-sbt clean test fun:test dist-tgz publish
+sbt clean test fun:test dist-tgz publish -Dbrowser=chrome -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
 
 echo "Gracefully shutdown server..."
 
