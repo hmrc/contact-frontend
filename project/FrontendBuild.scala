@@ -31,7 +31,9 @@ private object AppDependencies {
     "com.github.tomakehurst" % "wiremock" % "1.58" % "test",
     "uk.gov.hmrc" %% "scala-webdriver" % "4.24.0" % "test",
     "uk.gov.hmrc" %% "hmrctest" % "1.4.0" % "test"
-  )
+  ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
+    .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(
+    "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test")
 
   def apply() = compile ++ test
 }
