@@ -8,7 +8,12 @@ echo "Starting ASSETS"
 
 sm --stop ALL
 sm --cleanlogs
-sm --start ASSETS_FRONTEND -r --wait 60 --noprogress
+
+ASSETS_FRONTEND_VERSION=$(grep -e 'Prod.assets.version = "' conf/application.conf | cut -d '"' -f 2)
+
+echo "Using ASSETS_FRONTEND_VERSION as $ASSETS_FRONTEND_VERSION"
+
+sm --start ASSETS_FRONTEND -r $ASSETS_FRONTEND_VERSION --wait 60 --noprogress
 
 echo "Running functional test for contact-frontend..."
 
