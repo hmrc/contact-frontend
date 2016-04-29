@@ -5,9 +5,8 @@ import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.{Controller, Request}
+import play.api.mvc.Request
 import play.filters.csrf.CSRF
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.{Actions, AuthContext}
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import uk.gov.hmrc.play.validators.Validators
@@ -41,7 +40,7 @@ trait ContactHmrcController extends FrontendController with Actions with Deskpro
     new GovernmentGatewayAuthProvider(routes.ContactHmrcController.index().url)
   }
 
-  def index = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway).async {
+  def index = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway, pageVisibility = GGConfidence).async {
     implicit user => implicit request =>
       Future.successful {
         val referer = request.headers.get("Referer").getOrElse("n/a")
@@ -50,7 +49,7 @@ trait ContactHmrcController extends FrontendController with Actions with Deskpro
       }
   })
 
-  def submit = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway).async {
+  def submit = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway, pageVisibility = GGConfidence).async {
     implicit user => implicit request =>
 
       ContactHmrcForm.form.bindFromRequest()(request).fold(
@@ -68,7 +67,7 @@ trait ContactHmrcController extends FrontendController with Actions with Deskpro
         })
   })
 
-  def thanks = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway).async({
+  def thanks = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway, pageVisibility = GGConfidence).async({
     implicit user => implicit request => doThanks(user, request)
   }))
 

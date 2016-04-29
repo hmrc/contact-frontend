@@ -105,7 +105,8 @@ object Login extends Stub with SessionCookieBaker {
               |    "previouslyLoggedInAt": "2014-06-09T14:48:24.841Z",
               |    "accounts": {
               |    },
-              |    "levelOfAssurance": "2"
+              |    "levelOfAssurance": "2",
+              |    "confidenceLevel" : 50
               |}
               |
             """.stripMargin

@@ -36,3 +36,7 @@ Vanila screens (now deprecated)
 
 This still provides endpoints to complete vanilla screens, incl. empty header and wrapped with GovernmentGateway authorisation code. It is recommended to use partials and provide headers / authorisation in your controllers.
 
+Running Tests
+-------------------------------
+sbt clean test fun:test
+
