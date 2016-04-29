@@ -11,7 +11,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
   val WhatWhereYouDoing = "Something"
   val WhatDoYouNeedHelpWith = "Nothing"
 
-  feature("Get help with this page form") {
+  ignore("Get help with this page form") {
 
     info("In order to get help with a specific page")
     info("As a tax payer with Javascript disabled")
