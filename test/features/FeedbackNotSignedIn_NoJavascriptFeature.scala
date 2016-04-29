@@ -16,7 +16,7 @@ class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
 
     scenario("Submit feedback successfully") {
       Given("JavaScript is disabled")
-      Env.disableJavascript()
+      Env.useNoJsDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)

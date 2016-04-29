@@ -28,10 +28,12 @@ private object AppDependencies {
     "org.scalatestplus" %% "play" % "1.2.0" % "test",
     "org.pegdown" % "pegdown" % "1.4.2" % "test",
     "org.jsoup" % "jsoup" % "1.7.3" % "test",
-    "com.github.tomakehurst" % "wiremock" % "1.48" % "test",
-    "uk.gov.hmrc" %% "scala-webdriver" % "4.27.0" % "test",
+    "com.github.tomakehurst" % "wiremock" % "1.58" % "test",
+    "uk.gov.hmrc" %% "scala-webdriver" % "5.1.0" % "test",
     "uk.gov.hmrc" %% "hmrctest" % "1.4.0" % "test"
-  )
+  ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
+    .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(
+    "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test")
 
   def apply() = compile ++ test
 }
