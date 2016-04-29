@@ -6,8 +6,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.scalatest._
 import org.scalatestplus.play.OneServerPerSuite
 import support.behaviour.NavigationSugar
-import support.steps.{Env, ObservationSteps, ApiSteps, NavigationSteps}
-import support.stubs.Common._
+import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs._
 
 trait StubbedFeatureSpec
@@ -42,15 +41,12 @@ trait StubbedFeatureSpec
   }
 
   override def beforeEach() = {
-    Env.enableJavascript()
+//    Env.enableJavascript()
+    webDriver.manage().deleteAllCookies()
+    WireMock.reset()
     stubFor(Auditing)
     stubFor(Login)
     stubFor(Deskpro)
     stubFor(ExternalPages)
   }
-
-  override def afterEach() = {
-    WireMock.reset()
-  }
-
 }
