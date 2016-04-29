@@ -8,7 +8,7 @@ import support.stubs.Login
 
 class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
 
-  ignore("Contact HMRC with Javascript disabled") {
+  feature("Contact HMRC with Javascript disabled") {
 
     info("In order to make my views known")
     info("As a Tax Payer with Javascript disabled in my browser")
@@ -21,7 +21,7 @@ class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
       val Comment = "I am writing a comment"
 
       Given("JavaScript is disabled")
-      Env.disableJavascript()
+      Env.useNoJsDriver()
 
       And("I go to the 'Help' page")
       goOn(ContactHmrcPage)

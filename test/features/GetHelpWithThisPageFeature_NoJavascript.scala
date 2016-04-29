@@ -11,7 +11,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
   val WhatWhereYouDoing = "Something"
   val WhatDoYouNeedHelpWith = "Nothing"
 
-  ignore("Get help with this page form") {
+  feature("Get help with this page form") {
 
     info("In order to get help with a specific page")
     info("As a tax payer with Javascript disabled")
@@ -19,7 +19,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
     scenario("I don't see the open help form link without Javascript") {
       Given("JavaScript is disabled")
-      Env.disableJavascript()
+      Env.useNoJsDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -30,7 +30,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
     scenario("Successful form submission without Javascript") {
       Given("JavaScript is disabled")
-      Env.disableJavascript()
+      Env.useNoJsDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -53,7 +53,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
     scenario("Only these characters are allowed for the name: letters (lower and upper case), space, comma, period, braces and hyphen") {
       Given("JavaScript is disabled")
-      Env.disableJavascript()
+      Env.useNoJsDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -74,7 +74,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
     scenario("All fields are mandatory") {
       Given("JavaScript is disabled")
-      Env.disableJavascript()
+      Env.useNoJsDriver()
 
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)

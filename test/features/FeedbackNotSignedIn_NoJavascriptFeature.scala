@@ -8,7 +8,7 @@ import support.steps.Env
 
 class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
 
-  ignore("Feedback about the beta when not signed and with Javascript disabled") {
+  feature("Feedback about the beta when not signed and with Javascript disabled") {
 
     info("In order to make my views known about the beta")
     info("As an unauthenticated user with Javascript disabled")
@@ -16,7 +16,7 @@ class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
 
     scenario("Submit feedback successfully") {
       Given("JavaScript is disabled")
-      Env.disableJavascript()
+      Env.useNoJsDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)

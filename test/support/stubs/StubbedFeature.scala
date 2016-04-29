@@ -18,7 +18,7 @@ trait StubbedFeature extends AcceptanceSpec with Stubs {
   protected override def beforeAll() {
     super.beforeAll()
 
-    Env.enableJavascript()
+    Env.useJavascriptDriver()
   }
 
 }
@@ -37,7 +37,7 @@ trait NoJsFeature extends AcceptanceSpec with Stubs {
   protected override def beforeAll() {
     super.beforeAll()
 
-    Env.disableJavascript()
+    Env.useNoJsDriver()
   }
 }
 

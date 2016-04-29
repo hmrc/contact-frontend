@@ -1,6 +1,7 @@
 package support.steps
 
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import uk.gov.hmrc.integration.framework.SingletonDriver
 
 
@@ -23,18 +24,15 @@ object Env {
     SingletonDriver.getInstance()
   }
 
-  def enableJavascript() =  {
-    SingletonDriver.setJavascript(true)
+  def useJavascriptDriver() =  {
     driver = getChromeDriver
   }
 
-  def disableJavascript() = {
-    SingletonDriver.setJavascript(false)
-    driver = getChromeDriver
+  def useNoJsDriver() = {
+    driver = new HtmlUnitDriver(false)
   }
 
   sys addShutdownHook {
     driver.quit()
   }
-
 }
