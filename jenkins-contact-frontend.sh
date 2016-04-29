@@ -25,7 +25,7 @@ mkdir -p ${TMPDIR}
 
 echo "Start functional tests..."
 
-sbt -Djava.io.tmpdir=${TMPDIR} -Dbrowser=chrome -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver clean test fun:test dist-tgz publish
+sbt -Djava.io.tmpdir=${TMPDIR} -Dbrowser=chrome clean test fun:test dist-tgz publish
 
 echo "Gracefully shutdown server..."
 
