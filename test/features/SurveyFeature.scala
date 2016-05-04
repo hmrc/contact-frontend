@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.libs.json.{JsString, Json}
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
-import support.page.{SurveyConfirmationPage, SurveyPageWithTicketId}
+import support.page.{SurveyPageWithTicketAndServiceIds, SurveyConfirmationPage}
 
 class SurveyFeature extends StubbedFeatureSpec {
 
@@ -16,7 +16,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
 
       Given("I go to the survey form page")
-        goOn(new SurveyPageWithTicketId("HMRC-Z2V6DUK5"))
+        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary service id"))
 
       When("I successfully fill in the form")
         selectHowHelpfulTheResponseWas("strongly-agree")
@@ -38,6 +38,8 @@ class SurveyFeature extends StubbedFeatureSpec {
       fieldShouldBe("speed", "5")
       fieldShouldBe("improve", "Blah blooh blah la dee daaaaa")
       fieldShouldBe("ticketId", "HMRC-Z2V6DUK5")
+      fieldShouldBe("serviceId", "arbitrary service id")
+
 
       And("I should see the confirmation page - happy days")
         on(SurveyConfirmationPage)
@@ -48,7 +50,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
 
       Given("I go to the survey form page")
-        goOn(new SurveyPageWithTicketId("HMRC-Z2V6DUK5"))
+        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary service id"))
 
       When("I successfully fill in the form")
         selectHowHelpfulTheResponseWas("strongly-agree")
@@ -71,7 +73,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
 
       Given("I go to the survey form page")
-      goOn(new SurveyPageWithTicketId("HMRC-Z2V6DUK5"))
+      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary service id"))
 
       When("I fill the form in without selecting radio button options")
       setAdditionalComment("Blah blooh blah la dee daaaaa")
@@ -86,6 +88,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       (resultJson \ "detail" \ "helpful").asInstanceOf[JsString].value   shouldBe("0")
       (resultJson \ "detail" \ "speed").asInstanceOf[JsString].value     shouldBe("0")
       (resultJson \ "detail" \ "ticketId").asInstanceOf[JsString].value  shouldBe("HMRC-Z2V6DUK5")
+      (resultJson \ "detail" \ "serviceId").asInstanceOf[JsString].value  shouldBe("arbitrary service id")
       (resultJson \ "detail" \ "improve").asInstanceOf[JsString].value   shouldBe("Blah blooh blah la dee daaaaa")
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
@@ -95,7 +98,7 @@ class SurveyFeature extends StubbedFeatureSpec {
     scenario("Survey form errors, but still shows confirmation page again") {
 
       Given("I go to the survey form page")
-        goOn(new SurveyPageWithTicketId("HMRC-Z2V6DUK5"))
+        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary service id"))
 
       When("I successfully fill in the form")
         selectHowHelpfulTheResponseWas("strongly-agree")

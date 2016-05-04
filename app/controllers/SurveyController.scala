@@ -21,9 +21,9 @@ trait SurveyController
 
   def auditConnector: AuditConnector
 
-  def survey(ticketId: String) = UnauthorisedAction.async { implicit request =>
+  def survey(ticketId: String, serviceId: String) = UnauthorisedAction.async { implicit request =>
     Future.successful(
-      Ok(views.html.survey(ticketId))
+      Ok(views.html.survey(ticketId, serviceId))
     )
   }
 
@@ -57,6 +57,7 @@ trait SurveyController
     val speed = "speed"
     val improve = "improve"
     val ticketId = "ticket-id"
+    val serviceId = "service-id"
   }
 
   private val ratingScale = optional(number(min = 1, max = 5, strict = false))
@@ -66,7 +67,8 @@ trait SurveyController
       FormFields.helpful -> ratingScale,
       FormFields.speed -> ratingScale,
       FormFields.improve -> optional(text(maxLength = 2500)),
-      FormFields.ticketId -> optional(text(maxLength = 20))
+      FormFields.ticketId -> optional(text(maxLength = 20)),
+      FormFields.serviceId -> optional(text(maxLength = 20))
     )(SurveyFormData.apply)(SurveyFormData.unapply)
   )
 }
@@ -75,13 +77,15 @@ case class SurveyFormData(
                            helpful: Option[Int],
                            speed: Option[Int],
                            improve: Option[String],
-                           ticketId: Option[String]
+                           ticketId: Option[String],
+                           serviceId: Option[String]
                          ) {
   def toStringMap: Map[String, String] = collection.immutable.HashMap(
     "helpful" -> helpful.getOrElse(0).toString,
     "speed" -> speed.getOrElse(0).toString,
     "improve" -> improve.getOrElse(""),
-    "ticketId" -> ticketId.getOrElse("")
+    "ticketId" -> ticketId.getOrElse(""),
+    "serviceId" -> serviceId.getOrElse("")
   )
 }
 
