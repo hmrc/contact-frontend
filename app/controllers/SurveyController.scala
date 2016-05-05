@@ -74,7 +74,7 @@ trait SurveyController
       FormFields.speed -> ratingScale,
       FormFields.improve -> optional(text(maxLength = 2500)),
       FormFields.ticketId -> optional(text(maxLength = TICKET_ID_MAX_LENGTH)).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
-      FormFields.serviceId -> optional(text(maxLength = 20))
+      FormFields.serviceId -> optional(text(maxLength = 20)).verifying(serviceId => serviceId.getOrElse("").length>0)
     )(SurveyFormData.apply)(SurveyFormData.unapply)
   )
 }
