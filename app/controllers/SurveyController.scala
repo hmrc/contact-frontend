@@ -11,6 +11,7 @@ import uk.gov.hmrc.play.config.{AppName, RunMode}
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.http.HeaderCarrier
+import scala.util.matching.Regex
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -18,6 +19,11 @@ import scala.util.Try
 trait SurveyController
   extends FrontendController
     with Actions {
+
+  val TICKET_ID_REGEX      = new Regex("^HMRC-([A-Z0-9]|#){1,8}+$")
+  val TICKET_ID_MAX_LENGTH = 5+8
+
+  def validateTicketId(ticketId:String) = TICKET_ID_REGEX.findFirstIn(ticketId).isDefined
 
   def auditConnector: AuditConnector
 
@@ -67,7 +73,7 @@ trait SurveyController
       FormFields.helpful -> ratingScale,
       FormFields.speed -> ratingScale,
       FormFields.improve -> optional(text(maxLength = 2500)),
-      FormFields.ticketId -> optional(text(maxLength = 20)),
+      FormFields.ticketId -> optional(text(maxLength = TICKET_ID_MAX_LENGTH)).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
       FormFields.serviceId -> optional(text(maxLength = 20))
     )(SurveyFormData.apply)(SurveyFormData.unapply)
   )

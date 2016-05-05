@@ -16,7 +16,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
 
       Given("I go to the survey form page")
-        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary service id"))
+        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
 
       When("I successfully fill in the form")
         selectHowHelpfulTheResponseWas("strongly-agree")
@@ -45,12 +45,74 @@ class SurveyFeature extends StubbedFeatureSpec {
         on(SurveyConfirmationPage)
     }
 
+    scenario("Show successfully sent message whilst rejecting feedback when ticket ref is invalid") {
+
+      val invalidTicketId = "HMRC-Z2V6!UK5"
+
+      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
+
+      Given("I go to the survey form page")
+      goOn(new SurveyPageWithTicketAndServiceIds(invalidTicketId,"arbitrary%20service%20id"))
+
+      When("I successfully fill in the form")
+      selectHowHelpfulTheResponseWas("strongly-agree")
+      selectHowSpeedyTheResponseWas("strongly-agree")
+      setAdditionalComment("Your mother is an 'amster and your father smelled of elderberry!")
+
+      And("Submit the form")
+      clickSubmitButton()
+
+      Then("The data should get sent to 'audit land'")
+      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      loggedRequests.size() shouldBe 0
+    }
+
+    scenario("Show successfully sent message whilst rejecting feedback when ticket ref is empty") {
+
+      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
+
+      Given("I go to the survey form page")
+      goOn(new SurveyPageWithTicketAndServiceIds("","arbitrary%20service%20id"))
+
+      When("I successfully fill in the form")
+      selectHowHelpfulTheResponseWas("strongly-agree")
+      selectHowSpeedyTheResponseWas("strongly-agree")
+      setAdditionalComment("Damn you Artheur King and your silly English Kniiiights!")
+
+      And("Submit the form")
+      clickSubmitButton()
+
+      Then("The data should get sent to 'audit land'")
+      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      loggedRequests.size() shouldBe 0
+    }
+
+    scenario("Show successfully sent message whilst rejecting feedback when service is empty") {
+
+      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
+
+      Given("I go to the survey form page")
+      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6AUK5",""))
+
+      When("I successfully fill in the form")
+      selectHowHelpfulTheResponseWas("strongly-agree")
+      selectHowSpeedyTheResponseWas("strongly-agree")
+      setAdditionalComment("Your mother is a hamster and your father smelled of elderberry!")
+
+      And("Submit the form")
+      clickSubmitButton()
+
+      Then("The data should get sent to 'audit land'")
+      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      loggedRequests.size() shouldBe 0
+    }
+
     scenario("Survey form errors, but still shows confirmation page") {
 
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
 
       Given("I go to the survey form page")
-        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary service id"))
+        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
 
       When("I successfully fill in the form")
         selectHowHelpfulTheResponseWas("strongly-agree")
@@ -73,7 +135,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
 
       Given("I go to the survey form page")
-      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary service id"))
+      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
 
       When("I fill the form in without selecting radio button options")
       setAdditionalComment("Blah blooh blah la dee daaaaa")
@@ -98,7 +160,7 @@ class SurveyFeature extends StubbedFeatureSpec {
     scenario("Survey form errors, but still shows confirmation page again") {
 
       Given("I go to the survey form page")
-        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary service id"))
+        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
 
       When("I successfully fill in the form")
         selectHowHelpfulTheResponseWas("strongly-agree")
