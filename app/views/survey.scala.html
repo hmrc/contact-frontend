@@ -1,4 +1,4 @@
-@(ticketId: String)(implicit request : Request[_])
+@(ticketId: String, serviceId: String)(implicit request : Request[_])
 
 @import controllers.SurveyController._
 @import uk.gov.hmrc.play.views.html.helpers.form
@@ -12,6 +12,8 @@
 	@form(action=controllers.routes.SurveyController.submit, 'class -> "form") {
 
         <input type="hidden" value="@ticketId" id="ticket-id" name="ticket-id">
+        <input type="hidden" value="@serviceId" id="service-id" name="service-id">
+
 
 		<fieldset class="form-field-group">
 		    <legend class="float--none">@Messages("survey.was.answer.helpful.question")</legend>

@@ -7,6 +7,19 @@ object FrontendBuild extends Build with MicroService {
   val appVersion = envOrElse("CONTACT_FRONTEND_VERSION", "999-SNAPSHOT")
 
   override lazy val appDependencies: Seq[ModuleID] = AppDependencies()
+  override lazy val appOverrides: Set[ModuleID] = AppOverrides()
+}
+
+object DependencyVersions {
+  val apacheHttpComponentsCore = "4.4.1"
+}
+
+private object AppOverrides{
+  val overrides = Set[ModuleID](
+    "org.apache.httpcomponents" % "httpcore" % DependencyVersions.apacheHttpComponentsCore
+  )
+
+  def apply() = overrides
 }
 
 private object AppDependencies {
@@ -20,7 +33,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-ui" % "4.2.0",
     "uk.gov.hmrc" %% "govuk-template" % "4.0.0",
     "uk.gov.hmrc" %% "url-builder" % "1.0.0",
-    "org.apache.httpcomponents" % "httpclient" % "4.3.1"
+    "org.apache.httpcomponents" % "httpclient" % DependencyVersions.apacheHttpComponentsCore
   )
 
   val test = Seq(

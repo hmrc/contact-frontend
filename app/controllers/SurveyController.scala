@@ -11,6 +11,7 @@ import uk.gov.hmrc.play.config.{AppName, RunMode}
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.http.HeaderCarrier
+import scala.util.matching.Regex
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -19,11 +20,16 @@ trait SurveyController
   extends FrontendController
     with Actions {
 
+  val TICKET_ID_REGEX      = new Regex("^HMRC-([A-Z0-9]|#){1,8}+$")
+  val TICKET_ID_MAX_LENGTH = 5+8
+
+  def validateTicketId(ticketId:String) = TICKET_ID_REGEX.findFirstIn(ticketId).isDefined
+
   def auditConnector: AuditConnector
 
-  def survey(ticketId: String) = UnauthorisedAction.async { implicit request =>
+  def survey(ticketId: String, serviceId: String) = UnauthorisedAction.async { implicit request =>
     Future.successful(
-      Ok(views.html.survey(ticketId))
+      Ok(views.html.survey(ticketId, serviceId))
     )
   }
 
@@ -49,20 +55,7 @@ trait SurveyController
   }
 
   private[controllers] def buildAuditEvent(formData: SurveyFormData)(implicit request: Request[_], hc: HeaderCarrier): Future[DataEvent] = {
-    val auditDetail = questionnaireFormDataToMap(formData)
-    Future.successful(DataEvent(auditSource = "frontend", auditType = "DeskproSurvey", tags = hc.headers.toMap, detail = auditDetail))
-  }
-
-  private def questionnaireFormDataToMap(formData: SurveyFormData): Map[String, String] = {
-    formData.getClass.getDeclaredFields.map {
-      field =>
-        field.setAccessible(true)
-        field.getName -> (field.get(formData) match {
-          case Some(x) => x.toString
-          case xs: Seq[Any] => xs.mkString(",")
-          case x => x.toString
-        })
-    }.toMap
+    Future.successful(DataEvent(auditSource = "frontend", auditType = "DeskproSurvey", tags = hc.headers.toMap, detail = formData.toStringMap))
   }
 
   object FormFields {
@@ -70,6 +63,7 @@ trait SurveyController
     val speed = "speed"
     val improve = "improve"
     val ticketId = "ticket-id"
+    val serviceId = "service-id"
   }
 
   private val ratingScale = optional(number(min = 1, max = 5, strict = false))
@@ -79,7 +73,8 @@ trait SurveyController
       FormFields.helpful -> ratingScale,
       FormFields.speed -> ratingScale,
       FormFields.improve -> optional(text(maxLength = 2500)),
-      FormFields.ticketId -> optional(text(maxLength = 20))
+      FormFields.ticketId -> optional(text(maxLength = TICKET_ID_MAX_LENGTH)).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
+      FormFields.serviceId -> optional(text(maxLength = 20)).verifying(serviceId => serviceId.getOrElse("").length>0)
     )(SurveyFormData.apply)(SurveyFormData.unapply)
   )
 }
@@ -88,8 +83,17 @@ case class SurveyFormData(
                            helpful: Option[Int],
                            speed: Option[Int],
                            improve: Option[String],
-                           ticketId: Option[String]
-                         )
+                           ticketId: Option[String],
+                           serviceId: Option[String]
+                         ) {
+  def toStringMap: Map[String, String] = collection.immutable.HashMap(
+    "helpful" -> helpful.getOrElse(0).toString,
+    "speed" -> speed.getOrElse(0).toString,
+    "improve" -> improve.getOrElse(""),
+    "ticketId" -> ticketId.getOrElse(""),
+    "serviceId" -> serviceId.getOrElse("")
+  )
+}
 
 
 object SurveyController extends SurveyController {
