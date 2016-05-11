@@ -1,4 +1,4 @@
-@(contactForm: Form[controllers.ContactForm], externalContactHmrcUrl: String, renderFormOnly: Option[Boolean] = None)(implicit request : Request[_])
+@(contactForm: Form[controllers.ContactForm], externalContactHmrcUrl: String, renderFormOnly: Option[Boolean] = None)(implicit request: Request[_], lang : Lang)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 

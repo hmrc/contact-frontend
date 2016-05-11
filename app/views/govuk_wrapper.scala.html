@@ -4,7 +4,7 @@
   contentHeader: Option[Html] = None,
   mainContent: Html = HtmlFormat.empty,
   userLoggedIn: Boolean = true,
-  getHelpForm: Html  = HtmlFormat.empty)
+  getHelpForm: Html  = HtmlFormat.empty)(implicit request: Request[_], lang : Lang)
 
 @import layouts.{govuk_template => hmrcGovUkTemplate}
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
@@ -55,4 +55,4 @@
       getHelpForm = getHelpForm)
 }
 
-@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links()), true)(content)
+@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, HtmlFormat.empty, footerTop, Some(uiLayouts.footer_links(Some(partials.language_selection()))), true)(content)

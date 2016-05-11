@@ -2,7 +2,7 @@
   userLoggedIn: Boolean = true, 
   supportLinkEnabled: Boolean = true, 
   bodyClasses: Option[String] = None,
-  service: Option[String] = None)(mainContent: Html)(implicit request : Request[_])
+  service: Option[String] = None)(mainContent: Html)(implicit request : Request[_], lang : Lang)
 
 @import uk.gov.hmrc.play.views.html.layouts
 

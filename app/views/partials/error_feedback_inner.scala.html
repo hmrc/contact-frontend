@@ -1,4 +1,4 @@
-@(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_])
+@(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang)
 @import uk.gov.hmrc.play.views.html._
 
 <h3 class="h2-heading">@Messages("common.feedback.title")</h3>
