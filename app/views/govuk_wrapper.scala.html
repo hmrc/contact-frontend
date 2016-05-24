@@ -55,4 +55,17 @@
       getHelpForm = getHelpForm)
 }
 
-@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, HtmlFormat.empty, footerTop, Some(uiLayouts.footer_links(Some(partials.language_selection()))), true)(content)
+@hmrcGovUkTemplate(Some(title), bodyClasses)(
+head,
+bodyEnd,
+insideHeader,
+HtmlFormat.empty,
+footerTop,
+Some(
+    uiLayouts.footer_links(
+        Some(
+            partials.language_selection()
+        )
+    )
+),
+true)(content)

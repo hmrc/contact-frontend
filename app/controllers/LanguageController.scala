@@ -1,5 +1,6 @@
 package controllers
 
+import config.CFConfig
 import play.api.Logger
 import play.api.Play.current
 import play.api.i18n.Lang
@@ -17,11 +18,13 @@ trait LanguageController extends FrontendController {
   def switchToWelsh = switchToLang(welsh)
   
   private def switchToLang(lang: Lang) = Action { implicit request =>
+    val newLang = if (CFConfig.enableLanguageSwitching) lang else english
+
     request.headers.get(REFERER) match {
-      case Some(referrer) => Redirect(referrer).withLang(lang).flashing(LanguageUtils.flashWithSwitchIndicator)
+      case Some(referrer) => Redirect(referrer).withLang(newLang).flashing(LanguageUtils.flashWithSwitchIndicator)
       case None => {
-          Logger.warn("Unable to get the referrer, so sending them to the start.")
-          Redirect(controllers.routes.FeedbackController.feedbackForm(None)).withLang(lang)
+          Logger.warn(s"Unable to get the referrer, so sending them to ${CFConfig.fallbackURLForLangugeSwitcher}")
+          Redirect(CFConfig.fallbackURLForLangugeSwitcher).withLang(newLang)
         }
     }
   }
