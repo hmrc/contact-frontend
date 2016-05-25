@@ -58,25 +58,27 @@ trait SurveyController
     Future.successful(DataEvent(auditSource = "frontend", auditType = "DeskproSurvey", tags = hc.headers.toMap, detail = formData.toStringMap))
   }
 
-  object FormFields {
-    val helpful = "helpful"
-    val speed = "speed"
-    val improve = "improve"
-    val ticketId = "ticket-id"
-    val serviceId = "service-id"
-  }
+
 
   private val ratingScale = optional(number(min = 1, max = 5, strict = false))
 
   private[controllers] def surveyForm = Form[SurveyFormData](
     mapping(
-      FormFields.helpful -> ratingScale,
-      FormFields.speed -> ratingScale,
-      FormFields.improve -> optional(text(maxLength = 2500)),
-      FormFields.ticketId -> optional(text(maxLength = TICKET_ID_MAX_LENGTH)).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
-      FormFields.serviceId -> optional(text(maxLength = 20)).verifying(serviceId => serviceId.getOrElse("").length>0)
+      SurveyFormFields.helpful -> ratingScale,
+      SurveyFormFields.speed -> ratingScale,
+      SurveyFormFields.improve -> optional(text(maxLength = 2500)),
+      SurveyFormFields.ticketId -> optional(text(maxLength = TICKET_ID_MAX_LENGTH)).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
+      SurveyFormFields.serviceId -> optional(text(maxLength = 20)).verifying(serviceId => serviceId.getOrElse("").length>0)
     )(SurveyFormData.apply)(SurveyFormData.unapply)
   )
+}
+
+object SurveyFormFields {
+  val helpful = "helpful"
+  val speed = "speed"
+  val improve = "improve"
+  val ticketId = "ticket-id"
+  val serviceId = "service-id"
 }
 
 case class SurveyFormData(

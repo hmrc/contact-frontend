@@ -11,3 +11,13 @@ trait SurveyConfirmationPage extends WebPage with SharedPageModules {
 }
 
 object SurveyConfirmationPage extends SurveyConfirmationPage
+
+
+trait SurveyConfirmationPageWelsh extends SurveyConfirmationPage {
+
+  override val url = Env.host + "/contact/survey/confirmation"
+
+  override def isCurrentPage: Boolean = heading=="WELSH-Thank you, your feedback has been received"
+}
+
+object SurveyConfirmationPageWelsh extends SurveyConfirmationPageWelsh

@@ -1,10 +1,7 @@
 package config
 
-import java.io.File
-
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
-import play.api.Mode._
 import play.api.mvc._
 import play.api.{Application, Configuration, Play}
 import play.twirl.api.Html

@@ -1,4 +1,4 @@
-@(ticketId: String, thankYouMessage: Option[String])(implicit request : Request[_])
+@(ticketId: String, thankYouMessage: Option[String])(implicit request : Request[_], lang : Lang)
 
 @pageTitle = @{Messages("common.thank.you")}
 @main(title = pageTitle, supportLinkEnabled = false)  {

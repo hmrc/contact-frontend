@@ -1,6 +1,6 @@
 @(feedbackForm: Form[controllers.FeedbackForm],
   externalFeedbackUrl: String,
-  service: Option[String] = None)(implicit request : Request[_])
+  service: Option[String] = None)(implicit request : Request[_], lang : Lang)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 @import controllers.FeedbackFormConfig._

@@ -1,6 +1,6 @@
 @(feedbackForm: Form[controllers.FeedbackForm],
   user: Option[uk.gov.hmrc.play.frontend.auth.AuthContext],
-  service: Option[String] = None)(implicit request : Request[_])
+  service: Option[String] = None)(implicit request : Request[_], lang : Lang)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
