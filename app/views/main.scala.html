@@ -4,6 +4,7 @@
   bodyClasses: Option[String] = None,
   service: Option[String] = None)(mainContent: Html)(implicit request : Request[_], lang : Lang)
 
+@import config.CFConfig
 @import uk.gov.hmrc.play.views.html.layouts
 
 @getHelpForm = {
@@ -18,4 +19,5 @@
   bodyClasses = bodyClasses,
   mainContent = layouts.article(mainContent),
   userLoggedIn = userLoggedIn,
-  getHelpForm = getHelpForm)
+  getHelpForm = getHelpForm,
+  enableLanguageSwitching = CFConfig.enableLanguageSwitching)
