@@ -26,7 +26,7 @@ object CFConfig extends AppConfig with ServicesConfig {
   override lazy val analyticsToken = loadConfig(s"govuk-tax.$env.google-analytics.token")
   override lazy val analyticsHost = loadConfig(s"govuk-tax.$env.google-analytics.host")
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
-  override def fallbackURLForLangugeSwitcher = loadConfig("govuk-tax.$env.platform.frontend.host")
+  override def fallbackURLForLangugeSwitcher = loadConfig("govuk-tax.$env.platform.frontend.url")
   override def enableLanguageSwitching = configuration.getBoolean(s"govuk-tax.$env.enableLanguageSwitching").getOrElse(false)
 
 }
