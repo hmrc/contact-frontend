@@ -15,14 +15,7 @@ object Env {
     getChromeDriver
   }
 
-  def getChromeDriver: WebDriver = {
-    val os = System.getProperty("os.name").toLowerCase.replaceAll(" ", "")
-    val chromeDriver = getClass.getResource("/chromedriver/chromedriver_" + os).getPath
-    Runtime.getRuntime.exec("chmod u+x " + chromeDriver)
-    System.setProperty("webdriver.chrome.driver", chromeDriver)
-    System.setProperty("browser", "chrome")
-    SingletonDriver.getInstance()
-  }
+  def getChromeDriver: WebDriver = SingletonDriver.getInstance()
 
   def useJavascriptDriver() =  {
     driver = getChromeDriver

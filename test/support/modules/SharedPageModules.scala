@@ -41,10 +41,10 @@ trait SharedPageModules {
 
     def problemReportHidden: Boolean = {
       val hidden = webDriver.findElements(By.xpath("//*[contains(@class, 'report-error') and contains(@class, 'hidden')]"))
-      return hidden.size().equals(1)
+      hidden.size().equals(1)
     }
 
-    def toggleProblemReport = {click on linkText("Get help with this page.")}
+    def toggleProblemReport() = {click on linkText("Get help with this page.")}
 
     def fillProblemReport(name: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String): Unit = {
       nameField.value = name
@@ -68,7 +68,7 @@ trait SharedPageModules {
     }
 
     def submitProblemReport(javascriptEnabled: Boolean = true): Unit = {
-      clickSubmitButton
+      clickSubmitButton()
 
       if (javascriptEnabled) {
         val wait = new WebDriverWait(webDriver, 15)
