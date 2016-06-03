@@ -16,14 +16,14 @@ error.common.problem_report.error_mandatory=WELSH-Please enter details of what w
 error.common.problem_report.action_mandatory=WELSH-Please enter details of what you were doing.
 error.common.comments_mandatory=WELSH-Enter your comments.
 error.common.comments_too_long=WELSH-The comment cannot be longer than 2000 characters
+language-switcher.english=English
+language-switcher.welsh=Cymraeg
 problem_report.action=WELSH-What were you doing?
 problem_report.error=WELSH-What do you need help with?
 common.problem_report.error_nojavascript_title=WELSH-There was a problem sending your query
 deskpro.email_too_long=WELSH-The email cannot be longer than 255 characters
-
 contact.heading=WELSH-Help and contact
 contact.confirmation.message=WELSH-Someone will get back to you within 2 working days.
-
 survey.title=WELSH-Survey
 survey.confirmation.title=WELSH-Thank you, your feedback has been received
 survey.was.answer.helpful.question=WELSH-How satisfied are you with the answer we gave you?
@@ -36,6 +36,3 @@ survey.strongly.disagree.response=WELSH-Very dissatisfied
 survey.tell.us.how.we.can.improve=WELSH-Tell us how we can improve the support we give you.
 survey.2500.characters.or.less=WELSH-2500 characters or less
 survey.submit=WELSH-Submit
-
-language-switcher.english=English
-language-switcher.welsh=Cymraeg
