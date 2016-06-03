@@ -5,6 +5,7 @@ POST        /beta-feedback/submit-unauthenticated        controllers.FeedbackCon
 GET         /beta-feedback/thanks                        controllers.FeedbackController.thanks
 GET         /beta-feedback/thanks-unauthenticated        controllers.FeedbackController.unauthenticatedThanks
 
+
 GET         /contact-hmrc                                controllers.ContactHmrcController.index
 POST        /contact-hmrc                                controllers.ContactHmrcController.submit
 GET         /contact-hmrc/thanks                         controllers.ContactHmrcController.thanks
@@ -25,6 +26,9 @@ GET         /beta-feedback/form/confirmation             controllers.PartialsCon
 GET			/survey				 	                     controllers.SurveyController.survey(ticketId: String, serviceId: String)
 POST		/submitSurvey                                controllers.SurveyController.submit()
 GET			/survey/confirmation 	                     controllers.SurveyController.confirmation()
+
+GET         /switch-to-welsh                             controllers.LanguageController.switchToWelsh()
+GET         /switch-to-english                           controllers.LanguageController.switchToEnglish()
 
 OPTIONS /*path                                           controllers.ApplicationController.options(path)
 
