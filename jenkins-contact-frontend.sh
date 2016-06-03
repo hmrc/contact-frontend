@@ -19,14 +19,17 @@ echo "Running functional test for contact-frontend..."
 
 cd $WORKSPACE
 
-
 echo "creating TMPDIR as $TMPDIR"
 mkdir -p ${TMPDIR}
 
 echo "Start functional tests..."
 
-sbt -Djava.io.tmpdir=${TMPDIR} -Dbrowser=chrome clean test fun:test dist-tgz publish
+sbt -Djava.io.tmpdir=${TMPDIR} -Dbrowser=chrome clean validate test fun:test dist-tgz publish
+
+SBT_EXIT_CODE=`echo $?`
 
 echo "Gracefully shutdown server..."
 
 sm --stop ALL
+
+exit $SBT_EXIT_CODE

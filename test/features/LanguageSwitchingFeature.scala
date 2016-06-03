@@ -4,11 +4,18 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.i18n.Messages
 import play.api.libs.json.{JsString, Json}
+import play.api.test.FakeApplication
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
-import support.page.{SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds, SurveyConfirmationPage}
+import support.page.{SurveyConfirmationPage, SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds}
+import uk.gov.hmrc.play.test.WithFakeApplication
 
-class LanguageSwitchingFeature extends StubbedFeatureSpec {
+class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplication {
+
+  override lazy val app = new FakeApplication(
+    additionalConfiguration = Map("application.langs" -> "en,cy",
+      "govuk-tax.Test.enableLanguageSwitching" -> true)
+  )
 
   feature("Language Switching") {
 
