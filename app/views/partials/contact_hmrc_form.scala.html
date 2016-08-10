@@ -13,7 +13,7 @@
     <p>Don't include any personal or financial information. For example, your National Insurance or credit card numbers.</p>
 }
 
-<form action="@externalContactHmrcUrl" method="POST" class="form--feedback" novalidate>
+<form action="@externalContactHmrcUrl" method="POST" class="form--feedback" novalidate="novalidate">
     <input type="hidden" name="csrfToken" value="@contactForm("csrfToken").value"/>
 
     <input type="hidden" name="service" value="@contactForm("service").value"/>
@@ -35,10 +35,13 @@
         @textArea(
         contactForm("contact-comments"),
         '_label -> "Your comments",
-        '_divClass -> "form-field",
+        '_divClass -> "form-field char-counter",
         '_inputClass -> "input--fullwidth",
-        '_help -> "2000 Characters max"
+        '_maxlength -> "2000",
+        '_dataCharCounter -> "true",
+        '_dataCharField -> "true"
         )
+
         <input type="hidden" name="isJavascript" id="isJavascript" value="@contactForm.data.get("isJavascript")">
         <input type="hidden" name="referer" id="referer" value="@contactForm.data.get("referer")">
 

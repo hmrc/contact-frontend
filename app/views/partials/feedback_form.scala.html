@@ -37,14 +37,15 @@
         '_inputClass -> "input--fullwidth",
         '_type -> "email"
         )
-
         @textArea(
         feedbackForm("feedback-comments"),
         '_label -> "Comments",
-        '_info -> Messages("common.feedback.information.warning") ,
-        '_divClass -> "form-field",
+        '_info -> Messages("common.feedback.information.warning"),
+        '_divClass -> "form-field char-counter",
         '_inputClass -> "input--fullwidth",
-        '_help -> "Limit is 2000 characters"
+        '_maxlength -> "2000",
+        '_dataCharCounter -> "true",
+        '_dataCharField -> "true"
         )
         <input type="hidden" name="isJavascript" id="isJavascript" value="@feedbackForm.data.get("isJavascript")">
         <input type="hidden" name="referer" id="referer" value="@feedbackForm.data.get("referer")">
