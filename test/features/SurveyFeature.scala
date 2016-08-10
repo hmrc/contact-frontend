@@ -2,11 +2,14 @@ package features
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import play.api.libs.json.{JsString, Json}
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
-import support.page.{SurveyPageWithTicketAndServiceIds, SurveyConfirmationPage}
+import support.page.{SurveyConfirmationPage, SurveyPageWithTicketAndServiceIds}
 
+@RunWith(classOf[JUnitRunner])
 class SurveyFeature extends StubbedFeatureSpec {
 
   feature("Survey") {
@@ -27,7 +30,7 @@ class SurveyFeature extends StubbedFeatureSpec {
         clickSubmitButton()
 
       Then("The data should get sent to 'audit land'")
-      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      val loggedRequests = getDatastreamSubmissionsForSurvey
       loggedRequests.size() shouldBe 1
 
       val json = Json.parse(loggedRequests.get(0).getBodyAsString)
@@ -63,7 +66,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       clickSubmitButton()
 
       Then("The data should get sent to 'audit land'")
-      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      val loggedRequests = getDatastreamSubmissionsForSurvey
       loggedRequests.size() shouldBe 0
     }
 
@@ -83,7 +86,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       clickSubmitButton()
 
       Then("The data should get sent to 'audit land'")
-      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      val loggedRequests = getDatastreamSubmissionsForSurvey
       loggedRequests.size() shouldBe 0
     }
 
@@ -103,7 +106,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       clickSubmitButton()
 
       Then("The data should get sent to 'audit land'")
-      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      val loggedRequests = getDatastreamSubmissionsForSurvey
       loggedRequests.size() shouldBe 0
     }
 
@@ -123,7 +126,7 @@ class SurveyFeature extends StubbedFeatureSpec {
         clickSubmitButton()
 
       Then("The data should not get sent to 'audit land' - but it does")
-      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      val loggedRequests = getDatastreamSubmissionsForSurvey
       loggedRequests.size() shouldBe 1
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
@@ -144,14 +147,14 @@ class SurveyFeature extends StubbedFeatureSpec {
       clickSubmitButton()
 
       Then("The data should not get sent to 'audit land' - but it does")
-      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      val loggedRequests = getDatastreamSubmissionsForSurvey
       val resultJsonString = loggedRequests.get(0).getBodyAsString
       val resultJson = Json.parse(resultJsonString)
-      (resultJson \ "detail" \ "helpful").asInstanceOf[JsString].value   shouldBe("0")
-      (resultJson \ "detail" \ "speed").asInstanceOf[JsString].value     shouldBe("0")
-      (resultJson \ "detail" \ "ticketId").asInstanceOf[JsString].value  shouldBe("HMRC-Z2V6DUK5")
-      (resultJson \ "detail" \ "serviceId").asInstanceOf[JsString].value  shouldBe("arbitrary service id")
-      (resultJson \ "detail" \ "improve").asInstanceOf[JsString].value   shouldBe("Blah blooh blah la dee daaaaa")
+      (resultJson \ "detail" \ "helpful").asInstanceOf[JsString].value shouldBe "0"
+      (resultJson \ "detail" \ "speed").asInstanceOf[JsString].value shouldBe "0"
+      (resultJson \ "detail" \ "ticketId").asInstanceOf[JsString].value shouldBe "HMRC-Z2V6DUK5"
+      (resultJson \ "detail" \ "serviceId").asInstanceOf[JsString].value shouldBe "arbitrary service id"
+      (resultJson \ "detail" \ "improve").asInstanceOf[JsString].value shouldBe "Blah blooh blah la dee daaaaa"
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
       on(SurveyConfirmationPage)
@@ -171,7 +174,7 @@ class SurveyFeature extends StubbedFeatureSpec {
         clickSubmitButton()
 
       Then("The data should not get sent to 'audit land' - but it does")
-      val loggedRequests = getDatastreamSubmissionsForSurvey()
+      val loggedRequests = getDatastreamSubmissionsForSurvey
       loggedRequests.size() shouldBe 1
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
@@ -179,6 +182,6 @@ class SurveyFeature extends StubbedFeatureSpec {
     }
   }
 
-  def getDatastreamSubmissionsForSurvey() = WireMock.findAll(postRequestedFor(urlEqualTo("/write/audit"))
+  def getDatastreamSubmissionsForSurvey = WireMock.findAll(postRequestedFor(urlEqualTo("/write/audit"))
     .withRequestBody(matching(".*DeskproSurvey.*")))
 }
