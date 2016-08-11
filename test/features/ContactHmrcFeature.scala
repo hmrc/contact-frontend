@@ -87,8 +87,8 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
 
       And("I see:")
       i_see(
-        "Your name cannot be longer than 70 characters",
-        "The email cannot be longer than 255 characters",
+        "Your name can't be longer than 70 characters",
+        "Your email can't be longer than 255 characters",
         "0 remaining characters")
 
       And("the Deskpro endpoint '/deskpro/ticket' has not been hit")
