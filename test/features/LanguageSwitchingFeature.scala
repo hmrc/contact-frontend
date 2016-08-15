@@ -34,7 +34,7 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
       i_see(Messages("WELSH-How satisfied are you with the speed of our reply?"))
       i_see(Messages("WELSH-Tell us how we can improve the support we give you."))
       i_see(Messages("WELSH-2500 characters or less"))
-      i_see(Messages("WELSH-Get help with this page."))
+      i_see(Messages("WELSH-Is there anything wrong with this page?"))
       i_see(Messages("English"))
 
       And("I click on the switch language link")
@@ -45,7 +45,7 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
       i_see(Messages("How satisfied are you with the speed of our reply?"))
       i_see(Messages("Tell us how we can improve the support we give you."))
       i_see(Messages("2500 characters or less"))
-      i_see(Messages("Get help with this page."))
+      i_see(Messages("Is there anything wrong with this page?"))
       i_see(Messages("Cymraeg"))
     }
 

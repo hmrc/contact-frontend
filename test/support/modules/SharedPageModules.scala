@@ -44,7 +44,7 @@ trait SharedPageModules {
       hidden.size().equals(1)
     }
 
-    def toggleProblemReport() = {click on linkText("Get help with this page.")}
+    def toggleProblemReport() = {click on linkText("Is there anything wrong with this page?")}
 
     def fillProblemReport(name: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String): Unit = {
       nameField.value = name
