@@ -44,7 +44,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
 
 
     "return 200 and a valid html page for a valid request and js is not enabled for an authenticated user" in new ProblemReportsControllerApplication {
-      when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(Authority("uri", Accounts(), None, None, ConfidenceLevel.L50))))
+      when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(Authority("uri", Accounts(), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None))))
       when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(accounts), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
       val result = controller.doReport()(request.withSession(SessionKeys.authToken -> "authToken"))
@@ -100,7 +100,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
     }
 
     "fail if the name has invalid characters - Javascript disabled" in new ProblemReportsControllerApplication {
-      when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(Authority("uri",  Accounts(), None, None, ConfidenceLevel.L50))))
+      when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(Authority("uri",  Accounts(), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None))))
 
       val submit = controller.doReport()(generateRequest(javascriptEnabled = false, name="""<a href="blah.com">something</a>""").withSession(SessionKeys.authToken -> "authToken"))
       val page = Jsoup.parse(contentAsString(submit))
