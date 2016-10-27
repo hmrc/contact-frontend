@@ -69,7 +69,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
       And("I see an error message")
       i_see("There was a problem sending your query",
-            "Please try again later or email hmrcsupport@tax.service.gov.uk if you need technical help with this website.")
+            "Please try again later.")
     }
 
     scenario("All fields are mandatory") {
@@ -84,7 +84,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
       Then("I see an error for invalid name")
       i_see("There was a problem sending your query",
-        "Please try again later or email hmrcsupport@tax.service.gov.uk if you need technical help with this website.")
+        "Please try again later.")
     }
   }
 

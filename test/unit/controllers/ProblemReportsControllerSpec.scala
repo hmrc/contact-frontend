@@ -119,7 +119,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
 
       val document = Jsoup.parse(contentAsString(result))
       document.getElementById("report-confirmation-no-data") should not be null
-      document.text() should include("Please try again later or email hmrcsupport@tax.service.gov.uk if you need technical help with this website.")
+      document.text() should include("Please try again later.")
     }
 
     "render the thank you message given" in new ProblemReportsControllerApplication {
