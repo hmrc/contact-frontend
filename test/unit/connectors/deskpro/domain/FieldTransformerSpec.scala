@@ -86,8 +86,8 @@ class FieldTransformerScope {
   val epayeAccount = Some(EpayeAccount("epayeRoot", EmpRef("officeNum", "officeRef")))
   
   val userId = UserId("456")
-  val payeUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(Some(PayeAccount("payeRoot", Nino("SH233544B")))), None, None, ConfidenceLevel.L50))
-  val bizTaxUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(sa = saAccount, ct = ctAccount, vat = vatAccount, epaye = epayeAccount), None, None, ConfidenceLevel.L50))
+  val payeUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(Some(PayeAccount("payeRoot", Nino("SH233544B")))), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None))
+  val bizTaxUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(sa = saAccount, ct = ctAccount, vat = vatAccount, epaye = epayeAccount), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None))
 
   val sessionId: String = "sessionIdValue"
   val hc = HeaderCarrier(userId = Some(userId), sessionId = Some(SessionId(sessionId)))

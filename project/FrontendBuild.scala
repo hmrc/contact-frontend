@@ -25,8 +25,8 @@ private object AppOverrides{
 private object AppDependencies {
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "frontend-bootstrap" % "6.4.0",
-    "uk.gov.hmrc" %% "play-authorised-frontend" % "4.0.0",
+    "uk.gov.hmrc" %% "frontend-bootstrap" % "6.7.0",
+    "uk.gov.hmrc" %% "play-authorised-frontend" % "5.5.0",
     "uk.gov.hmrc" %% "play-config" % "2.0.1",
     "uk.gov.hmrc" %% "play-json-logger" % "2.1.0",
     "uk.gov.hmrc" %% "play-health" % "1.1.0",
@@ -42,7 +42,7 @@ private object AppDependencies {
     "org.pegdown" % "pegdown" % "1.4.2" % "test",
     "org.jsoup" % "jsoup" % "1.7.3" % "test",
     "com.github.tomakehurst" % "wiremock" % "1.58" % "test",
-    "uk.gov.hmrc" %% "scala-webdriver" % "5.4.0" % "test",
+    "uk.gov.hmrc" %% "scala-webdriver" % "5.12.0" % "test",
     "uk.gov.hmrc" %% "hmrctest" % "1.4.0" % "test"
   ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
     .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(
