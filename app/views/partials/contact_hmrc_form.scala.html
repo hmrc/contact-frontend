@@ -6,11 +6,12 @@
     <header class="page-header">
         <h1>@Messages("contact.heading")</h1>
     </header>
-    <p>If you have a specific tax query @uk.gov.hmrc.urls.Link.toExternalPage(url = "http://search2.hmrc.gov.uk/kb5/hmrc/contactus/home.page", value = Some("contact HMRC"), dataAttributes = Some(Map("journey-click" -> "contact-page:Click:Contact HMRC"))).toHtml.</p>
-    <p>If you need help using your tax account please fill in this form.</p>
+    <p>@Html(Messages("contact.form.specific.query", uk.gov.hmrc.urls.Link.toExternalPage(url = "http://search2.hmrc.gov.uk/kb5/hmrc/contactus/home.page", value = Some("contact HMRC"), dataAttributes = Some(Map
+            ("journey-click" -> "contact-page:Click:Contact HMRC"))).toHtml))</p>
+    <p>@Messages("contact.form.please.fill")</p>
 
-    <h2>How can we help you?</h2>
-    <p>Don't include any personal or financial information. For example, your National Insurance or credit card numbers.</p>
+    <h2>@Messages("contact.form.how.help")</h2>
+    <p>@Messages("contact.form.personal.info")</p>
 }
 
 <form action="@externalContactHmrcUrl" method="POST" class="form--feedback" novalidate="novalidate">
@@ -21,20 +22,20 @@
     <fieldset>
         @input(
         contactForm("contact-name"),
-        '_label -> "Your name",
+        '_label -> Messages("form.your.name"),
         '_divClass -> "form-field",
         '_inputClass -> "input--fullwidth"
         )
         @input(
         contactForm("contact-email"),
-        '_label -> "Email address",
+        '_label -> Messages("form.email.address"),
         '_divClass -> "form-field",
         '_inputClass -> "input--fullwidth",
         '_type -> "email"
         )
         @textArea(
         contactForm("contact-comments"),
-        '_label -> "Your comments",
+        '_label -> Messages("form.your.comments"),
         '_divClass -> "form-field char-counter",
         '_inputClass -> "input--fullwidth",
         '_maxlength -> "2000",
@@ -46,7 +47,7 @@
         <input type="hidden" name="referer" id="referer" value="@contactForm.data.get("referer")">
 
         <div class="form-field">
-            <button class="button" type="submit">Send</button>
+            <button class="button" type="submit">@Messages("form.send")</button>
         </div>
 
     </fieldset>
