@@ -37,7 +37,6 @@ survey.tell.us.how.we.can.improve=WELSH-Tell us how we can improve the support w
 survey.2500.characters.or.less=WELSH-2500 characters or less
 survey.submit=WELSH-Submit
 
-deskpro.error.technical.difficulties=WELSH-Sorry, we''re experiencing technical difficulties
 deskpro.error.problem.sending=WELSH-There was a problem sending your query.
 please.try.later=WELSH-Please try again later.
 
