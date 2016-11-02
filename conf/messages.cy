@@ -6,7 +6,7 @@ error.common.feedback.rating_valid=WELSH-Please select a valid experience rating
 common.feedback.heading=WELSH-Send your feedback
 common.feedback.confirmation.heading=WELSH-Your feedback
 common.feedback.confirmation.message=WELSH-Your feedback has been received.
-common.feedback.information.warning=WELSH-Don’t include any personal or financial information. For example, your National Insurance or credit card numbers.
+common.feedback.information.warning=WELSH-Don''t include any personal or financial information. For example, your National Insurance or credit card numbers.
 common.feedback.get.help=WELSH-Is there anything wrong with this page?
 common.feedback.title =WELSH- Get help using this service
 error.common.problem_report.name_mandatory=WELSH-Please provide your name.
@@ -44,7 +44,6 @@ please.try.later=WELSH-Please try again later.
 contact.form.specific.query=WELSH-If you have a specific tax query {0}.
 contact.form.please.fill=WELSH-If you need help using your tax account please fill in this form.
 contact.form.how.help=WELSH-How can we help you?
-contact.form.personal.info=WELSH-Don''t include any personal or financial information. For example, your National Insurance or credit card numbers.
 form.send=WELSH-Send
 
 form.your.name=WELSH-Your name
