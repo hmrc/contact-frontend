@@ -6,7 +6,7 @@ error.common.feedback.rating_valid=WELSH-Please select a valid experience rating
 common.feedback.heading=WELSH-Send your feedback
 common.feedback.confirmation.heading=WELSH-Your feedback
 common.feedback.confirmation.message=WELSH-Your feedback has been received.
-common.feedback.information.warning=WELSH-Don’t include any personal or financial information. For example, your National Insurance or credit card numbers.
+common.feedback.information.warning=WELSH-Don''t include any personal or financial information. For example, your National Insurance or credit card numbers.
 common.feedback.get.help=WELSH-Is there anything wrong with this page?
 common.feedback.title =WELSH- Get help using this service
 error.common.problem_report.name_mandatory=WELSH-Please provide your name.
@@ -36,3 +36,20 @@ survey.strongly.disagree.response=WELSH-Very dissatisfied
 survey.tell.us.how.we.can.improve=WELSH-Tell us how we can improve the support we give you.
 survey.2500.characters.or.less=WELSH-2500 characters or less
 survey.submit=WELSH-Submit
+
+deskpro.error.problem.sending=WELSH-There was a problem sending your query.
+please.try.later=WELSH-Please try again later.
+
+contact.form.specific.query=WELSH-If you have a specific tax query {0}.
+contact.form.please.fill=WELSH-If you need help using your tax account please fill in this form.
+contact.form.how.help=WELSH-How can we help you?
+form.send=WELSH-Send
+
+form.your.name=WELSH-Your name
+form.email.address=WELSH-Email address
+form.your.comments=WELSH-Your comments
+
+form.online.services=WELSH-What do you think of this online service?
+form.comments=WELSH-Comments
+form.name=WELSH-Name
+problem_report.email=WELSH-Email

@@ -17,11 +17,11 @@
 
     <fieldset>
         <div class="form-group-compound">
-            <label for="report-name" class="form-label">Name</label>
+            <label for="report-name" class="form-label">@Messages("form.name")</label>
             <input id="report-name" maxlength="70" class="input--fullwidth form-control" name="report-name" type="text"  data-rule-letterswithbasicpunc="true" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory")'>
         </div>
         <div class="form-group-compound">
-            <label for="report-email" class="form-label">Email</label>
+            <label for="report-email" class="form-label">@Messages("problem_report.email")</label>
             <input id="report-email" maxlength="255" class="input--fullwidth form-control" name="report-email" type="email" data-rule-required="true" data-rule-email="true" data-msg-required='@Messages("error.common.problem_report.email_mandatory")'>
         </div>
         <div class="form-group-compound">
@@ -35,7 +35,7 @@
         <input type="hidden" name="isJavascript" value="false"/>
         <input type="hidden" name="referrer" value="@{request.headers.get("referer").getOrElse("")}"/>
         <div class="form-field">
-            <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">Send</button>
+            <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
         </div>
     </fieldset>
 </form>

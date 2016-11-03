@@ -20,26 +20,26 @@
         @inputRadioGroup(
         feedbackForm("feedback-rating"),
         feedbackRatings,
-        '_legend -> "What do you think of this online service?",
+        '_legend -> Messages("form.online.services"),
         '_stackedLabel -> true,
         '_labelClass -> "label--inlineRadio--overhead"
         )
         @input(
         feedbackForm("feedback-name"),
-        '_label -> "Name",
+        '_label -> Messages("form.name"),
         '_divClass -> "form-field",
         '_inputClass -> "input--fullwidth"
         )
         @input(
         feedbackForm("feedback-email"),
-        '_label -> "Email address",
+        '_label -> Messages("form.email.address"),
         '_divClass -> "form-field",
         '_inputClass -> "input--fullwidth",
         '_type -> "email"
         )
         @textArea(
         feedbackForm("feedback-comments"),
-        '_label -> "Comments",
+        '_label -> Messages("form.comments"),
         '_info -> Messages("common.feedback.information.warning"),
         '_divClass -> "form-field char-counter",
         '_inputClass -> "input--fullwidth",
@@ -51,7 +51,7 @@
         <input type="hidden" name="referer" id="referer" value="@feedbackForm.data.get("referer")">
 
         <div class="form-field">
-            <button class="button" type="submit">Send</button>
+            <button class="button" type="submit">@Messages("form.send")</button>
         </div>
 
     </fieldset>
