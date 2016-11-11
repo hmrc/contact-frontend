@@ -30,8 +30,9 @@ class SurveyFeature extends StubbedFeatureSpec {
         clickSubmitButton()
 
       Then("The data should get sent to 'audit land'")
+      shouldSendSurveyToDatastream
+
       val loggedRequests = getDatastreamSubmissionsForSurvey
-      loggedRequests.size() shouldBe 1
 
       val json = Json.parse(loggedRequests.get(0).getBodyAsString)
 
@@ -65,9 +66,8 @@ class SurveyFeature extends StubbedFeatureSpec {
       And("Submit the form")
       clickSubmitButton()
 
-      Then("The data should get sent to 'audit land'")
-      val loggedRequests = getDatastreamSubmissionsForSurvey
-      loggedRequests.size() shouldBe 0
+      Then("The data should not get sent to 'audit land'")
+      shouldNotSendSurveyToDatastream
     }
 
     scenario("Show successfully sent message whilst rejecting feedback when ticket ref is empty") {
@@ -85,9 +85,8 @@ class SurveyFeature extends StubbedFeatureSpec {
       And("Submit the form")
       clickSubmitButton()
 
-      Then("The data should get sent to 'audit land'")
-      val loggedRequests = getDatastreamSubmissionsForSurvey
-      loggedRequests.size() shouldBe 0
+      Then("The data should not get sent to 'audit land'")
+      shouldNotSendSurveyToDatastream
     }
 
     scenario("Show successfully sent message whilst rejecting feedback when service is empty") {
@@ -105,9 +104,8 @@ class SurveyFeature extends StubbedFeatureSpec {
       And("Submit the form")
       clickSubmitButton()
 
-      Then("The data should get sent to 'audit land'")
-      val loggedRequests = getDatastreamSubmissionsForSurvey
-      loggedRequests.size() shouldBe 0
+      Then("The data should not get sent to 'audit land'")
+      shouldNotSendSurveyToDatastream
     }
 
     scenario("Survey form errors, but still shows confirmation page") {
@@ -125,9 +123,8 @@ class SurveyFeature extends StubbedFeatureSpec {
       And("Submit the form")
         clickSubmitButton()
 
-      Then("The data should not get sent to 'audit land' - but it does")
-      val loggedRequests = getDatastreamSubmissionsForSurvey
-      loggedRequests.size() shouldBe 1
+      Then("The data should get sent to 'audit land' - though this is questionable behaviour from the code")
+      shouldSendSurveyToDatastream
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
         on(SurveyConfirmationPage)
@@ -146,7 +143,9 @@ class SurveyFeature extends StubbedFeatureSpec {
       And("Submit the form")
       clickSubmitButton()
 
-      Then("The data should not get sent to 'audit land' - but it does")
+      Then("The data should get sent to 'audit land' - though this is questionable behaviour from the code")
+      shouldSendSurveyToDatastream
+
       val loggedRequests = getDatastreamSubmissionsForSurvey
       val resultJsonString = loggedRequests.get(0).getBodyAsString
       val resultJson = Json.parse(resultJsonString)
@@ -173,12 +172,23 @@ class SurveyFeature extends StubbedFeatureSpec {
       And("Submit the form")
         clickSubmitButton()
 
-      Then("The data should not get sent to 'audit land' - but it does")
-      val loggedRequests = getDatastreamSubmissionsForSurvey
-      loggedRequests.size() shouldBe 1
+      Then("The data should get sent to 'audit land' - though this is questionable behaviour from the code")
+      shouldSendSurveyToDatastream
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
         on(SurveyConfirmationPage)
+    }
+  }
+
+  def shouldSendSurveyToDatastream = {
+    eventually {
+      getDatastreamSubmissionsForSurvey.size() shouldBe 1
+    }
+  }
+
+  def shouldNotSendSurveyToDatastream = {
+    eventually {
+      getDatastreamSubmissionsForSurvey.size() shouldBe 0
     }
   }
 
