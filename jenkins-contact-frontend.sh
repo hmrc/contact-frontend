@@ -9,7 +9,7 @@ echo "Starting ASSETS"
 sm --stop ALL
 sm --cleanlogs
 
-ASSETS_FRONTEND_VERSION=$(grep -e 'Prod.assets.version = "' conf/application.conf | cut -d '"' -f 2)
+ASSETS_FRONTEND_VERSION=$(grep -e 'frontend.assets.version = "' conf/application.conf | cut -d '"' -f 2)
 
 echo "Using ASSETS_FRONTEND_VERSION as $ASSETS_FRONTEND_VERSION"
 

@@ -22,7 +22,7 @@ object CFConfig extends AppConfig with ServicesConfig {
 
   override lazy val externalReportProblemUrl = s"$contactHost/contact/problem_reports"
   override lazy val externalReportProblemSecureUrl = s"$contactHost/contact/problem_reports_secure"
-  override lazy val assetsPrefix = loadConfig(s"govuk-tax.$env.assets.url") + loadConfig(s"govuk-tax.$env.assets.version")
+  override lazy val assetsPrefix = loadConfig(s"frontend.assets.url") + loadConfig(s"frontend.assets.version")
   override lazy val analyticsToken = loadConfig(s"govuk-tax.$env.google-analytics.token")
   override lazy val analyticsHost = loadConfig(s"govuk-tax.$env.google-analytics.host")
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
