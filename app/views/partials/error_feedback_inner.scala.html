@@ -1,10 +1,8 @@
 @(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang)
 @import uk.gov.hmrc.play.views.html._
 
-<h3 class="h2-heading">@Messages("common.feedback.title")</h3>
-<p>
-    @Messages("common.feedback.information.warning")
-</p>
+<h2>@Messages("common.feedback.title")</h2>
+<p>@Messages("common.feedback.information.warning")</p>
 
 <form action="@actionUrl" method="POST" class="form--feedback" novalidate>
     @if(csrfToken.isDefined) {
@@ -16,6 +14,7 @@
     }
 
     <fieldset>
+        <legend class="visuallyhidden">@Messages("common.feedback.title")</legend>
         <div class="form-group-compound">
             <label for="report-name" class="form-label">@Messages("form.name")</label>
             <input id="report-name" maxlength="70" class="input--fullwidth form-control" name="report-name" type="text"  data-rule-letterswithbasicpunc="true" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory")'>
