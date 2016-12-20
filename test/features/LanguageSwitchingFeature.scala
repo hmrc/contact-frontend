@@ -2,25 +2,26 @@ package features
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import play.api.i18n.Messages
-import play.api.libs.json.{JsString, Json}
 import play.api.test.FakeApplication
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
-import support.page.{SurveyConfirmationPage, SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds}
+import support.page.{SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds}
 import uk.gov.hmrc.play.test.WithFakeApplication
 
+@RunWith(classOf[JUnitRunner])
 class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplication {
-
-  override lazy val app = new FakeApplication(
-    additionalConfiguration = Map("application.langs" -> "en,cy",
-      "govuk-tax.Test.enableLanguageSwitching" -> true)
+  override lazy val app = FakeApplication(
+    additionalConfiguration = Map(
+      "application.langs" -> "en,cy",
+      "govuk-tax.Test.enableLanguageSwitching" -> true
+    )
   )
 
   feature("Language Switching") {
-
     scenario("Switch from English to Welsh in the survey") {
-
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
 
       Given("I go to the survey form page")
@@ -29,13 +30,13 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
       And("I click on the switch language link")
       click on linkText("Cymraeg")
 
-      i_see(Messages("WELSH-Survey"))
-      i_see(Messages("WELSH-How satisfied are you with the answer we gave you?"))
-      i_see(Messages("WELSH-How satisfied are you with the speed of our reply?"))
-      i_see(Messages("WELSH-Tell us how we can improve the support we give you."))
-      i_see(Messages("WELSH-2500 characters or less"))
-      i_see(Messages("WELSH-Is there anything wrong with this page?"))
-      i_see(Messages("English"))
+      i_see("Arolwg")
+      i_see("Pa mor fodlon ydych gyda'r ateb a gawsoch gennym?")
+      i_see("Pa mor fodlon ydych gyda'r amser a gymerwyd gennym i'ch ateb?")
+      i_see("Rhowch wybod i ni sut y gallwn wella'r cymorth a roddwn i chi.")
+      i_see("2500 o gymeriadau neu lai")
+      i_see("A oes unrhyw beth o'i le gyda'r dudalen hon?")
+      i_see("English")
 
       And("I click on the switch language link")
       click on linkText("English")
@@ -50,9 +51,7 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
     }
 
     scenario("Show confirmation message in Welsh after submitting the form in Welsh") {
-
       val invalidTicketId = "HMRC-Z2V6DUK5"
-
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
 
       Given("I go to the survey form page")
@@ -72,8 +71,6 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
       And("I get to the Welsh Language confirmation page")
       on(SurveyConfirmationPageWelsh)
     }
-
   }
-
 }
 
