@@ -17,7 +17,7 @@ trait SurveyConfirmationPageWelsh extends SurveyConfirmationPage {
 
   override val url = Env.host + "/contact/survey/confirmation"
 
-  override def isCurrentPage: Boolean = heading=="WELSH-Thank you, your feedback has been received"
+  override def isCurrentPage: Boolean = heading=="Diolch, mae eich adborth wedi dod i law."
 }
 
 object SurveyConfirmationPageWelsh extends SurveyConfirmationPageWelsh
