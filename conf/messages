@@ -16,8 +16,12 @@ error.common.problem_report.error_mandatory=Please enter details of what went wr
 error.common.problem_report.action_mandatory=Please enter details of what you were doing.
 error.common.comments_mandatory=Enter your comments.
 error.common.comments_too_long=The comment cannot be longer than 2000 characters
+
 language-switcher.english=English
+language-switcher.english.hover=Use this account in English
 language-switcher.welsh=Cymraeg
+language-switcher.welsh.hover=Defnyddio''r cyfrif hwn yn Cymraeg
+
 problem_report.action=What were you doing?
 problem_report.error=What do you need help with?
 common.problem_report.error_nojavascript_title=There was a problem sending your query

@@ -16,8 +16,12 @@ error.common.problem_report.error_mandatory=Rhowch fanylion yr hyn a aeth o''i l
 error.common.problem_report.action_mandatory=Rhowch fanylion yr hyn yr oeddech yn ei wneud.
 error.common.comments_mandatory=Rhowch eich sylwadau.
 error.common.comments_too_long=Ni all y sylwadau fod yn hirach na 2000 o gymeriadau
+
 language-switcher.english=English
+language-switcher.english.hover=Use this account in English
 language-switcher.welsh=Cymraeg
+language-switcher.welsh.hover=Defnyddio''r cyfrif hwn yn Cymraeg
+
 problem_report.action=Beth oeddech yn ei wneud?
 problem_report.error=Gyda beth ydych angen help?
 common.problem_report.error_nojavascript_title=Cafwyd problem wrth anfon eich ymholiad
