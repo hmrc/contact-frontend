@@ -4,7 +4,7 @@
 <h2>@Messages("common.feedback.title")</h2>
 <p>@Messages("common.feedback.information.warning")</p>
 
-<form action="@actionUrl" method="POST" class="form--feedback" novalidate>
+<form action="@actionUrl" method="POST" id="error-feedback-form" class="form--feedback" novalidate>
     @if(csrfToken.isDefined) {
     <input type="hidden" name="csrfToken" value="@{csrfToken.get}"/>
     }
