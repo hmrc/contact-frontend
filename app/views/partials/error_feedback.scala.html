@@ -2,7 +2,7 @@
 @import uk.gov.hmrc.play.views.html._
 
 <div class="report-error">
-    <a class="report-error__toggle js-visible" id="get-help-action" href="@controllers.ProblemReportsController.reportFormNonJavaScript(service)">@Messages("common.feedback.get.help")</a>
+    <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help")</a>
     <div class="report-error__content js-hidden">
         @views.html.partials.error_feedback_inner(actionUrl, csrfToken, service)
     </div>
