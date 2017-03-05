@@ -124,5 +124,4 @@ object FeedbackForm {
 
 object FeedbackFormConfig {
   val validExperiences = (5 to 1 by -1) map (_.toString)
-  val feedbackRatings = validExperiences zip Seq("Very good", "Good", "Neutral", "Bad", "Very bad")
 }

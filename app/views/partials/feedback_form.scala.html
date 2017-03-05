@@ -3,7 +3,6 @@
   service: Option[String] = None)(implicit request : Request[_], lang : Lang)
 
 @import uk.gov.hmrc.play.views.html.helpers._
-@import controllers.FeedbackFormConfig._
 
 @import views.helpers.ServiceParameter.extractServiceParameter
 
@@ -19,7 +18,7 @@
     <fieldset>
         @inputRadioGroup(
         feedbackForm("feedback-rating"),
-        feedbackRatings,
+        Vector(("5",Messages("form.online.services.very_good")), ("4",Messages("form.online.services.good")), ("3",Messages("form.online.services.neutral")), ("2",Messages("form.online.services.bad")), ("1",Messages("form.online.services.very_bad"))),
         '_legend -> Messages("form.online.services"),
         '_stackedLabel -> true,
         '_labelClass -> "label--inlineRadio--overhead"

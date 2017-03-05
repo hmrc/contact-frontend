@@ -8,7 +8,7 @@ import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
-import support.page.{SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds}
+import support.page.{UnauthenticatedFeedbackPage, SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds}
 import uk.gov.hmrc.play.test.WithFakeApplication
 
 @RunWith(classOf[JUnitRunner])
@@ -70,6 +70,18 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
 
       And("I get to the Welsh Language confirmation page")
       on(SurveyConfirmationPageWelsh)
+    }
+
+    scenario("Show beta-feedback-unauthenticated page ratings in Welsh") {
+      Given("I go to the beta-feedback-unauthenticated page")
+      goOn(UnauthenticatedFeedbackPage)
+
+      When("I click on the switch language link")
+      click on linkText("Cymraeg")
+
+      Then("The ratings text is in Welsh")
+      UnauthenticatedFeedbackPage.pageTitle shouldBe "Anfon eich adborth"
+      UnauthenticatedFeedbackPage.ratingsList() shouldBe "Gwaeliawn Gwael Niwtral Da Daiawn"
     }
   }
 }
