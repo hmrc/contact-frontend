@@ -54,6 +54,11 @@ form.email.address=Cyfeiriad e-bost
 form.your.comments=Eich sylwadau
 
 form.online.services=Beth yw eich barn am y gwasanaeth ar-lein hwn?
+form.online.services.very_good=Da iawn
+form.online.services.good=Da
+form.online.services.neutral=Niwtral
+form.online.services.bad=Gwael
+form.online.services.very_bad=Gwael iawn
 form.comments=Sylwadau
 form.name=Enw
 problem_report.email=E-bost

@@ -54,6 +54,11 @@ form.email.address=Email address
 form.your.comments=Your comments
 
 form.online.services=What do you think of this online service?
+form.online.services.very_good=Very good
+form.online.services.good=Good
+form.online.services.neutral=Neutral
+form.online.services.bad=Bad
+form.online.services.very_bad=Very bad
 form.comments=Comments
 form.name=Name
 problem_report.email=Email
