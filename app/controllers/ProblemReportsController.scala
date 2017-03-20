@@ -13,6 +13,9 @@ import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import uk.gov.hmrc.play.frontend.controller.{UnauthorisedAction, FrontendController}
 import uk.gov.hmrc.play.validators.Validators._
 
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
+
 import scala.concurrent.Future
 
 trait ProblemReportsController extends FrontendController with ContactFrontendActions {

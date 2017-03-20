@@ -3,12 +3,13 @@ package controllers
 import config.CFConfig
 import play.api.Logger
 import play.api.Play.current
-import play.api.i18n.Lang
+import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import util.LanguageUtils
 
-trait LanguageController extends FrontendController {
+trait LanguageController extends FrontendController with I18nSupport{
+  override def messagesApi = ???
 
     val english = Lang("en")
     val welsh = Lang("cy")

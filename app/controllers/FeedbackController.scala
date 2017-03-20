@@ -10,6 +10,9 @@ import uk.gov.hmrc.play.frontend.auth.{Actions, AuthContext}
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.validators.Validators
 
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
+
 import scala.concurrent.Future
 
 object FeedbackFormBind {
