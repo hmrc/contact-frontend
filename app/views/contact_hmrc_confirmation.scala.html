@@ -1,4 +1,4 @@
-@(ticketId: String)(implicit request : Request[_], messages : Messages)
+@(ticketId: String)(implicit request : Request[_], lang : Lang, messages : Messages)
 
 @main(title = Messages("contact.heading"), supportLinkEnabled = false) {
   @views.html.partials.contact_hmrc_form_confirmation(ticketId)
