@@ -37,13 +37,14 @@ private object AppDependencies {
   )
 
   val test = Seq(
-    "org.scalatest" %% "scalatest" % "2.2.2" % "test",
+    "org.scalatest" %% "scalatest" % "2.2.6" % "test",
     "org.scalatestplus" %% "play" % "1.2.0" % "test",
-    "org.pegdown" % "pegdown" % "1.4.2" % "test",
+    "org.mockito" % "mockito-all" % "1.9.5" % "test",
+    "org.pegdown" % "pegdown" % "1.6.0" % "test",
     "org.jsoup" % "jsoup" % "1.7.3" % "test",
     "com.github.tomakehurst" % "wiremock" % "1.58" % "test",
     "uk.gov.hmrc" %% "scala-webdriver" % "5.12.0" % "test",
-    "uk.gov.hmrc" %% "hmrctest" % "1.4.0" % "test"
+    "uk.gov.hmrc" %% "hmrctest" % "2.1.0" % "test"
   ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
     .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(
     "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test")

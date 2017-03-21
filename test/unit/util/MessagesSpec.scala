@@ -1,6 +1,7 @@
 package unit.util
 
-import play.api.i18n.{DefaultMessagesPlugin, Lang}
+import play.api.Environment
+import play.api.i18n.{DefaultLangs, DefaultMessagesApi, Lang}
 import play.api.test.FakeApplication
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
@@ -11,7 +12,7 @@ class MessagesSpec extends UnitSpec with WithFakeApplication {
       "govuk-tax.Test.enableLanguageSwitching" -> true)
   )
 
-  val messagesAPI = new DefaultMessagesPlugin(fakeApplication).api
+  val messagesAPI = new DefaultMessagesApi(Environment.simple(), fakeApplication.configuration, new DefaultLangs(fakeApplication.configuration))
   val languageEnglish = Lang.get("en").getOrElse(throw new Exception())
   val languageWelsh = Lang.get("cy").getOrElse(throw new Exception())
   val MatchSingleQuoteOnly = """\w+'{1}\w+""".r

@@ -41,13 +41,13 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
       And("I click on the switch language link")
       click on linkText("English")
 
-      i_see(Messages("Survey"))
-      i_see(Messages("How satisfied are you with the answer we gave you?"))
-      i_see(Messages("How satisfied are you with the speed of our reply?"))
-      i_see(Messages("Tell us how we can improve the support we give you."))
-      i_see(Messages("2500 characters or less"))
-      i_see(Messages("Is there anything wrong with this page?"))
-      i_see(Messages("Cymraeg"))
+      i_see("Survey")
+      i_see("How satisfied are you with the answer we gave you?")
+      i_see("How satisfied are you with the speed of our reply?")
+      i_see("Tell us how we can improve the support we give you.")
+      i_see("2500 characters or less")
+      i_see("Is there anything wrong with this page?")
+      i_see("Cymraeg")
     }
 
     scenario("Show confirmation message in Welsh after submitting the form in Welsh") {
