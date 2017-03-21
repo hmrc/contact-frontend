@@ -29,7 +29,7 @@ class MessagesSpec extends UnitSpec with WithFakeApplication {
       messagesAPI.messages("en").size shouldBe 0
       val englishMessageCount = messagesAPI.messages("default").size - frameworkProvidedKeys.size
       messagesAPI.messages("cy").size shouldBe englishMessageCount
-      messagesAPI.messages("default.play").size shouldBe 38
+      messagesAPI.messages("default.play").size shouldBe 46
     }
   }
 
