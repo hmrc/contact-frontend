@@ -1,18 +1,20 @@
 package unit.util
 
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.Environment
 import play.api.i18n.{DefaultLangs, DefaultMessagesApi, Lang}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeApplication
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-class MessagesSpec extends UnitSpec with WithFakeApplication {
+class MessagesSpec extends UnitSpec with OneAppPerSuite {
 
-  override lazy val fakeApplication = new FakeApplication(
-    additionalConfiguration = Map("application.langs" -> "en,cy",
+  override lazy val app = GuiceApplicationBuilder().configure(
+    Map("application.langs" -> "en,cy",
       "govuk-tax.Test.enableLanguageSwitching" -> true)
-  )
+  ).build()
 
-  val messagesAPI = new DefaultMessagesApi(Environment.simple(), fakeApplication.configuration, new DefaultLangs(fakeApplication.configuration))
+  val messagesAPI = new DefaultMessagesApi(Environment.simple(), app.configuration, new DefaultLangs(app.configuration))
   val languageEnglish = Lang.get("en").getOrElse(throw new Exception())
   val languageWelsh = Lang.get("cy").getOrElse(throw new Exception())
   val MatchSingleQuoteOnly = """\w+'{1}\w+""".r

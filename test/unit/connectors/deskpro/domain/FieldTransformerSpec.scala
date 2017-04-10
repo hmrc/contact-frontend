@@ -1,5 +1,6 @@
 package connectors.deskpro.domain
 
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain._
 import uk.gov.hmrc.play.http.{HeaderCarrier, UserId}
@@ -9,7 +10,7 @@ import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.http.logging.SessionId
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-class FieldTransformerSpec extends UnitSpec with WithFakeApplication {
+class FieldTransformerSpec extends UnitSpec with OneAppPerSuite {
 
   "Field Transformer" should {
 

@@ -7,6 +7,8 @@ import org.mockito.Matchers
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.OneAppPerSuite
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.{FakeApplication, FakeRequest}
 import play.api.test.Helpers._
@@ -19,14 +21,14 @@ import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.Future
 
-class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
+class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
 
-  override lazy val fakeApplication = FakeApplication(additionalConfiguration = Map(
+  override lazy val app = GuiceApplicationBuilder().configure(Map(
     "govuk-tax.Test.assets.url" -> "",
     "govuk-tax.Test.assets.version" -> "",
     "govuk-tax.Test.google-analytics.token" -> "",
     "govuk-tax.Test.google-analytics.host" -> ""
-  ))
+  )).build()
 
   "Reporting a problem" should {
 
