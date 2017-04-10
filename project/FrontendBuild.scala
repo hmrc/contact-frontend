@@ -25,14 +25,14 @@ private object AppOverrides{
 private object AppDependencies {
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "frontend-bootstrap" % "7.14.0",
+    "uk.gov.hmrc" %% "frontend-bootstrap" % "7.17.0",
     "uk.gov.hmrc" %% "play-authorised-frontend" % "6.3.0",
     "uk.gov.hmrc" %% "play-config" % "4.3.0",
     "uk.gov.hmrc" %% "logback-json-logger" % "3.1.0",
     "uk.gov.hmrc" %% "play-health" % "2.1.0",
     "uk.gov.hmrc" %% "play-ui" % "7.0.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.1.0",
-    "uk.gov.hmrc" %% "url-builder" % "1.0.0",
+    "uk.gov.hmrc" %% "url-builder" % "2.1.0",
     "org.apache.httpcomponents" % "httpclient" % DependencyVersions.apacheHttpComponentsCore
   )
 
