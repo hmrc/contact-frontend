@@ -3,6 +3,7 @@ package controllers
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.{FakeHeaders, FakeRequest}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -13,7 +14,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @RunWith(classOf[JUnitRunner])
-class SurveyControllerSpec extends UnitSpec with WithFakeApplication {
+class SurveyControllerSpec extends UnitSpec with OneAppPerSuite {
 
   "ticketId regex" should {
     "validates correct ticket refs" in new SurveyControllerApplication {

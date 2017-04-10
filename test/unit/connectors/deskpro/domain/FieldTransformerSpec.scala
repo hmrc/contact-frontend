@@ -1,5 +1,6 @@
 package connectors.deskpro.domain
 
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain._
 import uk.gov.hmrc.play.http.{HeaderCarrier, UserId}
@@ -9,7 +10,7 @@ import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.http.logging.SessionId
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-class FieldTransformerSpec extends UnitSpec with WithFakeApplication {
+class FieldTransformerSpec extends UnitSpec with OneAppPerSuite {
 
   "Field Transformer" should {
 
@@ -86,8 +87,8 @@ class FieldTransformerScope {
   val epayeAccount = Some(EpayeAccount("epayeRoot", EmpRef("officeNum", "officeRef")))
   
   val userId = UserId("456")
-  val payeUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(Some(PayeAccount("payeRoot", Nino("SH233544B")))), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None))
-  val bizTaxUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(sa = saAccount, ct = ctAccount, vat = vatAccount, epaye = epayeAccount), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None))
+  val payeUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(Some(PayeAccount("payeRoot", Nino("SH233544B")))), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None, None, ""))
+  val bizTaxUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(sa = saAccount, ct = ctAccount, vat = vatAccount, epaye = epayeAccount), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None, None, ""))
 
   val sessionId: String = "sessionIdValue"
   val hc = HeaderCarrier(userId = Some(userId), sessionId = Some(SessionId(sessionId)))

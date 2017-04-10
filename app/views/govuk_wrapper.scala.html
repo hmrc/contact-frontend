@@ -4,7 +4,7 @@
   contentHeader: Option[Html] = None,
   mainContent: Html = HtmlFormat.empty,
   userLoggedIn: Boolean = true,
-  getHelpForm: Html  = HtmlFormat.empty, enableLanguageSwitching : Boolean)(implicit request: Request[_], lang : Lang)
+  getHelpForm: Html  = HtmlFormat.empty, enableLanguageSwitching : Boolean)(implicit request: Request[_], lang : Lang, messages : Messages)
 
 @import layouts.{govuk_template => hmrcGovUkTemplate}
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}

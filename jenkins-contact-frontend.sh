@@ -24,7 +24,7 @@ mkdir -p ${TMPDIR}
 
 echo "Start functional tests..."
 
-sbt -Djava.io.tmpdir=${TMPDIR} -Dbrowser=chrome clean validate test fun:test dist-tgz publish -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
+sbt -Djava.io.tmpdir=${TMPDIR} -Dbrowser=chrome clean validate test dist-tgz publish -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
 
 SBT_EXIT_CODE=`echo $?`
 

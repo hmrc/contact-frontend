@@ -1,11 +1,14 @@
 package features
 
-import com.ning.http.client.AsyncHttpClientConfig
+import akka.actor.ActorSystem
+import com.ning.http.client.AsyncHttpClient
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.ws.WS
-import play.api.libs.ws.ning.NingWSClient
+import play.api.libs.ws.ning.{NingWSClientConfig, NingAsyncHttpClientConfigBuilder, NingWSClient}
 import support.StubbedFeatureSpec
 import support.page.UnauthenticatedFeedbackPage
+
+import akka.stream.ActorMaterializer
 
 class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
 
@@ -45,7 +48,11 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
     scenario("External posts to form are not allowed") {
       When("I post to the form using external rest client")
       val baseUrl = "http://localhost:9000"
-      implicit val wsClient = new NingWSClient(new AsyncHttpClientConfig.Builder().build())
+
+      implicit val system = ActorSystem()
+      implicit val materializer = ActorMaterializer()
+      val asyncClientConfig = new NingAsyncHttpClientConfigBuilder(NingWSClientConfig()).build()
+      implicit val wsClient = new NingWSClient(asyncClientConfig)
 
       val eventualResponse = WS.clientUrl(s"$baseUrl/contact/problem_reports_secure")
         .withHeaders("Content-Type" -> "application/x-www-form-urlencoded")

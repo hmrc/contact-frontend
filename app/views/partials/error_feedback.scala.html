@@ -1,4 +1,4 @@
-@(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang)
+@(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages)
 @import uk.gov.hmrc.play.views.html._
 
 <div class="report-error">

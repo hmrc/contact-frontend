@@ -12,6 +12,9 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 import uk.gov.hmrc.play.validators.Validators
 import views.html.deskpro_error
 
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
+
 import scala.concurrent.Future
 
 object ContactHmrcForm {

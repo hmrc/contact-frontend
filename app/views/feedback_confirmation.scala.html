@@ -1,4 +1,4 @@
-@(ticketId:String, user: Option[uk.gov.hmrc.play.frontend.auth.AuthContext])(implicit request : Request[_], lang : Lang)
+@(ticketId:String, user: Option[uk.gov.hmrc.play.frontend.auth.AuthContext])(implicit request : Request[_], lang : Lang, messages : Messages)
 
 @main(title = Messages("common.feedback.heading"), userLoggedIn = user.isDefined) {
     @views.html.partials.feedback_form_confirmation(ticketId)

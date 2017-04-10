@@ -13,6 +13,9 @@ import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
+
 import scala.util.matching.Regex
 import scala.concurrent.Future
 import scala.util.Try

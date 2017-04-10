@@ -10,6 +10,10 @@ import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
+import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
+
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 object ContactFrontendGlobal extends DefaultFrontendGlobal with RunMode {
 
@@ -35,11 +39,11 @@ object ControllerConfiguration extends ControllerConfig {
   lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
 }
 
-object CFLoggingFilter extends FrontendLoggingFilter {
+object CFLoggingFilter extends FrontendLoggingFilter with MicroserviceFilterSupport {
   override def controllerNeedsLogging(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsLogging
 }
 
-object ContactFrontendAuditFilter extends FrontendAuditFilter with RunMode with AppName {
+object ContactFrontendAuditFilter extends FrontendAuditFilter with RunMode with AppName with MicroserviceFilterSupport {
 
   override lazy val maskedFormFields = Seq.empty
 

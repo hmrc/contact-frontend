@@ -1,4 +1,4 @@
-@()(implicit request : Request[_], lang : Lang)
+@()(implicit request : Request[_], lang : Lang, messages : Messages)
 
 @pageTitle = @{Messages("common.problem_report.error_nojavascript_title")}
 @main(title = pageTitle, supportLinkEnabled = false) {

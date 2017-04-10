@@ -27,8 +27,8 @@ GET			/survey				 	                     controllers.SurveyController.survey(tick
 POST		/submitSurvey                                controllers.SurveyController.submit()
 GET			/survey/confirmation 	                     controllers.SurveyController.confirmation()
 
-GET         /switch-to-welsh                             controllers.LanguageController.switchToWelsh()
-GET         /switch-to-english                           controllers.LanguageController.switchToEnglish()
+GET         /switch-to-welsh                             @controllers.LanguageController.switchToWelsh()
+GET         /switch-to-english                           @controllers.LanguageController.switchToEnglish()
 
 OPTIONS /*path                                           controllers.ApplicationController.options(path)
 

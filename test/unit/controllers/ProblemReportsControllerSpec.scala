@@ -7,6 +7,8 @@ import org.mockito.Matchers
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.OneAppPerSuite
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.{FakeApplication, FakeRequest}
 import play.api.test.Helpers._
@@ -19,14 +21,14 @@ import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.Future
 
-class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
+class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
 
-  override lazy val fakeApplication = FakeApplication(additionalConfiguration = Map(
+  override lazy val app = GuiceApplicationBuilder().configure(Map(
     "govuk-tax.Test.assets.url" -> "",
     "govuk-tax.Test.assets.version" -> "",
     "govuk-tax.Test.google-analytics.token" -> "",
     "govuk-tax.Test.google-analytics.host" -> ""
-  ))
+  )).build()
 
   "Reporting a problem" should {
 
@@ -44,7 +46,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
 
 
     "return 200 and a valid html page for a valid request and js is not enabled for an authenticated user" in new ProblemReportsControllerApplication {
-      when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(Authority("uri", Accounts(), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None))))
+      when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(Authority("uri", Accounts(), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None, None, ""))))
       when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(accounts), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
       val result = controller.doReport()(request.withSession(SessionKeys.authToken -> "authToken"))
@@ -100,7 +102,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
     }
 
     "fail if the name has invalid characters - Javascript disabled" in new ProblemReportsControllerApplication {
-      when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(Authority("uri",  Accounts(), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None))))
+      when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(Some(Authority("uri",  Accounts(), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None, None, ""))))
 
       val submit = controller.doReport()(generateRequest(javascriptEnabled = false, name="""<a href="blah.com">something</a>""").withSession(SessionKeys.authToken -> "authToken"))
       val page = Jsoup.parse(contentAsString(submit))

@@ -1,6 +1,8 @@
 import sbt.Keys._
 import sbt.Tests.{SubProcess, Group}
 import sbt._
+import play.routes.compiler.StaticRoutesGenerator
+import play.sbt.routes.RoutesKeys.routesGenerator
 
 trait MicroService {
 
@@ -16,7 +18,7 @@ trait MicroService {
 
   lazy val appDependencies : Seq[ModuleID] = ???
   lazy val appOverrides: Set[ModuleID] = ???
-  lazy val plugins : Seq[Plugins] = Seq(play.PlayScala)
+  lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
   def unitFilter(name: String): Boolean = !funFilter(name) && !smokeFilter(name)
@@ -37,7 +39,8 @@ trait MicroService {
       dependencyOverrides ++= appOverrides,
       parallelExecution in Test := false,
       fork in Test := false,
-      retrieveManaged := true
+      retrieveManaged := true,
+      routesGenerator := StaticRoutesGenerator
     )
     .settings(Repositories.playPublishingSettings : _*)
     .settings(testOptions in Test := Seq(Tests.Filter(unitFilter)),
@@ -76,7 +79,10 @@ trait MicroService {
       addTestReportOption(SmokeTest, "smoke-test-reports")
     )
     .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
-    .settings(resolvers += Resolver.bintrayRepo("hmrc", "releases"))
+    .settings(
+      resolvers += Resolver.bintrayRepo("hmrc", "releases"),
+      resolvers += Resolver.jcenterRepo
+    )
 }
 
 private object TestPhases {
