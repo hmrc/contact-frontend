@@ -1,15 +1,17 @@
 package controllers
 
+import javax.inject.{Inject, Singleton}
+
 import config.CFConfig
 import play.api.Logger
 import play.api.Play.current
-import play.api.i18n.{I18nSupport, Lang}
+import play.api.i18n.{MessagesApi, I18nSupport, Lang}
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import util.LanguageUtils
 
-trait LanguageController extends FrontendController with I18nSupport{
-  override def messagesApi = ???
+@Singleton
+class LanguageController @Inject() (override val messagesApi: MessagesApi) extends FrontendController with I18nSupport{
 
     val english = Lang("en")
     val welsh = Lang("cy")
@@ -31,6 +33,3 @@ trait LanguageController extends FrontendController with I18nSupport{
   }
   
 }
-
-
-object LanguageController extends LanguageController
