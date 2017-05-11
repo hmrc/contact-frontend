@@ -30,7 +30,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-config" % "4.3.0",
     "uk.gov.hmrc" %% "logback-json-logger" % "3.1.0",
     "uk.gov.hmrc" %% "play-health" % "2.1.0",
-    "uk.gov.hmrc" %% "play-ui" % "7.0.0",
+    "uk.gov.hmrc" %% "play-ui" % "7.2.1",
     "uk.gov.hmrc" %% "govuk-template" % "5.1.0",
     "uk.gov.hmrc" %% "url-builder" % "2.1.0",
     "org.apache.httpcomponents" % "httpclient" % DependencyVersions.apacheHttpComponentsCore
