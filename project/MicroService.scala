@@ -17,7 +17,7 @@ trait MicroService {
   val appVersion: String
 
   lazy val appDependencies : Seq[ModuleID] = ???
-  lazy val appOverrides: Set[ModuleID] = ???
+  lazy val appOverrides: Set[ModuleID] = AppDependencies.overrideDependencies
   lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 

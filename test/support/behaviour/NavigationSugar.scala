@@ -7,7 +7,6 @@ import org.scalatest.selenium.WebBrowser
 import org.scalatest.selenium.WebBrowser.{go => goo}
 import org.scalatest.{Assertions, ShouldMatchers}
 import support.page.WebPage
-import support.page.WebPage
 import support.steps.Env
 
 
@@ -15,34 +14,30 @@ trait NavigationSugar extends WebBrowser with Eventually with Assertions with Sh
 
   implicit def webDriver: WebDriver = Env.driver
 
-  def goOn(page: WebPage) = {
+  def goOn(page: WebPage): Unit = {
     go(page)
     on(page)
   }
 
-  def go(page: WebPage) = {
-    goo to page
-  }
+  def go(page: WebPage): Unit = goo to page
 
-  def on(page: WebPage) = {
+  def on(page: WebPage): Unit = {
     waitForPageToLoad()
     assert(page.isCurrentPage, s"Page was not loaded: $page")
   }
 
-  def waitForPageToLoad() = {
-    val wait = new WebDriverWait(webDriver, 30)
-    wait.until(
-      new ExpectedCondition[WebElement] {
-        override def apply(d: WebDriver) = {
-          d.findElement(By.tagName("body"))
+  def waitForPageToLoad(): WebElement = {
+    new WebDriverWait(webDriver, 30)
+      .until[WebElement](
+        new ExpectedCondition[WebElement] {
+          override def apply(d: WebDriver): WebElement = {
+            d.findElement(By.tagName("body"))
+          }
         }
-      }
-    )
+      )
 
   }
 
-  def anotherTabIsOpened() = {
-    webDriver.getWindowHandles.size() should be(2)
-  }
+  def anotherTabIsOpened(): Unit = webDriver.getWindowHandles.size() should be(2)
 
 }
