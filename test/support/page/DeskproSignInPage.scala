@@ -1,26 +1,33 @@
 package support.page
 
-object DeskproSignInPage extends WebPage {
-  override val url = "https://deskpro-qa.tax.service.gov.uk/index.php/agent/"
+import org.scalatest.concurrent.Eventually
+import org.scalatest.time.{Seconds, Span}
 
-  override def isCurrentPage: Boolean = pageTitle == "Log In"
+object DeskproSignInPage extends WebPage with Eventually {
+  override val url = "https://deskpro-qa.tax.service.gov.uk/agent/"
 
-  def emailFld = emailField("email")
-  def passwordFld = pwdField(id("password"))
-  def submitBtn = cssSelector("input[type=submit]")
+  def title: String = "Log In"
+  override def isCurrentPage: Boolean = pageTitle == title
 
-  def signIn(email: String, password: String) = {
-    emailFld.value = email
-    passwordFld.value = password
-    click on submitBtn
+  def emailFld: DeskproSignInPage.EmailField = emailField("email")
+  def passwordFld: DeskproSignInPage.PasswordField = pwdField(id("password"))
+  def submitBtn: DeskproSignInPage.CssSelectorQuery = cssSelector("input[type=submit]")
+
+  def signIn(email: String, password: String): Unit = {
+    eventually(timeout(Span(10, Seconds))) {
+      emailFld.value = email
+      passwordFld.value = password
+      click on submitBtn
+    }
   }
 }
 
 class DeskproViewTicketPage(ticketId: String) extends WebPage {
-  override val url: String = s"https://deskpro-qa.tax.service.gov.uk/index.php/agent/#app.tickets,inbox:all,t.o:$ticketId"
+  override val url: String = s"https://deskpro-qa.tax.service.gov.uk/agent/#app.tickets,inbox:all,t.o:$ticketId"
 
-  def messageBody = className("body-text-message")
-  def profile = xpath("//*[contains(@id,'profile_link')]/span")
+  def messageBody: ClassNameQuery = className("body-text-message")
+  def profile: XPathQuery = xpath("//*[contains(@id,'profile_link')]/span")
 
-  override def isCurrentPage: Boolean = heading=="somthing"
+  override def title: String = "something"
+  override def isCurrentPage: Boolean = heading == title
 }

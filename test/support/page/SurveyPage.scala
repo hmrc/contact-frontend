@@ -6,9 +6,10 @@ import support.steps.Env
 
 trait SurveyPage extends WebPage with SharedPageModules {
 
-  override val url = Env.host + "/contact/survey"
+  override val url: String = Env.host + "/contact/survey"
 
-  override def isCurrentPage: Boolean = heading=="Survey"
+  override def title: String = "Survey"
+  override def isCurrentPage: Boolean = heading == title
 
 
   def selectHowHelpfulTheResponseWas(option: String) {
@@ -23,11 +24,11 @@ trait SurveyPage extends WebPage with SharedPageModules {
     webDriver.findElement(By.id("improve")).sendKeys(reason)
   }
 
-  def clickSubmitButton() = click on id("submit-survey-button")
+  def clickSubmitButton(): Unit = click on id("submit-survey-button")
 }
 
 object SurveyPage extends SurveyPage
 
 class SurveyPageWithTicketAndServiceIds(ticketId: String, serviceId:String) extends SurveyPage {
-  override val url = Env.host + s"/contact/survey?ticketId=$ticketId&serviceId=$serviceId"
+  override val url: String = Env.host + s"/contact/survey?ticketId=$ticketId&serviceId=$serviceId"
 }

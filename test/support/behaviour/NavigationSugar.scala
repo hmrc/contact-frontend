@@ -5,12 +5,12 @@ import org.openqa.selenium.{By, WebDriver, WebElement}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.selenium.WebBrowser
 import org.scalatest.selenium.WebBrowser.{go => goo}
-import org.scalatest.{Assertions, ShouldMatchers}
+import org.scalatest.{Assertions, Matchers}
 import support.page.WebPage
 import support.steps.Env
 
 
-trait NavigationSugar extends WebBrowser with Eventually with Assertions with ShouldMatchers with IntegrationPatience {
+trait NavigationSugar extends WebBrowser with Eventually with Assertions with Matchers with IntegrationPatience {
 
   implicit def webDriver: WebDriver = Env.driver
 
@@ -27,7 +27,7 @@ trait NavigationSugar extends WebBrowser with Eventually with Assertions with Sh
   }
 
   def waitForPageToLoad(): WebElement = {
-    new WebDriverWait(webDriver, 30)
+    new WebDriverWait(webDriver, 60)
       .until[WebElement](
         new ExpectedCondition[WebElement] {
           override def apply(d: WebDriver): WebElement = {

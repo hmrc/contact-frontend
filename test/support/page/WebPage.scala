@@ -1,20 +1,21 @@
 package support.page
 
-import org.openqa.selenium.{By, WebElement, WebDriver}
-import org.openqa.selenium.support.ui.{ExpectedCondition, WebDriverWait}
+import org.openqa.selenium.WebDriver
 import org.scalatest._
-import org.scalatest.selenium.{WebBrowser, Page}
+import org.scalatest.selenium.{Page, WebBrowser}
 import support.steps.Env
 
-trait WebPage extends Page with WebBrowser with ShouldMatchers {
+trait WebPage extends Page with WebBrowser with Matchers {
 
   implicit def webDriver: WebDriver = Env.driver
 
+  def title: String
+
   def isCurrentPage: Boolean
 
-  def heading = tagName("h1").element.text
+  def heading: String = tagName("h1").element.text
 
-  def bodyText = tagName("body").element.text
+  def bodyText: String = tagName("body").element.text
 
 
 }

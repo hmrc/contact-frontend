@@ -16,7 +16,7 @@ trait Section extends WebBrowser {
 
   def section: Option[Element] = find(sectionQuery)
 
-  def displayed = section.fold(false)(_.isDisplayed)
+  def displayed: Boolean = section.fold(false)(_.isDisplayed)
 
   override def toString: String = s"Section(${sectionQuery.toString})"
 

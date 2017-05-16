@@ -1,20 +1,17 @@
 package support.steps
 
-import support.page.SignInLocalPage
+import support.page.SignInPage
 import uk.gov.hmrc.integration.{GovernmentGatewayUsers, TestUser}
 
 trait SmokeSteps extends BaseSteps {
 
   lazy val DefaultUser = GovernmentGatewayUsers.UserWithNoSARegime
 
-  def i_sign_in(): Unit = {
-    i_sign_in(DefaultUser)
-  }
+  def iSignIn(): Unit = iSignIn(DefaultUser)
 
-  def i_sign_in(user: TestUser): Unit = {
-    go(SignInLocalPage)
-
-    SignInLocalPage.signIn(user.username, user.password)
+  def iSignIn(user: TestUser): Unit = {
+    goOn(SignInPage)
+    SignInPage.signIn(user.username, user.password)
   }
 
 }

@@ -3,10 +3,11 @@ package support.page
 object ExternalPage extends WebPage {
   override val url: String = "http://localhost:11111/external/page"
 
-  def feedbackLink = linkText("Leave feedback")
-  def contactHmrcLink = linkText("Contact HMRC")
-  def clickOnFeedbackLink() = click on feedbackLink
-  def clickOnContactHmrcLink() = click on contactHmrcLink
+  def feedbackLink: ExternalPage.LinkTextQuery = linkText("Leave feedback")
+  def contactHmrcLink: ExternalPage.LinkTextQuery = linkText("Contact HMRC")
+  def clickOnFeedbackLink(): Unit = click on feedbackLink
+  def clickOnContactHmrcLink(): Unit = click on contactHmrcLink
 
-  override def isCurrentPage: Boolean = heading =="Page with links"
+  override def title: String = "Page with links"
+  override def isCurrentPage: Boolean = heading == title
 }

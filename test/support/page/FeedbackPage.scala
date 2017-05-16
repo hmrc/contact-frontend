@@ -1,18 +1,18 @@
 package support.page
 
-import org.openqa.selenium.{WebDriver, By}
+import org.openqa.selenium.By
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 import support.modules.SharedPageModules
 import support.steps.Env
 
 trait FeedbackPage extends WebPage with SharedPageModules {
 
-  def ratingRadioGroup = radioButtonGroup("feedback-rating")
-  def nameField = textField("feedback-name")
-  def emailInput = emailField("feedback-email")
-  def commentsField = textArea("feedback-comments")
-  def submitBtn = cssSelector("button[type=submit]")
-  def ratingsList() = {
+  def ratingRadioGroup: RadioButtonGroup = radioButtonGroup("feedback-rating")
+  def nameField: TextField = textField("feedback-name")
+  def emailInput: EmailField = emailField("feedback-email")
+  def commentsField: TextArea = textArea("feedback-comments")
+  def submitBtn: CssSelectorQuery = cssSelector("button[type=submit]")
+  def ratingsList(): String = {
     val eles = findAll(className("label--inlineRadio--overhead"))
     var rating  = List[String]()
     for (e <- eles) rating ::= e.text.split('\n').map(_.trim.filter(_ >= ' ')).mkString
@@ -21,7 +21,7 @@ trait FeedbackPage extends WebPage with SharedPageModules {
 
   def serviceFieldValue(): Option[String] = find(xpath("//input[@name='service']")).flatMap(_.attribute("value"))
 
-  def fillOutFeedbackForm(rating: Int, name: String, email: String, comment: String) = {
+  def fillOutFeedbackForm(rating: Int, name: String, email: String, comment: String): Unit = {
     val wait = new WebDriverWait(Env.driver, 15)
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-name")))
 
@@ -31,10 +31,11 @@ trait FeedbackPage extends WebPage with SharedPageModules {
     commentsField.value = comment
   }
 
-  def submitFeedbackForm() = {
+  def submitFeedbackForm(): Unit = {
     click on submitBtn
   }
-  override def isCurrentPage: Boolean = heading == "Send your feedback"
+  override def title: String = "Send your feedback"
+  override def isCurrentPage: Boolean = heading == title
 }
 
 object UnauthenticatedFeedbackPage extends FeedbackPage {
@@ -52,7 +53,8 @@ object AuthenticatedFeedbackPage extends FeedbackPage {
 
 
 object FeedbackSuccessPage extends  WebPage with SharedPageModules {
-  override def isCurrentPage: Boolean = heading=="Your feedback"
+  override def title: String = "Your feedback"
+  override def isCurrentPage: Boolean = heading == title
 
   override val url: String = Env.host + "/contact/???"
 }
