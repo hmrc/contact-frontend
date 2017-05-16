@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd ..
-
 # For some reason, this project will nut run with Chrome...
 GECKODRIVER=`which geckodriver`
 
