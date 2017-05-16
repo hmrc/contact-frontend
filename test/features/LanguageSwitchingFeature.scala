@@ -3,16 +3,20 @@ package features
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.junit.runner.RunWith
+import org.openqa.selenium.WebDriver
 import org.scalatest.junit.JUnitRunner
-import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
-import support.page.{UnauthenticatedFeedbackPage, SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds}
+import support.page.{SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds, UnauthenticatedFeedbackPage}
+import support.steps.Env
 import uk.gov.hmrc.play.test.WithFakeApplication
 
 @RunWith(classOf[JUnitRunner])
 class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplication {
+
+  val testUsingWebDriver: WebDriver = Env.getDriverWithJS
+
   override lazy val app = FakeApplication(
     additionalConfiguration = Map(
       "application.langs" -> "en,cy",

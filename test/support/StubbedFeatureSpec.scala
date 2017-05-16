@@ -3,6 +3,7 @@ package support
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
+import org.openqa.selenium.WebDriver
 import org.scalatest._
 import org.scalatestplus.play.OneServerPerSuite
 import support.behaviour.NavigationSugar
@@ -25,6 +26,8 @@ trait StubbedFeatureSpec
   with ObservationSteps
   with OptionValues {
 
+  val testUsingWebDriver: WebDriver
+
   override lazy val port = 9000
 
   val stubPort = 11111
@@ -41,8 +44,8 @@ trait StubbedFeatureSpec
   }
 
   override def beforeEach() = {
-    Env.useJavascriptDriver()
-    webDriver.manage().deleteAllCookies()
+//    Env.useJavascriptDriver()
+    testUsingWebDriver.manage().deleteAllCookies()
     WireMock.reset()
     stubFor(Auditing)
     stubFor(Login)

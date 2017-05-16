@@ -22,7 +22,7 @@ trait FeedbackPage extends WebPage with SharedPageModules {
   def serviceFieldValue(): Option[String] = find(xpath("//input[@name='service']")).flatMap(_.attribute("value"))
 
   def fillOutFeedbackForm(rating: Int, name: String, email: String, comment: String): Unit = {
-    val wait = new WebDriverWait(Env.driver, 15)
+    val wait = new WebDriverWait(Env.getDriverWithJS, 15)
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-name")))
 
     ratingRadioGroup.value = rating.toString
@@ -39,15 +39,15 @@ trait FeedbackPage extends WebPage with SharedPageModules {
 }
 
 object UnauthenticatedFeedbackPage extends FeedbackPage {
-  override val url = Env.host + "/contact/beta-feedback-unauthenticated"
+  override val url: String = Env.host + "/contact/beta-feedback-unauthenticated"
 }
 
 object UnauthenticatedFeedbackPageWithServiceQueryParameter extends FeedbackPage {
-  override val url = Env.host + "/contact/beta-feedback-unauthenticated?service=YTA"
+  override val url: String = Env.host + "/contact/beta-feedback-unauthenticated?service=YTA"
 }
 
 object AuthenticatedFeedbackPage extends FeedbackPage {
-  override val url = Env.host + "/contact/beta-feedback"
+  override val url: String = Env.host + "/contact/beta-feedback"
 
 }
 

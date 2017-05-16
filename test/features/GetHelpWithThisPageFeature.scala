@@ -1,16 +1,18 @@
 package features
 
 import akka.actor.ActorSystem
-import com.ning.http.client.AsyncHttpClient
+import akka.stream.ActorMaterializer
+import org.openqa.selenium.WebDriver
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.ws.WS
-import play.api.libs.ws.ning.{NingWSClientConfig, NingAsyncHttpClientConfigBuilder, NingWSClient}
+import play.api.libs.ws.ning.{NingAsyncHttpClientConfigBuilder, NingWSClient, NingWSClientConfig}
 import support.StubbedFeatureSpec
 import support.page.UnauthenticatedFeedbackPage
-
-import akka.stream.ActorMaterializer
+import support.steps.Env
 
 class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
+
+  val testUsingWebDriver: WebDriver = Env.getDriverWithJS
 
   val Name = "Grumpy Bear"
   val Email = "grumpy@carebears.com"
@@ -27,7 +29,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
 
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport()
 
       When("I fill the Get Help with this page' form correctly")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.fillProblemReport(Name, Email, WhatWhereYouDoing, WhatDoYouNeedHelpWith)
@@ -71,13 +73,13 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden should be (true)
 
       When("I open the 'Get help with this page' form")
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport()
 
       Then("The 'Get help with this page' form is visible")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden should be (false)
 
       When("I close the 'Get help with this page' form")
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport()
 
       Then("The get 'Get help with this page' form is hidden")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden should be (true)
@@ -86,7 +88,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
     scenario("Invalid name error if you entered anything other than letters (lower and upper case), space, comma, period, braces and hyphen") {
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport()
 
       When("I fill in an invalid name")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.typeName("<")
@@ -103,7 +105,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
     scenario("Invalid email error if you entered a badly formed email") {
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport()
 
       When("I fill in an invalid email address")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.typeEmail("not@valid.")
@@ -120,7 +122,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
     scenario("All fields are mandatory") {
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport()
 
       When("I fill in an invalid email address")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.clickSubmitButton()

@@ -6,23 +6,19 @@ import uk.gov.hmrc.integration.framework.SingletonDriver
 
 
 object Env {
-  var host: String = System.getProperty("environment", "dev") match {
+  val host: String = System.getProperty("environment", "dev") match {
     case "qa" => "https://www-qa.tax.service.gov.uk"
     case _ => System.getProperty("host", "http://localhost:9000")
   }
 
-  // Yuk. Rather than a var maybe we could just pull in different drivers implicitly or something?
-  // The issue with the var is that it's not obvious what the lifecycle of the webdriver is
-  // i.e. where and when they get set in the 'before' 'after' setups.
-  var driver: WebDriver = getChromeDriver
+  private val driver: WebDriver = getDriver(true)
 
-  def getChromeDriver: WebDriver = SingletonDriver.getInstance()
+  def getDriver(jsEnabled: Boolean): WebDriver =
+    if(jsEnabled) SingletonDriver.getInstance()
+    else new HtmlUnitDriver(false)
 
-  def useJavascriptDriver(): Unit =
-    driver = getChromeDriver
-
-  def useNoJsDriver(): Unit =
-    driver = new HtmlUnitDriver(false)
+  def getDriverWithJS: WebDriver = getDriver(true)
+  def getDriverNoJS: WebDriver = getDriver(false)
 
   sys addShutdownHook {
     driver.quit()

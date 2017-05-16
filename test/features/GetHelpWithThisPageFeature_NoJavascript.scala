@@ -1,10 +1,13 @@
 package features
 
+import org.openqa.selenium.WebDriver
 import support.StubbedFeatureSpec
 import support.page.{PleaseTryAgainPage, ThankYouPage, UnauthenticatedFeedbackPage}
 import support.steps.Env
 
 class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
+
+  val testUsingWebDriver: WebDriver = Env.getDriverNoJS
 
   val Name = "Grumpy Bear"
   val Email = "grumpy@carebears.com"
@@ -19,7 +22,6 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
     scenario("I don't see the open help form link without Javascript") {
       Given("JavaScript is disabled")
-      Env.useNoJsDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -30,7 +32,6 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
     scenario("Successful form submission without Javascript") {
       Given("JavaScript is disabled")
-      Env.useNoJsDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -53,7 +54,6 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
     scenario("Only these characters are allowed for the name: letters (lower and upper case), space, comma, period, braces and hyphen") {
       Given("JavaScript is disabled")
-      Env.useNoJsDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -74,7 +74,6 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
     scenario("All fields are mandatory") {
       Given("JavaScript is disabled")
-      Env.useNoJsDriver()
 
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)

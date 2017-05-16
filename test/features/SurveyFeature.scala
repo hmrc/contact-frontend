@@ -1,16 +1,23 @@
 package features
 
+import java.util
+
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.verification.LoggedRequest
 import org.junit.runner.RunWith
+import org.openqa.selenium.WebDriver
 import org.scalatest.junit.JUnitRunner
 import play.api.libs.json.{JsString, Json}
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
 import support.page.{SurveyConfirmationPage, SurveyPageWithTicketAndServiceIds}
+import support.steps.Env
 
 @RunWith(classOf[JUnitRunner])
 class SurveyFeature extends StubbedFeatureSpec {
+
+  val testUsingWebDriver: WebDriver = Env.getDriverWithJS
 
   feature("Survey") {
 
@@ -180,18 +187,18 @@ class SurveyFeature extends StubbedFeatureSpec {
     }
   }
 
-  def shouldSendSurveyToDatastream = {
+  def shouldSendSurveyToDatastream: Unit = {
     eventually {
       getDatastreamSubmissionsForSurvey.size() shouldBe 1
     }
   }
 
-  def shouldNotSendSurveyToDatastream = {
+  def shouldNotSendSurveyToDatastream: Unit = {
     eventually {
       getDatastreamSubmissionsForSurvey.size() shouldBe 0
     }
   }
 
-  def getDatastreamSubmissionsForSurvey = WireMock.findAll(postRequestedFor(urlEqualTo("/write/audit"))
+  def getDatastreamSubmissionsForSurvey: util.List[LoggedRequest] = WireMock.findAll(postRequestedFor(urlEqualTo("/write/audit"))
     .withRequestBody(matching(".*DeskproSurvey.*")))
 }

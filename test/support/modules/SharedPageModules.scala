@@ -9,7 +9,7 @@ trait SharedPageModules {
 
   object betaBanner extends WebBrowser {
 
-    implicit def webDriver: WebDriver = Env.driver
+    implicit def webDriver: WebDriver = Env.getDriverWithJS
 
     def feedbackLink: LinkTextQuery = linkText("feedback")
 
@@ -21,7 +21,7 @@ trait SharedPageModules {
 
   object getHelpWithThisPage extends WebBrowser {
 
-    implicit def webDriver: WebDriver = Env.driver
+    implicit def webDriver: WebDriver = Env.getDriverWithJS
 
     def sectionQuery: ClassNameQuery = className("report-error")
 

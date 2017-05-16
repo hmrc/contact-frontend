@@ -12,7 +12,7 @@ import support.steps.Env
 
 trait NavigationSugar extends WebBrowser with Eventually with Assertions with Matchers with IntegrationPatience {
 
-  implicit def webDriver: WebDriver = Env.driver
+  implicit def webDriver: WebDriver = Env.getDriverWithJS
 
   def goOn(page: WebPage): Unit = {
     go(page)

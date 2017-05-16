@@ -1,9 +1,13 @@
 package features
 
+import org.openqa.selenium.WebDriver
 import support.StubbedFeatureSpec
 import support.page.{ContactHmrcPage, ContactHmrcPartialPage}
+import support.steps.Env
 
 class ContactHmrcPartialFeature extends StubbedFeatureSpec {
+
+  val testUsingWebDriver: WebDriver = Env.getDriverWithJS
 
   feature("Contact HMRC partial") {
 

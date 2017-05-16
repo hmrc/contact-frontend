@@ -1,18 +1,22 @@
 package features
 
+import org.openqa.selenium.WebDriver
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import support.StubbedFeatureSpec
 import support.page.{ExternalPage, FeedbackSuccessPage, TechnicalDifficultiesPage, UnauthenticatedFeedbackPage}
+import support.steps.Env
 
 class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
 
-  val Name = "Grumpy Bear"
-  val Email = "grumpy@carebears.com"
-  val Comment = "I am writing a comment"
-  val InvalidEmailAddress = "grumpycarebears.com"
-  val TooLongName = "G"*71
-  val TooLongEmail = "g"*255 + "@x.com"
-  val TooLongComment = "I"*2001
+  val testUsingWebDriver: WebDriver = Env.getDriverWithJS
+
+  val Name: String = "Grumpy Bear"
+  val Email: String = "grumpy@carebears.com"
+  val Comment: String = "I am writing a comment"
+  val InvalidEmailAddress: String = "grumpycarebears.com"
+  val TooLongName: String = "G"*71
+  val TooLongEmail: String = "g"*255 + "@x.com"
+  val TooLongComment: String = "I"*2001
   
   feature("Feedback about the beta when not signed in") {
 

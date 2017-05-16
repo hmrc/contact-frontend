@@ -7,7 +7,7 @@ import support.steps.Env
 
 trait WebPage extends Page with WebBrowser with Matchers {
 
-  implicit def webDriver: WebDriver = Env.driver
+  implicit def webDriver: WebDriver = Env.getDriverWithJS
 
   def title: String
 

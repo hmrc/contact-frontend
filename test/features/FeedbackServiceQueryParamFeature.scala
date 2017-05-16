@@ -1,9 +1,13 @@
 package features
 
+import org.openqa.selenium.WebDriver
 import support.StubbedFeatureSpec
 import support.page.UnauthenticatedFeedbackPageWithServiceQueryParameter
+import support.steps.Env
 
 class FeedbackServiceQueryParamFeature extends StubbedFeatureSpec {
+
+  val testUsingWebDriver: WebDriver = Env.getDriverWithJS
 
   feature("Feedback form service field populated when passed as a query parameter") {
 
