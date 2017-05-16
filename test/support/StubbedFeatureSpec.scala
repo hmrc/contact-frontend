@@ -7,7 +7,7 @@ import org.openqa.selenium.WebDriver
 import org.scalatest._
 import org.scalatestplus.play.OneServerPerSuite
 import support.behaviour.NavigationSugar
-import support.steps.{ApiSteps, Env, NavigationSteps, ObservationSteps}
+import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs._
 
 trait StubbedFeatureSpec
@@ -34,17 +34,16 @@ trait StubbedFeatureSpec
   val stubHost = "localhost"
   val wireMockServer: WireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 
-  override def beforeAll() = {
+  override def beforeAll(): Unit = {
     wireMockServer.start()
     WireMock.configureFor(stubHost, stubPort)
   }
 
-  override def afterAll() = {
+  override def afterAll(): Unit = {
     wireMockServer.stop()
   }
 
-  override def beforeEach() = {
-//    Env.useJavascriptDriver()
+  override def beforeEach(): Unit = {
     testUsingWebDriver.manage().deleteAllCookies()
     WireMock.reset()
     stubFor(Auditing)
