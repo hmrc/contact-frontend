@@ -71,6 +71,10 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
       i_see("Thank you",
         "Someone will get back to you within 2 working days.")
 
+      /**** Beware of the Dragons ****/
+      Thread.sleep(3000)
+      /**** Beware of the Dragons ****/
+
       And("Support agent Ann receives a ticket via Deskpro")
       ticket_in_deskpro_exists(ContactHmrcPage.getHelpWithThisPage.ticketId.value, Name, Email, Seq(Comment))
     }
