@@ -70,7 +70,7 @@ trait MicroService {
     .configs(SmokeTest)
     .settings(inConfig(SmokeTest)(Defaults.testSettings): _*)
     .settings(
-      javaOptions in SmokeTest := Seq("-Denvironment=qa"),
+      javaOptions in SmokeTest := Seq("-Denvironment=qa", "-Dbrowser=chrome"),
       testOptions in SmokeTest := Seq(Tests.Filter(smokeFilter)),
       unmanagedSourceDirectories   in SmokeTest <<= (baseDirectory in SmokeTest)(base => Seq(base / "test")),
       unmanagedResourceDirectories in SmokeTest <<= (baseDirectory in SmokeTest)(base => Seq(base / "test")),
