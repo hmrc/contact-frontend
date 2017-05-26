@@ -149,11 +149,12 @@ class SurveyFeature extends StubbedFeatureSpec {
       val loggedRequests = getDatastreamSubmissionsForSurvey
       val resultJsonString = loggedRequests.get(0).getBodyAsString
       val resultJson = Json.parse(resultJsonString)
-      (resultJson \ "detail" \ "helpful").asInstanceOf[JsString].value shouldBe "0"
-      (resultJson \ "detail" \ "speed").asInstanceOf[JsString].value shouldBe "0"
-      (resultJson \ "detail" \ "ticketId").asInstanceOf[JsString].value shouldBe "HMRC-Z2V6DUK5"
-      (resultJson \ "detail" \ "serviceId").asInstanceOf[JsString].value shouldBe "arbitrary service id"
-      (resultJson \ "detail" \ "improve").asInstanceOf[JsString].value shouldBe "Blah blooh blah la dee daaaaa"
+
+      (resultJson \ "detail" \ "helpful").as[String] shouldBe "0"
+      (resultJson \ "detail" \ "speed").as[String] shouldBe "0"
+      (resultJson \ "detail" \ "ticketId").as[String] shouldBe "HMRC-Z2V6DUK5"
+      (resultJson \ "detail" \ "serviceId").as[String] shouldBe "arbitrary service id"
+      (resultJson \ "detail" \ "improve").as[String] shouldBe "Blah blooh blah la dee daaaaa"
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
       on(SurveyConfirmationPage)
