@@ -23,20 +23,8 @@ object ContactFrontendGlobal
   override def auditConnector = AuditConnector
   override def loggingFilter = CFLoggingFilter
   override def frontendAuditFilter = ContactFrontendAuditFilter
-  override def frontendFilters = Seq(
-    metricsFilter,
-    HeadersFilter,
-    SessionCookieCryptoFilter,
-    deviceIdFilter,
-    loggingFilter,
-    frontendAuditFilter,
-    sessionTimeoutFilter,
-    csrfExceptionsFilter,
-    csrfFilter,
-    CacheControlFilter.fromConfig("caching.allowedContentTypes"),
-    RecoveryFilter,
-    CorsFilter
-  )
+  override def frontendFilters = defaultFrontendFilters ++ Seq(CorsFilter)
+
 
   override def onStart(app: Application) {
     super.onStart(app)
