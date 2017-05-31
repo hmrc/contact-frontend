@@ -59,7 +59,7 @@ trait SurveyController
   private[controllers] def submitSurveyAction(implicit request: Request[_]): Result = {
     getAuditEventOrFormErrors match {
       case Left(eventOption) => eventOption foreach { dataEventFuture => dataEventFuture.foreach(auditConnector.sendEvent) }
-      case Right(errors) => errors foreach { error => Logger.error(s"Error processing survey form field: '${error.key}'") }
+      case Right(errors) => errors foreach { error => Logger.error(s"Error processing survey form field: '${error.key}' message='${error.message}' args='${error.args.mkString(",")}'") }
     }
     Redirect(routes.SurveyController.confirmation())
   }
