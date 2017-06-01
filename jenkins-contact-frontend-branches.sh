@@ -1,10 +1,10 @@
 #!/bin/bash
 
+echo "Starting ASSETS"
+
 cd $WORKSPACE
 rm -rf service-manager-config
 git clone git@github.tools.tax.service.gov.uk:HMRC/service-manager-config.git
-
-echo "Starting ASSETS"
 
 sm --stop ALL
 sm --cleanlogs
@@ -15,6 +15,12 @@ echo "Using ASSETS_FRONTEND_VERSION as $ASSETS_FRONTEND_VERSION"
 
 sm --start ASSETS_FRONTEND -r $ASSETS_FRONTEND_VERSION --wait 60 --noprogress
 
+if [ $? -ne 0 ]
+  then
+    echo "Assets front end startup failed...Exiting..."
+    exit $?
+fi
+
 echo "Running functional test for contact-frontend..."
 
 cd $WORKSPACE
@@ -24,7 +30,12 @@ mkdir -p ${TMPDIR}
 
 echo "Start functional tests..."
 
-sbt -Djava.io.tmpdir=${TMPDIR} -Dbrowser=chrome clean validate test fun:test dist-tgz publish -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
+if [ "$1" == "--with-publish" ]
+  then
+    sbt -Djava.io.tmpdir=${TMPDIR} clean validate test fun:test dist-tgz publish -Dbrowser=chrome -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
+  else
+    sbt -Djava.io.tmpdir=${TMPDIR} clean validate test fun:test -Dbrowser=chrome -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
+fi
 
 SBT_EXIT_CODE=`echo $?`
 
