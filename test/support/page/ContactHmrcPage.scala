@@ -5,31 +5,30 @@ import support.steps.Env
 
 trait ContactHmrcPage extends WebPage with SharedPageModules {
 
-  override val url: String = Env.host + "/contact/contact-hmrc"
+  override val url = Env.host + "/contact/contact-hmrc"
 
-  def nameField: TextField = textField("contact-name")
-  def emailInput: EmailField = emailField("contact-email")
-  def commentsField: TextArea = textArea("contact-comments")
-  def submitBtn: CssSelectorQuery = cssSelector("button[type=submit]")
-  def contactHmrcLink: LinkTextQuery = linkText("contact HMRC")
+  def nameField = textField("contact-name")
+  def emailInput = emailField("contact-email")
+  def commentsField = textArea("contact-comments")
+  def submitBtn = cssSelector("button[type=submit]")
+  def contactHmrcLink = linkText("contact HMRC")
 
-  def fillContactForm(name: String, email: String, comment: String): Unit = {
+  def fillContactForm(name: String, email: String, comment: String) = {
     nameField.value = name
     emailInput.value = email
     commentsField.value = comment
   }
 
-  def submitContactForm(): Unit = click on submitBtn
+  def submitContactForm() = click on submitBtn
 
-  def sendContactForm(name: String, email: String, comment: String): Unit = {
+  def sendContactForm(name: String, email: String, comment: String) = {
     fillContactForm(name, email, comment)
     submitContactForm()
   }
 
-  def clickOnContactHmrcLink(): Unit = click on contactHmrcLink
+  def clickOnContactHmrcLink() = click on contactHmrcLink
 
-  override def title = "Help and contact"
-  override def isCurrentPage: Boolean = heading == title
+  override def isCurrentPage: Boolean = heading=="Help and contact"
 }
 
 object ContactHmrcPage extends ContactHmrcPage

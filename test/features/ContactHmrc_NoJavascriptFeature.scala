@@ -1,6 +1,5 @@
 package features
 
-import org.openqa.selenium.WebDriver
 import org.skyscreamer.jsonassert.JSONCompareMode
 import support.StubbedFeatureSpec
 import support.page.ContactHmrcPage
@@ -8,8 +7,6 @@ import support.steps.Env
 import support.stubs.Login
 
 class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
-
-  val testUsingWebDriver: WebDriver = Env.getDriverNoJS
 
   feature("Contact HMRC with Javascript disabled") {
 
@@ -24,6 +21,7 @@ class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
       val Comment = "I am writing a comment"
 
       Given("JavaScript is disabled")
+      Env.useNoJsDriver()
 
       And("I go to the 'Help' page")
       goOn(ContactHmrcPage)

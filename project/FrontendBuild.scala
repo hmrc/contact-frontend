@@ -24,8 +24,6 @@ private object AppOverrides{
 
 private object AppDependencies {
 
-  val seleniumVersion: String = "3.4.0"
-
   val compile = Seq(
     "uk.gov.hmrc" %% "frontend-bootstrap" % "7.17.0",
     "uk.gov.hmrc" %% "play-authorised-frontend" % "6.3.0",
@@ -39,25 +37,17 @@ private object AppDependencies {
   )
 
   val test = Seq(
-    "com.google.guava" % "guava" % "21.0",
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",
     "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % "test",
-    "org.mockito" % "mockito-all" % "2.0.2-beta" % "test",
+    "org.mockito" % "mockito-all" % "1.9.5" % "test",
     "org.pegdown" % "pegdown" % "1.6.0" % "test",
     "org.jsoup" % "jsoup" % "1.7.3" % "test",
     "com.github.tomakehurst" % "wiremock" % "1.58" % "test",
-    "uk.gov.hmrc" %% "scala-webdriver" % "5.14.0" % "test",
-    "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % "test" excludeAll ExclusionRule(organization = "org.mockito")
+    "uk.gov.hmrc" %% "scala-webdriver" % "5.12.0" % "test",
+    "uk.gov.hmrc" %% "hmrctest" % "2.1.0" % "test"
   ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
     .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(
-    "org.seleniumhq.selenium" % "selenium-java" % seleniumVersion % "test")
-
-
-
-  val overrideDependencies = Set(
-    "org.seleniumhq.selenium" % "selenium-java" % seleniumVersion % "test,it",
-    "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % seleniumVersion % "test,it"
-  )
+    "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test")
 
   def apply() = compile ++ test
 }

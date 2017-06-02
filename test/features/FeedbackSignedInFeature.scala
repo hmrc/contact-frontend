@@ -1,15 +1,11 @@
 package features
 
-import org.openqa.selenium.WebDriver
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import support.StubbedFeatureSpec
 import support.page.{AuthenticatedFeedbackPage, FeedbackSuccessPage}
-import support.steps.Env
 import support.stubs.Login
 
 class FeedbackSignedInFeature extends StubbedFeatureSpec {
-
-  val testUsingWebDriver: WebDriver = Env.getDriverWithJS
 
   feature("Feedback about the beta when signed in") {
 

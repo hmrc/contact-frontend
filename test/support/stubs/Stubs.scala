@@ -30,7 +30,7 @@ trait Stub {
 }
 
 trait SessionCookieBaker {
-  def cookieValue(sessionData: Map[String,String]): String = {
+  def cookieValue(sessionData: Map[String,String]) = {
     def encode(data: Map[String, String]): PlainText = {
       val encoded = data.map {
         case (k, v) => URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v, "UTF-8")
@@ -48,7 +48,7 @@ trait SessionCookieBaker {
 
 object Auditing extends Stub {
 
-  def create(): Unit = {
+  def create() = {
     stubFor(post(urlEqualTo("/write/audit"))
       .willReturn(
         aResponse()
@@ -66,11 +66,11 @@ object Login extends Stub with SessionCookieBaker {
 
   val SessionId = s"stubbed-${UUID.randomUUID}"
 
-  def create(): Unit = {
+  def create() = {
     stubSuccessfulLogin()
   }
 
-  def stubSuccessfulLogin(): Unit = {
+  def stubSuccessfulLogin() = {
     val data = Map(
       SessionKeys.sessionId -> SessionId,
       SessionKeys.userId -> "/auth/oid/1234567890",
@@ -117,7 +117,7 @@ object Login extends Stub with SessionCookieBaker {
 }
 
 object Deskpro extends Stub {
-  override def create(): Unit = {
+  override def create() = {
 
     stubFor(post(urlEqualTo("/deskpro/ticket"))
       .willReturn(
@@ -136,7 +136,7 @@ object Deskpro extends Stub {
 }
 
 object ExternalPages extends Stub {
-  override def create(): Unit = {
+  override def create() = {
     stubForPage(urlEqualTo("/external/page"), "Page with links") {
       """<a href="http://localhost:9000/contact/beta-feedback-unauthenticated">Leave feedback</a>
         |<a href="http://localhost:9000/contact/contact-hmrc">Contact HMRC</a>

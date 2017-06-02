@@ -6,19 +6,24 @@ import uk.gov.hmrc.integration.framework.SingletonDriver
 
 
 object Env {
-  val host: String = System.getProperty("environment", "dev") match {
-    case "qa" => "https://www-qa.tax.service.gov.uk"
-    case _ => System.getProperty("host", "http://localhost:9000")
+  var host = Option(System.getProperty("environment")) match {
+    case Some("qa") => "https://www-qa.tax.service.gov.uk"
+    case _ => Option(System.getProperty("host")).getOrElse("http://localhost:9000")
   }
 
-  private val driver: WebDriver = getDriver(true)
+  var driver: WebDriver = {
+    getChromeDriver
+  }
 
-  def getDriver(jsEnabled: Boolean): WebDriver =
-    if(jsEnabled) SingletonDriver.getInstance()
-    else new HtmlUnitDriver(false)
+  def getChromeDriver: WebDriver = SingletonDriver.getInstance()
 
-  def getDriverWithJS: WebDriver = getDriver(true)
-  def getDriverNoJS: WebDriver = getDriver(false)
+  def useJavascriptDriver() =  {
+    driver = getChromeDriver
+  }
+
+  def useNoJsDriver() = {
+    driver = new HtmlUnitDriver(false)
+  }
 
   sys addShutdownHook {
     driver.quit()

@@ -6,7 +6,7 @@ class ContactHmrcPartialPage(submitUrl: String,
                              service: Option[String] = None, 
                              renderFormOnly: Option[Boolean] = None) extends ContactHmrcPage {
 
-  override val url: String = {
+  override val url = {
     val queryParameters = List(
       s"submitUrl=$submitUrl",
       "csrfToken=token",

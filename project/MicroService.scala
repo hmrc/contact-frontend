@@ -17,7 +17,7 @@ trait MicroService {
   val appVersion: String
 
   lazy val appDependencies : Seq[ModuleID] = ???
-  lazy val appOverrides: Set[ModuleID] = AppDependencies.overrideDependencies
+  lazy val appOverrides: Set[ModuleID] = ???
   lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
@@ -70,7 +70,7 @@ trait MicroService {
     .configs(SmokeTest)
     .settings(inConfig(SmokeTest)(Defaults.testSettings): _*)
     .settings(
-      javaOptions in SmokeTest := Seq("-Denvironment=qa", "-Dbrowser=chrome"),
+      javaOptions in SmokeTest := Seq("-Denvironment=qa"),
       testOptions in SmokeTest := Seq(Tests.Filter(smokeFilter)),
       unmanagedSourceDirectories   in SmokeTest <<= (baseDirectory in SmokeTest)(base => Seq(base / "test")),
       unmanagedResourceDirectories in SmokeTest <<= (baseDirectory in SmokeTest)(base => Seq(base / "test")),

@@ -4,8 +4,7 @@ import support.modules.SharedPageModules
 import support.steps.Env
 
 object ThankYouPage  extends WebPage with SharedPageModules {
-  override val url: String = Env.host + "/contact/???"
+  override val url = Env.host + "/contact/???"
 
-  override def title: String = "Thank you"
-  override def isCurrentPage: Boolean = heading == title
+  override def isCurrentPage: Boolean = heading=="Thank you"
 }

@@ -1,15 +1,11 @@
 package features
 
-import org.openqa.selenium.WebDriver
 import org.skyscreamer.jsonassert.JSONCompareMode._
 import support.StubbedFeatureSpec
 import support.page.{ContactHmrcPage, ExternalPage, TechnicalDifficultiesPage}
-import support.steps.Env
 import support.stubs._
 
 class ContactHmrcFeature extends StubbedFeatureSpec {
-
-  val testUsingWebDriver: WebDriver = Env.getDriverWithJS
 
   feature("Help") {
 

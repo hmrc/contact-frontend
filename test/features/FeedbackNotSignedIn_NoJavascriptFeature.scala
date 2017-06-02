@@ -1,6 +1,5 @@
 package features
 
-import org.openqa.selenium.WebDriver
 import org.skyscreamer.jsonassert.JSONCompareMode
 import support.StubbedFeatureSpec
 import support.page.{FeedbackSuccessPage, UnauthenticatedFeedbackPage}
@@ -8,8 +7,6 @@ import support.steps.Env
 
 
 class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
-
-  val testUsingWebDriver: WebDriver = Env.getDriverNoJS
 
   feature("Feedback about the beta when not signed and with Javascript disabled") {
 
@@ -19,6 +16,7 @@ class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
 
     scenario("Submit feedback successfully") {
       Given("JavaScript is disabled")
+      Env.useNoJsDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)

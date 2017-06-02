@@ -3,17 +3,16 @@ package support
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
-import org.openqa.selenium.WebDriver
 import org.scalatest._
 import org.scalatestplus.play.OneServerPerSuite
 import support.behaviour.NavigationSugar
-import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
+import support.steps.{ApiSteps, Env, NavigationSteps, ObservationSteps}
 import support.stubs._
 
 trait StubbedFeatureSpec
   extends FeatureSpec
   with GivenWhenThen
-  with Matchers
+  with ShouldMatchers
   with OneServerPerSuite
   with Stubs
   with BeforeAndAfter
@@ -26,25 +25,24 @@ trait StubbedFeatureSpec
   with ObservationSteps
   with OptionValues {
 
-  val testUsingWebDriver: WebDriver
-
   override lazy val port = 9000
 
   val stubPort = 11111
   val stubHost = "localhost"
   val wireMockServer: WireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 
-  override def beforeAll(): Unit = {
+  override def beforeAll() = {
     wireMockServer.start()
     WireMock.configureFor(stubHost, stubPort)
   }
 
-  override def afterAll(): Unit = {
+  override def afterAll() = {
     wireMockServer.stop()
   }
 
-  override def beforeEach(): Unit = {
-    testUsingWebDriver.manage().deleteAllCookies()
+  override def beforeEach() = {
+    Env.useJavascriptDriver()
+    webDriver.manage().deleteAllCookies()
     WireMock.reset()
     stubFor(Auditing)
     stubFor(Login)

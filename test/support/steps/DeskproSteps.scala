@@ -11,15 +11,15 @@ trait DeskproSteps extends NavigationSugar with BaseSteps {
     go(ticketPage)
 
 
-    eventually(timeout(Span(60, Seconds))) {
+    eventually(timeout(Span(10, Seconds))) {
       withClue(s"Expected to be in the DeskPro Log In page, but was on page: $currentUrl - ") {
         DeskproSignInPage should be('isCurrentPage)
       }
     }
 
-    DeskproSignInPage.signIn("isaac.thomas2@digital.hmrc.gov.uk", "Business2017")
+    DeskproSignInPage.signIn("haroon.rasheed@digital.hmrc.gov.uk", "W3lc0me-to-D3skpro3")
 
-    eventually(timeout(Span(60, Seconds))) {
+    eventually(timeout(Span(10, Seconds))) {
       ticketPage.profile.element.text should be(s"$name ($email)")
       ticketPage.messageBody.element.text should containInOrder(textInMessageBody)
     }
