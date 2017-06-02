@@ -175,23 +175,6 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       i_see("There was a problem sending your query.")
     }
 
-
-    scenario("Link to contact HMRC about tax queries") {
-      Given("I am logged in and I go to the 'Help' page")
-      goOn(ContactHmrcPage)
-
-      When("I click on the 'contact HMRC' link")
-      ContactHmrcPage.clickOnContactHmrcLink()
-
-      Then("another tab is opened")
-      another_tab_is_opened()
-      switch_tab()
-
-      And("I am on the 'Contact us' page")
-      i_am_on_the_page("HM Revenue & Customs Contacts")
-    }
-
-
     scenario("The referrer URL is sent to Deskpro") {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
