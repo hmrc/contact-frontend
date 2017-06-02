@@ -1,5 +1,6 @@
 package features
 
+import akka.stream.ActorMaterializer
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import support.StubbedFeatureSpec
 import support.page.{AuthenticatedFeedbackPage, FeedbackSuccessPage}
@@ -14,6 +15,8 @@ class FeedbackSignedInFeature extends StubbedFeatureSpec {
     info("I want to leave my feedback")
 
     scenario("Submit feedback successfully") {
+
+
       val Name = "Grumpy Bear"
       val Email = "grumpy@carebears.com"
       val Comment = "I am writing a comment"

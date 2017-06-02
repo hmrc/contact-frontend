@@ -25,7 +25,7 @@ private object AppOverrides{
 private object AppDependencies {
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "frontend-bootstrap" % "7.17.0",
+    "uk.gov.hmrc" %% "frontend-bootstrap" % "7.22.0",
     "uk.gov.hmrc" %% "play-authorised-frontend" % "6.3.0",
     "uk.gov.hmrc" %% "play-config" % "4.3.0",
     "uk.gov.hmrc" %% "logback-json-logger" % "3.1.0",
@@ -39,12 +39,12 @@ private object AppDependencies {
   val test = Seq(
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",
     "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % "test",
-    "org.mockito" % "mockito-all" % "1.9.5" % "test",
+    "org.mockito" % "mockito-all" % "2.0.2-beta" % "test",
     "org.pegdown" % "pegdown" % "1.6.0" % "test",
     "org.jsoup" % "jsoup" % "1.7.3" % "test",
     "com.github.tomakehurst" % "wiremock" % "1.58" % "test",
     "uk.gov.hmrc" %% "scala-webdriver" % "5.12.0" % "test",
-    "uk.gov.hmrc" %% "hmrctest" % "2.1.0" % "test"
+    "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % "test"
   ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
     .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(
     "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test")

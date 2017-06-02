@@ -2,6 +2,7 @@ package controllers
 
 import config.FrontendAuthConnector
 import connectors.deskpro.HmrcDeskproConnector
+import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{AnyContent, Request, Result}
@@ -9,36 +10,10 @@ import play.filters.csrf.CSRF
 import uk.gov.hmrc.play.frontend.auth.{Actions, AuthContext}
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.validators.Validators
-
 import play.api.i18n.Messages.Implicits._
 import play.api.Play.current
 
 import scala.concurrent.Future
-
-object FeedbackFormBind {
-
-  import controllers.FeedbackFormConfig._
-
-  val form = Form[FeedbackForm](mapping(
-    "feedback-rating" -> optional(text)
-      .verifying("error.common.feedback.rating_mandatory", rating => rating.isDefined && !rating.get.trim.isEmpty)
-      .verifying("error.common.feedback.rating_valid", rating => rating.map(validExperiences.contains(_)).getOrElse(true)),
-    "feedback-name" -> text
-      .verifying("error.common.feedback.name_mandatory", name => !name.trim.isEmpty)
-      .verifying("error.common.feedback.name_too_long", name => name.size <= 70),
-    "feedback-email" -> Validators.emailWithDomain.verifying("deskpro.email_too_long", email => email.size <= 255),
-    "feedback-comments" -> text
-      .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)
-      .verifying("error.common.comments_too_long", comment => comment.size <= 2000),
-    "isJavascript" -> boolean,
-    "referer" -> text,
-    "csrfToken" -> text,
-    "service" -> optional(text)
-  )(FeedbackForm.apply)((feedbackForm: FeedbackForm) => {
-    import feedbackForm._
-    Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer, csrfToken, service))
-  }))
-}
 
 trait FeedbackController
   extends FrontendController
@@ -48,22 +23,24 @@ trait FeedbackController
 
   val ggAuthProvider = new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm(None).url)
 
-  def feedbackForm(service: Option[String] = None) = WithNewSessionTimeout(AuthenticatedBy(ggAuthProvider, pageVisibility = GGConfidence).async {
-    implicit user => implicit request =>
-    Future.successful(
-      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map{ _.value }.getOrElse("")), Some(user), service))
+  def feedbackForm(service: Option[String] = None) = {
+    WithNewSessionTimeout(
+      AuthenticatedBy(ggAuthProvider, pageVisibility = GGConfidence).async { implicit user => implicit request =>
+        Future.successful(
+          Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map { _.value }.getOrElse("")), Some(user), service))
+        )
+      }
     )
-  })
+  }
 
   def unauthenticatedFeedbackForm(service: Option[String] = None) = UnauthorisedAction.async { implicit request =>
     Future.successful(
-      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map{ _.value }.getOrElse("")), None, service))
+      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map { _.value }.getOrElse("")), None, service))
     )
   }
 
   def submit = WithNewSessionTimeout {
-    AuthenticatedBy(ggAuthProvider, pageVisibility = GGConfidence).async {
-      implicit user => implicit request =>
+    AuthenticatedBy(ggAuthProvider, pageVisibility = GGConfidence).async { implicit user => implicit request =>
       doSubmit(Some(user))
     }
   }
@@ -75,8 +52,7 @@ trait FeedbackController
   val ggAuthProviderThanks = new GovernmentGatewayAuthProvider(routes.FeedbackController.thanks().url)
 
   def thanks = WithNewSessionTimeout {
-    AuthenticatedBy(ggAuthProviderThanks, pageVisibility = GGConfidence).async {
-      implicit user => implicit request => doThanks(Some(user), request)
+    AuthenticatedBy(ggAuthProviderThanks, pageVisibility = GGConfidence).async { implicit user => implicit request => doThanks(Some(user), request)
     }
   }
 
@@ -116,9 +92,13 @@ object FeedbackController extends FeedbackController {
 case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"))
 
 object FeedbackForm {
-  def apply(referer: String, csrfToken: String): FeedbackForm = FeedbackForm("", "", "", "", javascriptEnabled = false, referer, csrfToken)
+  def apply(referer: String, csrfToken: String): FeedbackForm =
+    FeedbackForm("", "", "", "", javascriptEnabled = false, referer, csrfToken)
 
-  def apply(experienceRating: Option[String], name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String]): FeedbackForm =
+  def apply(
+    experienceRating: Option[String], name: String, email: String, comments: String,
+    javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String]
+  ): FeedbackForm =
     FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken, service)
 
   def emptyForm(csrfToken: String, referer: Option[String] = None)(implicit request: Request[AnyRef]) =
@@ -127,4 +107,37 @@ object FeedbackForm {
 
 object FeedbackFormConfig {
   val validExperiences = (5 to 1 by -1) map (_.toString)
+}
+
+object FeedbackFormBind {
+
+  import controllers.FeedbackFormConfig._
+
+  val form = Form[FeedbackForm](mapping(
+    "feedback-rating" -> optional(text)
+      .verifying("error.common.feedback.rating_mandatory", rating => rating.isDefined && !rating.get.trim.isEmpty)
+      .verifying("error.common.feedback.rating_valid", rating => rating.map(validExperiences.contains(_)).getOrElse(true)),
+
+    "feedback-name" -> text
+      .verifying("error.common.feedback.name_mandatory", name => !name.trim.isEmpty)
+      .verifying("error.common.feedback.name_too_long", name => name.size <= 70),
+
+    "feedback-email" -> Validators.emailWithDomain.verifying("deskpro.email_too_long", email => email.size <= 255),
+
+    "feedback-comments" -> text
+      .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)
+      .verifying("error.common.comments_too_long", comment => {
+        val result = comment.size <= 2000
+        Logger.error(s"Comment too long? ${result}")
+        result
+      }),
+
+    "isJavascript" -> boolean,
+    "referer" -> text,
+    "csrfToken" -> text,
+    "service" -> optional(text)
+  )(FeedbackForm.apply)((feedbackForm: FeedbackForm) => {
+      import feedbackForm._
+      Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer, csrfToken, service))
+    }))
 }

@@ -29,18 +29,18 @@ trait Stub {
   }
 }
 
+
 trait SessionCookieBaker {
-  def cookieValue(sessionData: Map[String,String]) = {
-    def encode(data: Map[String, String]): PlainText = {
+  def cookieValue(sessionData: Map[String, String]) = {
+    def encode(data: Map[String, String]): String = {
       val encoded = data.map {
         case (k, v) => URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v, "UTF-8")
       }.mkString("&")
-      val key = "yNhI04vHs9<_HWbC`]20u`37=NGLGYY5:0Tg5?y`W<NoJnXWqmjcgZBec@rOxb^G".getBytes
-      PlainText(Crypto.sign(encoded, key) + "-" + encoded)
+      Crypto.sign(encoded, "yNhI04vHs9<_HWbC`]20u`37=NGLGYY5:0Tg5?y`W<NoJnXWqmjcgZBec@rOxb^G".getBytes) + "-" + encoded
     }
 
     val encodedCookie = encode(sessionData)
-    val encrypted = CompositeSymmetricCrypto.aesGCM("gvBoGdgzqG1AarzF1LY0zQ==", Seq()).encrypt(encodedCookie).value
+    val encrypted = CompositeSymmetricCrypto.aesGCM("gvBoGdgzqG1AarzF1LY0zQ==", Seq()).encrypt(PlainText(encodedCookie)).value
 
     s"""mdtp="$encrypted"; Path=/; HTTPOnly"; Path=/; HTTPOnly"""
   }
@@ -75,9 +75,10 @@ object Login extends Stub with SessionCookieBaker {
       SessionKeys.sessionId -> SessionId,
       SessionKeys.userId -> "/auth/oid/1234567890",
       SessionKeys.authToken -> "PGdhdGV3YXk6R2F0ZXdheVRva2VuIHhtbG5zOndzdD0iaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNC8wNC90cnVzdCIgeG1sbnM6d3NhPSJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA0LzAzL2FkZHJlc3NpbmciIHhtbG5zOndzc2U9Imh0dHA6Ly9kb2NzLm9hc2lzLW9wZW4ub3JnL3dzcy8yMDA0LzAxL29hc2lzLTIwMDQwMS13c3Mtd3NzZWN1cml0eS1zZWNleHQtMS4wLnhzZCIgeG1sbnM6d3N1PSJodHRwOi8vZG9jcy5vYXNpcy1vcGVuLm9yZy93c3MvMjAwNC8wMS9vYXNpcy0yMDA0MDEtd3NzLXdzc2VjdXJpdHktdXRpbGl0eS0xLjAueHNkIiB4bWxuczpzb2FwPSJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy9zb2FwL2VudmVsb3BlLyI",
-      SessionKeys.name -> "JOHN THE SAINSBURY",
       SessionKeys.token -> "PGdhdGV3YXk6R2F0ZXdheVRva2VuIHhtbG5zOndzdD0iaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNC8wNC90cnVzdCIgeG1sbnM6d3NhPSJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA0LzAzL2FkZHJlc3NpbmciIHhtbG5zOndzc2U9Imh0dHA6Ly9kb2NzLm9hc2lzLW9wZW4ub3JnL3dzcy8yMDA0LzAxL29hc2lzLTIwMDQwMS13c3Mtd3NzZWN1cml0eS1zZWNleHQtMS4wLnhzZCIgeG1sbnM6d3N1PSJodHRwOi8vZG9jcy5vYXNpcy1vcGVuLm9yZy93c3MvMjAwNC8wMS9vYXNpcy0yMDA0MDEtd3NzLXdzc2VjdXJpdHktdXRpbGl0eS0xLjAueHNkIiB4bWxuczpzb2FwPSJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy9zb2FwL2VudmVsb3BlLyI",
       SessionKeys.affinityGroup -> "Organisation",
+      SessionKeys.lastRequestTimestamp -> new java.util.Date().getTime.toString,
+      SessionKeys.name -> "JOHN THE SAINSBURY",
       SessionKeys.authProvider -> "GGW"
     )
 
@@ -93,25 +94,27 @@ object Login extends Stub with SessionCookieBaker {
       .withHeader(HeaderNames.SET_COOKIE, cookieValue(data))
       .withHeader(HeaderNames.LOCATION, "http://localhost:9000/contact/contact-hmrc")))
 
+    val body = s"""
+                 |{
+                 |    "uri": "/auth/oid/1234567890",
+                 |    "loggedInAt": "2014-06-09T14:57:09.522Z",
+                 |    "previouslyLoggedInAt": "2014-06-09T14:48:24.841Z",
+                 |    "accounts": {
+                 |    },
+                 |    "legacyOid": "",
+                 |    "levelOfAssurance": "2",
+                 |    "credentialStrength": "weak",
+                 |    "confidenceLevel" : 50
+                 |}
+                 """.stripMargin
+
     stubFor(get(urlEqualTo("/auth/authority"))
       .willReturn(
         aResponse()
           .withStatus(200)
-          .withBody(
-            s"""
-             |{
-              |    "uri": "/auth/oid/1234567890",
-              |    "loggedInAt": "2014-06-09T14:57:09.522Z",
-              |    "previouslyLoggedInAt": "2014-06-09T14:48:24.841Z",
-              |    "accounts": {
-              |    },
-              |    "levelOfAssurance": "2",
-              |    "credentialStrength": "weak",
-              |    "confidenceLevel" : 50
-              |}
-              |
-            """.stripMargin
-          )))
+          .withBody(body)))
+
+
   }
 
 }
