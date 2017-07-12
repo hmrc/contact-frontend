@@ -27,8 +27,8 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       i_see("Thank you",
         "Someone will get back to you within 2 working days.")
 
-      And("the Deskpro endpoint '/deskpro/ticket' has received the following POST request:")
-      verify_post(to = "/deskpro/ticket", body =
+      And("the Deskpro endpoint '/deskpro/get-help-ticket' has received the following POST request:")
+      verify_post(to = "/deskpro/get-help-ticket", body =
         s"""
           |{
           |   "name":"$Name",
@@ -63,8 +63,8 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
         "Enter a valid email address",
         "Enter your comments")
 
-      And("the Deskpro endpoint '/deskpro/ticket' has not been hit")
-      verify_post_no_hit("/deskpro/ticket")
+      And("the Deskpro endpoint '/deskpro/get-help-ticket' has not been hit")
+      verify_post_no_hit("/deskpro/get-help-ticket")
     }
 
 
@@ -91,8 +91,8 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
         "Your email can't be longer than 255 characters",
         "0 remaining characters")
 
-      And("the Deskpro endpoint '/deskpro/ticket' has not been hit")
-      verify_post_no_hit("/deskpro/ticket")
+      And("the Deskpro endpoint '/deskpro/get-help-ticket' has not been hit")
+      verify_post_no_hit("/deskpro/get-help-ticket")
     }
 
 
@@ -111,16 +111,16 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       And("I see:")
       i_see("Enter a valid email address")
 
-      And("the Deskpro endpoint '/deskpro/ticket' has not been hit")
-      verify_post_no_hit("/deskpro/ticket")
+      And("the Deskpro endpoint '/deskpro/get-help-ticket' has not been hit")
+      verify_post_no_hit("/deskpro/get-help-ticket")
     }
 
     scenario("Deskpro fails with 404") {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
 
-      Given("the call to Deskpro endpoint '/deskpro/ticket' will fail with status 404")
-      service_will_fail_on_POST_request("/deskpro/ticket", 404)
+      Given("the call to Deskpro endpoint '/deskpro/get-help-ticket' will fail with status 404")
+      service_will_fail_on_POST_request("/deskpro/get-help-ticket", 404)
 
       When("I fill the contact form correctly")
       ContactHmrcPage.fillContactForm(Name, Email, Comment)
@@ -139,8 +139,8 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
 
-      Given("the call to Deskpro endpoint '/deskpro/ticket' will take too much time")
-      service_will_return_payload_for_POST_request("/deskpro/ticket", delayMillis = 10000)("")
+      Given("the call to Deskpro endpoint '/deskpro/get-help-ticket' will take too much time")
+      service_will_return_payload_for_POST_request("/deskpro/get-help-ticket", delayMillis = 10000)("")
 
       When("I fill the contact form correctly")
       ContactHmrcPage.fillContactForm(Name, Email, Comment)
@@ -159,8 +159,8 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
 
-      Given("the call to Deskpro endpoint '/deskpro/ticket' will fail with status 500")
-      service_will_fail_on_POST_request("/deskpro/ticket", 500)
+      Given("the call to Deskpro endpoint '/deskpro/get-help-ticket' will fail with status 500")
+      service_will_fail_on_POST_request("/deskpro/get-help-ticket", 500)
 
       When("I fill the contact form correctly")
       ContactHmrcPage.fillContactForm(Name, Email, Comment)
@@ -189,8 +189,8 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       And("I try to send the contact form")
       ContactHmrcPage.submitContactForm()
 
-      Then("the Deskpro endpoint '/deskpro/ticket' has received the following POST request:")
-      verify_post(to = "/deskpro/ticket", body =
+      Then("the Deskpro endpoint '/deskpro/get-help-ticket' has received the following POST request:")
+      verify_post(to = "/deskpro/get-help-ticket", body =
         s"""
           |{
           |   "name":"$Name",

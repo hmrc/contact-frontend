@@ -122,7 +122,7 @@ object Login extends Stub with SessionCookieBaker {
 object Deskpro extends Stub {
   override def create() = {
 
-    stubFor(post(urlEqualTo("/deskpro/ticket"))
+    stubFor(post(urlEqualTo("/deskpro/get-help-ticket"))
       .willReturn(
         aResponse()
           .withStatus(200)

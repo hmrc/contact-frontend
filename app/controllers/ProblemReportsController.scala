@@ -86,21 +86,22 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
         }) recover {
           case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript())
         }
-      })
+      }
+    )
   }
 
   private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], accountsOption: Option[Accounts], referrer: String) = {
     implicit val hc = HeaderCarrier.fromHeadersAndSession(request.headers, Some(request.session))
     hmrcDeskproConnector.createDeskProTicket(
-      problemReport.reportName,
-      problemReport.reportEmail,
-      "Support Request",
-      problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer,
-      problemReport.isJavascript,
-      request,
-      accountsOption,
-      problemReport.service
+      name = problemReport.reportName,
+      email = problemReport.reportEmail,
+      subject = "Support Request",
+      message = problemMessage(problemReport.reportAction, problemReport.reportError),
+      referrer = referrer,
+      isJavascript = problemReport.isJavascript,
+      request = request,
+      accountsOption = accountsOption,
+      service = problemReport.service
     )
   }
 

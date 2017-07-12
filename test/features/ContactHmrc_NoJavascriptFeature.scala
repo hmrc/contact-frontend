@@ -36,8 +36,8 @@ class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
       i_see("Thank you",
         "Someone will get back to you within 2 working days.")
 
-      And("the Deskpro endpoint '/deskpro/ticket' has received the following POST request:")
-      verify_post(to = "/deskpro/ticket", body =
+      And("the Deskpro endpoint '/deskpro/get-help-ticket' has received the following POST request:")
+      verify_post(to = "/deskpro/get-help-ticket", body =
         s"""
           |{
           |   "name":"$Name",
