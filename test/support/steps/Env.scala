@@ -34,6 +34,11 @@ object Env {
     driver.manage().deleteAllCookies()
   }
 
+  def deleteAllCookies() = {
+    jsDriver.manage().deleteAllCookies()
+    htmlUnitDriver.manage().deleteAllCookies()
+  }
+
   sys addShutdownHook {
     SingletonDriver.closeInstance()
     NoJsDriver.closeInstance()

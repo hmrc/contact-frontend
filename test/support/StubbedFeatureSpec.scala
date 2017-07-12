@@ -39,6 +39,7 @@ trait StubbedFeatureSpec
 
   override def afterAll() = {
     wireMockServer.stop()
+    Env.deleteAllCookies()
   }
 
   override def beforeEach() = {
