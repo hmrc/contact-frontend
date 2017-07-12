@@ -21,7 +21,7 @@ class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
       val Comment = "I am writing a comment"
 
       Given("JavaScript is disabled")
-      Env.useNoJsDriver()
+      Env.useNonJavascriptDriver()
 
       And("I go to the 'Help' page")
       goOn(ContactHmrcPage)

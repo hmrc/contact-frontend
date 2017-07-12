@@ -32,6 +32,7 @@ trait StubbedFeatureSpec
   val wireMockServer: WireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 
   override def beforeAll() = {
+    Env.useJavascriptDriver()
     wireMockServer.start()
     WireMock.configureFor(stubHost, stubPort)
   }
@@ -41,8 +42,7 @@ trait StubbedFeatureSpec
   }
 
   override def beforeEach() = {
-    Env.useJavascriptDriver()
-    webDriver.manage().deleteAllCookies()
+    Env.deleteCookies()
     WireMock.reset()
     stubFor(Auditing)
     stubFor(Login)

@@ -11,21 +11,53 @@ object Env {
     case _ => Option(System.getProperty("host")).getOrElse("http://localhost:9000")
   }
 
-  var driver: WebDriver = {
-    getChromeDriver
+  private var jsEnabled = true
+
+  def jsDriver = SingletonDriver.getInstance()
+  def htmlUnitDriver = NoJsDriver.getInstance()
+
+  def driver = jsEnabled match {
+    case true => jsDriver
+    case false => htmlUnitDriver
   }
 
-  def getChromeDriver: WebDriver = SingletonDriver.getInstance()
-
-  def useJavascriptDriver() =  {
-    driver = getChromeDriver
+  def useJavascriptDriver() = {
+    jsEnabled = true
   }
 
-  def useNoJsDriver() = {
-    driver = new HtmlUnitDriver(false)
+  def useNonJavascriptDriver() = {
+    SingletonDriver.closeInstance()
+    jsEnabled = false
+  }
+
+  def deleteCookies() = {
+    driver.manage().deleteAllCookies()
   }
 
   sys addShutdownHook {
-    driver.quit()
+    SingletonDriver.closeInstance()
+    NoJsDriver.closeInstance()
   }
+}
+
+object NoJsDriver {
+  private var instanceOption: Option[HtmlUnitDriver] = None
+
+  def getInstance() = {
+    instanceOption getOrElse initialiseBrowser()
+  }
+
+  def initialiseBrowser() = {
+    val instance = new HtmlUnitDriver(false)
+    instanceOption = Some(instance)
+    instance
+  }
+
+  def closeInstance() = {
+    instanceOption.foreach { instance =>
+      instance.close()
+      instance.quit()
+    }
+  }
+
 }
