@@ -8,7 +8,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.libs.Crypto
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.crypto.{CompositeSymmetricCrypto, PlainText}
-import uk.gov.hmrc.play.http.SessionKeys
+import uk.gov.hmrc.http.SessionKeys
 
 trait Stubs {
   def stubFor(stub: Stub) {

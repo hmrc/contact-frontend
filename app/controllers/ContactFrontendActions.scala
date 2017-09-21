@@ -1,13 +1,12 @@
 package controllers
 
 import play.api.mvc.Request
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
-import uk.gov.hmrc.play.http.SessionKeys
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HeaderCarrier, SessionKeys }
 
 trait ContactFrontendActions extends Actions {
 

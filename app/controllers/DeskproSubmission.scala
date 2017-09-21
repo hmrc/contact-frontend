@@ -3,10 +3,10 @@ package controllers
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import play.api.mvc.{AnyContent, Request}
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait DeskproSubmission {
 

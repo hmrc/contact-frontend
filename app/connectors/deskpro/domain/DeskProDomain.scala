@@ -1,12 +1,11 @@
 package connectors.deskpro.domain
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.http.HeaderCarrier
 import play.api.mvc.Request
 import uk.gov.hmrc.domain._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
-import uk.gov.hmrc.play.http.SessionKeys
+import uk.gov.hmrc.http.{ HeaderCarrier, SessionKeys }
 
 case class Ticket private(name: String,
                           email: String,

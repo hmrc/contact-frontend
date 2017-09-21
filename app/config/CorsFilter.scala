@@ -2,10 +2,10 @@ package config
 
 import play.api.mvc.{Result, RequestHeader, Filter}
 import uk.gov.hmrc.play.config.RunMode
-import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.play.frontend.filters.MicroserviceFilterSupport
 
 object CorsFilter extends CorsFilter with RunMode with MicroserviceFilterSupport {
   override val enableAnyOrigin: Boolean = env == "Dev"

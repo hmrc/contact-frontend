@@ -7,16 +7,15 @@ import play.api.data._
 import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.{Action, Request}
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
-import uk.gov.hmrc.play.frontend.controller.{UnauthorisedAction, FrontendController}
+import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.validators.Validators._
-
 import play.api.i18n.Messages.Implicits._
 import play.api.Play.current
 
 import scala.concurrent.Future
+import uk.gov.hmrc.play.HeaderCarrierConverter
 
 trait ProblemReportsController extends FrontendController with ContactFrontendActions {
 
@@ -91,7 +90,7 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
   }
 
   private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], accountsOption: Option[Accounts], referrer: String) = {
-    implicit val hc = HeaderCarrier.fromHeadersAndSession(request.headers, Some(request.session))
+    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
     hmrcDeskproConnector.createDeskProTicket(
       name = problemReport.reportName,
       email = problemReport.reportEmail,

@@ -5,13 +5,11 @@ import play.api.data.{Form, FormError}
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.mvc.{Request, Result}
-import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.config.{AppName, RunMode}
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import play.api.i18n.Messages.Implicits._
 import play.api.Play.current
@@ -19,6 +17,8 @@ import play.api.Play.current
 import scala.util.matching.Regex
 import scala.concurrent.Future
 import scala.util.Try
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.config.LoadAuditingConfig
 
 
 trait SurveyController
