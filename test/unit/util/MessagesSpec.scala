@@ -1,70 +1,52 @@
 package unit.util
 
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.Environment
-import play.api.i18n.{DefaultLangs, DefaultMessagesApi, Lang}
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.FakeApplication
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import play.api.i18n.Messages
+import play.api.i18n.Messages.MessageSource
+import uk.gov.hmrc.play.test.UnitSpec
 
-class MessagesSpec extends UnitSpec with OneAppPerSuite {
+import scala.io.Source
 
-  override lazy val app = GuiceApplicationBuilder().configure(
-    Map("application.langs" -> "en,cy",
-      "govuk-tax.Test.enableLanguageSwitching" -> true)
-  ).build()
+class MessagesSpec extends UnitSpec  {
 
-  val messagesAPI = new DefaultMessagesApi(Environment.simple(), app.configuration, new DefaultLangs(app.configuration))
-  val languageEnglish = Lang.get("en").getOrElse(throw new Exception())
-  val languageWelsh = Lang.get("cy").getOrElse(throw new Exception())
-  val MatchSingleQuoteOnly = """\w+'{1}\w+""".r
-  val MatchBacktickQuoteOnly = """`+""".r
-  val MatchForwardTickQuoteOnly = """’+""".r
+  private val MatchSingleQuoteOnly = """\w+'{1}\w+""".r
+  private val MatchBacktickQuoteOnly = """`+""".r
+  private val MatchForwardTickQuoteOnly = """’+""".r
 
-  "Application" should {
-    "have the correct message configs" in {
-      messagesAPI.messages.size shouldBe 4
-      messagesAPI.messages.keys should contain theSameElementsAs Vector("en", "cy", "default", "default.play")
-    }
-
-    "have messages for default and cy only" in {
-      messagesAPI.messages("en").size shouldBe 0
-      val englishMessageCount = messagesAPI.messages("default").size - frameworkProvidedKeys.size
-      messagesAPI.messages("cy").size shouldBe englishMessageCount
-      messagesAPI.messages("default.play").size shouldBe 46
-    }
-  }
+  private val englishMessages = parseMessages("conf/messages")
+  private val welshMessages = parseMessages("conf/messages.cy")
 
   "All message files" should {
     "have the same set of keys" in {
-      withClue(describeMismatch(defaultMessages.keySet, welshMessages.keySet)) {
-        welshMessages.keySet shouldBe defaultMessages.keySet
+      withClue(describeMismatch(englishMessages.keySet, welshMessages.keySet)) {
+        welshMessages.keySet shouldBe englishMessages.keySet
       }
     }
+
     "have a non-empty message for each key" in {
-      assertNonEmptyValuesForDefaultMessages()
-      assertNonEmptyValuesForWelshMessages()
+      assertNonEmpty("English", englishMessages)
+      assertNonEmpty("Welsh", welshMessages)
     }
+
     "have no unescaped single quotes in value" in {
-      assertCorrectUseOfQuotesForDefaultMessages()
-      assertCorrectUseOfQuotesForWelshMessages()
+      assertCorrectUseOfQuotes("English", englishMessages)
+      assertCorrectUseOfQuotes("Welsh", welshMessages)
     }
+
     "have a resolvable message for keys which take args" in {
-      countMessagesWithArgs(welshMessages).size shouldBe countMessagesWithArgs(defaultMessages).size
+      countMessagesWithArgs(welshMessages).size shouldBe countMessagesWithArgs(englishMessages).size
     }
   }
 
-  private def countMessagesWithArgs(messages: Map[String, String]) = messages.values.filter(_.contains("{0"))
+  private def parseMessages(filename: String): Map[String, String] = {
+    Messages.parse(new MessageSource {override def read: String = Source.fromFile(filename).mkString}, filename) match {
+      case Right(messages) => messages
+      case Left(e)         => throw e
+    }
+  }
 
-  private def assertNonEmptyValuesForDefaultMessages() = assertNonEmptyNonTemporaryValues("Default", defaultMessages)
+  private def countMessagesWithArgs(messages: Map[String, String]) = messages.values.filter(_.contains("{0}"))
 
-  private def assertNonEmptyValuesForWelshMessages() = assertNonEmptyNonTemporaryValues("Welsh", welshMessages)
-
-  private def assertCorrectUseOfQuotesForDefaultMessages() = assertCorrectUseOfQuotes("Default", defaultMessages)
-
-  private def assertCorrectUseOfQuotesForWelshMessages() = assertCorrectUseOfQuotes("Welsh", welshMessages)
-
-  private def assertNonEmptyNonTemporaryValues(label: String, messages: Map[String, String]) = messages.foreach { case (key: String, value: String) =>
+  private def assertNonEmpty(label: String, messages: Map[String, String]) = messages.foreach { case (key: String, value: String) =>
     withClue(s"In $label, there is an empty value for the key:[$key][$value]") {
       value.trim.isEmpty shouldBe false
     }
@@ -78,35 +60,12 @@ class MessagesSpec extends UnitSpec with OneAppPerSuite {
     }
   }
 
-  private def listMissingMessageKeys(header: String, missingKeys: Set[String]) = missingKeys.toList.sorted.mkString(header + displayLine, "\n", displayLine)
+  private def listMissingMessageKeys(header: String, missingKeys: Set[String]) = {
+    val displayLine = "\n" + ("@" * 42) + "\n"
+    missingKeys.toList.sorted.mkString(header + displayLine, "\n", displayLine)
+  }
 
-  private lazy val displayLine = "\n" + ("@" * 42) + "\n"
-
-  private lazy val defaultMessages = getExpectedMessages("default") -- providedKeys
-
-  private lazy val welshMessages = getExpectedMessages("cy") -- commonProvidedKeys
-
-  private def getExpectedMessages(languageCode: String) = messagesAPI.messages.getOrElse(languageCode, throw new Exception(s"Missing messages for $languageCode"))
-
-  private def describeMismatch(defaultKeySet: Set[String], welshKeySet: Set[String]) =
-    if (defaultKeySet.size > welshKeySet.size) listMissingMessageKeys("The following message keys are missing from the Welsh Set:", defaultKeySet -- welshKeySet)
-    else listMissingMessageKeys("The following message keys are missing from the Default Set:", welshKeySet -- defaultKeySet)
-
-
-  private val commonProvidedKeys = Set(
-    "error.address.invalid.character")
-
-  private val frameworkProvidedKeys = Set(
-    "global.error.InternalServerError500.heading",
-    "global.error.InternalServerError500.message",
-    "global.error.InternalServerError500.title",
-    "global.error.badRequest400.heading",
-    "global.error.badRequest400.message",
-    "global.error.badRequest400.title",
-    "global.error.pageNotFound404.heading",
-    "global.error.pageNotFound404.message",
-    "global.error.pageNotFound404.title"
-  )
-
-  private val providedKeys = commonProvidedKeys ++ frameworkProvidedKeys
+  private def describeMismatch(englishKeySet: Set[String], welshKeySet: Set[String]) =
+    if (englishKeySet.size > welshKeySet.size) listMissingMessageKeys("The following message keys are missing from the Welsh Set:", englishKeySet -- welshKeySet)
+    else listMissingMessageKeys("The following message keys are missing from the English Set:", welshKeySet -- englishKeySet)
 }
