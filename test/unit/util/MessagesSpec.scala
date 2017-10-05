@@ -1,11 +1,12 @@
 package unit.util
 
-import org.scalatestplus.play.OneAppPerSuite
+import play.api.i18n.Messages
+import play.api.i18n.Messages.MessageSource
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.io.Source
 
-class MessagesSpec extends UnitSpec with OneAppPerSuite {
+class MessagesSpec extends UnitSpec  {
 
   private val MatchSingleQuoteOnly = """\w+'{1}\w+""".r
   private val MatchBacktickQuoteOnly = """`+""".r
@@ -37,12 +38,10 @@ class MessagesSpec extends UnitSpec with OneAppPerSuite {
   }
 
   private def parseMessages(filename: String): Map[String, String] = {
-    Source.fromFile(filename)
-      .getLines()
-      .filter(_.nonEmpty)
-      .map(s => s.splitAt(s.indexOf("=")))
-      .map(kv => (kv._1, kv._2.drop(1)))
-      .toMap
+    Messages.parse(new MessageSource {override def read: String = Source.fromFile(filename).mkString}, filename) match {
+      case Right(messages) => messages
+      case Left(e)         => throw e
+    }
   }
 
   private def countMessagesWithArgs(messages: Map[String, String]) = messages.values.filter(_.contains("{0}"))
