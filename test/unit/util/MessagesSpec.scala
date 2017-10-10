@@ -31,7 +31,6 @@ class MessagesSpec extends UnitSpec  {
       assertCorrectUseOfQuotes("English", englishMessages)
       assertCorrectUseOfQuotes("Welsh", welshMessages)
     }
-
     "have a resolvable message for keys which take args" in {
       countMessagesWithArgs(welshMessages).size shouldBe countMessagesWithArgs(englishMessages).size
     }
