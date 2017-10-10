@@ -7,7 +7,7 @@ import uk.gov.hmrc.integration.framework.SingletonDriver
 
 object Env {
   var host = Option(System.getProperty("environment")) match {
-    case Some("qa") => "https://www-qa.tax.service.gov.uk"
+    case Some("qa") => "https://www.qa.tax.service.gov.uk"
     case _ => Option(System.getProperty("host")).getOrElse("http://localhost:9000")
   }
 
