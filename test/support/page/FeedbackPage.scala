@@ -13,7 +13,7 @@ trait FeedbackPage extends WebPage with SharedPageModules {
   def commentsField = textArea("feedback-comments")
   def submitBtn = cssSelector("button[type=submit]")
   def ratingsList() = {
-    val eles = findAll(className("label--inlineRadio--overhead"))
+    val eles = findAll(className("multiple-choice"))
     var rating  = List[String]()
     for (e <- eles) rating ::= e.text.split('\n').map(_.trim.filter(_ >= ' ')).mkString
     rating.mkString(" ")
