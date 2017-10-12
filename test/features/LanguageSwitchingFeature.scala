@@ -81,7 +81,7 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
 
       Then("The ratings text is in Welsh")
       UnauthenticatedFeedbackPage.pageTitle shouldBe "Anfon eich adborth"
-      UnauthenticatedFeedbackPage.ratingsList() shouldBe "Gwael iawn Gwael Niwtral Da Da iawn"
+      UnauthenticatedFeedbackPage.ratingsList() shouldBe List("Gwael iawn", "Gwael", "Niwtral", "Da", "Da iawn")
     }
   }
 }

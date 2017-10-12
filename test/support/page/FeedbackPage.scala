@@ -14,9 +14,7 @@ trait FeedbackPage extends WebPage with SharedPageModules {
   def submitBtn = cssSelector("button[type=submit]")
   def ratingsList() = {
     val eles = findAll(className("multiple-choice"))
-    var rating  = List[String]()
-    for (e <- eles) rating ::= e.text.split('\n').map(_.trim.filter(_ >= ' ')).mkString
-    rating.mkString(" ")
+    eles.map(_.text).toList
   }
 
   def serviceFieldValue(): Option[String] = find(xpath("//input[@name='service']")).flatMap(_.attribute("value"))
