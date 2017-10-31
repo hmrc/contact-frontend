@@ -1,16 +1,19 @@
 package controllers
 
-import config.FrontendAuthConnector
+import javax.inject.{Inject, Singleton}
+
+import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import views.html.deskpro_error
 
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
-
 import scala.concurrent.Future
 
-trait PartialsController extends FrontendController with DeskproSubmission with ContactFrontendActions {
+@Singleton
+class PartialsController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnector)(implicit val authConnector : AuthConnector, appConfig : AppConfig, override val messagesApi : MessagesApi) extends FrontendController with DeskproSubmission
+  with ContactFrontendActions with I18nSupport {
 
   def contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean]) = UnauthorisedAction.async {
     implicit request =>
@@ -76,7 +79,3 @@ trait PartialsController extends FrontendController with DeskproSubmission with 
 
 }
 
-object PartialsController extends PartialsController {
-  override val hmrcDeskproConnector = HmrcDeskproConnector
-  override protected val authConnector = FrontendAuthConnector
-}

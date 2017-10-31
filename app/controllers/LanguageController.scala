@@ -2,16 +2,15 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import config.CFConfig
+import config.AppConfig
 import play.api.Logger
-import play.api.Play.current
-import play.api.i18n.{MessagesApi, I18nSupport, Lang}
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import util.LanguageUtils
 
 @Singleton
-class LanguageController @Inject() (override val messagesApi: MessagesApi) extends FrontendController with I18nSupport{
+class LanguageController @Inject() (override val messagesApi: MessagesApi)(implicit appConfig : AppConfig) extends FrontendController with I18nSupport{
 
     val english = Lang("en")
     val welsh = Lang("cy")
@@ -21,13 +20,13 @@ class LanguageController @Inject() (override val messagesApi: MessagesApi) exten
   def switchToWelsh = switchToLang(welsh)
   
   private def switchToLang(lang: Lang) = Action { implicit request =>
-    val newLang = if (CFConfig.enableLanguageSwitching) lang else english
+    val newLang = if (appConfig.enableLanguageSwitching) lang else english
 
     request.headers.get(REFERER) match {
       case Some(referrer) => Redirect(referrer).withLang(newLang).flashing(LanguageUtils.flashWithSwitchIndicator)
       case None => {
-          Logger.warn(s"Unable to get the referrer, so sending them to ${CFConfig.fallbackURLForLangugeSwitcher}")
-          Redirect(CFConfig.fallbackURLForLangugeSwitcher).withLang(newLang)
+          Logger.warn(s"Unable to get the referrer, so sending them to ${appConfig.fallbackURLForLangugeSwitcher}")
+          Redirect(appConfig.fallbackURLForLangugeSwitcher).withLang(newLang)
         }
     }
   }

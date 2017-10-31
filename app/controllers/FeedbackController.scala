@@ -1,27 +1,30 @@
 package controllers
 
-import config.FrontendAuthConnector
+import javax.inject.{Inject, Singleton}
+
+import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{AnyContent, Request, Result}
 import play.filters.csrf.CSRF
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.auth.{Actions, AuthContext}
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.validators.Validators
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
 
 import scala.concurrent.Future
 
-trait FeedbackController
-  extends FrontendController
-  with Actions with DeskproSubmission {
+@Singleton
+class FeedbackController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnector, ggProvider : GovernmentGatewayAuthProvider)(implicit val authConnector : AuthConnector, appConfig : AppConfig, override val messagesApi : MessagesApi)
+extends FrontendController
+  with Actions with DeskproSubmission with I18nSupport {
 
   val formId = "FeedbackForm"
 
-  val ggAuthProvider = new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm(None).url)
+  val ggAuthProvider = ggProvider.forUrl(routes.FeedbackController.feedbackForm(None).url)
 
   def feedbackForm(service: Option[String] = None) = {
     WithNewSessionTimeout(
@@ -49,7 +52,7 @@ trait FeedbackController
     implicit request => doSubmit(None)
   }
 
-  val ggAuthProviderThanks = new GovernmentGatewayAuthProvider(routes.FeedbackController.thanks().url)
+  val ggAuthProviderThanks = ggProvider.forUrl(routes.FeedbackController.thanks().url)
 
   def thanks = WithNewSessionTimeout {
     AuthenticatedBy(ggAuthProviderThanks, pageVisibility = GGConfidence).async { implicit user => implicit request => doThanks(Some(user), request)
@@ -82,11 +85,6 @@ trait FeedbackController
     Future.successful(result)
   }
 
-}
-
-object FeedbackController extends FeedbackController {
-  override val authConnector = FrontendAuthConnector
-  override val hmrcDeskproConnector = HmrcDeskproConnector
 }
 
 case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"))

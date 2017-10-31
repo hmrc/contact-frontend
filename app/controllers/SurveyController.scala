@@ -1,36 +1,33 @@
 package controllers
 
-import config.FrontendAuthConnector
-import play.api.data.{Form, FormError}
+import javax.inject.{Inject, Singleton}
+
+import config.AppConfig
 import play.api.Logger
 import play.api.data.Forms._
+import play.api.data.{Form, FormError}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Request, Result}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.config.{AppName, RunMode}
 import uk.gov.hmrc.play.frontend.auth.Actions
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
-
-import scala.util.matching.Regex
 import scala.concurrent.Future
 import scala.util.Try
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.config.LoadAuditingConfig
+import scala.util.matching.Regex
 
-
-trait SurveyController
+@Singleton
+class SurveyController @Inject() (auditConnector : AuditConnector)(implicit val messagesApi : MessagesApi, val authConnector : AuthConnector, appConfig : AppConfig)
   extends FrontendController
-    with Actions {
+    with Actions with I18nSupport {
 
   val TICKET_ID_REGEX      = new Regex("^HMRC-([A-Z0-9]|#){1,8}+$")
   val TICKET_ID_MAX_LENGTH = 5+8
 
   def validateTicketId(ticketId:String) = TICKET_ID_REGEX.findFirstIn(ticketId).isDefined
-
-  def auditConnector: AuditConnector
 
   def survey(ticketId: String, serviceId: String) = UnauthorisedAction.async { implicit request =>
     Future.successful(
@@ -103,15 +100,4 @@ case class SurveyFormData(helpful: Option[Int],
     "ticketId" -> ticketId.getOrElse(""),
     "serviceId" -> serviceId.getOrElse("")
   )
-}
-
-
-object SurveyController extends SurveyController {
-  override val authConnector = FrontendAuthConnector
-  override val auditConnector = YTAAuditConnector
-}
-
-
-object YTAAuditConnector extends AuditConnector with AppName with RunMode {
-  override lazy val auditingConfig = LoadAuditingConfig(s"$env.auditing")
 }

@@ -1,5 +1,6 @@
 package controllers
 
+import config.CFConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import org.jsoup.Jsoup
@@ -8,17 +9,18 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
+import play.api.Configuration
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
-import play.api.test.{FakeApplication, FakeRequest}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, _}
+import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
 
@@ -147,10 +149,7 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
 
 class ProblemReportsControllerApplication extends MockitoSugar {
 
-  val controller = new ProblemReportsController {
-    override lazy val hmrcDeskproConnector = mock[HmrcDeskproConnector]
-    override lazy val authConnector = mock[AuthConnector]
-  }
+  val controller = new ProblemReportsController(mock[HmrcDeskproConnector])(mock[AuthConnector], new CFConfig(Configuration()), mock[MessagesApi])
 
   val deskproName: String = "John Densmore"
   val deskproEmail: String = "name@mail.com"

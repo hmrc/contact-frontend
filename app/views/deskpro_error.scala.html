@@ -1,4 +1,6 @@
-@()(implicit request : Request[_], lang : Lang, messages : Messages)
+@import config.AppConfig
+
+@()(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 @main(title = Messages("contact.heading"), supportLinkEnabled = false) {

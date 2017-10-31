@@ -9,19 +9,20 @@ import play.api.mvc._
 import play.api.{Application, Configuration, Play}
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
-import uk.gov.hmrc.play.frontend.filters.{ FrontendAuditFilter, FrontendLoggingFilter, MicroserviceFilterSupport }
+import uk.gov.hmrc.play.frontend.filters.{FrontendAuditFilter, FrontendLoggingFilter, MicroserviceFilterSupport}
 
 object ContactFrontendGlobal
   extends DefaultFrontendGlobal
   with RunMode {
 
-  override def auditConnector = AuditConnector
+  override def auditConnector = Play.current.injector.instanceOf[AuditConnector]
   override def loggingFilter = CFLoggingFilter
   override def frontendAuditFilter = ContactFrontendAuditFilter
   override def frontendFilters = defaultFrontendFilters ++ Seq(CorsFilter)
-
+  implicit lazy val config = Play.current.injector.instanceOf[AppConfig]
 
   override def onStart(app: Application) {
     super.onStart(app)
@@ -50,7 +51,7 @@ object ContactFrontendAuditFilter extends FrontendAuditFilter with RunMode with 
 
   override lazy val applicationPort = None
 
-  override lazy val auditConnector = AuditConnector
+  override lazy val auditConnector = Play.current.injector.instanceOf[AuditConnector]
 
   override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
 }

@@ -1,23 +1,25 @@
-@(title: String, 
+@import config.AppConfig
+@import uk.gov.hmrc.play.views.html.layouts
+
+@(
+  title: String,
   userLoggedIn: Boolean = true, 
   supportLinkEnabled: Boolean = true, 
   bodyClasses: Option[String] = None,
-  service: Option[String] = None)(mainContent: Html)(implicit request : Request[_], lang : Lang, messages : Messages)
+  service: Option[String] = None)(mainContent: Html)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
-@import config.CFConfig
-@import uk.gov.hmrc.play.views.html.layouts
+
 
 @getHelpForm = {
   @if(supportLinkEnabled) {
-    @partials.error_feedback(config.CFConfig.externalReportProblemSecureUrl, play.filters.csrf.CSRF.getToken(request).map(_.value), service)
+    @partials.error_feedback(appConfig.externalReportProblemSecureUrl, play.filters.csrf.CSRF.getToken(request).map(_.value), service)
   }
 }
 
 @govuk_wrapper(
-  appConfig = config.CFConfig,
   title = title,
   bodyClasses = bodyClasses,
   mainContent = layouts.article(mainContent),
   userLoggedIn = userLoggedIn,
   getHelpForm = getHelpForm,
-  enableLanguageSwitching = CFConfig.enableLanguageSwitching)
+  enableLanguageSwitching = appConfig.enableLanguageSwitching)

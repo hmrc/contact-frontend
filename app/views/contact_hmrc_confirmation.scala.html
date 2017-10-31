@@ -1,4 +1,6 @@
-@(ticketId: String)(implicit request : Request[_], lang : Lang, messages : Messages)
+@import config.AppConfig
+
+@(ticketId: String)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @main(title = Messages("contact.heading"), supportLinkEnabled = false) {
   @views.html.partials.contact_hmrc_form_confirmation(ticketId)
