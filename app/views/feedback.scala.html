@@ -1,15 +1,16 @@
 @import config.AppConfig
 
 @(feedbackForm: Form[controllers.FeedbackForm],
-  user: Option[uk.gov.hmrc.play.frontend.auth.AuthContext],
+  loggedIn : Boolean,
   service: Option[String] = None)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@main(title = Messages("common.feedback.heading"), userLoggedIn = user.isDefined) {
+@main(title = Messages("common.feedback.heading"), userLoggedIn = loggedIn) {
 
-    @defining(user.map{_ => routes.FeedbackController.submit}.getOrElse(routes.FeedbackController.submitUnauthenticated))  { call =>
-        @views.html.partials.feedback_form(feedbackForm, call.url, service)
+    @if(loggedIn) {
+        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submit.url, service)
+    } else {
+        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submitUnauthenticated.url, service)
     }
-
 }

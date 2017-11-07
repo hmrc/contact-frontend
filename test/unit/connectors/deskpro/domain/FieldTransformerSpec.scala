@@ -2,12 +2,11 @@ package connectors.deskpro.domain
 
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeRequest
+import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import uk.gov.hmrc.domain._
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import uk.gov.hmrc.http.{ HeaderCarrier, SessionKeys, UserId }
 import uk.gov.hmrc.http.logging.SessionId
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys, UserId}
+import uk.gov.hmrc.play.test.UnitSpec
 
 class FieldTransformerSpec extends UnitSpec with OneAppPerSuite {
 
@@ -63,15 +62,19 @@ class FieldTransformerSpec extends UnitSpec with OneAppPerSuite {
     }
 
     "transform non authorised user to UserTaxIdentifiers containing no identifiers" in new FieldTransformerScope {
-      transformer.userTaxIdentifiersOf(None) shouldBe expectedUserTaxIdentifiers()
+      transformer.userTaxIdentifiersFromEnrolments(None) shouldBe expectedUserTaxIdentifiers()
     }
 
     "transform paye authorised user to UserTaxIdentifiers containing one identifier i.e. the SH233544B" in new FieldTransformerScope {
-      transformer.userTaxIdentifiersOf(Some(payeUser)) shouldBe expectedUserTaxIdentifiers(nino = Some(Nino("SH233544B")))
+      transformer.userTaxIdentifiersFromEnrolments(Some(payeUser)) shouldBe expectedUserTaxIdentifiers(nino = Some("SH233544B"))
     }
 
-    "transform business tax authorised user to UserTaxIdentifiers containing all the Business Tax Identifiers" in new FieldTransformerScope {
-      transformer.userTaxIdentifiersOf(Some(bizTaxUser)) shouldBe expectedUserTaxIdentifiers(utr = Some(SaUtr("sa")), ctUtr = Some(CtUtr("ct")), vrn = Some(Vrn("vrn")), empRef = Some(EmpRef("officeNum", "officeRef")))
+    "transform business tax authorised user to UserTaxIdentifiers containing all the Business Tax Identifiers (and HMCE-VATDEC-ORG endorsement)" in new FieldTransformerScope {
+      transformer.userTaxIdentifiersFromEnrolments(Some(bizTaxUserWithVatDec)) shouldBe expectedUserTaxIdentifiers(utr = Some("sa"), ctUtr = Some("ct"), vrn = Some("vrn1"), empRef = Some(EmpRef("officeNum", "officeRef").value))
+    }
+
+    "transform business tax authorised user to UserTaxIdentifiers containing all the Business Tax Identifiers (and HMCE-VATVAR-ORG endorsement)" in new FieldTransformerScope {
+      transformer.userTaxIdentifiersFromEnrolments(Some(bizTaxUserWithVatVar)) shouldBe expectedUserTaxIdentifiers(utr = Some("sa"), ctUtr = Some("ct"), vrn = Some("vrn2"), empRef = Some(EmpRef("officeNum", "officeRef").value))
     }
   }
 
@@ -80,14 +83,28 @@ class FieldTransformerSpec extends UnitSpec with OneAppPerSuite {
 class FieldTransformerScope {
   val transformer = new FieldTransformer {}
 
-  val vatAccount = Some(VatAccount("/vatRoot", Vrn("vrn")))
-  val saAccount = Some(SaAccount("/saRoot", SaUtr("sa")))
-  val ctAccount = Some(CtAccount("/ctRoot", CtUtr("ct")))
-  val epayeAccount = Some(EpayeAccount("epayeRoot", EmpRef("officeNum", "officeRef")))
-  
+
   val userId = UserId("456")
-  val payeUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(Some(PayeAccount("payeRoot", Nino("SH233544B")))), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None, None, ""))
-  val bizTaxUser = AuthContext(Authority(s"/auth/oid/$userId",  Accounts(sa = saAccount, ct = ctAccount, vat = vatAccount, epaye = epayeAccount), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None, None, ""))
+  val payeUser =
+    Enrolments(Set(
+      Enrolment("HMRC-NI").withIdentifier("NINO", "SH233544B")
+    ))
+
+  val bizTaxUserWithVatDec =
+    Enrolments(Set(
+      Enrolment("IR-SA").withIdentifier("UTR", "sa"),
+      Enrolment("IR-CT").withIdentifier("UTR", "ct"),
+      Enrolment("HMCE-VATDEC-ORG").withIdentifier("VATRegNo", "vrn1"),
+      Enrolment("IR-PAYE").withIdentifier("TaxOfficeNumber", "officeNum").withIdentifier("TaxOfficeReference", "officeRef")
+    ))
+
+  val bizTaxUserWithVatVar =
+    Enrolments(Set(
+      Enrolment("IR-SA").withIdentifier("UTR", "sa"),
+      Enrolment("IR-CT").withIdentifier("UTR", "ct"),
+      Enrolment("HMCE-VATVAR-ORG").withIdentifier("VATRegNo", "vrn2"),
+      Enrolment("IR-PAYE").withIdentifier("TaxOfficeNumber", "officeNum").withIdentifier("TaxOfficeReference", "officeRef")
+    ))
 
   val sessionId: String = "sessionIdValue"
   val hc = HeaderCarrier(userId = Some(userId), sessionId = Some(SessionId(sessionId)))
@@ -100,10 +117,10 @@ class FieldTransformerScope {
   val request = FakeRequest().withHeaders(("User-Agent", userAgent))
   val requestAuthenticatedByIda = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession((SessionKeys.authProvider, "IDA"))
 
-  def expectedUserTaxIdentifiers(nino: Option[Nino] = None,
-                                 ctUtr: Option[CtUtr] = None,
-                                 utr: Option[SaUtr] = None,
-                                 vrn: Option[Vrn] = None,
-                                 empRef: Option[EmpRef] = None) = UserTaxIdentifiers(nino, ctUtr, utr, vrn, empRef)
+  def expectedUserTaxIdentifiers(nino: Option[String] = None,
+                                 ctUtr: Option[String] = None,
+                                 utr: Option[String] = None,
+                                 vrn: Option[String] = None,
+                                 empRef: Option[String] = None) = UserTaxIdentifiers(nino, ctUtr, utr, vrn, empRef)
 }
 

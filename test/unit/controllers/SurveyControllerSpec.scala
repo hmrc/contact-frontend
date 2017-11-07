@@ -6,10 +6,9 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.Configuration
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.test.{FakeHeaders, FakeRequest}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Await
@@ -82,5 +81,5 @@ class SurveyControllerSpec extends UnitSpec with OneAppPerSuite {
 
 
 class SurveyControllerApplication extends MockitoSugar {
-  val controller = new SurveyController(mock[AuditConnector], mock[AuthConnector])(mock[MessagesApi], new CFConfig(Configuration()))
+  val controller = new SurveyController( mock[AuditConnector])(mock[MessagesApi], new CFConfig(Configuration()))
 }
