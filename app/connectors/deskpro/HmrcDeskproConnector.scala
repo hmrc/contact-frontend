@@ -1,18 +1,18 @@
 package connectors.deskpro
 
 import javax.inject.Inject
-
-import config.WSHttp
 import connectors.deskpro.domain.{Feedback, Ticket, TicketId}
+import play.api.{Configuration, Environment}
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, Upstream5xxResponse}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent.Future
 
-class HmrcDeskproConnector @Inject() (http : WSHttp) extends ServicesConfig {
+class HmrcDeskproConnector @Inject() (http : HttpClient, environment : Environment, configuration : Configuration) extends ServicesConfig {
 
   def serviceUrl: String = baseUrl("hmrc-deskpro")
 
@@ -31,4 +31,7 @@ class HmrcDeskproConnector @Inject() (http : WSHttp) extends ServicesConfig {
 
   private def requestUrl[B, A](uri: String): String = s"$serviceUrl$uri"
 
+  override protected def mode = environment.mode
+
+  override protected def runModeConfiguration = configuration
 }

@@ -11,7 +11,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.play.HeaderCarrierConverter
-import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
+import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
 import util.DeskproEmailValidator
 
 import scala.concurrent.Future

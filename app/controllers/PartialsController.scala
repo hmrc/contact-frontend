@@ -7,7 +7,7 @@ import connectors.deskpro.HmrcDeskproConnector
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Action
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
+import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
 import views.html.deskpro_error
 
 import scala.concurrent.Future
