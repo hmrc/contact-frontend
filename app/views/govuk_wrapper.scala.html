@@ -1,10 +1,9 @@
-@(appConfig: config.AppConfig,
-  title: String,
+@(title: String,
   bodyClasses: Option[String] = None,
   contentHeader: Option[Html] = None,
   mainContent: Html = HtmlFormat.empty,
   userLoggedIn: Boolean = true,
-  getHelpForm: Html  = HtmlFormat.empty, enableLanguageSwitching : Boolean)(implicit request: Request[_], lang : Lang, messages : Messages)
+  getHelpForm: Html  = HtmlFormat.empty, enableLanguageSwitching : Boolean)(implicit request: Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 
 @import layouts.{govuk_template => hmrcGovUkTemplate}
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}

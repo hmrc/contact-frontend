@@ -1,26 +1,24 @@
 package controllers
 
-import config.FrontendAuthConnector
+import javax.inject.{Inject, Singleton}
+
+import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import play.api.data.Forms._
 import play.api.data._
-import play.api.i18n.Messages
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.json._
 import play.api.mvc.{Action, Request}
+import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.validators.Validators._
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
 
 import scala.concurrent.Future
-import uk.gov.hmrc.play.HeaderCarrierConverter
 
-trait ProblemReportsController extends FrontendController with ContactFrontendActions {
-
-  def hmrcDeskproConnector: HmrcDeskproConnector
-  def authConnector: AuthConnector
+@Singleton
+class ProblemReportsController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector)(implicit  appConfig : AppConfig, override val messagesApi : MessagesApi) extends FrontendController with ContactFrontendActions with I18nSupport {
 
   val form = Form[ProblemReport](
     mapping(
@@ -44,18 +42,18 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
   //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
   def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String], service: Option[String]) = UnauthorisedAction { implicit request =>
     val isSecure = secure.getOrElse(false)
-    val postEndpoint = if(isSecure) config.CFConfig.externalReportProblemSecureUrl else config.CFConfig.externalReportProblemUrl
+    val postEndpoint = if(isSecure) appConfig.externalReportProblemSecureUrl else appConfig.externalReportProblemUrl
     val csrfToken = preferredCsrfToken.orElse { if(isSecure) Some("{{csrfToken}}") else None }
 
     Ok(views.html.partials.error_feedback(postEndpoint, csrfToken, service))
   }
 
   def reportFormAjax(service: Option[String]) = UnauthorisedAction { implicit request =>
-    Ok(views.html.partials.error_feedback_inner(config.CFConfig.externalReportProblemSecureUrl, None, service))
+    Ok(views.html.partials.error_feedback_inner(appConfig.externalReportProblemSecureUrl, None, service))
   }
 
   def reportFormNonJavaScript(service: Option[String]) = UnauthorisedAction { implicit request =>
-    Ok(views.html.problem_reports_nonjavascript(config.CFConfig.externalReportProblemSecureUrl, service))
+    Ok(views.html.problem_reports_nonjavascript(appConfig.externalReportProblemSecureUrl, service))
   }
 
   def submitSecure = submit
@@ -120,9 +118,3 @@ trait ProblemReportsController extends FrontendController with ContactFrontendAc
 }
 
 case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referrer: Option[String])
-
-
-object ProblemReportsController extends ProblemReportsController {
-  override lazy val hmrcDeskproConnector = HmrcDeskproConnector
-  override lazy val authConnector = FrontendAuthConnector
-}

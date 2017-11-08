@@ -3,7 +3,7 @@ package controllers
 import play.api.mvc._
 import uk.gov.hmrc.play.config.RunMode
 
-object ApplicationController extends Controller with RunMode {
+class ApplicationController extends Controller with RunMode {
 
   def options(path: String) = Action {
     implicit request =>

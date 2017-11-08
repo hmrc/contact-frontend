@@ -1,19 +1,21 @@
 package controllers
 
-import config.FrontendAuthConnector
+import javax.inject.{Inject, Singleton}
+
+import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
+import play.api.Play.current
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.i18n.Messages.Implicits._
 import play.api.mvc.Request
 import play.filters.csrf.CSRF
-import uk.gov.hmrc.play.frontend.auth.{Actions, AuthContext}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.frontend.auth.{Actions, AuthContext, GovernmentGateway}
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import uk.gov.hmrc.play.validators.Validators
 import views.html.deskpro_error
-
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
 
 import scala.concurrent.Future
 
@@ -35,13 +37,10 @@ object ContactHmrcForm {
   )
 }
 
-trait ContactHmrcController extends FrontendController with Actions with DeskproSubmission {
+@Singleton
+class ContactHmrcController @Inject() (val hmrcDeskproConnector: HmrcDeskproConnector, authProvider : GovernmentGatewayAuthProvider, val authConnector : AuthConnector)(implicit appConfig : AppConfig) extends FrontendController with Actions with DeskproSubmission {
 
-  override implicit val authConnector = FrontendAuthConnector
-
-  lazy val GovernmentGateway: GovernmentGatewayAuthProvider = {
-    new GovernmentGatewayAuthProvider(routes.ContactHmrcController.index().url)
-  }
+  lazy val GovernmentGateway: GovernmentGateway = authProvider.forUrl(routes.ContactHmrcController.index().url)
 
   def index = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway, pageVisibility = GGConfidence).async {
     implicit user => implicit request =>
@@ -81,10 +80,6 @@ trait ContactHmrcController extends FrontendController with Actions with Deskpro
     Future.successful(result)
   }
 
-}
-
-object ContactHmrcController extends ContactHmrcController {
-  override val hmrcDeskproConnector = HmrcDeskproConnector
 }
 
 case class ContactForm(contactName: String, contactEmail: String, contactComments: String, isJavascript: Boolean, referer: String, csrfToken: String, service: Option[String] = Some("unknown"))
