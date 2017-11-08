@@ -18,7 +18,7 @@ import uk.gov.hmrc.play.validators.Validators._
 import scala.concurrent.Future
 
 @Singleton
-class ProblemReportsController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector)(implicit val authConnector : AuthConnector, appConfig : AppConfig, override val messagesApi : MessagesApi) extends FrontendController with ContactFrontendActions with I18nSupport {
+class ProblemReportsController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector)(implicit  appConfig : AppConfig, override val messagesApi : MessagesApi) extends FrontendController with ContactFrontendActions with I18nSupport {
 
   val form = Form[ProblemReport](
     mapping(

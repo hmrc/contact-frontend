@@ -20,7 +20,7 @@ import scala.util.Try
 import scala.util.matching.Regex
 
 @Singleton
-class SurveyController @Inject() (auditConnector : AuditConnector)(implicit val messagesApi : MessagesApi, val authConnector : AuthConnector, appConfig : AppConfig)
+class SurveyController @Inject() (auditConnector : AuditConnector, val authConnector : AuthConnector)(implicit val messagesApi : MessagesApi, appConfig : AppConfig)
   extends FrontendController
     with Actions with I18nSupport {
 

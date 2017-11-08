@@ -12,7 +12,7 @@ import views.html.deskpro_error
 import scala.concurrent.Future
 
 @Singleton
-class PartialsController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnector)(implicit val authConnector : AuthConnector, appConfig : AppConfig, override val messagesApi : MessagesApi) extends FrontendController with DeskproSubmission
+class PartialsController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector)(implicit appConfig : AppConfig, override val messagesApi : MessagesApi) extends FrontendController with DeskproSubmission
   with ContactFrontendActions with I18nSupport {
 
   def contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean]) = UnauthorisedAction.async {

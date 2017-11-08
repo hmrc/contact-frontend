@@ -18,7 +18,7 @@ import uk.gov.hmrc.play.validators.Validators
 import scala.concurrent.Future
 
 @Singleton
-class FeedbackController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnector, ggProvider : GovernmentGatewayAuthProvider)(implicit val authConnector : AuthConnector, appConfig : AppConfig, override val messagesApi : MessagesApi)
+class FeedbackController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnector, ggProvider : GovernmentGatewayAuthProvider, val authConnector : AuthConnector)(implicit appConfig : AppConfig, override val messagesApi : MessagesApi)
 extends FrontendController
   with Actions with DeskproSubmission with I18nSupport {
 

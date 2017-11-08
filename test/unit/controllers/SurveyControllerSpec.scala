@@ -82,5 +82,5 @@ class SurveyControllerSpec extends UnitSpec with OneAppPerSuite {
 
 
 class SurveyControllerApplication extends MockitoSugar {
-  val controller = new SurveyController( mock[AuditConnector])(mock[MessagesApi], mock[AuthConnector], new CFConfig(Configuration()))
+  val controller = new SurveyController(mock[AuditConnector], mock[AuthConnector])(mock[MessagesApi], new CFConfig(Configuration()))
 }

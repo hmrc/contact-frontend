@@ -38,7 +38,7 @@ object ContactHmrcForm {
 }
 
 @Singleton
-class ContactHmrcController @Inject() (val hmrcDeskproConnector: HmrcDeskproConnector, authProvider : GovernmentGatewayAuthProvider)(implicit val authConnector : AuthConnector, appConfig : AppConfig) extends FrontendController with Actions with DeskproSubmission {
+class ContactHmrcController @Inject() (val hmrcDeskproConnector: HmrcDeskproConnector, authProvider : GovernmentGatewayAuthProvider, val authConnector : AuthConnector)(implicit appConfig : AppConfig) extends FrontendController with Actions with DeskproSubmission {
 
   lazy val GovernmentGateway: GovernmentGateway = authProvider.forUrl(routes.ContactHmrcController.index().url)
 
