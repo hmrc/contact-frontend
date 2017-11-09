@@ -15,18 +15,24 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.play.frontend.controller.FrontendController
-import uk.gov.hmrc.play.validators.Validators
+import util.DeskproEmailValidator
 import views.html.deskpro_error
 
 import scala.concurrent.Future
 
 object ContactHmrcForm {
+
+  private val emailValidator = new DeskproEmailValidator()
+  private val validateEmail: (String) => Boolean = emailValidator.validate
+
   val form = Form[ContactForm](
     mapping(
       "contact-name" -> text
         .verifying("error.common.problem_report.name_mandatory", name => !name.trim.isEmpty)
         .verifying("error.common.problem_report.name_too_long", name => name.size <= 70),
-      "contact-email" -> Validators.emailWithDomain.verifying("deskpro.email_too_long", email => email.size <= 255),
+      "contact-email" -> text
+        .verifying("error.email", validateEmail)
+        .verifying("deskpro.email_too_long", email => email.size <= 255),
       "contact-comments" -> text
         .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)
         .verifying("error.common.comments_too_long", comment => comment.size <= 2000),

@@ -14,7 +14,7 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
 import uk.gov.hmrc.play.frontend.controller.FrontendController
-import uk.gov.hmrc.play.validators.Validators
+import util.DeskproEmailValidator
 
 import scala.concurrent.Future
 
@@ -112,6 +112,9 @@ object FeedbackFormBind {
 
   import controllers.FeedbackFormConfig._
 
+  private val emailValidator = new DeskproEmailValidator()
+  private val validateEmail: (String) => Boolean = emailValidator.validate
+
   val form = Form[FeedbackForm](mapping(
     "feedback-rating" -> optional(text)
       .verifying("error.common.feedback.rating_mandatory", rating => rating.isDefined && !rating.get.trim.isEmpty)
@@ -121,7 +124,9 @@ object FeedbackFormBind {
       .verifying("error.common.feedback.name_mandatory", name => !name.trim.isEmpty)
       .verifying("error.common.feedback.name_too_long", name => name.size <= 70),
 
-    "feedback-email" -> Validators.emailWithDomain.verifying("deskpro.email_too_long", email => email.size <= 255),
+    "feedback-email" -> text
+      .verifying("error.email", validateEmail)
+      .verifying("deskpro.email_too_long", email => email.size <= 255),
 
     "feedback-comments" -> text
       .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)

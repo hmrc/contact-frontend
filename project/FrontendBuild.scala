@@ -28,6 +28,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "frontend-bootstrap" % "8.8.0",
     "uk.gov.hmrc" %% "url-builder" % "2.1.0",
     "uk.gov.hmrc" %% "auth-client" % "2.3.0",
+    "commons-validator" % "commons-validator" % "1.6",
     "org.apache.httpcomponents" % "httpclient" % DependencyVersions.apacheHttpComponentsCore
   )
 

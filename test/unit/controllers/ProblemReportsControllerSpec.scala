@@ -21,6 +21,7 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.test.UnitSpec
+import util.DeskproEmailValidator
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -94,7 +95,13 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
     }
 
     "fail if the email has invalid syntax (for DeskPRO)" in new ProblemReportsControllerApplication(app) {
-      val submit = controller.doReport()(generateRequest(javascriptEnabled = false, email = "a@a"))
+      val failingEmailValidator = new DeskproEmailValidator {
+        override def validate(email: String): Boolean = false
+      }
+
+      val failingController = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector, failingEmailValidator)(new CFConfig(app.configuration), app.injector.instanceOf[MessagesApi])
+
+      val submit = failingController.doReport()(generateRequest(javascriptEnabled = false, email = "a@a"))
       val page = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe 200
@@ -155,7 +162,11 @@ class ProblemReportsControllerApplication(app : Application) extends MockitoSuga
     }
   }
 
-  val controller = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector)(new CFConfig(app.configuration), app.injector.instanceOf[MessagesApi])
+  val emailValidator = new DeskproEmailValidator {
+    override def validate(email: String): Boolean = true
+  }
+
+  val controller = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector, emailValidator)(new CFConfig(app.configuration), app.injector.instanceOf[MessagesApi])
 
   val deskproName: String = "John Densmore"
   val deskproEmail: String = "name@mail.com"
