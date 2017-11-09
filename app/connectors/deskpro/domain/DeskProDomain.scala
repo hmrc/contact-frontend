@@ -1,11 +1,10 @@
 package connectors.deskpro.domain
 
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Request
-import uk.gov.hmrc.domain._
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
-import uk.gov.hmrc.http.{ HeaderCarrier, SessionKeys }
+import uk.gov.hmrc.auth.core.Enrolments
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 case class Ticket private(name: String,
                           email: String,
@@ -37,9 +36,9 @@ object Ticket extends FieldTransformer {
              isJavascript: Boolean,
              hc: HeaderCarrier,
              request: Request[AnyRef],
-             accountsOption: Option[Accounts],
-             service: Option[String]): Ticket =
-    Ticket(
+             enrolments: Option[Enrolments],
+             service: Option[String]): Ticket = {
+    val ticket = Ticket(
       name.trim,
       email,
       subject,
@@ -50,8 +49,11 @@ object Ticket extends FieldTransformer {
       userIdFrom(request, hc),
       areaOfTaxOf,
       sessionIdFrom(hc),
-      userTaxIdentifiersFromAccounts(accountsOption),
+      userTaxIdentifiersFromEnrolments(enrolments),
       service)
+    Logger.info(s"Creating ticket $ticket")
+    ticket
+  }
 }
 
 object TicketId {
@@ -61,11 +63,11 @@ object TicketId {
 case class TicketId(ticket_id: Int)
 
 
-case class UserTaxIdentifiers(nino: Option[Nino],
-                              ctUtr: Option[CtUtr],
-                              utr: Option[SaUtr],
-                              vrn: Option[Vrn],
-                              empRef: Option[EmpRef])
+case class UserTaxIdentifiers(nino: Option[String],
+                              ctUtr: Option[String],
+                              utr: Option[String],
+                              vrn: Option[String],
+                              empRef: Option[String])
 
 
 case class Feedback(name: String,
@@ -96,7 +98,7 @@ object Feedback extends FieldTransformer {
              isJavascript: Boolean,
              hc: HeaderCarrier,
              request: Request[AnyRef],
-             accounts: Option[Accounts],
+             enrolments: Option[Enrolments],
              service: Option[String]): Feedback =
     Feedback(
       name.trim,
@@ -110,7 +112,7 @@ object Feedback extends FieldTransformer {
       userIdFrom(request, hc),
       areaOfTaxOf,
       sessionIdFrom(hc),
-      userTaxIdentifiersFromAccounts(accounts),
+      userTaxIdentifiersFromEnrolments(enrolments),
       service)
 }
 
@@ -132,18 +134,24 @@ trait FieldTransformer {
 
   def ynValueOf(javascript: Boolean) = if (javascript) "Y" else "N"
 
-  def userTaxIdentifiersOf(userOption: Option[AuthContext]) = {
-    userTaxIdentifiersFromAccounts(userOption.map(_.principal.accounts))
+  private def extractIdentifier(enrolments: Enrolments, enrolment : String, identifierKey : String): Option[String] = {
+    enrolments.getEnrolment(enrolment).flatMap(_.identifiers.find(_.key == identifierKey)).map(_.value)
   }
 
-  def userTaxIdentifiersFromAccounts(accountsOption: Option[Accounts]) = {
-    accountsOption.map {
-      accounts =>
-        val nino = accounts.paye.map(paye => paye.nino)
-        val saUtr = accounts.sa.map(sa => sa.utr)
-        val ctUtr = accounts.ct.map(ct => ct.utr)
-        val vrn = accounts.vat.map(vat => vat.vrn)
-        val empRef = accounts.epaye.map(epaye => epaye.empRef)
+  def userTaxIdentifiersFromEnrolments(enrolmentsOption: Option[Enrolments]) = {
+    enrolmentsOption.map {
+      enrolments =>
+        val nino = extractIdentifier(enrolments, "HMRC-NI", "NINO")
+        val saUtr = extractIdentifier(enrolments, "IR-SA", "UTR")
+        val ctUtr = extractIdentifier(enrolments, "IR-CT", "UTR")
+        val vrn = extractIdentifier(enrolments, "HMCE-VATDEC-ORG", "VATRegNo")
+            .orElse(extractIdentifier(enrolments, "HMCE-VATVAR-ORG", "VATRegNo"))
+
+        val empRef = for (
+          taxOfficeNumber <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeNumber");
+          taxOfficeRef <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeReference")
+        ) yield s"$taxOfficeNumber/$taxOfficeRef"
+
         UserTaxIdentifiers(nino, ctUtr, saUtr, vrn, empRef)
     }.getOrElse(UserTaxIdentifiers(None, None, None, None, None))
   }

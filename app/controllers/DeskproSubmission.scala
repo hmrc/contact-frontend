@@ -3,10 +3,10 @@ package controllers
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import play.api.mvc.{AnyContent, Request}
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
+import uk.gov.hmrc.auth.core.Enrolments
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 trait DeskproSubmission {
 
@@ -14,7 +14,7 @@ trait DeskproSubmission {
 
   protected def hmrcDeskproConnector: HmrcDeskproConnector
 
-  def createDeskproTicket(data: ContactForm, accounts: Option[Accounts])(implicit request: Request[AnyContent], hc: HeaderCarrier) : Future[TicketId] = {
+  def createDeskproTicket(data: ContactForm, enrolments: Option[Enrolments])(implicit request: Request[AnyContent], hc: HeaderCarrier) : Future[TicketId] = {
     hmrcDeskproConnector.createDeskProTicket(
       name = data.contactName,
       email = data.contactEmail,
@@ -23,11 +23,11 @@ trait DeskproSubmission {
       referrer = data.referer,
       isJavascript = data.isJavascript,
       request = request,
-      accountsOption = accounts,
+      enrolmentsOption = enrolments,
       service = data.service)
   }
 
-  def createDeskproFeedback(data: FeedbackForm, accounts: Option[Accounts])(implicit request: Request[AnyContent], hc: HeaderCarrier) : Future[TicketId] = {
+  def createDeskproFeedback(data: FeedbackForm, enrolments: Option[Enrolments])(implicit request: Request[AnyContent], hc: HeaderCarrier) : Future[TicketId] = {
     hmrcDeskproConnector.createFeedback(
       name = data.name,
       email = data.email,
@@ -37,7 +37,7 @@ trait DeskproSubmission {
       referrer = data.referrer,
       isJavascript = data.javascriptEnabled,
       request = request,
-      accountsOption = accounts,
+      enrolmentsOption = enrolments,
       service = data.service)
   }
 }

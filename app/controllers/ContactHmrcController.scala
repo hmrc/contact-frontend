@@ -5,14 +5,15 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
-import play.api.Play.current
+import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.Messages.Implicits._
-import play.api.mvc.Request
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, Request}
 import play.filters.csrf.CSRF
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.auth.{Actions, AuthContext, GovernmentGateway}
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import uk.gov.hmrc.play.validators.Validators
 import views.html.deskpro_error
@@ -38,28 +39,33 @@ object ContactHmrcForm {
 }
 
 @Singleton
-class ContactHmrcController @Inject() (val hmrcDeskproConnector: HmrcDeskproConnector, authProvider : GovernmentGatewayAuthProvider, val authConnector : AuthConnector)(implicit appConfig : AppConfig) extends FrontendController with Actions with DeskproSubmission {
+class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector, val authConnector : AuthConnector, val configuration : Configuration)(implicit
+                                                                                      val appConfig : AppConfig,
+                                                                                      override val messagesApi : MessagesApi)
+  extends FrontendController with DeskproSubmission with AuthorisedFunctions with LoginRedirection with I18nSupport {
 
-  lazy val GovernmentGateway: GovernmentGateway = authProvider.forUrl(routes.ContactHmrcController.index().url)
-
-  def index = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway, pageVisibility = GGConfidence).async {
-    implicit user => implicit request =>
+  def index = Action.async { implicit request =>
+    loginRedirection(routes.ContactHmrcController.index().url)(
+    authorised(AuthProviders(GovernmentGateway))({
       Future.successful {
         val referer = request.headers.get("Referer").getOrElse("n/a")
         val csrfToken = CSRF.getToken(request).map{ _.value }.getOrElse("")
         Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None))))
       }
-  })
+    }))
+  }
 
-  def submit = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway, pageVisibility = GGConfidence).async {
-    implicit user => implicit request =>
+  def submit = Action.async { implicit request =>
+    loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments){
+      allEnrolments =>
 
       ContactHmrcForm.form.bindFromRequest()(request).fold(
         error => {
           Future.successful(BadRequest(views.html.contact_hmrc(error)))
         },
         data => {
-          val ticketIdF: Future[TicketId] = createDeskproTicket(data, Some(user.principal.accounts))
+          val ticketIdF: Future[TicketId] = createDeskproTicket(data, Some(allEnrolments))
+
 
           ticketIdF.map{ ticketId =>
             Redirect(routes.ContactHmrcController.thanks()).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
@@ -67,13 +73,16 @@ class ContactHmrcController @Inject() (val hmrcDeskproConnector: HmrcDeskproConn
             case _ => InternalServerError(deskpro_error())
           }
         })
-  })
+    })
+  }
 
-  def thanks = WithNewSessionTimeout(AuthenticatedBy(GovernmentGateway, pageVisibility = GGConfidence).async({
-    implicit user => implicit request => doThanks(user, request)
-  }))
+  def thanks =  Action.async { implicit request =>
+    loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway))({
+      doThanks(request)
+    }))
+  }
 
-  def doThanks(implicit user: AuthContext, request: Request[AnyRef]) = {
+  def doThanks(implicit request: Request[AnyRef]) = {
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
       Ok(views.html.contact_hmrc_confirmation(ticketId))
     }

@@ -27,6 +27,7 @@ private object AppDependencies {
   val compile = Seq(
     "uk.gov.hmrc" %% "frontend-bootstrap" % "8.8.0",
     "uk.gov.hmrc" %% "url-builder" % "2.1.0",
+    "uk.gov.hmrc" %% "auth-client" % "2.3.0",
     "org.apache.httpcomponents" % "httpclient" % DependencyVersions.apacheHttpComponentsCore
   )
 

@@ -3,7 +3,7 @@ package support.stubs
 import java.net.URLEncoder
 import java.util.UUID
 
-import com.github.tomakehurst.wiremock.client.UrlMatchingStrategy
+import com.github.tomakehurst.wiremock.client.{UrlMatchingStrategy, WireMock}
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.libs.Crypto
 import play.mvc.Http.HeaderNames
@@ -95,25 +95,21 @@ object Login extends Stub with SessionCookieBaker {
       .withHeader(HeaderNames.LOCATION, "http://localhost:9000/contact/contact-hmrc")))
 
     val body = s"""
-                 |{
-                 |    "uri": "/auth/oid/1234567890",
-                 |    "loggedInAt": "2014-06-09T14:57:09.522Z",
-                 |    "previouslyLoggedInAt": "2014-06-09T14:48:24.841Z",
-                 |    "accounts": {
-                 |    },
-                 |    "legacyOid": "",
-                 |    "levelOfAssurance": "2",
-                 |    "credentialStrength": "weak",
-                 |    "confidenceLevel" : 50
-                 |}
+                 |{ "allEnrolments" : []}
                  """.stripMargin
 
-    stubFor(get(urlEqualTo("/auth/authority"))
+    stubFor(post(urlEqualTo("/auth/authorise")).atPriority(1).withHeader(HeaderNames.AUTHORIZATION, WireMock.matching(".*"))
       .willReturn(
         aResponse()
           .withStatus(200)
           .withBody(body)))
 
+    stubFor(post(urlEqualTo("/auth/authorise")).atPriority(2)
+      .willReturn(
+        aResponse()
+          .withStatus(401)
+            .withHeader("WWW-Authenticate", "MDTP detail=\"MissingBearerToken\"")
+          .withBody("{}")))
 
   }
 

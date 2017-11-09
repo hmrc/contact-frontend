@@ -6,40 +6,37 @@ import config.AppConfig
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data.{Form, FormError}
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Request, Result}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, Request, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 import scala.util.Try
 import scala.util.matching.Regex
 
 @Singleton
-class SurveyController @Inject() (auditConnector : AuditConnector, val authConnector : AuthConnector)(implicit val messagesApi : MessagesApi, appConfig : AppConfig)
-  extends FrontendController
-    with Actions with I18nSupport {
+class SurveyController @Inject() (auditConnector : AuditConnector)(implicit val messagesApi : MessagesApi, appConfig : AppConfig)
+  extends FrontendController with I18nSupport {
 
   val TICKET_ID_REGEX      = new Regex("^HMRC-([A-Z0-9]|#){1,8}+$")
   val TICKET_ID_MAX_LENGTH = 5+8
 
   def validateTicketId(ticketId:String) = TICKET_ID_REGEX.findFirstIn(ticketId).isDefined
 
-  def survey(ticketId: String, serviceId: String) = UnauthorisedAction.async { implicit request =>
+  def survey(ticketId: String, serviceId: String) = Action.async { implicit request =>
     Future.successful(
       Ok(views.html.survey(ticketId, serviceId))
     )
   }
 
-  def submit() = UnauthorisedAction.async { implicit request =>
+  def submit() = Action.async { implicit request =>
     Future.successful(submitSurveyAction)
   }
 
-  def confirmation() = UnauthorisedAction.async { implicit request =>
+  def confirmation() = Action.async { implicit request =>
     Future.successful(
       Ok(views.html.survey_confirmation())
     )
