@@ -7,8 +7,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 class ContactFrontendModule extends Module {
   override def bindings(environment: Environment, configuration: Configuration) = {
     Seq(
-      bind[AppConfig].to[CFConfig],
-      bind[AuthConnector].to[ContactFrontendAuthConnector]
+      bind[AppConfig].to[CFConfig]
     )
   }
 }

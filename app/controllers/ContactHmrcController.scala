@@ -45,7 +45,8 @@ object ContactHmrcForm {
 }
 
 @Singleton
-class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector, val authConnector : AuthConnector, val configuration : Configuration)(implicit
+class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector, val authConnector : AuthConnector,
+                                      val configuration : Configuration, val environment: Environment)(implicit
                                                                                       val appConfig : AppConfig,
                                                                                       override val messagesApi : MessagesApi)
   extends FrontendController with DeskproSubmission with AuthorisedFunctions with LoginRedirection with I18nSupport {

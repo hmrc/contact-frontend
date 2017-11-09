@@ -19,7 +19,7 @@ import util.DeskproEmailValidator
 import scala.concurrent.Future
 
 @Singleton
-class FeedbackController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector, val configuration : Configuration)(implicit
+class FeedbackController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector, val configuration : Configuration, val environment: Environment)(implicit
                                                                                     val appConfig : AppConfig,
                                                                                     override val messagesApi : MessagesApi)
 extends FrontendController with DeskproSubmission with I18nSupport with AuthorisedFunctions with LoginRedirection {
