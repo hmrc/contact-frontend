@@ -134,8 +134,8 @@ trait FieldTransformer {
 
   def ynValueOf(javascript: Boolean) = if (javascript) "Y" else "N"
 
-  private def extractIdentifier(enrolments: Enrolments, enrollment : String, identifierKey : String): Option[String] = {
-    enrolments.getEnrolment(enrollment).flatMap(_.identifiers.find(_.key == identifierKey)).map(_.value)
+  private def extractIdentifier(enrolments: Enrolments, enrolment : String, identifierKey : String): Option[String] = {
+    enrolments.getEnrolment(enrolment).flatMap(_.identifiers.find(_.key == identifierKey)).map(_.value)
   }
 
   def userTaxIdentifiersFromEnrolments(enrolmentsOption: Option[Enrolments]) = {

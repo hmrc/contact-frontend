@@ -45,8 +45,8 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
 
   def submit = Action.async { implicit request =>
     authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments){
-        allEnrollments =>
-      doSubmit(Some(allEnrollments))
+        allEnrolments =>
+      doSubmit(Some(allEnrolments))
     }
   }
 
@@ -64,13 +64,13 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
     implicit request => doThanks(false, request)
   }
 
-  private def doSubmit(enrollments: Option[Enrolments])(implicit request: Request[AnyContent]): Future[Result] =
+  private def doSubmit(enrolments: Option[Enrolments])(implicit request: Request[AnyContent]): Future[Result] =
     FeedbackFormBind.form.bindFromRequest()(request).fold(
-      error => Future.successful(BadRequest(feedbackView(enrollments.isDefined, error))),
+      error => Future.successful(BadRequest(feedbackView(enrolments.isDefined, error))),
       data => {
-        val ticketIdF = createDeskproFeedback(data, enrollments)
+        val ticketIdF = createDeskproFeedback(data, enrolments)
         ticketIdF map { ticketId =>
-          Redirect(enrollments.map(_ => routes.FeedbackController.thanks()).getOrElse(routes.FeedbackController.unauthenticatedThanks())).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+          Redirect(enrolments.map(_ => routes.FeedbackController.thanks()).getOrElse(routes.FeedbackController.unauthenticatedThanks())).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
         }
       }
     )

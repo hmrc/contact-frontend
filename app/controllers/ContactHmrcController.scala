@@ -57,14 +57,14 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
 
   def submit = Action.async { implicit request =>
     loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments){
-      allEnrollments =>
+      allEnrolments =>
 
       ContactHmrcForm.form.bindFromRequest()(request).fold(
         error => {
           Future.successful(BadRequest(views.html.contact_hmrc(error)))
         },
         data => {
-          val ticketIdF: Future[TicketId] = createDeskproTicket(data, Some(allEnrollments))
+          val ticketIdF: Future[TicketId] = createDeskproTicket(data, Some(allEnrolments))
 
 
           ticketIdF.map{ ticketId =>
