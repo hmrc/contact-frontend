@@ -7,12 +7,12 @@ import connectors.deskpro.HmrcDeskproConnector
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.libs.json._
+import play.api.libs.json.Json
 import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
-import _root_.util.DeskproEmailValidator
+import util.DeskproEmailValidator
 
 import scala.concurrent.Future
 
