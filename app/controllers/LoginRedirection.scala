@@ -3,12 +3,12 @@ package controllers
 import config.AppConfig
 import play.api.Configuration
 import play.api.mvc.{Result, Results}
-import uk.gov.hmrc.auth.core.{AuthorisationException, NoActiveSession}
+import uk.gov.hmrc.auth.core.NoActiveSession
 import uk.gov.hmrc.play.config.RunMode
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait LoginRedirection extends Results {
+trait LoginRedirection extends Results with RunMode {
 
   def appConfig : AppConfig
 
@@ -17,7 +17,6 @@ trait LoginRedirection extends Results {
   def loginRedirection[B <: Result](continueUrl: String)(body: Future[B])(implicit ec : ExecutionContext) : Future[Result] = {
     body.recoverWith {
       case _: NoActiveSession => Future.successful(redirectForLogin(continueUrl))
-      case e: AuthorisationException => Future.successful(Unauthorized(s"Authorisation failed. Reason: ${e.reason}"))
     }
   }
 
@@ -27,7 +26,7 @@ trait LoginRedirection extends Results {
         .orElse(configuration.getString("appName"))
         .getOrElse("undefined")
 
-      lazy val companyAuthUrl = configuration.getString(s"govuk-tax.${RunMode.env}.company-auth.host").getOrElse("")
+      lazy val companyAuthUrl = configuration.getString(s"govuk-tax.$env.company-auth.host").getOrElse("")
       val loginURL: String = s"$companyAuthUrl/gg/sign-in"
       val continueURL: String = appConfig.loginCallback(continueUrl)
 

@@ -8,24 +8,27 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Request, Result}
-import play.api.{Configuration, Logger}
+import play.api.{Configuration, Environment, Logger}
 import play.filters.csrf.CSRF
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.DeskproEmailValidator
 
 import scala.concurrent.Future
 
 @Singleton
-class FeedbackController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector, val configuration : Configuration)(implicit
+class FeedbackController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector, val configuration : Configuration, val environment: Environment)(implicit
                                                                                     val appConfig : AppConfig,
                                                                                     override val messagesApi : MessagesApi)
 extends FrontendController with DeskproSubmission with I18nSupport with AuthorisedFunctions with LoginRedirection {
 
   val formId = "FeedbackForm"
 
+  override protected def mode = environment.mode
+
+  override protected def runModeConfiguration = configuration
 
   def feedbackForm(service: Option[String] = None) = Action.async { implicit request =>
     loginRedirection(routes.FeedbackController.feedbackForm(None).url)(authorised(AuthProviders(GovernmentGateway)) {

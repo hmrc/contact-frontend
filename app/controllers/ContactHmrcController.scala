@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
-import play.api.Configuration
+import play.api.{Configuration, Environment}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -14,7 +14,7 @@ import play.filters.csrf.CSRF
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.DeskproEmailValidator
 import views.html.deskpro_error
 
@@ -45,10 +45,15 @@ object ContactHmrcForm {
 }
 
 @Singleton
-class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector, val authConnector : AuthConnector, val configuration : Configuration)(implicit
+class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector, val authConnector : AuthConnector,
+                                      val configuration : Configuration, val environment: Environment)(implicit
                                                                                       val appConfig : AppConfig,
                                                                                       override val messagesApi : MessagesApi)
   extends FrontendController with DeskproSubmission with AuthorisedFunctions with LoginRedirection with I18nSupport {
+
+  override protected def mode = environment.mode
+
+  override protected def runModeConfiguration = configuration
 
   def index = Action.async { implicit request =>
     loginRedirection(routes.ContactHmrcController.index().url)(

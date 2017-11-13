@@ -9,7 +9,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.Application
+import play.api.{Application, Environment}
 import play.api.i18n.MessagesApi
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -166,7 +166,7 @@ class ProblemReportsControllerApplication(app : Application) extends MockitoSuga
     override def validate(email: String): Boolean = true
   }
 
-  val controller = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector, emailValidator)(new CFConfig(app.configuration), app.injector.instanceOf[MessagesApi])
+  val controller = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector, emailValidator)(new CFConfig(Environment.simple(), app.configuration), app.injector.instanceOf[MessagesApi])
 
   val deskproName: String = "John Densmore"
   val deskproEmail: String = "name@mail.com"

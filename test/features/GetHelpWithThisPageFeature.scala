@@ -60,7 +60,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
 
       And("I get a bad request error")
       eventualResponse.futureValue.status shouldBe 403
-      eventualResponse.futureValue.body shouldBe "No CSRF token found in headers"
+      eventualResponse.futureValue.body should include("No CSRF token found in headers")
     }
 
     scenario("The problem report form toggles") {
