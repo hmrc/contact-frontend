@@ -95,13 +95,8 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
     }
 
     "fail if the email has invalid syntax (for DeskPRO)" in new ProblemReportsControllerApplication(app) {
-      val failingEmailValidator = new DeskproEmailValidator {
-        override def validate(email: String): Boolean = false
-      }
 
-      val failingController = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector, failingEmailValidator)(new CFConfig(Environment.simple(), app.configuration), app.injector.instanceOf[MessagesApi])
-
-      val submit = failingController.doReport()(generateRequest(javascriptEnabled = false, email = "a@a"))
+      val submit = controller.doReport()(generateRequest(javascriptEnabled = false, email = "a@a"))
       val page = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe 200
@@ -162,11 +157,7 @@ class ProblemReportsControllerApplication(app : Application) extends MockitoSuga
     }
   }
 
-  val emailValidator = new DeskproEmailValidator {
-    override def validate(email: String): Boolean = true
-  }
-
-  val controller = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector, emailValidator)(new CFConfig(Environment.simple(), app.configuration), app.injector.instanceOf[MessagesApi])
+  val controller = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector)(new CFConfig(Environment.simple(), app.configuration), app.injector.instanceOf[MessagesApi])
 
   val deskproName: String = "John Densmore"
   val deskproEmail: String = "name@mail.com"
