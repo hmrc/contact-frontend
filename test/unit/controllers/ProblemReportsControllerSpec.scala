@@ -99,7 +99,7 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
         override def validate(email: String): Boolean = false
       }
 
-      val failingController = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector, failingEmailValidator)(new CFConfig(app.configuration), app.injector.instanceOf[MessagesApi])
+      val failingController = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector, failingEmailValidator)(new CFConfig(Environment.simple(), app.configuration), app.injector.instanceOf[MessagesApi])
 
       val submit = failingController.doReport()(generateRequest(javascriptEnabled = false, email = "a@a"))
       val page = Jsoup.parse(contentAsString(submit))
