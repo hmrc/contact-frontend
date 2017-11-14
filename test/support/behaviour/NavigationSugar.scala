@@ -7,8 +7,7 @@ import org.scalatest.selenium.WebBrowser
 import org.scalatest.selenium.WebBrowser.{go => goo}
 import org.scalatest.{Assertions, ShouldMatchers}
 import support.page.WebPage
-import support.page.WebPage
-import support.steps.Env
+import support.util.Env
 
 
 trait NavigationSugar extends WebBrowser with Eventually with Assertions with ShouldMatchers with IntegrationPatience {

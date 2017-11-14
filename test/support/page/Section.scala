@@ -2,7 +2,7 @@ package support.page
 
 import org.openqa.selenium.{By, WebDriver, WebElement}
 import org.scalatest.selenium.WebBrowser
-import support.steps.Env
+import support.util.Env
 
 import scala.util.Try
 

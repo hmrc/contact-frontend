@@ -1,10 +1,9 @@
 package support.modules
 
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
-import org.openqa.selenium.{Keys, By, WebDriver}
+import org.openqa.selenium.{By, WebDriver}
 import org.scalatest.selenium.WebBrowser
-import support.page._
-import support.steps.Env
+import support.util.Env
 
 trait SharedPageModules {
 
@@ -37,7 +36,7 @@ trait SharedPageModules {
 
     def sendBtn = id("report-submit")
 
-    def ticketId = id("ticketId").element.attribute("value")
+    def ccsTicketId = id("ticketId").element.attribute("value")
 
     def problemReportHidden: Boolean = {
       val hidden = webDriver.findElements(By.xpath("//*[contains(@class, 'report-error') and contains(@class, 'hidden')]"))

@@ -2,8 +2,9 @@ package smoke
 
 import org.scalatest.AcceptanceSpec
 import support.behaviour.NavigationSugar
-import support.page.{UnauthenticatedFeedbackPage, ContactHmrcPage}
-import support.steps.{DeskproSteps, NavigationSteps, ObservationSteps, SmokeSteps}
+import support.page.{ContactHmrcPage, UnauthenticatedFeedbackPage}
+import support.steps.{DeskproSteps, ObservationSteps, SmokeSteps}
+import uk.gov.hmrc.integration.util.RandomUtils
 
 class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with ObservationSteps with SmokeSteps with DeskproSteps {
 
@@ -13,9 +14,9 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
     info("As a Tax Payer")
     info("I want to contact HMRC")
 
-
     Scenario("Problem report - Get help with this page") {
       Given("Tax payer Bill goes to the Feedback page")
+
       goOn(UnauthenticatedFeedbackPage)
 
       UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
@@ -28,7 +29,7 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
             "Someone will get back to you within 2 working days.")
 
       And("Support agent Ann receives a ticket via Deskpro")
-      ticket_in_deskpro_exists(UnauthenticatedFeedbackPage.getHelpWithThisPage.ticketId.value, Name, Email, Seq(WhatIWasDoing, WhatWentWrong))
+      ticket_is_created_in_deskpro(UnauthenticatedFeedbackPage.getHelpWithThisPage.ccsTicketId.value, Name, Email, Seq(WhatIWasDoing, WhatWentWrong))
     }
 
 
@@ -44,8 +45,8 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
       i_see("Thank you",
             "Your feedback has been received.")
 
-      And("Support agent Ann receives a ticket via Deskpro")
-      ticket_in_deskpro_exists(UnauthenticatedFeedbackPage.getHelpWithThisPage.ticketId.value, Name, Email, Seq(Comment))
+      And("Ticket is created in hmrc-deskpro")
+      ticket_is_created_in_hmrc_deskpro(UnauthenticatedFeedbackPage.getHelpWithThisPage.ccsTicketId.value)
     }
 
 
@@ -61,15 +62,15 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
       i_see("Thank you",
         "Someone will get back to you within 2 working days.")
 
-      And("Support agent Ann receives a ticket via Deskpro")
-      ticket_in_deskpro_exists(ContactHmrcPage.getHelpWithThisPage.ticketId.value, Name, Email, Seq(Comment))
+      And("Ticket is created in hmrc-deskpro")
+      ticket_is_created_in_hmrc_deskpro(ContactHmrcPage.getHelpWithThisPage.ccsTicketId.value)
     }
   }
-
-  private val Name = "Grumpy Bear"
-  private val Email = "grumpy@carebears.com"
-  private val WhatIWasDoing = "I was trying to do something"
-  private val WhatWentWrong = "I could not figure out how"
-  private val Comment = "I am writing a comment"
+  private val randomString = RandomUtils.randString(5)
+  private val Name = s"Grumpy Bear ${randomString}"
+  private val Email = s"grumpy_${randomString}@carebears.com"
+  private val WhatIWasDoing = s"I was trying to do something ${randomString}"
+  private val WhatWentWrong = s"I could not figure out how ${randomString}"
+  private val Comment = s"I am writing a comment ${randomString}"
 
 }
