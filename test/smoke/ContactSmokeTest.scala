@@ -27,9 +27,6 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
       Then("He sees a success message")
       i_see("Thank you",
             "Someone will get back to you within 2 working days.")
-
-      And("Support agent Ann receives a ticket via Deskpro")
-      ticket_is_created_in_deskpro(UnauthenticatedFeedbackPage.getHelpWithThisPage.ccsTicketId.value, Name, Email, Seq(WhatIWasDoing, WhatWentWrong))
     }
 
 
@@ -44,9 +41,6 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
       Then("He sees a success message")
       i_see("Thank you",
             "Your feedback has been received.")
-
-      And("Ticket is created in hmrc-deskpro")
-      ticket_is_created_in_hmrc_deskpro(UnauthenticatedFeedbackPage.getHelpWithThisPage.ccsTicketId.value)
     }
 
 
@@ -61,9 +55,6 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
       Then("He sees a success message")
       i_see("Thank you",
         "Someone will get back to you within 2 working days.")
-
-      And("Ticket is created in hmrc-deskpro")
-      ticket_is_created_in_hmrc_deskpro(ContactHmrcPage.getHelpWithThisPage.ccsTicketId.value)
     }
   }
   private val randomString = RandomUtils.randString(5)
