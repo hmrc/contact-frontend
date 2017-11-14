@@ -14,9 +14,9 @@
     <input type="hidden" name="service" value="@{service.get}"/>
     }
 
+    <label class="form-label">@Messages("form.name")</label>
     @input(
         problemForm("report-name"),
-        '_label -> Messages("form.name"),
         '_divClass -> "form-group-compound",
         '_inputClass -> "input--fullwidth form-control"
     )
