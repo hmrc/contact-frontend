@@ -16,43 +16,27 @@
 
     <fieldset>
         <legend class="visuallyhidden">@Messages("common.feedback.title")</legend>
+
+        <div class="form-group-compound">
+            <label for="report-name" class="form-label">@Messages("form.name")</label>
+            <input id="report-name" maxlength="70" class="input--fullwidth form-control" name="report-name" type="text"  data-rule-letterswithbasicpunc="true" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory")'>
+        </div>
+        <div class="form-group-compound">
+            <label for="report-email" class="form-label">@Messages("problem_report.email")</label>
+            <input id="report-email" maxlength="255" class="input--fullwidth form-control" name="report-email" type="email" data-rule-required="true" data-rule-email="true" data-msg-required='@Messages("error.common.problem_report.email_mandatory")'>
+        </div>
+        <div class="form-group-compound">
+            <label for="report-action" class="form-label">@Messages("problem_report.action")</label>
+            <input id="report-action" maxlength="1000" class="input--fullwidth form-control" name="report-action" type="text" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.action_mandatory")'>
+        </div>
         <div class="form-group-compound">
             <label for="report-error" class="form-label">@Messages("problem_report.error")</label>
             <input id="report-error" maxlength="1000" class="input--fullwidth form-control" name="report-error"  type="text" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.error_mandatory")'>
         </div>
 
-        @input(
-        problemForm("report-name"),
-        '_label -> Messages("form.name"),
-        '_divClass -> "form-group-compound",
-        '_inputClass -> "input--input--fullwidth form-control"
-        )
-        @input(
-        problemForm("report-email"),
-        '_label -> Messages("problem_report.email"),
-        '_divClass -> "form-group-compound",
-        '_inputClass -> "input--fullwidth form-control",
-        '_type -> "email"
-        )
-        @input(
-        problemForm("report-action"),
-        '_label -> Messages("problem_report.action"),
-        '_divClass -> "form-group-compound",
-        '_inputClass -> "input--fullwidth form-control",
-        '_type -> "text"
-        )
-        @input(
-        problemForm("report-error"),
-        '_label -> Messages("problem_report.error"),
-        '_divClass -> "form-group-compound",
-        '_inputClass -> "input--fullwidth form-control",
-        '_type -> "text"
-        )
-
         <input type="hidden" name="isJavascript" value="false"/>
         <input type="hidden" name="referrer" value="@{request.headers.get("referer").getOrElse("")}"/>
         <input type="hidden" name="use-secure" id="use-secure" value="@useSecure" />
-        <input type="hidden" name="preferred-csrf-token" id="preferred-csrf-token" value="@useSecure" />
 
         <div class="form-field">
             <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
