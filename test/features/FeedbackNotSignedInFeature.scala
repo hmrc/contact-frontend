@@ -74,6 +74,12 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       And("I send the feedback form")
       UnauthenticatedFeedbackPage.submitFeedbackForm()
 
+      Then("I see:")
+      i_see(
+        "Thank you",
+        "Your feedback has been received."
+      )
+
       Then("the Deskpro endpoint '/deskpro/feedback' has received the following POST request:")
       verify_post(to = "/deskpro/feedback", body =
         s"""

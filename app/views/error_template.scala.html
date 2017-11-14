@@ -1,5 +1,6 @@
-@(pageTitle: String, heading: String, message: String)(implicit rh: Request[_], lang : Lang, messages : Messages)
-@import config.CFConfig
+@import config.AppConfig
+
+@(pageTitle: String, heading: String, message: String)(implicit rh: Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @contentHeader = {
   <h1>@heading</h1>
@@ -9,4 +10,4 @@
   <p>@message</p>
 }
 
-@govuk_wrapper(appConfig = config.CFConfig, title = pageTitle, contentHeader = Some(contentHeader), mainContent = mainContent, enableLanguageSwitching = CFConfig.enableLanguageSwitching)
+@govuk_wrapper(title = pageTitle, contentHeader = Some(contentHeader), mainContent = mainContent, enableLanguageSwitching = appConfig.enableLanguageSwitching)

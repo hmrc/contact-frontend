@@ -1,5 +1,6 @@
 package controllers
 
+import config.CFConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import org.jsoup.Jsoup
@@ -8,17 +9,21 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
+import play.api.{Application, Environment}
+import play.api.i18n.MessagesApi
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 import play.api.mvc.Request
-import play.api.test.{FakeApplication, FakeRequest}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.auth.core.authorise.Predicate
+import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.play.test.UnitSpec
+import util.DeskproEmailValidator
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
 
@@ -31,7 +36,7 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
 
   "Reporting a problem" should {
 
-    "return 200 and a valid html page for a valid request and js is not enabled for an unauthenticated user" in new ProblemReportsControllerApplication {
+    "return 200 and a valid html page for a valid request and js is not enabled for an unauthenticated user" in new ProblemReportsControllerApplication(app) {
 
       hrmcConnectorWillReturnTheTicketId
 
@@ -44,9 +49,8 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
     }
 
 
-    "return 200 and a valid html page for a valid request and js is not enabled for an authenticated user" in new ProblemReportsControllerApplication {
-      when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]), Matchers.any(classOf[ExecutionContext]))).thenReturn(Future.successful(Some(Authority("uri", Accounts(), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None, None, ""))))
-      when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(accounts), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
+    "return 200 and a valid html page for a valid request and js is not enabled for an authenticated user" in new ProblemReportsControllerApplication(app) {
+      when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(enrolments), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
       val result = controller.doReport()(request.withSession(SessionKeys.authToken -> "authToken"))
 
@@ -56,7 +60,7 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
       document.getElementById("report-confirmation") should not be null
     }
 
-    "return 200 and a valid json for a valid request and js is enabled" in new ProblemReportsControllerApplication {
+    "return 200 and a valid json for a valid request and js is enabled" in new ProblemReportsControllerApplication(app) {
       when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(true), any[Request[AnyRef]](), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
       val result = controller.doReport()(generateRequest())
@@ -69,7 +73,7 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
       message should include("Someone will get back to you within 2 working days.")
     }
 
-    "return 200 and a valid html page for invalid input and js is not enabled" in new ProblemReportsControllerApplication {
+    "return 200 and a valid html page for invalid input and js is not enabled" in new ProblemReportsControllerApplication(app) {
 
       val result = controller.doReport()(generateInvalidRequest(javascriptEnabled = false))
 
@@ -80,7 +84,7 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
       document.getElementById("report-confirmation-no-data") should not be null
     }
 
-    "return 400 and a valid json for invalid input and js is enabled" in new ProblemReportsControllerApplication {
+    "return 400 and a valid json for invalid input and js is enabled" in new ProblemReportsControllerApplication(app) {
 
       val result = controller.doReport()(generateInvalidRequest())
 
@@ -90,7 +94,8 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
       contentAsJson(result).\("status").as[String] shouldBe "ERROR"
     }
 
-    "fail if the email has invalid syntax (for DeskPRO)" in new ProblemReportsControllerApplication {
+    "fail if the email has invalid syntax (for DeskPRO)" in new ProblemReportsControllerApplication(app) {
+
       val submit = controller.doReport()(generateRequest(javascriptEnabled = false, email = "a@a"))
       val page = Jsoup.parse(contentAsString(submit))
 
@@ -100,8 +105,7 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
       page.getElementById("report-confirmation-no-data") should not be null
     }
 
-    "fail if the name has invalid characters - Javascript disabled" in new ProblemReportsControllerApplication {
-      when(authConnector.currentAuthority(Matchers.any(classOf[HeaderCarrier]), Matchers.any(classOf[ExecutionContext]))).thenReturn(Future.successful(Some(Authority("uri",  Accounts(), None, None, CredentialStrength.Weak, ConfidenceLevel.L50, None, None, None, ""))))
+    "fail if the name has invalid characters - Javascript disabled" in new ProblemReportsControllerApplication(app) {
 
       val submit = controller.doReport()(generateRequest(javascriptEnabled = false, name="""<a href="blah.com">something</a>""").withSession(SessionKeys.authToken -> "authToken"))
       val page = Jsoup.parse(contentAsString(submit))
@@ -112,7 +116,7 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
       page.getElementById("report-confirmation-no-data") should not be null
     }
 
-    "Return error page if the Deskpro ticket creation fails - Javascript disabled" in new ProblemReportsControllerApplication {
+    "Return error page if the Deskpro ticket creation fails - Javascript disabled" in new ProblemReportsControllerApplication(app) {
       when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.failed(new Exception("failed")))
 
       val result = controller.doReport()(request)
@@ -123,7 +127,7 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
       document.text() should include("Please try again later.")
     }
 
-    "render the thank you message given" in new ProblemReportsControllerApplication {
+    "render the thank you message given" in new ProblemReportsControllerApplication(app) {
       hrmcConnectorWillReturnTheTicketId
 
       val submit = controller.doReport(Some("common.feedback.title"))(request)
@@ -132,7 +136,7 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
       page.text() should include("Get help using this service")
     }
 
-    "render the default thank you message if one is not provided" in new ProblemReportsControllerApplication {
+    "render the default thank you message if one is not provided" in new ProblemReportsControllerApplication(app) {
       hrmcConnectorWillReturnTheTicketId
 
       val submit = controller.doReport()(request)
@@ -145,12 +149,15 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
 
 }
 
-class ProblemReportsControllerApplication extends MockitoSugar {
+class ProblemReportsControllerApplication(app : Application) extends MockitoSugar {
 
-  val controller = new ProblemReportsController {
-    override lazy val hmrcDeskproConnector = mock[HmrcDeskproConnector]
-    override lazy val authConnector = mock[AuthConnector]
+  val authConnector = new AuthConnector {
+    override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] = {
+      Future.successful(Json.parse("{ \"allEnrolments\" : []}").as[A](retrieval.reads))
+    }
   }
+
+  val controller = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector)(new CFConfig(Environment.simple(), app.configuration), app.injector.instanceOf[MessagesApi])
 
   val deskproName: String = "John Densmore"
   val deskproEmail: String = "name@mail.com"
@@ -159,9 +166,8 @@ class ProblemReportsControllerApplication extends MockitoSugar {
   val deskproReferrer: String = "/contact/problem_reports"
 
   val hmrcDeskproConnector = controller.hmrcDeskproConnector
-  val authConnector = controller.authConnector
 
-  val accounts = Some(Accounts())
+  val enrolments = Some(Enrolments(Set()))
 
   def generateRequest(javascriptEnabled: Boolean = true, name:String = deskproName, email: String = deskproEmail) = FakeRequest()
     .withHeaders(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent"))

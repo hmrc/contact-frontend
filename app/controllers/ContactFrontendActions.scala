@@ -1,22 +1,19 @@
 package controllers
 
 import play.api.mvc.Request
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
+import uk.gov.hmrc.auth.core.retrieve.Retrievals
+import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolments}
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, SessionKeys }
 
-trait ContactFrontendActions extends Actions {
+trait ContactFrontendActions extends AuthorisedFunctions {
 
-  protected def maybeAuthenticatedUserAccounts()(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[Accounts]] = {
+  protected def maybeAuthenticatedUserEnrolments()(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[Enrolments]] = {
     if (request.session.get(SessionKeys.authToken).isDefined) {
-      authConnector.currentAuthority.map(
-        authorityOption => authorityOption.map(_.accounts)
-      ).recover {
-        case _: Throwable => None
-      }
+      authorised().retrieve(Retrievals.allEnrolments) { enrolments => Future.successful(Some(enrolments))}
+        .recover{case _ => None}
     } else {
       Future.successful(None)
     }

@@ -1,4 +1,4 @@
-@(ticketId: String, thankYouMessage: Option[String])(implicit lang : Lang, messages : Messages)
+@(ticketId: String, thankYouMessage: Option[String])(implicit lang : Lang, messages : Messages, appConfig: config.AppConfig)
 
 <h2 id="feedback-thank-you-header">@Messages("common.thank.you")</h2>
 

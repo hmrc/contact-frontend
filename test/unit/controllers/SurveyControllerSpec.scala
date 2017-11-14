@@ -1,17 +1,19 @@
 package controllers
 
+import config.CFConfig
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
+import play.api.i18n.MessagesApi
 import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
 class SurveyControllerSpec extends UnitSpec with OneAppPerSuite {
@@ -79,8 +81,5 @@ class SurveyControllerSpec extends UnitSpec with OneAppPerSuite {
 
 
 class SurveyControllerApplication extends MockitoSugar {
-  val controller = new SurveyController {
-    override lazy val auditConnector = mock[AuditConnector]
-    override lazy val authConnector = mock[AuthConnector]
-  }
+  val controller = new SurveyController( mock[AuditConnector])(mock[MessagesApi], new CFConfig(Environment.simple(), Configuration()))
 }

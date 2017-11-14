@@ -1,34 +1,34 @@
-GET         /beta-feedback                               controllers.FeedbackController.feedbackForm(service: Option[String])
-GET         /beta-feedback-unauthenticated               controllers.FeedbackController.unauthenticatedFeedbackForm(service: Option[String])
-POST        /beta-feedback/submit                        controllers.FeedbackController.submit
-POST        /beta-feedback/submit-unauthenticated        controllers.FeedbackController.submitUnauthenticated
-GET         /beta-feedback/thanks                        controllers.FeedbackController.thanks
-GET         /beta-feedback/thanks-unauthenticated        controllers.FeedbackController.unauthenticatedThanks
+GET         /beta-feedback                               @controllers.FeedbackController.feedbackForm(service: Option[String])
+GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.unauthenticatedFeedbackForm(service: Option[String])
+POST        /beta-feedback/submit                        @controllers.FeedbackController.submit
+POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackController.submitUnauthenticated
+GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks
+GET         /beta-feedback/thanks-unauthenticated        @controllers.FeedbackController.unauthenticatedThanks
 
 
-GET         /contact-hmrc                                controllers.ContactHmrcController.index
-POST        /contact-hmrc                                controllers.ContactHmrcController.submit
-GET         /contact-hmrc/thanks                         controllers.ContactHmrcController.thanks
+GET         /contact-hmrc                                @controllers.ContactHmrcController.index
+POST        /contact-hmrc                                @controllers.ContactHmrcController.submit
+GET         /contact-hmrc/thanks                         @controllers.ContactHmrcController.thanks
 
-GET         /problem_reports                             controllers.ProblemReportsController.reportForm(secure: Option[Boolean], csrfToken: Option[String], service: Option[String])
-GET         /problem_reports_ajax                        controllers.ProblemReportsController.reportFormAjax(service: Option[String])
-GET         /problem_reports_nonjs                       controllers.ProblemReportsController.reportFormNonJavaScript(service: Option[String])
-POST        /problem_reports                             controllers.ProblemReportsController.submit
-POST        /problem_reports_secure                      controllers.ProblemReportsController.submitSecure
+GET         /problem_reports                             @controllers.ProblemReportsController.reportForm(secure: Option[Boolean], csrfToken: Option[String], service: Option[String])
+GET         /problem_reports_ajax                        @controllers.ProblemReportsController.reportFormAjax(service: Option[String])
+GET         /problem_reports_nonjs                       @controllers.ProblemReportsController.reportFormNonJavaScript(service: Option[String])
+POST        /problem_reports                             @controllers.ProblemReportsController.submit
+POST        /problem_reports_secure                      @controllers.ProblemReportsController.submitSecure
 
-GET         /contact-hmrc/form                           controllers.PartialsController.contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean])
-POST        /contact-hmrc/form                           controllers.PartialsController.submitContactHmrcForm(resubmitUrl: String, renderFormOnly: Option[Boolean])
-GET         /contact-hmrc/form/confirmation              controllers.PartialsController.contactHmrcFormConfirmation(ticketId: String)
-GET         /beta-feedback/form                          controllers.PartialsController.feedbackForm(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String])
-POST        /beta-feedback/form                          controllers.PartialsController.submitFeedbackForm(resubmitUrl: String)
-GET         /beta-feedback/form/confirmation             controllers.PartialsController.feedbackFormConfirmation(ticketId: String)
+GET         /contact-hmrc/form                           @controllers.PartialsController.contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean])
+POST        /contact-hmrc/form                           @controllers.PartialsController.submitContactHmrcForm(resubmitUrl: String, renderFormOnly: Option[Boolean])
+GET         /contact-hmrc/form/confirmation              @controllers.PartialsController.contactHmrcFormConfirmation(ticketId: String)
+GET         /beta-feedback/form                          @controllers.PartialsController.feedbackForm(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String])
+POST        /beta-feedback/form                          @controllers.PartialsController.submitFeedbackForm(resubmitUrl: String)
+GET         /beta-feedback/form/confirmation             @controllers.PartialsController.feedbackFormConfirmation(ticketId: String)
 
-GET			/survey				 	                     controllers.SurveyController.survey(ticketId: String, serviceId: String)
-POST		/submitSurvey                                controllers.SurveyController.submit()
-GET			/survey/confirmation 	                     controllers.SurveyController.confirmation()
+GET			/survey				 	                     @controllers.SurveyController.survey(ticketId: String, serviceId: String)
+POST		/submitSurvey                                @controllers.SurveyController.submit()
+GET			/survey/confirmation 	                     @controllers.SurveyController.confirmation()
 
 GET         /switch-to-welsh                             @controllers.LanguageController.switchToWelsh()
 GET         /switch-to-english                           @controllers.LanguageController.switchToEnglish()
 
-OPTIONS /*path                                           controllers.ApplicationController.options(path)
+OPTIONS /*path                                           @controllers.ApplicationController.options(path)
 

@@ -1,39 +1,37 @@
 package connectors.deskpro
 
-import config.WSHttp
+import javax.inject.Inject
 import connectors.deskpro.domain.{Feedback, Ticket, TicketId}
+import play.api.{Configuration, Environment}
 import play.api.mvc.Request
+import uk.gov.hmrc.auth.core.Enrolments
+import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, Upstream5xxResponse}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, NotFoundException, Upstream5xxResponse }
 
-object HmrcDeskproConnector extends HmrcDeskproConnector with ServicesConfig {
-  override lazy val serviceUrl = baseUrl("hmrc-deskpro")
-  override val http = WSHttp
-}
+class HmrcDeskproConnector @Inject() (http : HttpClient, environment : Environment, configuration : Configuration) extends ServicesConfig {
 
-trait HmrcDeskproConnector {
+  def serviceUrl: String = baseUrl("hmrc-deskpro")
 
-  def serviceUrl: String
+  def createDeskProTicket(name: String, email: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], service: Option[String])(implicit hc: HeaderCarrier): Future[TicketId] = {
+    val ticket = Ticket.create(name, email, subject, message, referrer, isJavascript, hc, request, enrolmentsOption, service)
+    http.POST[Ticket, TicketId](requestUrl("/deskpro/get-help-ticket"), ticket) recover {
+      case nf: NotFoundException => throw new Upstream5xxResponse(nf.getMessage, 404, 500)
+   }
+  }
 
-  def http: HttpPost
-
-  def createDeskProTicket(name: String, email: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], accountsOption: Option[Accounts], service: Option[String])(implicit hc: HeaderCarrier): Future[TicketId] = {
-    http.POST[Ticket, TicketId](requestUrl("/deskpro/get-help-ticket"), Ticket.create(name, email, subject, message, referrer, isJavascript, hc, request, accountsOption, service)) recover {
+  def createFeedback(name: String, email: String, rating: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], service: Option[String])(implicit hc: HeaderCarrier): Future[TicketId] = {
+    http.POST[Feedback, TicketId](requestUrl("/deskpro/feedback"), Feedback.create(name, email, rating, subject, message, referrer, isJavascript, hc, request, enrolmentsOption, service)) recover {
       case nf: NotFoundException => throw new Upstream5xxResponse(nf.getMessage, 404, 500)
     }
   }
-
-  def createFeedback(name: String, email: String, rating: String, subject: String, message: String, referrer: String, isJavascript: Boolean, request: Request[AnyRef], accountsOption: Option[Accounts], service: Option[String])(implicit hc: HeaderCarrier): Future[TicketId] = {
-    http.POST[Feedback, TicketId](requestUrl("/deskpro/feedback"), Feedback.create(name, email, rating, subject, message, referrer, isJavascript, hc, request, accountsOption, service)) recover {
-      case nf: NotFoundException => throw new Upstream5xxResponse(nf.getMessage, 404, 500)
-    }
-  }
-
 
   private def requestUrl[B, A](uri: String): String = s"$serviceUrl$uri"
 
+  override protected def mode = environment.mode
+
+  override protected def runModeConfiguration = configuration
 }

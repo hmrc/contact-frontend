@@ -1,92 +1,94 @@
 package controllers
 
-import config.FrontendAuthConnector
+import javax.inject.{Inject, Singleton}
+
+import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
-import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.{Configuration, Environment, Logger}
 import play.filters.csrf.CSRF
-import uk.gov.hmrc.play.frontend.auth.{Actions, AuthContext}
-import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
-import uk.gov.hmrc.play.validators.Validators
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.retrieve.Retrievals
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import util.DeskproEmailValidator
 
 import scala.concurrent.Future
 
-trait FeedbackController
-  extends FrontendController
-  with Actions with DeskproSubmission {
+@Singleton
+class FeedbackController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector, val configuration : Configuration, val environment: Environment)(implicit
+                                                                                    val appConfig : AppConfig,
+                                                                                    override val messagesApi : MessagesApi)
+extends FrontendController with DeskproSubmission with I18nSupport with AuthorisedFunctions with LoginRedirection {
 
   val formId = "FeedbackForm"
 
-  val ggAuthProvider = new GovernmentGatewayAuthProvider(routes.FeedbackController.feedbackForm(None).url)
+  override protected def mode = environment.mode
 
-  def feedbackForm(service: Option[String] = None) = {
-    WithNewSessionTimeout(
-      AuthenticatedBy(ggAuthProvider, pageVisibility = GGConfidence).async { implicit user => implicit request =>
-        Future.successful(
-          Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map { _.value }.getOrElse("")), Some(user), service))
-        )
-      }
-    )
+  override protected def runModeConfiguration = configuration
+
+  def feedbackForm(service: Option[String] = None) = Action.async { implicit request =>
+    loginRedirection(routes.FeedbackController.feedbackForm(None).url)(authorised(AuthProviders(GovernmentGateway)) {
+      Future.successful(
+        Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map {
+          _.value
+        }.getOrElse("")), true, service))
+      )
+    })
   }
 
-  def unauthenticatedFeedbackForm(service: Option[String] = None) = UnauthorisedAction.async { implicit request =>
+  def unauthenticatedFeedbackForm(service: Option[String] = None) = Action.async { implicit request =>
     Future.successful(
-      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map { _.value }.getOrElse("")), None, service))
+      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map { _.value }.getOrElse("")), false, service))
     )
   }
 
-  def submit = WithNewSessionTimeout {
-    AuthenticatedBy(ggAuthProvider, pageVisibility = GGConfidence).async { implicit user => implicit request =>
-      doSubmit(Some(user))
+  def submit = Action.async { implicit request =>
+    authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments){
+        allEnrolments =>
+      doSubmit(Some(allEnrolments))
     }
   }
 
-  def submitUnauthenticated = UnauthorisedAction.async {
+  def submitUnauthenticated = Action.async {
     implicit request => doSubmit(None)
   }
 
-  val ggAuthProviderThanks = new GovernmentGatewayAuthProvider(routes.FeedbackController.thanks().url)
-
-  def thanks = WithNewSessionTimeout {
-    AuthenticatedBy(ggAuthProviderThanks, pageVisibility = GGConfidence).async { implicit user => implicit request => doThanks(Some(user), request)
-    }
+  def thanks = Action.async { implicit request =>
+    loginRedirection(routes.FeedbackController.thanks().url)(
+    authorised(AuthProviders(GovernmentGateway)) { doThanks(true, request)
+    })
   }
 
-  def unauthenticatedThanks = UnauthorisedAction.async {
-    implicit request => doThanks(None, request)
+  def unauthenticatedThanks = Action.async {
+    implicit request => doThanks(false, request)
   }
 
-  private def doSubmit(user: Option[AuthContext])(implicit request: Request[AnyContent]): Future[Result] =
+  private def doSubmit(enrolments: Option[Enrolments])(implicit request: Request[AnyContent]): Future[Result] =
     FeedbackFormBind.form.bindFromRequest()(request).fold(
-      error => Future.successful(BadRequest(feedbackView(user, error))),
+      error => Future.successful(BadRequest(feedbackView(enrolments.isDefined, error))),
       data => {
-        val ticketIdF = createDeskproFeedback(data, user.map(_.principal.accounts))
+        val ticketIdF = createDeskproFeedback(data, enrolments)
         ticketIdF map { ticketId =>
-          Redirect(user.map(_ => routes.FeedbackController.thanks()).getOrElse(routes.FeedbackController.unauthenticatedThanks())).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+          Redirect(enrolments.map(_ => routes.FeedbackController.thanks()).getOrElse(routes.FeedbackController.unauthenticatedThanks())).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
         }
       }
     )
 
-  private def feedbackView(user: Option[AuthContext], form: Form[FeedbackForm])(implicit request: Request[AnyRef]) = {
-    views.html.feedback(form, user)
+  private def feedbackView(loggedIn : Boolean, form: Form[FeedbackForm])(implicit request: Request[AnyRef]) = {
+    views.html.feedback(form, loggedIn)
   }
 
-  private def doThanks(implicit user: Option[AuthContext], request: Request[AnyRef]): Future[Result] = {
+  private def doThanks(implicit loggedIn : Boolean, request: Request[AnyRef]): Future[Result] = {
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
-      Ok(views.html.feedback_confirmation(ticketId, user))
+      Ok(views.html.feedback_confirmation(ticketId, loggedIn))
     }
     Future.successful(result)
   }
 
-}
-
-object FeedbackController extends FeedbackController {
-  override val authConnector = FrontendAuthConnector
-  override val hmrcDeskproConnector = HmrcDeskproConnector
 }
 
 case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"))
@@ -113,6 +115,9 @@ object FeedbackFormBind {
 
   import controllers.FeedbackFormConfig._
 
+  private val emailValidator = new DeskproEmailValidator()
+  private val validateEmail: (String) => Boolean = emailValidator.validate
+
   val form = Form[FeedbackForm](mapping(
     "feedback-rating" -> optional(text)
       .verifying("error.common.feedback.rating_mandatory", rating => rating.isDefined && !rating.get.trim.isEmpty)
@@ -122,7 +127,9 @@ object FeedbackFormBind {
       .verifying("error.common.feedback.name_mandatory", name => !name.trim.isEmpty)
       .verifying("error.common.feedback.name_too_long", name => name.size <= 70),
 
-    "feedback-email" -> Validators.emailWithDomain.verifying("deskpro.email_too_long", email => email.size <= 255),
+    "feedback-email" -> text
+      .verifying("error.email", validateEmail)
+      .verifying("deskpro.email_too_long", email => email.size <= 255),
 
     "feedback-comments" -> text
       .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)

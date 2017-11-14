@@ -1,4 +1,4 @@
-@(ticketId: String, serviceId: String)(implicit request : Request[_], lang : Lang, messages : Messages)
+@(ticketId: String, serviceId: String)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 
 @import uk.gov.hmrc.play.views.html.helpers.form
 @import controllers.SurveyFormFields

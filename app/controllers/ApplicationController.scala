@@ -1,9 +1,16 @@
 package controllers
 
+import javax.inject.Inject
+
+import play.api.{Configuration, Environment}
 import play.api.mvc._
 import uk.gov.hmrc.play.config.RunMode
 
-object ApplicationController extends Controller with RunMode {
+class ApplicationController @Inject() (environment : Environment, configuration : Configuration) extends Controller with RunMode {
+
+  override protected def mode = environment.mode
+
+  override protected def runModeConfiguration = configuration
 
   def options(path: String) = Action {
     implicit request =>
