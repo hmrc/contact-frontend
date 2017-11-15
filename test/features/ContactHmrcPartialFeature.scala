@@ -11,6 +11,7 @@ class ContactHmrcPartialFeature extends StubbedFeatureSpec {
     info("As a Application")
     info("I need to be able to submit contact form partial")
 
+//    MoveToAcceptanceTest
     scenario("Contact form retrieved successfully") {
       goOn(new ContactHmrcPartialPage("http://server/account/contact", Some("myservice")))
 
@@ -20,6 +21,7 @@ class ContactHmrcPartialFeature extends StubbedFeatureSpec {
       name("service").element.attribute("value") shouldBe Some("myservice")
     }
 
+//    MoveToAcceptanceTest
     scenario("Copy hidden when renderFormOnly set to true") {
       go(new ContactHmrcPartialPage(submitUrl = "http://server/account/contact", renderFormOnly = Some(true)))
 

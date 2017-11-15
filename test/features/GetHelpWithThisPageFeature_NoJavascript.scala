@@ -17,6 +17,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
     info("As a tax payer with Javascript disabled")
     info("I want to ask for help to HMRC")
 
+//    MoveToAcceptanceTest
     scenario("I don't see the open help form link without Javascript") {
       Given("JavaScript is disabled")
       Env.useNonJavascriptDriver()
@@ -51,6 +52,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
       )
     }
 
+//    MoveToAcceptanceTest
     scenario("Only these characters are allowed for the name: letters (lower and upper case), space, comma, period, braces and hyphen") {
       Given("JavaScript is disabled")
       Env.useNonJavascriptDriver()
@@ -72,6 +74,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
             "Please try again later.")
     }
 
+//    MoveToAcceptanceTest
     scenario("All fields are mandatory") {
       Given("JavaScript is disabled")
       Env.useNonJavascriptDriver()

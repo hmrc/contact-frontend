@@ -14,6 +14,7 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
     info("As a Tax Payer")
     info("I want to contact HMRC")
 
+//    MoveToAcceptanceTest: End to end test
     Scenario("Problem report - Get help with this page") {
       Given("Tax payer Bill goes to the Feedback page")
 
@@ -29,7 +30,7 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
             "Someone will get back to you within 2 working days.")
     }
 
-
+//    MoveToAcceptanceTest: End to end test
     Scenario("Feedback submission") {
       Given("Tax payer Bill goes to the Feedback page")
       goOn(UnauthenticatedFeedbackPage)
@@ -44,6 +45,7 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
     }
 
 
+//    MoveToAcceptanceTest: End to end test
     Scenario("Contact HMRC") {
       Given("Tax payer Bill goes to the Contact HMRC page")
       i_sign_in()

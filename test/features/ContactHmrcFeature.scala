@@ -45,6 +45,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
         """.stripMargin, LENIENT)
     }
 
+//    MoveToAcceptanceTest
     scenario("All fields are mandatory") {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
@@ -68,6 +69,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
     }
 
 
+//    MoveToAcceptanceTest
     scenario("Fields have a size limit") {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
@@ -96,6 +98,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
     }
 
 
+//    MoveToAcceptanceTest
     scenario("Invalid email address")  {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
@@ -115,6 +118,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       verify_post_no_hit("/deskpro/get-help-ticket")
     }
 
+//    MoveToAcceptanceTest: DeskPro Integration Test
     scenario("Deskpro fails with 404") {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
@@ -135,6 +139,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       i_see("There was a problem sending your query.")
     }
 
+//    MoveToAcceptanceTest: Deskpro Integration Test
     scenario("Deskpro times out") {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
@@ -155,6 +160,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       i_see("There was a problem sending your query.")
     }
 
+//    MoveToAcceptanceTest: Deskpro Integration Test
     scenario("Deskpro fails with 500") {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
@@ -175,6 +181,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       i_see("There was a problem sending your query.")
     }
 
+//    MoveToAcceptanceTest: Deskpro Integration Test
     scenario("The referrer URL is sent to Deskpro") {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
