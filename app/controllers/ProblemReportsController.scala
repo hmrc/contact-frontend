@@ -113,7 +113,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
           if (!error.data.getOrElse("isJavascript", "true").toBoolean) {
             Future.successful(Ok(views.html.problem_reports_error_nonjavascript()))
           } else {
-            val isSecure = error.data.get("is-secure").exists(_.toBoolean)
+            val isSecure = error.data.get("use-secure").exists(_.toBoolean)
             val postEndpoint = if (isSecure) appConfig.externalReportProblemSecureUrl else appConfig.externalReportProblemUrl
             val csrfToken = error.data
               .get("csrfToken")
