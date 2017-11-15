@@ -1,10 +1,10 @@
 package support.page
 
-import org.openqa.selenium.{By, WebElement, WebDriver}
+import org.openqa.selenium.{By, WebDriver, WebElement}
 import org.openqa.selenium.support.ui.{ExpectedCondition, WebDriverWait}
 import org.scalatest._
-import org.scalatest.selenium.{WebBrowser, Page}
-import support.steps.Env
+import org.scalatest.selenium.{Page, WebBrowser}
+import support.util.Env
 
 trait WebPage extends Page with WebBrowser with ShouldMatchers {
 

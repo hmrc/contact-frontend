@@ -4,11 +4,10 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
-import support.page.{UnauthenticatedFeedbackPage, SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds}
+import support.page.{SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds, UnauthenticatedFeedbackPage}
 import uk.gov.hmrc.play.test.WithFakeApplication
 
 @RunWith(classOf[JUnitRunner])
@@ -21,6 +20,7 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
   )
 
   feature("Language Switching") {
+//    MoveToAcceptanceTest
     scenario("Switch from English to Welsh in the survey") {
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
 
@@ -50,6 +50,7 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
       i_see("Cymraeg")
     }
 
+//    MoveToAcceptanceTest
     scenario("Show confirmation message in Welsh after submitting the form in Welsh") {
       val invalidTicketId = "HMRC-Z2V6DUK5"
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
@@ -72,6 +73,7 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
       on(SurveyConfirmationPageWelsh)
     }
 
+//    MoveToAcceptanceTest
     scenario("Show beta-feedback-unauthenticated page ratings in Welsh") {
       Given("I go to the beta-feedback-unauthenticated page")
       goOn(UnauthenticatedFeedbackPage)

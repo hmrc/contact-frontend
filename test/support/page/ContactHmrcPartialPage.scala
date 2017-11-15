@@ -1,8 +1,8 @@
 package support.page
 
-import support.steps.Env
+import support.util.Env
 
-class ContactHmrcPartialPage(submitUrl: String, 
+class ContactHmrcPartialPage(submitUrl: String,
                              service: Option[String] = None, 
                              renderFormOnly: Option[Boolean] = None) extends ContactHmrcPage {
 

@@ -1,6 +1,5 @@
-package support.steps
+package support.util
 
-import org.openqa.selenium.WebDriver
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import uk.gov.hmrc.integration.framework.SingletonDriver
 
@@ -10,6 +9,12 @@ object Env {
     case Some("qa") => "https://www.qa.tax.service.gov.uk"
     case _ => Option(System.getProperty("host")).getOrElse("http://localhost:9000")
   }
+
+  val stagingDeskproBaseUrl = "https://deskpro.tools.staging.tax.service.gov.uk"
+  val stagingDeskproAgentUrl = s"${stagingDeskproBaseUrl}/agent"
+
+  val hMRCDeskproBaseUrl = "https://hmrc-deskpro.public.mdtp/deskpro"
+
 
   private var jsEnabled = true
 

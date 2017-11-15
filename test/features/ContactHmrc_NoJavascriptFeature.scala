@@ -3,7 +3,7 @@ package features
 import org.skyscreamer.jsonassert.JSONCompareMode
 import support.StubbedFeatureSpec
 import support.page.ContactHmrcPage
-import support.steps.Env
+import support.util.Env
 import support.stubs.Login
 
 class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {

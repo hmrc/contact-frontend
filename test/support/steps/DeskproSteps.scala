@@ -1,28 +1,26 @@
 package support.steps
 
-import org.scalatest.time.{Seconds, Span}
+import play.api.libs.json.{JsString, Json}
 import support.behaviour.NavigationSugar
-import support.page.{DeskproSignInPage, DeskproViewTicketPage}
+import support.modules.Deskpro
 
-trait DeskproSteps extends NavigationSugar with BaseSteps {
+trait DeskproSteps extends NavigationSugar with BaseSteps{
 
-  def ticket_in_deskpro_exists(ticketId: String, name: String, email: String, textInMessageBody: Seq[String]) = {
-    val ticketPage = new DeskproViewTicketPage(ticketId)
-    go(ticketPage)
+  def ticket_is_created_in_deskpro(ccsTicketId: String, name: String, email: String, textInMessageBody: Seq[String]) = {
+    val deskProTicketId = ticket_is_created_in_hmrc_deskpro(ccsTicketId)
+    val ticketDetails: String = Deskpro.getTicketDetailsFor(deskProTicketId)
+    ticketDetails shouldNot be("")
+    val responseBody = (Json.parse(ticketDetails) \ "messages")(0)
+    (responseBody \ "person" \ "display_name").as[JsString].value should be(name)
+    val emailActual = (responseBody \ "person" \ "primary_email" \ "email").as[JsString].value
+    (responseBody \ "person" \ "primary_email" \ "email").as[JsString].value should be(email)
+    (responseBody \ "message").as[JsString].value should containInOrder(textInMessageBody)
+  }
 
-
-    eventually(timeout(Span(10, Seconds))) {
-      withClue(s"Expected to be in the DeskPro Log In page, but was on page: $currentUrl - ") {
-        DeskproSignInPage should be('isCurrentPage)
-      }
-    }
-
-    DeskproSignInPage.signIn("haroon.rasheed@digital.hmrc.gov.uk", "W3lc0me-to-D3skpro3")
-
-    eventually(timeout(Span(10, Seconds))) {
-      ticketPage.profile.element.text should be(s"$name ($email)")
-      ticketPage.messageBody.element.text should containInOrder(textInMessageBody)
-    }
-
+  def ticket_is_created_in_hmrc_deskpro(ccsTicketId: String): String = {
+    Thread.sleep(60000)
+    val deskProTicketId: String = HMRCDeskpro.getDeskproTicketIdFrom(ccsTicketId)
+    deskProTicketId shouldNot be("null")
+    deskProTicketId
   }
 }
