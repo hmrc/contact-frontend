@@ -20,23 +20,26 @@
         '_divClass -> "form-group-compound",
         '_inputClass -> "input--fullwidth form-control"
     )
+
+    <label class="form-label">@Messages("problem_report.email")</label>
     @input(
         problemForm("report-email"),
-        '_label -> Messages("problem_report.email"),
         '_divClass -> "form-group-compound",
         '_inputClass -> "input--fullwidth form-control",
         '_type -> "email"
     )
+
+    <label class="form-label">@Messages("problem_report.action")</label>
     @input(
         problemForm("report-action"),
-        '_label -> Messages("problem_report.action"),
         '_divClass -> "form-group-compound",
         '_inputClass -> "input--fullwidth form-control",
         '_type -> "text"
     )
+
+    <label class="form-label">@Messages("problem_report.error")</label>
     @input(
         problemForm("report-error"),
-        '_label -> Messages("problem_report.error"),
         '_divClass -> "form-group-compound",
         '_inputClass -> "input--fullwidth form-control",
         '_type -> "text"
