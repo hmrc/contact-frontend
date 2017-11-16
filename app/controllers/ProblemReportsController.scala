@@ -64,9 +64,7 @@ object ProblemReportFormV2 {
         .verifying("error.common.comments_too_long", error => error.size <= 1000),
       "isJavascript" -> boolean,
       "service" -> optional(text),
-      "referrer" -> optional(text),
-      "csrfToken" -> optional(text),
-      "use-secure" -> boolean
+      "referrer" -> optional(text)
     )(ProblemReportV2.apply)(ProblemReportV2.unapply)
   )
 }
@@ -88,7 +86,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
 
   def reportFormAjax(service: Option[String]) = UnauthorisedAction { implicit request =>
     if (appConfig.useV2ProblemReportAjax) {
-      Ok(views.html.partials.error_feedback_inner_v2(ProblemReportFormV2.form, appConfig.externalReportProblemSecureUrl, None, service, true))
+      Ok(views.html.partials.error_feedback_inner_v2(ProblemReportFormV2.form, appConfig.externalReportProblemSecureUrl, None, service))
     }
     else {
       Ok(views.html.partials.error_feedback_inner(appConfig.externalReportProblemSecureUrl, None, service))
@@ -113,15 +111,8 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
           if (!error.data.getOrElse("isJavascript", "true").toBoolean) {
             Future.successful(Ok(views.html.problem_reports_error_nonjavascript()))
           } else {
-            val isSecure = error.data.get("use-secure").exists(_.toBoolean)
-            val postEndpoint = if (isSecure) appConfig.externalReportProblemSecureUrl else appConfig.externalReportProblemUrl
-            val csrfToken = error.data
-              .get("csrfToken")
-              .orElse {
-                if (isSecure) Some("{{csrfToken}}") else None
-              }
             val errorHtmlAsString =
-              views.html.partials.error_feedback_inner_v2(error, postEndpoint, csrfToken, error.data.get("service"), isSecure).toString()
+              views.html.partials.error_feedback_inner_v2(error, appConfig.externalReportProblemSecureUrl, None, error.data.get("service")).toString()
             Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> errorHtmlAsString))))
           }
         },
@@ -211,4 +202,4 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
 
 case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referrer: Option[String])
 
-case class ProblemReportV2(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referrer: Option[String], preferredCsrfToken: Option[String], useSecure: Boolean)
+case class ProblemReportV2(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referrer: Option[String])

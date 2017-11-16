@@ -1,4 +1,4 @@
-@(problemForm: Form[controllers.ProblemReportV2], actionUrl: String, csrfToken: Option[String], service: Option[String], useSecure: Boolean)(implicit request : Request[_], lang : Lang, messages : Messages)
+@(problemForm: Form[controllers.ProblemReportV2], actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages)
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
 
@@ -47,7 +47,6 @@
 
         <input type="hidden" name="isJavascript" value="false"/>
         <input type="hidden" name="referrer" value="@{request.headers.get("referer").getOrElse("")}"/>
-        <input type="hidden" name="use-secure" id="use-secure" value="@useSecure" />
 
         <div class="form-field">
             <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
