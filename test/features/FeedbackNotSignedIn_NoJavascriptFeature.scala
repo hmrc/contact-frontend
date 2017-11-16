@@ -3,7 +3,7 @@ package features
 import org.skyscreamer.jsonassert.JSONCompareMode
 import support.StubbedFeatureSpec
 import support.page.{FeedbackSuccessPage, UnauthenticatedFeedbackPage}
-import support.steps.Env
+import support.util.Env
 
 
 class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {

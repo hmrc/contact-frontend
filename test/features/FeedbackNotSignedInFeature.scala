@@ -60,6 +60,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
         """.stripMargin, LENIENT)
     }
 
+//    MoveToAcceptanceTest
     scenario("The referrer URL is sent to Deskpro") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -80,6 +81,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
         "Your feedback has been received."
       )
 
+//      MoveToAcceptanceTest: Deskpro Integration Test
       Then("the Deskpro endpoint '/deskpro/feedback' has received the following POST request:")
       verify_post(to = "/deskpro/feedback", body =
         s"""
@@ -99,6 +101,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
         """.stripMargin, LENIENT)
     }
 
+//    MoveToAcceptanceTest
     scenario("All fields are mandatory") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -123,6 +126,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       verify_post_no_hit("/deskpro/feedback")
     }
 
+//    MoveToAcceptanceTest
     scenario("Fields have a size limit") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -149,6 +153,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       "0 remaining characters")
     }
 
+//    MoveToAcceptanceTest
     scenario("Invalid email address") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -166,6 +171,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       i_see("Enter a valid email address")
     }
 
+//    MoveToAcceptanceTest: Deskpro Integration Test
     scenario("Call to Deskpro times out after several seconds") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -186,6 +192,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       i_see("Please try again in a few minutes.")
     }
 
+//    MoveToAcceptanceTest: Deskpro Integration Test
     scenario("Deskpro fails with status 404") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -206,6 +213,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       i_see("Please try again in a few minutes.")
     }
 
+//    MoveToAcceptanceTest: Deskpro Integration Test
     scenario("Deskpro fails with status 500") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)

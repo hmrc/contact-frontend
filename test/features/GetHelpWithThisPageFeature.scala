@@ -1,14 +1,12 @@
 package features
 
 import akka.actor.ActorSystem
-import com.ning.http.client.AsyncHttpClient
+import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.ws.WS
-import play.api.libs.ws.ning.{NingWSClientConfig, NingAsyncHttpClientConfigBuilder, NingWSClient}
+import play.api.libs.ws.ning.{NingAsyncHttpClientConfigBuilder, NingWSClient, NingWSClientConfig}
 import support.StubbedFeatureSpec
 import support.page.UnauthenticatedFeedbackPage
-
-import akka.stream.ActorMaterializer
 
 class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
 
@@ -45,6 +43,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       )
     }
 
+//  MoveToAcceptanceTest
     scenario("External posts to form are not allowed") {
       When("I post to the form using external rest client")
       val baseUrl = "http://localhost:9000"
@@ -63,6 +62,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       eventualResponse.futureValue.body should include("No CSRF token found in headers")
     }
 
+//    MoveToAcceptanceTest
     scenario("The problem report form toggles") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -83,6 +83,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden should be (true)
     }
 
+//    MoveToAcceptanceTest
     scenario("Invalid name error if you entered anything other than letters (lower and upper case), space, comma, period, braces and hyphen") {
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)
@@ -100,6 +101,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       }
     }
 
+//    MoveToAcceptanceTest
     scenario("Invalid email error if you entered a badly formed email") {
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)
@@ -117,6 +119,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       }
     }
 
+//    MoveToAcceptanceTest
     scenario("All fields are mandatory") {
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)

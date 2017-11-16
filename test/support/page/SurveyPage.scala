@@ -2,7 +2,7 @@ package support.page
 
 import org.openqa.selenium.By
 import support.modules.SharedPageModules
-import support.steps.Env
+import support.util.Env
 
 trait SurveyPage extends WebPage with SharedPageModules {
 

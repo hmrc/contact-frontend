@@ -1,7 +1,9 @@
 package support.page
 
+import support.util.Env
+
 object DeskproSignInPage extends WebPage {
-  override val url = "https://deskpro-qa.tax.service.gov.uk/index.php/agent/"
+  override val url = Env.stagingDeskproAgentUrl
 
   override def isCurrentPage: Boolean = pageTitle == "Log In"
 
@@ -9,15 +11,16 @@ object DeskproSignInPage extends WebPage {
   def passwordFld = pwdField(id("password"))
   def submitBtn = cssSelector("input[type=submit]")
 
-  def signIn(email: String, password: String) = {
-    emailFld.value = email
-    passwordFld.value = password
+  def signIn() = {
+    emailFld.value = "asrivastava@equalexperts.com"
+    passwordFld.value = "Password1234"
     click on submitBtn
   }
 }
 
 class DeskproViewTicketPage(ticketId: String) extends WebPage {
-  override val url: String = s"https://deskpro-qa.tax.service.gov.uk/index.php/agent/#app.tickets,inbox:all,t.o:$ticketId"
+
+  override val url: String = s"${Env.stagingDeskproAgentUrl}/#app.tickets,inbox:all,t.o:$ticketId"
 
   def messageBody = className("body-text-message")
   def profile = xpath("//*[contains(@id,'profile_link')]/span")

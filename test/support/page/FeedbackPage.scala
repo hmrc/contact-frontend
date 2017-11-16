@@ -1,9 +1,9 @@
 package support.page
 
-import org.openqa.selenium.{WebDriver, By}
+import org.openqa.selenium.By
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 import support.modules.SharedPageModules
-import support.steps.Env
+import support.util.Env
 
 trait FeedbackPage extends WebPage with SharedPageModules {
 

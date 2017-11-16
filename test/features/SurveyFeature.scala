@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.Json
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
 import support.page.{SurveyConfirmationPage, SurveyPageWithTicketAndServiceIds}
@@ -49,6 +49,7 @@ class SurveyFeature extends StubbedFeatureSpec {
         on(SurveyConfirmationPage)
     }
 
+//    MoveToAcceptanceTest
     scenario("Show successfully sent message whilst rejecting feedback when ticket ref is invalid") {
 
       val invalidTicketId = "HMRC-Z2V6!UK5"
@@ -70,6 +71,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       shouldNotSendSurveyToDatastream
     }
 
+//    MoveToAcceptanceTest
     scenario("Show successfully sent message whilst rejecting feedback when ticket ref is empty") {
 
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
@@ -89,6 +91,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       shouldNotSendSurveyToDatastream
     }
 
+//    MoveToAcceptanceTest
     scenario("Show successfully sent message whilst rejecting feedback when service is empty") {
 
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
@@ -108,6 +111,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       shouldNotSendSurveyToDatastream
     }
 
+//    MoveToAcceptanceTest
     scenario("Survey form errors, but still shows confirmation page") {
 
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
@@ -130,6 +134,7 @@ class SurveyFeature extends StubbedFeatureSpec {
         on(SurveyConfirmationPage)
     }
 
+//    MoveToAcceptanceTest
     scenario("Survey submitted with no radio button selections, but still shows confirmation page") {
 
       WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
@@ -160,6 +165,7 @@ class SurveyFeature extends StubbedFeatureSpec {
       on(SurveyConfirmationPage)
     }
 
+//    MoveToAcceptanceTest
     scenario("Survey form errors, but still shows confirmation page again") {
 
       Given("I go to the survey form page")

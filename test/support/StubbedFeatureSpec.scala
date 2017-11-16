@@ -7,8 +7,9 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.scalatest._
 import org.scalatestplus.play.OneServerPerSuite
 import support.behaviour.NavigationSugar
-import support.steps.{ApiSteps, Env, NavigationSteps, ObservationSteps}
+import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs._
+import support.util.Env
 
 trait StubbedFeatureSpec
   extends FeatureSpec
