@@ -100,7 +100,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   def submitSecure = submit
 
   //TODO remove once everyone is off play-frontend as this doesn't have CSRF check
-  def submit = Action.async { implicit request =>
+  def submit = UnauthorisedAction.async { implicit request =>
     doReport()
   }
 
