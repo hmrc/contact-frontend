@@ -113,7 +113,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
           } else {
             val errorHtmlAsString =
               views.html.partials.error_feedback_inner_v2(error, appConfig.externalReportProblemSecureUrl, None, error.data.get("service")).toString()
-            Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> errorHtmlAsString))))
+            Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> errorHtmlAsString))).withHeaders(("Csrf-Token", "nocheck")))
           }
         },
         problemReport => {
