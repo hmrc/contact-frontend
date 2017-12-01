@@ -14,7 +14,6 @@ import support.util.Env
 trait StubbedFeatureSpec
   extends FeatureSpec
   with GivenWhenThen
-  with ShouldMatchers
   with OneServerPerSuite
   with Stubs
   with BeforeAndAfter

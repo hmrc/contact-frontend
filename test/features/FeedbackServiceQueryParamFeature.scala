@@ -17,7 +17,7 @@ class FeedbackServiceQueryParamFeature extends StubbedFeatureSpec {
       goOn(UnauthenticatedFeedbackPageWithServiceQueryParameter)
 
       Then("The form contains the service value YTA")
-      UnauthenticatedFeedbackPageWithServiceQueryParameter.serviceFieldValue() shouldBe Some("YTA")
+      UnauthenticatedFeedbackPageWithServiceQueryParameter.serviceFieldValue() mustBe Some("YTA")
     }
   }
 }

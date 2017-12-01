@@ -24,16 +24,16 @@ trait NavigationSteps extends BaseSteps  {
 
   def i_am_on_the_page(heading: String) = {
     eventually(timeout(Span(10, Seconds))) {
-      tagName("h1").element.text shouldBe heading
+      tagName("h1").element.text mustBe heading
     }
   }
 
   def i_am_on_the_page(page: WebPage) = {
-    page should be('isCurrentPage)
+    page must be('isCurrentPage)
   }
 
   def another_tab_is_opened() = {
-    webDriver.getWindowHandles.size() should be(2)
+    webDriver.getWindowHandles.size() must be(2)
   }
 
   def switch_tab() = {
@@ -44,7 +44,7 @@ trait NavigationSteps extends BaseSteps  {
   def shouldBeAt(page: org.scalatest.selenium.Page) = {
     eventually {
       withClue("Was at page with title: " + tagName("h1").findElement.map(_.text) + " - ") {
-        currentUrl should be(page.url)
+        currentUrl must be(page.url)
       }
     }
   }
@@ -54,7 +54,7 @@ trait NavigationSteps extends BaseSteps  {
       val body = tagName("body").element
 
       withClue("Was at page with title: " + tagName("h1").findElement.map(_.text) + " - ") {
-        body.attribute("class").value should include(className)
+        body.attribute("class").value must include(className)
       }
     }
   }

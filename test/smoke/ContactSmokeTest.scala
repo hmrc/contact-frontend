@@ -1,21 +1,24 @@
 package smoke
 
 import org.scalatest.AcceptanceSpec
+import support.StubbedFeatureSpec
 import support.behaviour.NavigationSugar
 import support.page.{ContactHmrcPage, UnauthenticatedFeedbackPage}
 import support.steps.{DeskproSteps, ObservationSteps, SmokeSteps}
 import uk.gov.hmrc.integration.util.RandomUtils
 
-class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with ObservationSteps with SmokeSteps with DeskproSteps {
+//class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with ObservationSteps with SmokeSteps with DeskproSteps {
+class ContactSmokeTest extends StubbedFeatureSpec with SmokeSteps with DeskproSteps {
 
-  Feature("Contact HMRC") {
+
+  feature("Contact HMRC") {
 
     info("In order to make my views known")
     info("As a Tax Payer")
     info("I want to contact HMRC")
 
 //    MoveToAcceptanceTest: End to end test
-    Scenario("Problem report - Get help with this page") {
+    scenario("Problem report - Get help with this page") {
       Given("Tax payer Bill goes to the Feedback page")
 
       goOn(UnauthenticatedFeedbackPage)
@@ -31,7 +34,7 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
     }
 
 //    MoveToAcceptanceTest: End to end test
-    Scenario("Feedback submission") {
+    scenario("Feedback submission") {
       Given("Tax payer Bill goes to the Feedback page")
       goOn(UnauthenticatedFeedbackPage)
 
@@ -46,7 +49,7 @@ class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with Observat
 
 
 //    MoveToAcceptanceTest: End to end test
-    Scenario("Contact HMRC") {
+    scenario("Contact HMRC") {
       Given("Tax payer Bill goes to the Contact HMRC page")
       i_sign_in()
       goOn(ContactHmrcPage)

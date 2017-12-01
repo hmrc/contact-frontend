@@ -44,6 +44,6 @@ trait ApiSteps extends BaseSteps {
       .withRequestBody(equalToJson(body, compareMode)))
   }
 
-  def verify_post_no_hit(to: String) = WireMock.findAll(postRequestedFor(urlEqualTo(to))) should be('isEmpty)
+  def verify_post_no_hit(to: String) = WireMock.findAll(postRequestedFor(urlEqualTo(to))) must be('isEmpty)
 
 }
