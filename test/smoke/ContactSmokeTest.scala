@@ -7,7 +7,6 @@ import support.page.{ContactHmrcPage, UnauthenticatedFeedbackPage}
 import support.steps.{DeskproSteps, ObservationSteps, SmokeSteps}
 import uk.gov.hmrc.integration.util.RandomUtils
 
-//class ContactSmokeTest extends AcceptanceSpec with NavigationSugar with ObservationSteps with SmokeSteps with DeskproSteps {
 class ContactSmokeTest extends StubbedFeatureSpec with SmokeSteps with DeskproSteps {
 
 
