@@ -6,7 +6,7 @@ import org.scalatest._
 import org.scalatest.selenium.{Page, WebBrowser}
 import support.util.Env
 
-trait WebPage extends Page with WebBrowser with ShouldMatchers {
+trait WebPage extends Page with WebBrowser with MustMatchers {
 
   implicit def webDriver: WebDriver = Env.driver
 

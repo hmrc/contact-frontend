@@ -36,7 +36,7 @@ class SurveyFeature extends StubbedFeatureSpec {
 
       val json = Json.parse(loggedRequests.get(0).getBodyAsString)
 
-      def fieldShouldBe(key: String, expectedValue: String) = (json \ "detail" \ key).asOpt[String] shouldBe Some(expectedValue)
+      def fieldShouldBe(key: String, expectedValue: String) = (json \ "detail" \ key).asOpt[String] mustBe Some(expectedValue)
 
       fieldShouldBe("helpful", "5")
       fieldShouldBe("speed", "5")
@@ -155,11 +155,11 @@ class SurveyFeature extends StubbedFeatureSpec {
       val resultJsonString = loggedRequests.get(0).getBodyAsString
       val resultJson = Json.parse(resultJsonString)
 
-      (resultJson \ "detail" \ "helpful").as[String] shouldBe "0"
-      (resultJson \ "detail" \ "speed").as[String] shouldBe "0"
-      (resultJson \ "detail" \ "ticketId").as[String] shouldBe "HMRC-Z2V6DUK5"
-      (resultJson \ "detail" \ "serviceId").as[String] shouldBe "arbitrary service id"
-      (resultJson \ "detail" \ "improve").as[String] shouldBe "Blah blooh blah la dee daaaaa"
+      (resultJson \ "detail" \ "helpful").as[String] mustBe "0"
+      (resultJson \ "detail" \ "speed").as[String] mustBe "0"
+      (resultJson \ "detail" \ "ticketId").as[String] mustBe "HMRC-Z2V6DUK5"
+      (resultJson \ "detail" \ "serviceId").as[String] mustBe "arbitrary service id"
+      (resultJson \ "detail" \ "improve").as[String] mustBe "Blah blooh blah la dee daaaaa"
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
       on(SurveyConfirmationPage)
@@ -189,13 +189,13 @@ class SurveyFeature extends StubbedFeatureSpec {
 
   def shouldSendSurveyToDatastream = {
     eventually {
-      getDatastreamSubmissionsForSurvey.size() shouldBe 1
+      getDatastreamSubmissionsForSurvey.size() mustBe 1
     }
   }
 
   def shouldNotSendSurveyToDatastream = {
     eventually {
-      getDatastreamSubmissionsForSurvey.size() shouldBe 0
+      getDatastreamSubmissionsForSurvey.size() mustBe 0
     }
   }
 

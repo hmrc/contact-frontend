@@ -16,9 +16,9 @@ class ContactHmrcPartialFeature extends StubbedFeatureSpec {
       goOn(new ContactHmrcPartialPage("http://server/account/contact", Some("myservice")))
 
       Then("I confirm the submit URL is correct")
-      tagName("form").element.attribute("action") shouldBe Some("http://server/account/contact")
-      name("csrfToken").element.attribute("value") shouldBe Some("token")
-      name("service").element.attribute("value") shouldBe Some("myservice")
+      tagName("form").element.attribute("action") mustBe Some("http://server/account/contact")
+      name("csrfToken").element.attribute("value") mustBe Some("token")
+      name("service").element.attribute("value") mustBe Some("myservice")
     }
 
 //    MoveToAcceptanceTest
@@ -26,11 +26,11 @@ class ContactHmrcPartialFeature extends StubbedFeatureSpec {
       go(new ContactHmrcPartialPage(submitUrl = "http://server/account/contact", renderFormOnly = Some(true)))
 
       Then("The form is rendered")
-      tagName("form").element.attribute("action") shouldBe Some("http://server/account/contact")
+      tagName("form").element.attribute("action") mustBe Some("http://server/account/contact")
 
       And("I do not see any copy with the form")
-      ContactHmrcPage.bodyText.contains("If you have a specific tax query") shouldBe false
-      ContactHmrcPage.bodyText.contains("How can we help you?") shouldBe false
+      ContactHmrcPage.bodyText.contains("If you have a specific tax query") mustBe false
+      ContactHmrcPage.bodyText.contains("How can we help you?") mustBe false
     }
 
   }

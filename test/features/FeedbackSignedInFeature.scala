@@ -23,7 +23,7 @@ class FeedbackSignedInFeature extends StubbedFeatureSpec {
 
       Given("I go to the 'Send your feedback' page")
       goOn(AuthenticatedFeedbackPage)
-      AuthenticatedFeedbackPage.ratingsList() shouldBe List("Very good", "Good", "Neutral", "Bad", "Very bad")
+      AuthenticatedFeedbackPage.ratingsList() mustBe List("Very good", "Good", "Neutral", "Bad", "Very bad")
 
       When("I fill the feedback form correctly")
       AuthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)

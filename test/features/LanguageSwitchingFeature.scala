@@ -82,8 +82,8 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
       click on linkText("Cymraeg")
 
       Then("The ratings text is in Welsh")
-      UnauthenticatedFeedbackPage.pageTitle shouldBe "Anfon eich adborth"
-      UnauthenticatedFeedbackPage.ratingsList() shouldBe List("Da iawn", "Da", "Niwtral", "Gwael", "Gwael iawn")
+      UnauthenticatedFeedbackPage.pageTitle mustBe "Anfon eich adborth"
+      UnauthenticatedFeedbackPage.ratingsList() mustBe List("Da iawn", "Da", "Niwtral", "Gwael", "Gwael iawn")
     }
   }
 }

@@ -41,11 +41,11 @@ private object AppDependencies {
     "org.pegdown" % "pegdown" % "1.6.0" % "test",
     "org.jsoup" % "jsoup" % "1.7.3" % "test",
     "com.github.tomakehurst" % "wiremock" % "1.58" % "test",
-    "uk.gov.hmrc" %% "scala-webdriver" % "5.16.0" % "test",
+    "uk.gov.hmrc" %% "scala-webdriver" % "5.18.0" % "test",
     "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % "test"
   ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
     .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(
-    "org.seleniumhq.selenium" % "selenium-java" % "2.53.1" % "test")
+    "org.seleniumhq.selenium" % "selenium-java" % "3.6.0" % "test")
 
   def apply() = compile ++ test
 }

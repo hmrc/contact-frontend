@@ -58,8 +58,8 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
         .post(s"report-name=Mike&report-email=mike@example.com&report-action=Action&report-error=error")
 
       And("I get a bad request error")
-      eventualResponse.futureValue.status shouldBe 403
-      eventualResponse.futureValue.body should include("No CSRF token found in headers")
+      eventualResponse.futureValue.status mustBe 403
+      eventualResponse.futureValue.body must include("No CSRF token found in headers")
     }
 
 //    MoveToAcceptanceTest
@@ -68,19 +68,19 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       goOn(UnauthenticatedFeedbackPage)
 
       Then("The get 'Get help with this page' form is hidden")
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden should be (true)
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden must be (true)
 
       When("I open the 'Get help with this page' form")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
 
       Then("The 'Get help with this page' form is visible")
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden should be (false)
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden must be (false)
 
       When("I close the 'Get help with this page' form")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
 
       Then("The get 'Get help with this page' form is hidden")
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden should be (true)
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden must be (true)
     }
 
 //    MoveToAcceptanceTest
@@ -97,7 +97,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
 
       Then("I see an error for invalid name")
       eventually {
-        UnauthenticatedFeedbackPage.bodyText should include ("Letters or punctuation only please")
+        UnauthenticatedFeedbackPage.bodyText must include ("Letters or punctuation only please")
       }
     }
 
@@ -115,7 +115,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
 
       Then("I see an error for invalid email")
       eventually {
-        UnauthenticatedFeedbackPage.bodyText should include ("Please enter a valid email address.")
+        UnauthenticatedFeedbackPage.bodyText must include ("Please enter a valid email address.")
       }
     }
 
@@ -129,10 +129,10 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       UnauthenticatedFeedbackPage.getHelpWithThisPage.clickSubmitButton()
 
       Then("I see an error for invalid name")
-      UnauthenticatedFeedbackPage.bodyText should include ("Please provide your name.")
-      UnauthenticatedFeedbackPage.bodyText should include ("Please provide your email address.")
-      UnauthenticatedFeedbackPage.bodyText should include ("Please enter details of what you were doing.")
-      UnauthenticatedFeedbackPage.bodyText should include ("Please enter details of what went wrong.")
+      UnauthenticatedFeedbackPage.bodyText must include ("Please provide your name.")
+      UnauthenticatedFeedbackPage.bodyText must include ("Please provide your email address.")
+      UnauthenticatedFeedbackPage.bodyText must include ("Please enter details of what you were doing.")
+      UnauthenticatedFeedbackPage.bodyText must include ("Please enter details of what went wrong.")
     }
   }
 

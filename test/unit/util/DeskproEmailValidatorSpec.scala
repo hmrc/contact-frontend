@@ -24,8 +24,10 @@ class DeskproEmailValidatorSpec extends UnitSpec {
   }
 
   "Given an email address with an invalid domain, an email validator" should {
-    emailValidator.validate("some.name@o.2") shouldBe false
-    emailValidator.validate("some.name@moo.min") shouldBe false
-    emailValidator.validate("some.name@foo") shouldBe false
+    "return false" in {
+      emailValidator.validate("some.name@o.2") shouldBe false
+      emailValidator.validate("some.name@moo.min") shouldBe false
+      emailValidator.validate("some.name@foo") shouldBe false
+    }
   }
 }

@@ -23,7 +23,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
     scenario("Submit feedback successfully") {
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
-      UnauthenticatedFeedbackPage.ratingsList() shouldBe List("Very good", "Good", "Neutral", "Bad", "Very bad")
+      UnauthenticatedFeedbackPage.ratingsList() mustBe List("Very good", "Good", "Neutral", "Bad", "Very bad")
 
       When("I fill the feedback form correctly")
       UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
