@@ -2,7 +2,7 @@ import sbt._
 
 object FrontendBuild extends Build with MicroService {
   import scala.util.Properties.envOrElse
-
+  private val commonSettings = net.virtualvoid.sbt.graph.DependencyGraphSettings.graphSettings
   val appName = "contact-frontend"
   val appVersion = envOrElse("CONTACT_FRONTEND_VERSION", "999-SNAPSHOT")
 
@@ -41,7 +41,7 @@ private object AppDependencies {
     "org.pegdown" % "pegdown" % "1.6.0" % "test",
     "org.jsoup" % "jsoup" % "1.7.3" % "test",
     "com.github.tomakehurst" % "wiremock" % "1.58" % "test",
-    "uk.gov.hmrc" %% "scala-webdriver" % "5.18.0" % "test",
+    "uk.gov.hmrc" %% "scala-webdriver" % "5.18.0",
     "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % "test"
   ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
     .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(

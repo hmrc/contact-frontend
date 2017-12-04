@@ -37,6 +37,5 @@ trait NavigationSugar extends WebBrowser with Eventually with Assertions with In
         }
       }
     )
-
   }
 }
