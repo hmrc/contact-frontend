@@ -1,6 +1,7 @@
 package connectors.deskpro.domain
 
-import org.scalatestplus.play.OneAppPerSuite
+import play.api.Play
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import uk.gov.hmrc.domain._
@@ -8,7 +9,18 @@ import uk.gov.hmrc.http.logging.SessionId
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys, UserId}
 import uk.gov.hmrc.play.test.UnitSpec
 
-class FieldTransformerSpec extends UnitSpec with OneAppPerSuite {
+class FieldTransformerSpec extends UnitSpec {
+
+  def withinPlayApplication(block: => Unit): Unit = {
+    val application = GuiceApplicationBuilder().configure().build()
+    try {
+      Play.start(application)
+      block
+    } finally {
+      Play.stop(application)
+    }
+  }
+
 
   "Field Transformer" should {
 
@@ -33,16 +45,22 @@ class FieldTransformerSpec extends UnitSpec with OneAppPerSuite {
     }
 
     "transforms userId in the header carrier to user id" in new FieldTransformerScope {
-      transformer.userIdFrom(requestAuthenticatedByIda, hc) shouldBe userId.value
+      withinPlayApplication {
+        transformer.userIdFrom(requestAuthenticatedByIda, hc) shouldBe userId.value
+      }
     }
 
     "transforms userId in the header carrier to n/a if the suppressUserIdInSupportRequests session key is set to true" in new FieldTransformerScope {
-      val requestWithSuppressedUserId = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession(SessionKeys.authProvider -> "IDA", SessionKeys.sensitiveUserId -> "true")
-      transformer.userIdFrom(requestWithSuppressedUserId, hc) shouldBe "n/a"
+      withinPlayApplication {
+        val requestWithSuppressedUserId = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession(SessionKeys.authProvider -> "IDA", SessionKeys.sensitiveUserId -> "true")
+        transformer.userIdFrom(requestWithSuppressedUserId, hc) shouldBe "n/a"
+      }
     }
 
     "transforms no userId in the header carrier to n/a" in new FieldTransformerScope {
-      transformer.userIdFrom(FakeRequest(), hc.copy(userId = None)) shouldBe "n/a"
+      withinPlayApplication {
+        transformer.userIdFrom(FakeRequest(), hc.copy(userId = None)) shouldBe "n/a"
+      }
     }
 
     "transform  sessionId in the header carrier to session id" in new FieldTransformerScope {
@@ -81,16 +99,16 @@ class FieldTransformerSpec extends UnitSpec with OneAppPerSuite {
 }
 
 class FieldTransformerScope {
-  val transformer = new FieldTransformer {}
+  lazy val transformer = new FieldTransformer {}
 
 
-  val userId = UserId("456")
-  val payeUser =
+  lazy val userId = UserId("456")
+  lazy val payeUser =
     Enrolments(Set(
       Enrolment("HMRC-NI").withIdentifier("NINO", "SH233544B")
     ))
 
-  val bizTaxUserWithVatDec =
+  lazy val bizTaxUserWithVatDec =
     Enrolments(Set(
       Enrolment("IR-SA").withIdentifier("UTR", "sa"),
       Enrolment("IR-CT").withIdentifier("UTR", "ct"),
@@ -98,7 +116,7 @@ class FieldTransformerScope {
       Enrolment("IR-PAYE").withIdentifier("TaxOfficeNumber", "officeNum").withIdentifier("TaxOfficeReference", "officeRef")
     ))
 
-  val bizTaxUserWithVatVar =
+  lazy val bizTaxUserWithVatVar =
     Enrolments(Set(
       Enrolment("IR-SA").withIdentifier("UTR", "sa"),
       Enrolment("IR-CT").withIdentifier("UTR", "ct"),
@@ -114,8 +132,8 @@ class FieldTransformerScope {
   val subject: String = "subject"
   val message: String = "message"
   val referrer: String = "referer"
-  val request = FakeRequest().withHeaders(("User-Agent", userAgent))
-  val requestAuthenticatedByIda = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession((SessionKeys.authProvider, "IDA"))
+  lazy val request = FakeRequest().withHeaders(("User-Agent", userAgent))
+  lazy val requestAuthenticatedByIda = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession((SessionKeys.authProvider, "IDA"))
 
   def expectedUserTaxIdentifiers(nino: Option[String] = None,
                                  ctUtr: Option[String] = None,
