@@ -16,7 +16,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
-class SurveyControllerSpec extends UnitSpec with OneAppPerSuite {
+class SurveyControllerSpec extends UnitSpec {
 
   "ticketId regex" should {
     "validates correct ticket refs" in new SurveyControllerApplication {

@@ -9,7 +9,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.{Application, Environment}
+import play.api.{Application, Environment, Play}
 import play.api.i18n.MessagesApi
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -25,63 +25,73 @@ import util.DeskproEmailValidator
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
+class ProblemReportsControllerSpec extends UnitSpec {
 
-  override lazy val app = GuiceApplicationBuilder().configure(Map(
-    "govuk-tax.Test.assets.url" -> "",
-    "govuk-tax.Test.assets.version" -> "",
-    "govuk-tax.Test.google-analytics.token" -> "",
-    "govuk-tax.Test.google-analytics.host" -> ""
-  )).build()
+  def withinPlayApplication(application: Application)(block: => Unit): Unit = {
+    try {
+      Play.start(application)
+      block
+    } finally {
+      Play.stop(application)
+    }
+  }
+
+  lazy val app = GuiceApplicationBuilder().configure().build()
 
   "Reporting a problem" should {
 
     "return 200 and a valid html page for a valid request and js is not enabled for an unauthenticated user" in new ProblemReportsControllerApplication(app) {
+      withinPlayApplication(app) {
 
-      hrmcConnectorWillReturnTheTicketId
+        hrmcConnectorWillReturnTheTicketId
 
-      val result = controller.doReport()(request)
+        val result = controller.doReport()(request)
 
-      status(result) should be(200)
+        status(result) should be(200)
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("report-confirmation") should not be null
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("report-confirmation") should not be null
+      }
     }
 
-
     "return 200 and a valid html page for a valid request and js is not enabled for an authenticated user" in new ProblemReportsControllerApplication(app) {
-      when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(enrolments), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
+      withinPlayApplication(app) {
+        when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(enrolments), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
-      val result = controller.doReport()(request.withSession(SessionKeys.authToken -> "authToken"))
+        val result = controller.doReport()(request.withSession(SessionKeys.authToken -> "authToken"))
 
-      status(result) should be(200)
+        status(result) should be(200)
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("report-confirmation") should not be null
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("report-confirmation") should not be null
+      }
     }
 
     "return 200 and a valid json for a valid request and js is enabled" in new ProblemReportsControllerApplication(app) {
-      when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(true), any[Request[AnyRef]](), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
+      withinPlayApplication(app) {
+        when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(true), any[Request[AnyRef]](), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
-      val result = controller.doReport()(generateRequest())
+        val result = controller.doReport()(generateRequest())
 
-      status(result) should be(200)
+        status(result) should be(200)
 
-      val message = contentAsJson(result).\("message").as[String]
-      contentAsJson(result).\("status").as[String] shouldBe "OK"
-      message should include("<h2 id=\"feedback-thank-you-header\">Thank you</h2>")
-      message should include("Someone will get back to you within 2 working days.")
+        val message = contentAsJson(result).\("message").as[String]
+        contentAsJson(result).\("status").as[String] shouldBe "OK"
+        message should include("<h2 id=\"feedback-thank-you-header\">Thank you</h2>")
+        message should include("Someone will get back to you within 2 working days.")
+      }
     }
 
     "return 200 and a valid html page for invalid input and js is not enabled" in new ProblemReportsControllerApplication(app) {
+      withinPlayApplication(app) {
+        val result = controller.doReport()(generateInvalidRequest(javascriptEnabled = false))
 
-      val result = controller.doReport()(generateInvalidRequest(javascriptEnabled = false))
+        status(result) should be(200)
+        verifyZeroInteractions(hmrcDeskproConnector)
 
-      status(result) should be(200)
-      verifyZeroInteractions(hmrcDeskproConnector)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("report-confirmation-no-data") should not be null
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("report-confirmation-no-data") should not be null
+      }
     }
 
     "return 400 and a valid json for invalid input and js is enabled" in new ProblemReportsControllerApplication(app) {
@@ -95,61 +105,67 @@ class ProblemReportsControllerSpec extends UnitSpec with OneAppPerSuite {
     }
 
     "fail if the email has invalid syntax (for DeskPRO)" in new ProblemReportsControllerApplication(app) {
+      withinPlayApplication(app) {
+        val submit = controller.doReport()(generateRequest(javascriptEnabled = false, email = "a@a"))
+        val page = Jsoup.parse(contentAsString(submit))
 
-      val submit = controller.doReport()(generateRequest(javascriptEnabled = false, email = "a@a"))
-      val page = Jsoup.parse(contentAsString(submit))
+        status(submit) shouldBe 200
+        verifyZeroInteractions(hmrcDeskproConnector)
 
-      status(submit) shouldBe 200
-      verifyZeroInteractions(hmrcDeskproConnector)
-
-      page.getElementById("report-confirmation-no-data") should not be null
+        page.getElementById("report-confirmation-no-data") should not be null
+      }
     }
 
     "fail if the name has invalid characters - Javascript disabled" in new ProblemReportsControllerApplication(app) {
+      withinPlayApplication(app) {
+        val submit = controller.doReport()(generateRequest(javascriptEnabled = false, name ="""<a href="blah.com">something</a>""").withSession(SessionKeys.authToken -> "authToken"))
+        val page = Jsoup.parse(contentAsString(submit))
 
-      val submit = controller.doReport()(generateRequest(javascriptEnabled = false, name="""<a href="blah.com">something</a>""").withSession(SessionKeys.authToken -> "authToken"))
-      val page = Jsoup.parse(contentAsString(submit))
+        status(submit) shouldBe 200
+        verifyZeroInteractions(hmrcDeskproConnector)
 
-      status(submit) shouldBe 200
-      verifyZeroInteractions(hmrcDeskproConnector)
-
-      page.getElementById("report-confirmation-no-data") should not be null
+        page.getElementById("report-confirmation-no-data") should not be null
+      }
     }
 
-    "Return error page if the Deskpro ticket creation fails - Javascript disabled" in new ProblemReportsControllerApplication(app) {
-      when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.failed(new Exception("failed")))
+    "return error page if the Deskpro ticket creation fails - Javascript disabled" in new ProblemReportsControllerApplication(app) {
+      withinPlayApplication(app) {
+        when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.failed(new Exception("failed")))
 
-      val result = controller.doReport()(request)
-      status(result) should be(200)
+        val result = controller.doReport()(request)
+        status(result) should be(200)
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("report-confirmation-no-data") should not be null
-      document.text() should include("Please try again later.")
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("report-confirmation-no-data") should not be null
+        document.text() should include("Please try again later.")
+      }
     }
 
     "render the thank you message given" in new ProblemReportsControllerApplication(app) {
-      hrmcConnectorWillReturnTheTicketId
+      withinPlayApplication(app) {
+        hrmcConnectorWillReturnTheTicketId
 
-      val submit = controller.doReport(Some("common.feedback.title"))(request)
-      val page = Jsoup.parse(contentAsString(submit))
+        val submit = controller.doReport(Some("common.feedback.title"))(request)
+        val page = Jsoup.parse(contentAsString(submit))
 
-      page.text() should include("Get help using this service")
+        page.text() should include("Get help using this service")
+      }
     }
 
     "render the default thank you message if one is not provided" in new ProblemReportsControllerApplication(app) {
-      hrmcConnectorWillReturnTheTicketId
+      withinPlayApplication(app) {
+        hrmcConnectorWillReturnTheTicketId
 
-      val submit = controller.doReport()(request)
-      val page = Jsoup.parse(contentAsString(submit))
+        val submit = controller.doReport()(request)
+        val page = Jsoup.parse(contentAsString(submit))
 
-      page.text() should include("Someone will get back to you within 2 working days.")
+        page.text() should include("Someone will get back to you within 2 working days.")
+      }
     }
-
   }
-
 }
 
-class ProblemReportsControllerApplication(app : Application) extends MockitoSugar {
+class ProblemReportsControllerApplication(app: Application) extends MockitoSugar {
 
   val authConnector = new AuthConnector {
     override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] = {
@@ -169,7 +185,7 @@ class ProblemReportsControllerApplication(app : Application) extends MockitoSuga
 
   val enrolments = Some(Enrolments(Set()))
 
-  def generateRequest(javascriptEnabled: Boolean = true, name:String = deskproName, email: String = deskproEmail) = FakeRequest()
+  def generateRequest(javascriptEnabled: Boolean = true, name: String = deskproName, email: String = deskproEmail) = FakeRequest()
     .withHeaders(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent"))
     .withFormUrlEncodedBody("report-name" -> name, "report-email" -> email,
       "report-action" -> "Some Action", "report-error" -> "Some Error", "isJavascript" -> javascriptEnabled.toString)
@@ -196,5 +212,4 @@ class ProblemReportsControllerApplication(app : Application) extends MockitoSuga
       meq(None),
       meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(result)
   }
-
 }
