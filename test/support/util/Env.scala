@@ -1,7 +1,9 @@
 package support.util
 
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.firefox.{FirefoxDriver, FirefoxOptions}
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
-import uk.gov.hmrc.integration.framework.SingletonDriver
+import org.openqa.selenium.remote.DesiredCapabilities
 
 
 object Env {
@@ -18,12 +20,41 @@ object Env {
 
   private var jsEnabled = true
 
-  def jsDriver = SingletonDriver.getInstance()
+  lazy val systemProperties = System.getProperties
+
+  def getDriver(): WebDriver = {
+    val capabilities = DesiredCapabilities.firefox()
+    capabilities.setJavascriptEnabled(javascriptEnabled)
+
+
+    val options = new FirefoxOptions(capabilities)
+
+    System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true"
+    )
+    System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "true"
+    )
+
+    new FirefoxDriver(options)
+  }
+
+  def javascriptEnabled: Boolean = {
+    val jsEnabled: String = systemProperties.getProperty("javascriptEnabled")
+    if(jsEnabled == null) systemProperties.setProperty("javascriptEnabled", "true")
+    if (jsEnabled != "false") {
+      true
+    } else {
+      false
+    }
+  }
+
+//  def jsDriver = SingletonDriver.getInstance()
+  def jsDriver = Driver.getInstance()
   def htmlUnitDriver = NoJsDriver.getInstance()
 
   def driver = jsEnabled match {
     case true => jsDriver
     case false => htmlUnitDriver
+
   }
 
   def useJavascriptDriver() = {
@@ -31,7 +62,8 @@ object Env {
   }
 
   def useNonJavascriptDriver() = {
-    SingletonDriver.closeInstance()
+//    SingletonDriver.closeInstance()
+    Driver.closeInstance()
     jsEnabled = false
   }
 
@@ -45,7 +77,8 @@ object Env {
   }
 
   sys addShutdownHook {
-    SingletonDriver.closeInstance()
+//    SingletonDriver.closeInstance()
+    Driver.closeInstance()
     NoJsDriver.closeInstance()
   }
 }
