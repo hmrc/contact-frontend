@@ -36,7 +36,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
           |   "subject":"Contact form submission",
           |   "message":"$Comment",
           |   "referrer":"n/a",
-          |   "javascriptEnabled":"Y",
+          |   "javascriptEnabled":"N",
           |   "authId":"/auth/oid/1234567890",
           |   "areaOfTax":"unknown",
           |   "sessionId": "${Login.SessionId}",
@@ -90,8 +90,8 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       And("I see:")
       i_see(
         "Your name can't be longer than 70 characters",
-        "Your email can't be longer than 255 characters",
-        "0 remaining characters")
+        "Your email can't be longer than 255 characters")
+//        "0 remaining characters")
 
       And("the Deskpro endpoint '/deskpro/get-help-ticket' has not been hit")
       verify_post_no_hit("/deskpro/get-help-ticket")
@@ -205,7 +205,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
           |   "subject":"Contact form submission",
           |   "message":"$Comment",
           |   "referrer":"http://localhost:11111/external/page",
-          |   "javascriptEnabled":"Y",
+          |   "javascriptEnabled":"N",
           |   "authId":"/auth/oid/1234567890",
           |   "areaOfTax":"unknown",
           |   "sessionId": "${Login.SessionId}",
