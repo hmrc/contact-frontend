@@ -5,7 +5,6 @@ import uk.gov.hmrc.integration.framework.SingletonDriver
 
 
 object Env {
-
   var host = Option(System.getProperty("environment")) match {
     case Some("qa") => "https://www.qa.tax.service.gov.uk"
     case _ => Option(System.getProperty("host")).getOrElse("http://localhost:9000")
@@ -37,7 +36,6 @@ object Env {
   def driver = jsEnabled match {
     case true => jsDriver
     case false => htmlUnitDriver
-
   }
 
   def useJavascriptDriver() = {
