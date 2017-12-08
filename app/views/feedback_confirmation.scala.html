@@ -1,7 +1,7 @@
 @import config.AppConfig
 
-@(ticketId:String, loggedIn: Boolean)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@(ticketId:String, loggedIn: Boolean, returnUrl: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @main(title = Messages("common.feedback.heading"), userLoggedIn = loggedIn) {
-    @views.html.partials.feedback_form_confirmation(ticketId)
+    @views.html.partials.feedback_form_confirmation(ticketId, returnUrl)
 }

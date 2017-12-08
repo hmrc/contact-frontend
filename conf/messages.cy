@@ -21,6 +21,7 @@ language-switcher.english=English
 language-switcher.english.hover=Use this account in English
 language-switcher.welsh=Cymraeg
 language-switcher.welsh.hover=Defnyddio''r cyfrif hwn yn Cymraeg
+button.back=Yn ôl
 
 problem_report.action=Beth oeddech yn ei wneud?
 problem_report.error=Gyda beth ydych angen help?

@@ -2,15 +2,16 @@
 
 @(feedbackForm: Form[controllers.FeedbackForm],
   loggedIn : Boolean,
-  service: Option[String] = None)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+  service: Option[String] = None,
+  returnUrl: Option[String] = None)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
 @main(title = Messages("common.feedback.heading"), userLoggedIn = loggedIn) {
 
     @if(loggedIn) {
-        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submit.url, service)
+        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submit.url, service, returnUrl)
     } else {
-        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submitUnauthenticated.url, service)
+        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submitUnauthenticated.url, service, returnUrl)
     }
 }
