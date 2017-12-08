@@ -1,6 +1,5 @@
 package features
 
-import akka.stream.ActorMaterializer
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import support.StubbedFeatureSpec
 import support.page.{AuthenticatedFeedbackPage, FeedbackSuccessPage}
@@ -50,7 +49,7 @@ class FeedbackSignedInFeature extends StubbedFeatureSpec {
           |   "rating":"1",
           |   "message":"$Comment",
           |   "referrer":"n/a",
-          |   "javascriptEnabled":"Y",
+          |   "javascriptEnabled":"N",
           |   "authId":"/auth/oid/1234567890",
           |   "areaOfTax":"unknown",
           |   "sessionId": "${Login.SessionId}",
