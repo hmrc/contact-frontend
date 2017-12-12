@@ -1,7 +1,7 @@
 @(feedbackForm: Form[controllers.FeedbackForm],
   externalFeedbackUrl: String,
   service: Option[String] = None,
-  returnUrl: Option[String] = None)(implicit request : Request[_], lang : Lang, messages : Messages)
+  backUrl: Option[String] = None)(implicit request : Request[_], lang : Lang, messages : Messages)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
@@ -49,8 +49,8 @@
         )
         <input type="hidden" name="isJavascript" id="isJavascript" value="@feedbackForm.data.get("isJavascript")">
         <input type="hidden" name="referer" id="referer" value="@feedbackForm.data.get("referer")">
-        @for(url <- returnUrl) {
-            <input type="hidden" name="returnUrl" value="@url">
+        @for(url <- backUrl) {
+            <input type="hidden" name="backUrl" value="@url">
         }
 
         <div class="form-field">

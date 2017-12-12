@@ -7,19 +7,9 @@ import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import uk.gov.hmrc.domain._
 import uk.gov.hmrc.http.logging.SessionId
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys, UserId}
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-class FieldTransformerSpec extends UnitSpec {
-
-  def withinPlayApplication(block: => Unit): Unit = {
-    val application = GuiceApplicationBuilder().configure().build()
-    try {
-      Play.start(application)
-      block
-    } finally {
-      Play.stop(application)
-    }
-  }
+class FieldTransformerSpec extends UnitSpec with WithFakeApplication {
 
 
   "Field Transformer" should {
@@ -45,22 +35,16 @@ class FieldTransformerSpec extends UnitSpec {
     }
 
     "transforms userId in the header carrier to user id" in new FieldTransformerScope {
-      withinPlayApplication {
-        transformer.userIdFrom(requestAuthenticatedByIda, hc) shouldBe userId.value
-      }
+      transformer.userIdFrom(requestAuthenticatedByIda, hc) shouldBe userId.value
     }
 
     "transforms userId in the header carrier to n/a if the suppressUserIdInSupportRequests session key is set to true" in new FieldTransformerScope {
-      withinPlayApplication {
-        val requestWithSuppressedUserId = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession(SessionKeys.authProvider -> "IDA", SessionKeys.sensitiveUserId -> "true")
-        transformer.userIdFrom(requestWithSuppressedUserId, hc) shouldBe "n/a"
-      }
+      val requestWithSuppressedUserId = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession(SessionKeys.authProvider -> "IDA", SessionKeys.sensitiveUserId -> "true")
+      transformer.userIdFrom(requestWithSuppressedUserId, hc) shouldBe "n/a"
     }
 
     "transforms no userId in the header carrier to n/a" in new FieldTransformerScope {
-      withinPlayApplication {
-        transformer.userIdFrom(FakeRequest(), hc.copy(userId = None)) shouldBe "n/a"
-      }
+      transformer.userIdFrom(FakeRequest(), hc.copy(userId = None)) shouldBe "n/a"
     }
 
     "transform  sessionId in the header carrier to session id" in new FieldTransformerScope {
