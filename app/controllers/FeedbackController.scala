@@ -31,7 +31,7 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
   override protected def runModeConfiguration = configuration
 
   def feedbackForm(service: Option[String] = None, backUrl: Option[String] = None) = Action.async { implicit request =>
-    loginRedirection(routes.FeedbackController.feedbackForm(None, backUrl).url)(authorised(AuthProviders(GovernmentGateway)) {
+    loginRedirection(routes.FeedbackController.feedbackForm(service, backUrl).url)(authorised(AuthProviders(GovernmentGateway)) {
       Future.successful(
         Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map {
           _.value
