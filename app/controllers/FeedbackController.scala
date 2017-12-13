@@ -30,19 +30,20 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
 
   override protected def runModeConfiguration = configuration
 
-  def feedbackForm(service: Option[String] = None) = Action.async { implicit request =>
-    loginRedirection(routes.FeedbackController.feedbackForm(None).url)(authorised(AuthProviders(GovernmentGateway)) {
+  def feedbackForm(service: Option[String] = None, backUrl: Option[String] = None) = Action.async { implicit request =>
+    loginRedirection(routes.FeedbackController.feedbackForm(service, backUrl).url)(authorised(AuthProviders(GovernmentGateway)) {
       Future.successful(
         Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map {
           _.value
-        }.getOrElse("")), true, service))
+        }.getOrElse(""), backUrl = backUrl), true, service, backUrl))
       )
     })
   }
 
-  def unauthenticatedFeedbackForm(service: Option[String] = None) = Action.async { implicit request =>
+  def unauthenticatedFeedbackForm(service: Option[String] = None, backUrl: Option[String] = None) = Action.async { implicit request =>
     Future.successful(
-      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map { _.value }.getOrElse("")), false, service))
+      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map { _.value }.getOrElse(""),
+        backUrl = backUrl), false, service, backUrl))
     )
   }
 
@@ -57,14 +58,14 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
     implicit request => doSubmit(None)
   }
 
-  def thanks = Action.async { implicit request =>
-    loginRedirection(routes.FeedbackController.thanks().url)(
-    authorised(AuthProviders(GovernmentGateway)) { doThanks(true, request)
+  def thanks(backUrl: Option[String] = None) = Action.async { implicit request =>
+    loginRedirection(routes.FeedbackController.thanks(backUrl).url)(
+    authorised(AuthProviders(GovernmentGateway)) { doThanks(true, request, backUrl)
     })
   }
 
-  def unauthenticatedThanks = Action.async {
-    implicit request => doThanks(false, request)
+  def unauthenticatedThanks(backUrl: Option[String] = None) = Action.async {
+    implicit request => doThanks(false, request, backUrl)
   }
 
   private def doSubmit(enrolments: Option[Enrolments])(implicit request: Request[AnyContent]): Future[Result] =
@@ -73,7 +74,9 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
       data => {
         val ticketIdF = createDeskproFeedback(data, enrolments)
         ticketIdF map { ticketId =>
-          Redirect(enrolments.map(_ => routes.FeedbackController.thanks()).getOrElse(routes.FeedbackController.unauthenticatedThanks())).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+          Redirect(enrolments.map(_ => routes.FeedbackController.thanks(data.backUrl))
+            .getOrElse(routes.FeedbackController.unauthenticatedThanks(data.backUrl))).
+              withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
         }
       }
     )
@@ -82,29 +85,32 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
     views.html.feedback(form, loggedIn)
   }
 
-  private def doThanks(implicit loggedIn : Boolean, request: Request[AnyRef]): Future[Result] = {
+  private def doThanks(implicit loggedIn : Boolean, request: Request[AnyRef], backUrl: Option[String] = None): Future[Result] = {
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
-      Ok(views.html.feedback_confirmation(ticketId, loggedIn))
+      Ok(views.html.feedback_confirmation(ticketId, loggedIn, backUrl))
     }
     Future.successful(result)
   }
 
 }
 
-case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"))
+case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"), backUrl: Option[String])
 
 object FeedbackForm {
-  def apply(referer: String, csrfToken: String): FeedbackForm =
-    FeedbackForm("", "", "", "", javascriptEnabled = false, referer, csrfToken)
+  def apply(referer: String, csrfToken: String, backUrl : Option[String]): FeedbackForm =
+    FeedbackForm("", "", "", "", javascriptEnabled = false, referer, csrfToken, backUrl = backUrl)
 
   def apply(
     experienceRating: Option[String], name: String, email: String, comments: String,
-    javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String]
+    javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String],
+    backUrl: Option[String]
   ): FeedbackForm =
-    FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken, service)
+    FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken, service,
+      backUrl)
 
-  def emptyForm(csrfToken: String, referer: Option[String] = None)(implicit request: Request[AnyRef]) =
-    FeedbackFormBind.form.fill(FeedbackForm(referer.getOrElse(request.headers.get("Referer").getOrElse("n/a")), csrfToken))
+  def emptyForm(csrfToken: String, referer: Option[String] = None, backUrl : Option[String])(implicit request: Request[AnyRef]) =
+    FeedbackFormBind.form.fill(FeedbackForm(referer.getOrElse(request.headers.get("Referer").getOrElse("n/a")), csrfToken,
+      backUrl))
 }
 
 object FeedbackFormConfig {
@@ -142,9 +148,10 @@ object FeedbackFormBind {
     "isJavascript" -> boolean,
     "referer" -> text,
     "csrfToken" -> text,
-    "service" -> optional(text)
+    "service" -> optional(text),
+    "backUrl" -> optional(text)
   )(FeedbackForm.apply)((feedbackForm: FeedbackForm) => {
       import feedbackForm._
-      Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer, csrfToken, service))
+      Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer, csrfToken, service, backUrl ))
     }))
 }

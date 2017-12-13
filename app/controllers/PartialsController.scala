@@ -50,7 +50,7 @@ class PartialsController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnec
   def feedbackForm(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String]) = Action.async {
     implicit request =>
       Future.successful {
-        Ok(views.html.partials.feedback_form(FeedbackForm.emptyForm(csrfToken, referer), submitUrl, service))
+        Ok(views.html.partials.feedback_form(FeedbackForm.emptyForm(csrfToken, referer, None), submitUrl, service))
       }
   }
 
@@ -75,7 +75,7 @@ class PartialsController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnec
 
   def feedbackFormConfirmation(ticketId: String) = UnauthorisedAction {
     implicit request =>
-      Ok(views.html.partials.feedback_form_confirmation(ticketId))
+      Ok(views.html.partials.feedback_form_confirmation(ticketId, None))
   }
 
 }

@@ -1,9 +1,9 @@
-GET         /beta-feedback                               @controllers.FeedbackController.feedbackForm(service: Option[String])
-GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.unauthenticatedFeedbackForm(service: Option[String])
+GET         /beta-feedback                               @controllers.FeedbackController.feedbackForm(service: Option[String], backUrl: Option[String])
+GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.unauthenticatedFeedbackForm(service: Option[String], backUrl: Option[String])
 POST        /beta-feedback/submit                        @controllers.FeedbackController.submit
 POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackController.submitUnauthenticated
-GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks
-GET         /beta-feedback/thanks-unauthenticated        @controllers.FeedbackController.unauthenticatedThanks
+GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks(backUrl: Option[String])
+GET         /beta-feedback/thanks-unauthenticated        @controllers.FeedbackController.unauthenticatedThanks(backUrl: Option[String])
 
 
 GET         /contact-hmrc                                @controllers.ContactHmrcController.index
