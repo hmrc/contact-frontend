@@ -45,7 +45,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % "test"
   ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
     .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(
-    "org.seleniumhq.selenium" % "selenium-java" % "3.6.0" % "test")
+    "org.seleniumhq.selenium" % "selenium-java" % "3.7.1" % "test")
 
   def apply() = compile ++ test
 }
