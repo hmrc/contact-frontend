@@ -1,13 +1,9 @@
 package support
 
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.scalatest._
+import org.scalatestplus.play.OneServerPerSuite
+import play.api.Logger
 import support.behaviour.NavigationSugar
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.TestServer
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs._
 import support.util.Env
@@ -15,7 +11,6 @@ import support.util.Env
 trait StubbedFeatureSpec
   extends FeatureSpec
     with GivenWhenThen
-//    with OneServerPerSuite
     with Stubs
     with BeforeAndAfter
     with BeforeAndAfterEach
@@ -25,34 +20,38 @@ trait StubbedFeatureSpec
     with NavigationSteps
     with ApiSteps
     with ObservationSteps
-    with OptionValues {
+    with OptionValues
+    with OneServerPerSuite {
 
-  lazy val port = 9000
-  val stubPort = 11111
-  val stubHost = "localhost"
-  val wireMockServer: WireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
-  lazy val app: Application = new GuiceApplicationBuilder().build()
-  var testServer = TestServer(port, app)
+   val logger = Logger("tests")
 
   override def beforeAll() = {
     Env.useJavascriptDriver()
-    wireMockServer.start()
-    WireMock.configureFor(stubHost, stubPort)
-    testServer.start()
+    Auditing.start()
+    Login.start()
+    Deskpro.start()
+    ExternalPages.start()
   }
 
   override def afterAll() = {
-    testServer.stop()
-    wireMockServer.stop()
+    Auditing.shutdown()
+    Login.shutdown()
+    Deskpro.shutdown()
+    ExternalPages.shutdown()
     Env.deleteAllCookies()
   }
 
   override def beforeEach() = {
     Env.deleteCookies()
-    WireMock.reset()
-    stubFor(Auditing)
-    stubFor(Login)
-    stubFor(Deskpro)
-    stubFor(ExternalPages)
+
+    Auditing.reset()
+    Login.reset()
+    Deskpro.reset()
+    ExternalPages.reset()
+
+    Auditing.create()
+    Login.create()
+    Deskpro.create()
+    ExternalPages.create()
   }
 }
