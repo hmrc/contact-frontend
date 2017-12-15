@@ -4,7 +4,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode
 import support.StubbedFeatureSpec
 import support.page.ContactHmrcPage
 import support.util.Env
-import support.stubs.Login
+import support.stubs.{Deskpro, Login}
 
 class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
 
@@ -37,7 +37,7 @@ class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
         "Someone will get back to you within 2 working days.")
 
       And("the Deskpro endpoint '/deskpro/get-help-ticket' has received the following POST request:")
-      verify_post(to = "/deskpro/get-help-ticket", body =
+      Deskpro.verify_post(to = "/deskpro/get-help-ticket", body =
         s"""
           |{
           |   "name":"$Name",

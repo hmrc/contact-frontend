@@ -1,17 +1,14 @@
 package features
 
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import play.api.test.FakeApplication
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
 import support.page.{SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds, UnauthenticatedFeedbackPage}
-import uk.gov.hmrc.play.test.WithFakeApplication
 
 @RunWith(classOf[JUnitRunner])
-class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplication {
+class LanguageSwitchingFeature extends StubbedFeatureSpec {
   override lazy val app = FakeApplication(
     additionalConfiguration = Map(
       "application.langs" -> "en,cy",
@@ -22,7 +19,6 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
   feature("Language Switching") {
 //    MoveToAcceptanceTest
     scenario("Switch from English to Welsh in the survey") {
-      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
 
       Given("I go to the survey form page")
       goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5", "arbitrary%20service%20id"))
@@ -53,13 +49,13 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
 //    MoveToAcceptanceTest
     scenario("Show confirmation message in Welsh after submitting the form in Welsh") {
       val invalidTicketId = "HMRC-Z2V6DUK5"
-      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
 
       Given("I go to the survey form page")
       goOn(new SurveyPageWithTicketAndServiceIds(invalidTicketId,"arbitrary%20service%20id"))
 
       And("I click on the switch language link")
       click on linkText("Cymraeg")
+      i_see("Arolwg")
 
       When("I successfully fill in the form")
       selectHowHelpfulTheResponseWas("strongly-agree")
@@ -82,7 +78,7 @@ class LanguageSwitchingFeature extends StubbedFeatureSpec with WithFakeApplicati
       click on linkText("Cymraeg")
 
       Then("The ratings text is in Welsh")
-      UnauthenticatedFeedbackPage.pageTitle mustBe "Anfon eich adborth"
+      i_see("Anfon eich adborth")
       UnauthenticatedFeedbackPage.ratingsList() mustBe List("Da iawn", "Da", "Niwtral", "Gwael", "Gwael iawn")
     }
   }

@@ -3,6 +3,7 @@ package features
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import support.StubbedFeatureSpec
 import support.page.{ExternalPage, FeedbackSuccessPage, TechnicalDifficultiesPage, UnauthenticatedFeedbackPage}
+import support.stubs.Deskpro
 
 class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
 
@@ -41,7 +42,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       )
 
       And("the Deskpro endpoint '/deskpro/feedback' has received the following POST request:")
-      verify_post(to = "/deskpro/feedback", body =
+      Deskpro.verify_post(to = "/deskpro/feedback", body =
         s"""
           |{
           |   "name":"$Name",
@@ -50,7 +51,6 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
           |   "rating":"1",
           |   "message":"$Comment",
           |   "referrer":"n/a",
-          |   "javascriptEnabled":"Y",
           |   "authId":"n/a",
           |   "areaOfTax":"unknown",
           |   "sessionId":"n/a",
@@ -83,7 +83,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
 
 //      MoveToAcceptanceTest: Deskpro Integration Test
       Then("the Deskpro endpoint '/deskpro/feedback' has received the following POST request:")
-      verify_post(to = "/deskpro/feedback", body =
+      Deskpro.verify_post(to = "/deskpro/feedback", body =
         s"""
           |{
           |   "name":"$Name",
@@ -91,8 +91,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
           |   "subject":"Beta feedback submission",
           |   "rating":"1",
           |   "message":"$Comment",
-          |   "referrer":"http://localhost:11111/external/page",
-          |   "javascriptEnabled":"Y",
+          |   "referrer":"http://localhost:11115/external/page",
           |   "authId":"n/a",
           |   "areaOfTax":"unknown",
           |   "sessionId":"n/a",
@@ -123,7 +122,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       )
 
       And("the Deskpro enpoint '/deskpro/feedback' has not been hit")
-      verify_post_no_hit("/deskpro/feedback")
+      Deskpro.verify_post_no_hit("/deskpro/feedback")
     }
 
 //    MoveToAcceptanceTest
@@ -149,8 +148,9 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       And("I see:")
       i_see(
       "Your name can't be longer than 70 characters",
-      "Your email can't be longer than 255 characters",
-      "0 remaining characters")
+      "Your email can't be longer than 255 characters"
+//      "0 remaining characters"
+       )
     }
 
 //    MoveToAcceptanceTest
@@ -177,7 +177,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       goOn(UnauthenticatedFeedbackPage)
 
       Given("the call to Deskpro endpoint '/deskpro/feedback' will take too much time")
-      service_will_return_payload_for_POST_request("/deskpro/feedback", delayMillis = 10000)("")
+      Deskpro.service_will_return_payload_for_POST_request("/deskpro/feedback", delayMillis = 10000)("")
 
       When("I fill the feedback form correctly")
       UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
@@ -198,7 +198,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       goOn(UnauthenticatedFeedbackPage)
 
       Given(s"the call to Deskpro endpoint '/deskpro/feedback' will fail with status 404")
-      service_will_fail_on_POST_request("/deskpro/feedback", 404)
+      Deskpro.service_will_fail_on_POST_request("/deskpro/feedback", 404)
 
       When("I fill the contact form correctly")
       UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)
@@ -219,7 +219,7 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
       goOn(UnauthenticatedFeedbackPage)
 
       Given(s"the call to Deskpro endpoint '/deskpro/feedback' will fail with status 500")
-      service_will_fail_on_POST_request("/deskpro/feedback", 500)
+      Deskpro.service_will_fail_on_POST_request("/deskpro/feedback", 500)
 
       When("I fill the contact form correctly")
       UnauthenticatedFeedbackPage.fillOutFeedbackForm(1, Name, Email, Comment)

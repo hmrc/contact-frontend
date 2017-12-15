@@ -20,7 +20,7 @@ trait FeedbackPage extends WebPage with SharedPageModules {
   def serviceFieldValue(): Option[String] = find(xpath("//input[@name='service']")).flatMap(_.attribute("value"))
 
   def fillOutFeedbackForm(rating: Int, name: String, email: String, comment: String) = {
-    val wait = new WebDriverWait(Env.driver, 15)
+    val wait = new WebDriverWait(Env.driver, 3)
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-name")))
 
     ratingRadioGroup.value = rating.toString

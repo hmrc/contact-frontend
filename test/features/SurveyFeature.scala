@@ -8,6 +8,7 @@ import play.api.libs.json.Json
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
 import support.page.{SurveyConfirmationPage, SurveyPageWithTicketAndServiceIds}
+import support.stubs.Auditing
 
 @RunWith(classOf[JUnitRunner])
 class SurveyFeature extends StubbedFeatureSpec {
@@ -15,8 +16,6 @@ class SurveyFeature extends StubbedFeatureSpec {
   feature("Survey") {
 
     scenario("Survey form sent successfully") {
-
-      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
 
       Given("I go to the survey form page")
         goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
@@ -54,8 +53,6 @@ class SurveyFeature extends StubbedFeatureSpec {
 
       val invalidTicketId = "HMRC-Z2V6!UK5"
 
-      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
-
       Given("I go to the survey form page")
       goOn(new SurveyPageWithTicketAndServiceIds(invalidTicketId,"arbitrary%20service%20id"))
 
@@ -73,8 +70,6 @@ class SurveyFeature extends StubbedFeatureSpec {
 
 //    MoveToAcceptanceTest
     scenario("Show successfully sent message whilst rejecting feedback when ticket ref is empty") {
-
-      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
 
       Given("I go to the survey form page")
       goOn(new SurveyPageWithTicketAndServiceIds("","arbitrary%20service%20id"))
@@ -94,8 +89,6 @@ class SurveyFeature extends StubbedFeatureSpec {
 //    MoveToAcceptanceTest
     scenario("Show successfully sent message whilst rejecting feedback when service is empty") {
 
-      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(200)))
-
       Given("I go to the survey form page")
       goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6AUK5",""))
 
@@ -114,7 +107,7 @@ class SurveyFeature extends StubbedFeatureSpec {
 //    MoveToAcceptanceTest
     scenario("Survey form errors, but still shows confirmation page") {
 
-      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
+      Auditing.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
 
       Given("I go to the survey form page")
         goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
@@ -137,7 +130,7 @@ class SurveyFeature extends StubbedFeatureSpec {
 //    MoveToAcceptanceTest
     scenario("Survey submitted with no radio button selections, but still shows confirmation page") {
 
-      WireMock.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
+      Auditing.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
 
       Given("I go to the survey form page")
       goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
@@ -199,6 +192,6 @@ class SurveyFeature extends StubbedFeatureSpec {
     }
   }
 
-  def getDatastreamSubmissionsForSurvey = WireMock.findAll(postRequestedFor(urlEqualTo("/write/audit"))
+  def getDatastreamSubmissionsForSurvey = Auditing.findAll(postRequestedFor(urlEqualTo("/write/audit"))
     .withRequestBody(matching(".*DeskproSurvey.*")))
 }

@@ -1,13 +1,15 @@
 package support.util
 
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
+import play.api.test.Helpers
 import uk.gov.hmrc.integration.framework.SingletonDriver
 
 
 object Env {
-  var host = Option(System.getProperty("environment")) match {
+
+  lazy val host = Option(System.getProperty("environment")) match {
     case Some("qa") => "https://www.qa.tax.service.gov.uk"
-    case _ => Option(System.getProperty("host")).getOrElse("http://localhost:9000")
+    case _ => Option(System.getProperty("host")).getOrElse(s"http://localhost:${Helpers.testServerPort}")
   }
 
   val stagingDeskproBaseUrl = "https://deskpro.tools.staging.tax.service.gov.uk"
@@ -17,6 +19,18 @@ object Env {
 
 
   private var jsEnabled = true
+
+  lazy val systemProperties = System.getProperties
+
+  def javascriptEnabled: Boolean = {
+    val jsEnabled: String = systemProperties.getProperty("javascriptEnabled")
+    if(jsEnabled == null) systemProperties.setProperty("javascriptEnabled", "true")
+    if (jsEnabled != "false") {
+      true
+    } else {
+      false
+    }
+  }
 
   def jsDriver = SingletonDriver.getInstance()
   def htmlUnitDriver = NoJsDriver.getInstance()
@@ -31,7 +45,6 @@ object Env {
   }
 
   def useNonJavascriptDriver() = {
-    SingletonDriver.closeInstance()
     jsEnabled = false
   }
 
