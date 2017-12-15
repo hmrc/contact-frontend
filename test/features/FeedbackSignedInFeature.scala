@@ -3,7 +3,7 @@ package features
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import support.StubbedFeatureSpec
 import support.page.{AuthenticatedFeedbackPage, FeedbackSuccessPage}
-import support.stubs.Login
+import support.stubs.{Deskpro, Login}
 
 class FeedbackSignedInFeature extends StubbedFeatureSpec {
 
@@ -14,7 +14,6 @@ class FeedbackSignedInFeature extends StubbedFeatureSpec {
     info("I want to leave my feedback")
 
     scenario("Submit feedback successfully") {
-
 
       val Name = "Grumpy Bear"
       val Email = "grumpy@carebears.com"
@@ -40,7 +39,7 @@ class FeedbackSignedInFeature extends StubbedFeatureSpec {
       )
 
       And("the Deskpro endpoint '/deskpro/feedback' has received the following POST request:")
-      verify_post(to = "/deskpro/feedback", body =
+      Deskpro.verify_post(to = "/deskpro/feedback", body =
         s"""
           |{
           |   "name":"$Name",
@@ -49,7 +48,6 @@ class FeedbackSignedInFeature extends StubbedFeatureSpec {
           |   "rating":"1",
           |   "message":"$Comment",
           |   "referrer":"n/a",
-          |   "javascriptEnabled":"N",
           |   "authId":"/auth/oid/1234567890",
           |   "areaOfTax":"unknown",
           |   "sessionId": "${Login.SessionId}",

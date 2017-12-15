@@ -1,13 +1,13 @@
 package support.behaviour
 
 import org.openqa.selenium.support.ui.{ExpectedCondition, WebDriverWait}
-import org.openqa.selenium.{By, WebDriver, WebElement}
+import org.openqa.selenium._
 import org.scalatest.Assertions
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.selenium.WebBrowser
 import org.scalatest.selenium.WebBrowser.{go => goo}
-import support.page.WebPage
-import support.util.Env
+import _root_.support.page.WebPage
+import _root_.support.util.Env
 
 
 trait NavigationSugar extends WebBrowser with Eventually with Assertions with IntegrationPatience {
@@ -24,8 +24,23 @@ trait NavigationSugar extends WebBrowser with Eventually with Assertions with In
   }
 
   def on(page: WebPage) = {
-    waitForPageToLoad()
-    assert(page.isCurrentPage, s"Page was not loaded: $page")
+    try {
+      waitForPage(page)
+    } catch {
+      case e: TimeoutException =>
+        val className = page.getClass.getSimpleName.replaceAll("\\$", "")
+        throw new TimeoutException(s"Timed out waiting for page: $className\n", e)
+    }
+  }
+
+  private def waitForPage(page: WebPage)(implicit webDriver: WebDriver): Unit = {
+    val wait = new WebDriverWait(webDriver, 30).ignoring(classOf[StaleElementReferenceException])
+    wait.until(
+      new ExpectedCondition[Boolean] {
+        override def apply(d: WebDriver) = page.isCurrentPage
+      }
+    )
+
   }
 
   def waitForPageToLoad() = {

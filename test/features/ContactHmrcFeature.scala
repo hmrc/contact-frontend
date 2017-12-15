@@ -4,6 +4,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode._
 import support.StubbedFeatureSpec
 import support.page.{ContactHmrcPage, ExternalPage, TechnicalDifficultiesPage}
 import support.stubs._
+import support.util.Env
 
 class ContactHmrcFeature extends StubbedFeatureSpec {
 
@@ -15,6 +16,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
 
     scenario("Contact form sent successfully") {
       Given("I am logged in and I go to the 'Help' page")
+      Env.useJavascriptDriver()
       goOn(ContactHmrcPage)
 
       When("I fill the contact form correctly")
@@ -28,7 +30,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
         "Someone will get back to you within 2 working days.")
 
       And("the Deskpro endpoint '/deskpro/get-help-ticket' has received the following POST request:")
-      verify_post(to = "/deskpro/get-help-ticket", body =
+      Deskpro.verify_post(to = "/deskpro/get-help-ticket", body =
         s"""
           |{
           |   "name":"$Name",
@@ -36,7 +38,6 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
           |   "subject":"Contact form submission",
           |   "message":"$Comment",
           |   "referrer":"n/a",
-          |   "javascriptEnabled":"N",
           |   "authId":"/auth/oid/1234567890",
           |   "areaOfTax":"unknown",
           |   "sessionId": "${Login.SessionId}",
@@ -49,7 +50,6 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
     scenario("All fields are mandatory") {
       Given("I am logged in and I go to the 'Help' page")
       goOn(ContactHmrcPage)
-
       When("I fill the form with empty values")
 
       And("I try to send the contact form")
@@ -65,7 +65,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
         "Enter your comments")
 
       And("the Deskpro endpoint '/deskpro/get-help-ticket' has not been hit")
-      verify_post_no_hit("/deskpro/get-help-ticket")
+      Deskpro.verify_post_no_hit("/deskpro/get-help-ticket")
     }
 
 
@@ -94,7 +94,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
 //        "0 remaining characters")
 
       And("the Deskpro endpoint '/deskpro/get-help-ticket' has not been hit")
-      verify_post_no_hit("/deskpro/get-help-ticket")
+      Deskpro.verify_post_no_hit("/deskpro/get-help-ticket")
     }
 
 
@@ -115,7 +115,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       i_see("Enter a valid email address")
 
       And("the Deskpro endpoint '/deskpro/get-help-ticket' has not been hit")
-      verify_post_no_hit("/deskpro/get-help-ticket")
+      Deskpro.verify_post_no_hit("/deskpro/get-help-ticket")
     }
 
 //    MoveToAcceptanceTest: DeskPro Integration Test
@@ -124,7 +124,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       goOn(ContactHmrcPage)
 
       Given("the call to Deskpro endpoint '/deskpro/get-help-ticket' will fail with status 404")
-      service_will_fail_on_POST_request("/deskpro/get-help-ticket", 404)
+      Deskpro.service_will_fail_on_POST_request("/deskpro/get-help-ticket", 404)
 
       When("I fill the contact form correctly")
       ContactHmrcPage.fillContactForm(Name, Email, Comment)
@@ -140,26 +140,25 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
     }
 
 //    MoveToAcceptanceTest: Deskpro Integration Test
-//    Commented out, library changes failing this test
-//      scenario("Deskpro times out") {
-//      Given("I am logged in and I go to the 'Help' page")
-//      goOn(ContactHmrcPage)
-//
-//      Given("the call to Deskpro endpoint '/deskpro/get-help-ticket' will take too much time")
-//      service_will_return_payload_for_POST_request("/deskpro/get-help-ticket", delayMillis = 10000)("")
-//
-//      When("I fill the contact form correctly")
-//      ContactHmrcPage.fillContactForm(Name, Email, Comment)
-//
-//      And("I try to send the contact form")
-//      ContactHmrcPage.submitContactForm()
-//
-//      Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
-//      on(TechnicalDifficultiesPage)
-//
-//      And("I see:")
-//      i_see("There was a problem sending your query.")
-//    }
+    scenario("Deskpro times out") {
+      Given("I am logged in and I go to the 'Help' page")
+      goOn(ContactHmrcPage)
+
+      Given("the call to Deskpro endpoint '/deskpro/get-help-ticket' will take too much time")
+      Deskpro.service_will_return_payload_for_POST_request("/deskpro/get-help-ticket", delayMillis = 10000)("")
+
+      When("I fill the contact form correctly")
+      ContactHmrcPage.fillContactForm(Name, Email, Comment)
+
+      And("I try to send the contact form")
+      ContactHmrcPage.submitContactForm()
+
+      Then("I am on the 'Sorry, we’re experiencing technical difficulties' page")
+      on(TechnicalDifficultiesPage)
+
+      And("I see:")
+      i_see("There was a problem sending your query.")
+    }
 
 //    MoveToAcceptanceTest: Deskpro Integration Test
     scenario("Deskpro fails with 500") {
@@ -167,7 +166,7 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
       goOn(ContactHmrcPage)
 
       Given("the call to Deskpro endpoint '/deskpro/get-help-ticket' will fail with status 500")
-      service_will_fail_on_POST_request("/deskpro/get-help-ticket", 500)
+      Deskpro.service_will_fail_on_POST_request("/deskpro/get-help-ticket", 500)
 
       When("I fill the contact form correctly")
       ContactHmrcPage.fillContactForm(Name, Email, Comment)
@@ -185,28 +184,34 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
 //    MoveToAcceptanceTest: Deskpro Integration Test
     scenario("The referrer URL is sent to Deskpro") {
       Given("I am logged in and I go to the 'Help' page")
+      Env.useJavascriptDriver()
       goOn(ContactHmrcPage)
 
       Given("I come from a page that links to Contact HMRC")
       goOn(ExternalPage)
       ExternalPage.clickOnContactHmrcLink()
 
+
       When("I fill the contact form correctly")
+      on(ContactHmrcPage)
       ContactHmrcPage.fillContactForm(Name, Email, Comment)
 
       And("I try to send the contact form")
       ContactHmrcPage.submitContactForm()
 
+      Then("I see:")
+      i_see("Thank you",
+        "Someone will get back to you within 2 working days.")
+
       Then("the Deskpro endpoint '/deskpro/get-help-ticket' has received the following POST request:")
-      verify_post(to = "/deskpro/get-help-ticket", body =
+      Deskpro.verify_post(to = "/deskpro/get-help-ticket", body =
         s"""
           |{
           |   "name":"$Name",
           |   "email":"$Email",
           |   "subject":"Contact form submission",
           |   "message":"$Comment",
-          |   "referrer":"http://localhost:11111/external/page",
-          |   "javascriptEnabled":"N",
+          |   "referrer":"http://localhost:11115/external/page",
           |   "authId":"/auth/oid/1234567890",
           |   "areaOfTax":"unknown",
           |   "sessionId": "${Login.SessionId}",

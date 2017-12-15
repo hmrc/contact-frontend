@@ -3,6 +3,7 @@ package features
 import org.skyscreamer.jsonassert.JSONCompareMode
 import support.StubbedFeatureSpec
 import support.page.{FeedbackSuccessPage, UnauthenticatedFeedbackPage}
+import support.stubs.Deskpro
 import support.util.Env
 
 
@@ -37,7 +38,7 @@ class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
       )
 
       And("the Deskpro endpoint '/deskpro/feedback' has received the following POST request:")
-      verify_post(to = "/deskpro/feedback", body =
+      Deskpro.verify_post(to = "/deskpro/feedback", body =
         s"""
           |{
           |   "name":"$Name",

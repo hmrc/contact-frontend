@@ -5,7 +5,9 @@ import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.ws.WS
 import play.api.libs.ws.ning.{NingAsyncHttpClientConfigBuilder, NingWSClient, NingWSClientConfig}
+import play.api.test.Helpers
 import support.StubbedFeatureSpec
+import support.page.UnauthenticatedFeedbackPage
 
 class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
 
@@ -20,33 +22,32 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
     info("As a tax payer")
     info("I want to ask for help to HMRC")
 
-//    Commented out, library changes failing this test
-//    scenario("Successful form submission") {
-//      Given("I go to the 'Feedback' page")
-//      goOn(UnauthenticatedFeedbackPage)
-//
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
-//
-//      When("I fill the Get Help with this page' form correctly")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.fillProblemReport(Name, Email, WhatWhereYouDoing, WhatDoYouNeedHelpWith)
-//
-//      And("I send the 'Get help with this page' form")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.submitProblemReport()
-//
-//      Then("I remain on the same page")
-//      on(UnauthenticatedFeedbackPage)
-//
-//      Then("I see:")
-//      i_see(
-//        "Thank you",
-//        "Someone will get back to you within 2 working days."
-//      )
-//    }
+    scenario("Successful form submission") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
+
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      When("I fill the Get Help with this page' form correctly")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.fillProblemReport(Name, Email, WhatWhereYouDoing, WhatDoYouNeedHelpWith)
+
+      And("I send the 'Get help with this page' form")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.submitProblemReport()
+
+      Then("I remain on the same page")
+      on(UnauthenticatedFeedbackPage)
+
+      Then("I see:")
+      i_see(
+        "Thank you",
+        "Someone will get back to you within 2 working days."
+      )
+    }
 
 //  MoveToAcceptanceTest
     scenario("External posts to form are not allowed") {
       When("I post to the form using external rest client")
-      val baseUrl = "http://localhost:9000"
+      val baseUrl = s"http://localhost:${Helpers.testServerPort}"
 
       implicit val system = ActorSystem()
       implicit val materializer = ActorMaterializer()
@@ -63,81 +64,74 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
     }
 
 //    MoveToAcceptanceTest
-//    Commented out, library changes failing this test
-//    scenario("The problem report form toggles") {
-//      Given("I go to the 'Feedback' page")
-//      goOn(UnauthenticatedFeedbackPage)
-//
-//      Then("The get 'Get help with this page' form is hidden")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden must be (true)
-//
-//      When("I open the 'Get help with this page' form")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
-//
-//      Then("The 'Get help with this page' form is visible")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden must be (false)
-//
-//      When("I close the 'Get help with this page' form")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
-//
-//      Then("The get 'Get help with this page' form is hidden")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden must be (true)
-//    }
+    scenario("The problem report form toggles") {
+      Given("I go to the 'Feedback' page")
+      goOn(UnauthenticatedFeedbackPage)
+
+      Then("The get 'Get help with this page' form is hidden")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden must be (true)
+
+      When("I open the 'Get help with this page' form")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      Then("The 'Get help with this page' form is visible")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden must be (false)
+
+      When("I close the 'Get help with this page' form")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      Then("The get 'Get help with this page' form is hidden")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden must be (true)
+    }
 
 //    MoveToAcceptanceTest
-//    Commented out, library changes failing this test
-//    scenario("Invalid name error if you entered anything other than letters (lower and upper case), space, comma, period, braces and hyphen") {
-//      Given("I have the 'Get help with this page' form open")
-//      goOn(UnauthenticatedFeedbackPage)
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
-//
-//      When("I fill in an invalid name")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeName("<")
-//
-//      And("Change focus to trigger validation")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeEmail("some@validemail.com")
-//
-//      Then("I see an error for invalid name")
-//      eventually {
-//        UnauthenticatedFeedbackPage.bodyText must include ("Letters or punctuation only please")
-//      }
-//    }
+    scenario("Invalid name error if you entered anything other than letters (lower and upper case), space, comma, period, braces and hyphen") {
+      Given("I have the 'Get help with this page' form open")
+      goOn(UnauthenticatedFeedbackPage)
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      When("I fill in an invalid name")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeName("<")
+
+      And("Change focus to trigger validation")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeEmail("some@validemail.com")
+
+      Then("I see an error for invalid name")
+      i_see("Letters or punctuation only please")
+    }
 
 //    MoveToAcceptanceTest
-//    Commented out, library changes failing this test
-//    scenario("Invalid email error if you entered a badly formed email") {
-//      Given("I have the 'Get help with this page' form open")
-//      goOn(UnauthenticatedFeedbackPage)
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
-//
-//      When("I fill in an invalid email address")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeEmail("not@valid.")
-//
-//      And("Change focus to trigger validation")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeName("Validname")
-//
-//      Then("I see an error for invalid email")
-//      eventually {
-//        UnauthenticatedFeedbackPage.bodyText must include ("Please enter a valid email address.")
-//      }
-//    }
+    scenario("Invalid email error if you entered a badly formed email") {
+      Given("I have the 'Get help with this page' form open")
+      goOn(UnauthenticatedFeedbackPage)
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      When("I fill in an invalid email address")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeEmail("not@valid.")
+
+      And("Change focus to trigger validation")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.typeName("Validname")
+
+      Then("I see an error for invalid email")
+      i_see("Please enter a valid email address.")
+    }
 
 //    MoveToAcceptanceTest
-//    Commented out, library changes failing this test
-//    scenario("All fields are mandatory") {
-//      Given("I have the 'Get help with this page' form open")
-//      goOn(UnauthenticatedFeedbackPage)
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
-//
-//      When("I fill in an invalid email address")
-//      UnauthenticatedFeedbackPage.getHelpWithThisPage.clickSubmitButton()
-//
-//      Then("I see an error for invalid name")
-//      UnauthenticatedFeedbackPage.bodyText must include ("Please provide your name.")
-//      UnauthenticatedFeedbackPage.bodyText must include ("Please provide your email address.")
-//      UnauthenticatedFeedbackPage.bodyText must include ("Please enter details of what you were doing.")
-//      UnauthenticatedFeedbackPage.bodyText must include ("Please enter details of what went wrong.")
-//    }
+    scenario("All fields are mandatory") {
+      Given("I have the 'Get help with this page' form open")
+      goOn(UnauthenticatedFeedbackPage)
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+
+      When("I fill in an invalid email address")
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.clickSubmitButton()
+
+      Then("I see an error for invalid name")
+      i_see(
+        "Please provide your name.",
+        "Please provide your email address.",
+        "Please enter details of what you were doing.",
+        "Please enter details of what went wrong.")
+    }
   }
 
 
