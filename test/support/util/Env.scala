@@ -45,7 +45,16 @@ object Env {
   }
 
   def useNonJavascriptDriver() = {
+    NoJsDriver.initialiseBrowser()
     jsEnabled = false
+  }
+
+  def shutdown() = {
+    if (jsEnabled) {
+      SingletonDriver.closeInstance()
+    } else {
+      NoJsDriver.closeInstance()
+    }
   }
 
   def deleteCookies() = {
@@ -53,8 +62,11 @@ object Env {
   }
 
   def deleteAllCookies() = {
-    jsDriver.manage().deleteAllCookies()
-    htmlUnitDriver.manage().deleteAllCookies()
+    if (jsEnabled) {
+      jsDriver.manage().deleteAllCookies()
+    } else {
+      htmlUnitDriver.manage().deleteAllCookies()
+    }
   }
 
   sys addShutdownHook {

@@ -1,6 +1,5 @@
 package features
 
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -13,20 +12,22 @@ import support.stubs.Auditing
 @RunWith(classOf[JUnitRunner])
 class SurveyFeature extends StubbedFeatureSpec {
 
+  override def useJavascript: Boolean = true
+
   feature("Survey") {
 
     scenario("Survey form sent successfully") {
 
       Given("I go to the survey form page")
-        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
+      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5", "arbitrary%20service%20id"))
 
       When("I successfully fill in the form")
-        selectHowHelpfulTheResponseWas("strongly-agree")
-        selectHowSpeedyTheResponseWas("strongly-agree")
-        setAdditionalComment("Blah blooh blah la dee daaaaa")
+      selectHowHelpfulTheResponseWas("strongly-agree")
+      selectHowSpeedyTheResponseWas("strongly-agree")
+      setAdditionalComment("Blah blooh blah la dee daaaaa")
 
       And("Submit the form")
-        clickSubmitButton()
+      clickSubmitButton()
 
       Then("The data should get sent to 'audit land'")
       shouldSendSurveyToDatastream
@@ -45,16 +46,16 @@ class SurveyFeature extends StubbedFeatureSpec {
 
 
       And("I should see the confirmation page - happy days")
-        on(SurveyConfirmationPage)
+      on(SurveyConfirmationPage)
     }
 
-//    MoveToAcceptanceTest
+    //    MoveToAcceptanceTest
     scenario("Show successfully sent message whilst rejecting feedback when ticket ref is invalid") {
 
       val invalidTicketId = "HMRC-Z2V6!UK5"
 
       Given("I go to the survey form page")
-      goOn(new SurveyPageWithTicketAndServiceIds(invalidTicketId,"arbitrary%20service%20id"))
+      goOn(new SurveyPageWithTicketAndServiceIds(invalidTicketId, "arbitrary%20service%20id"))
 
       When("I successfully fill in the form")
       selectHowHelpfulTheResponseWas("strongly-agree")
@@ -68,11 +69,11 @@ class SurveyFeature extends StubbedFeatureSpec {
       shouldNotSendSurveyToDatastream
     }
 
-//    MoveToAcceptanceTest
+    //    MoveToAcceptanceTest
     scenario("Show successfully sent message whilst rejecting feedback when ticket ref is empty") {
 
       Given("I go to the survey form page")
-      goOn(new SurveyPageWithTicketAndServiceIds("","arbitrary%20service%20id"))
+      goOn(new SurveyPageWithTicketAndServiceIds("", "arbitrary%20service%20id"))
 
       When("I successfully fill in the form")
       selectHowHelpfulTheResponseWas("strongly-agree")
@@ -86,11 +87,11 @@ class SurveyFeature extends StubbedFeatureSpec {
       shouldNotSendSurveyToDatastream
     }
 
-//    MoveToAcceptanceTest
+    //    MoveToAcceptanceTest
     scenario("Show successfully sent message whilst rejecting feedback when service is empty") {
 
       Given("I go to the survey form page")
-      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6AUK5",""))
+      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6AUK5", ""))
 
       When("I successfully fill in the form")
       selectHowHelpfulTheResponseWas("strongly-agree")
@@ -104,36 +105,36 @@ class SurveyFeature extends StubbedFeatureSpec {
       shouldNotSendSurveyToDatastream
     }
 
-//    MoveToAcceptanceTest
+    //    MoveToAcceptanceTest
     scenario("Survey form errors, but still shows confirmation page") {
 
       Auditing.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
 
       Given("I go to the survey form page")
-        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
+      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5", "arbitrary%20service%20id"))
 
       When("I successfully fill in the form")
-        selectHowHelpfulTheResponseWas("strongly-agree")
-        selectHowSpeedyTheResponseWas("strongly-agree")
-        setAdditionalComment("Blah blooh blah la dee daaaaa")
+      selectHowHelpfulTheResponseWas("strongly-agree")
+      selectHowSpeedyTheResponseWas("strongly-agree")
+      setAdditionalComment("Blah blooh blah la dee daaaaa")
 
       And("Submit the form")
-        clickSubmitButton()
+      clickSubmitButton()
 
       Then("The data should get sent to 'audit land' - though this is questionable behaviour from the code")
       shouldSendSurveyToDatastream
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
-        on(SurveyConfirmationPage)
+      on(SurveyConfirmationPage)
     }
 
-//    MoveToAcceptanceTest
+    //    MoveToAcceptanceTest
     scenario("Survey submitted with no radio button selections, but still shows confirmation page") {
 
       Auditing.stubFor(post(urlEqualTo("/write/audit")).willReturn(aResponse().withStatus(500)))
 
       Given("I go to the survey form page")
-      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
+      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5", "arbitrary%20service%20id"))
 
       When("I fill the form in without selecting radio button options")
       setAdditionalComment("Blah blooh blah la dee daaaaa")
@@ -158,25 +159,25 @@ class SurveyFeature extends StubbedFeatureSpec {
       on(SurveyConfirmationPage)
     }
 
-//    MoveToAcceptanceTest
+    //    MoveToAcceptanceTest
     scenario("Survey form errors, but still shows confirmation page again") {
 
       Given("I go to the survey form page")
-        goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5","arbitrary%20service%20id"))
+      goOn(new SurveyPageWithTicketAndServiceIds("HMRC-Z2V6DUK5", "arbitrary%20service%20id"))
 
       When("I successfully fill in the form")
-        selectHowHelpfulTheResponseWas("strongly-agree")
-        selectHowSpeedyTheResponseWas("strongly-agree")
-        setAdditionalComment("Blah blooh blah la dee daaaaa")
+      selectHowHelpfulTheResponseWas("strongly-agree")
+      selectHowSpeedyTheResponseWas("strongly-agree")
+      setAdditionalComment("Blah blooh blah la dee daaaaa")
 
       And("Submit the form")
-        clickSubmitButton()
+      clickSubmitButton()
 
       Then("The data should get sent to 'audit land' - though this is questionable behaviour from the code")
       shouldSendSurveyToDatastream
 
       And("I should see the failure page, but i cant determine a failure has occurred, so i show the conf page. lovely.")
-        on(SurveyConfirmationPage)
+      on(SurveyConfirmationPage)
     }
   }
 
@@ -194,4 +195,6 @@ class SurveyFeature extends StubbedFeatureSpec {
 
   def getDatastreamSubmissionsForSurvey = Auditing.findAll(postRequestedFor(urlEqualTo("/write/audit"))
     .withRequestBody(matching(".*DeskproSurvey.*")))
+
+
 }

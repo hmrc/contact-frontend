@@ -9,6 +9,9 @@ import support.page.{SurveyConfirmationPageWelsh, SurveyPageWithTicketAndService
 
 @RunWith(classOf[JUnitRunner])
 class LanguageSwitchingFeature extends StubbedFeatureSpec {
+
+  override def useJavascript: Boolean = true
+
   override lazy val app = FakeApplication(
     additionalConfiguration = Map(
       "application.langs" -> "en,cy",

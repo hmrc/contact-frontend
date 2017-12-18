@@ -25,8 +25,15 @@ trait StubbedFeatureSpec
 
    val logger = Logger("tests")
 
+  def useJavascript : Boolean
+
   override def beforeAll() = {
-    Env.useJavascriptDriver()
+    if (useJavascript) {
+      Env.useJavascriptDriver()
+    } else {
+      Env.useNonJavascriptDriver()
+    }
+
     Auditing.start()
     Login.start()
     Deskpro.start()
@@ -39,6 +46,7 @@ trait StubbedFeatureSpec
     Deskpro.shutdown()
     ExternalPages.shutdown()
     Env.deleteAllCookies()
+    Env.shutdown()
   }
 
   override def beforeEach() = {

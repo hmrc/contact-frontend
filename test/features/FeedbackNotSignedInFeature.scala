@@ -7,6 +7,8 @@ import support.stubs.Deskpro
 
 class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
 
+  override def useJavascript: Boolean = true
+
   val Name = "Grumpy Bear"
   val Email = "grumpy@carebears.com"
   val Comment = "I am writing a comment"
@@ -235,5 +237,6 @@ class FeedbackNotSignedInFeature extends StubbedFeatureSpec {
     }
 
   }
+
 
 }

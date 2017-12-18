@@ -11,6 +11,8 @@ import support.page.UnauthenticatedFeedbackPage
 
 class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
 
+  override def useJavascript: Boolean = true
+
   val Name = "Grumpy Bear"
   val Email = "grumpy@carebears.com"
   val WhatWhereYouDoing = "Something"

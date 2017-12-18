@@ -5,6 +5,8 @@ import support.page.UnauthenticatedFeedbackPageWithServiceQueryParameter
 
 class FeedbackServiceQueryParamFeature extends StubbedFeatureSpec {
 
+  override def useJavascript: Boolean = true
+
   feature("Feedback form service field populated when passed as a query parameter") {
 
     info("As someone handling deskpro tickets")
@@ -20,4 +22,5 @@ class FeedbackServiceQueryParamFeature extends StubbedFeatureSpec {
       UnauthenticatedFeedbackPageWithServiceQueryParameter.serviceFieldValue() mustBe Some("YTA")
     }
   }
+
 }

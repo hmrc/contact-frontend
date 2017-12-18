@@ -8,6 +8,8 @@ import support.stubs.{Deskpro, Login}
 
 class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
 
+  override def useJavascript: Boolean = false
+
   feature("Contact HMRC with Javascript disabled") {
 
     info("In order to make my views known")
@@ -21,7 +23,6 @@ class ContactHmrc_NoJavascriptFeature extends StubbedFeatureSpec {
       val Comment = "I am writing a comment"
 
       Given("JavaScript is disabled")
-      Env.useNonJavascriptDriver()
 
       And("I go to the 'Help' page")
       goOn(ContactHmrcPage)

@@ -6,6 +6,8 @@ import support.util.Env
 
 class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 
+  override def useJavascript: Boolean = false
+
   val Name = "Grumpy Bear"
   val Email = "grumpy@carebears.com"
   val WhatWhereYouDoing = "Something"
@@ -20,7 +22,6 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 //    MoveToAcceptanceTest
     scenario("I don't see the open help form link without Javascript") {
       Given("JavaScript is disabled")
-      Env.useNonJavascriptDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -40,7 +41,7 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
       UnauthenticatedFeedbackPage.getHelpWithThisPage.fillProblemReport(Name, Email, WhatWhereYouDoing, WhatDoYouNeedHelpWith)
 
       And("I send the 'Get help with this page' form")
-      UnauthenticatedFeedbackPage.getHelpWithThisPage.submitProblemReport()
+      UnauthenticatedFeedbackPage.getHelpWithThisPage.submitProblemReport(javascriptEnabled = false)
 
       Then("I am on the success page")
       on(ThankYouPage)
@@ -55,7 +56,6 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 //    MoveToAcceptanceTest
     scenario("Only these characters are allowed for the name: letters (lower and upper case), space, comma, period, braces and hyphen") {
       Given("JavaScript is disabled")
-      Env.useNonJavascriptDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -77,7 +77,6 @@ class GetHelpWithThisPageFeature_NoJavascript extends StubbedFeatureSpec {
 //    MoveToAcceptanceTest
     scenario("All fields are mandatory") {
       Given("JavaScript is disabled")
-      Env.useNonJavascriptDriver()
 
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)

@@ -7,6 +7,8 @@ import support.stubs.{Deskpro, Login}
 
 class FeedbackSignedInFeature extends StubbedFeatureSpec {
 
+  override def useJavascript: Boolean = true
+
   feature("Feedback about the beta when signed in") {
 
     info("In order to make my views known about the beta")

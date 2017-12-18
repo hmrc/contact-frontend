@@ -5,6 +5,8 @@ import support.page.{ContactHmrcPage, ContactHmrcPartialPage}
 
 class ContactHmrcPartialFeature extends StubbedFeatureSpec {
 
+  override def useJavascript: Boolean = true
+
   feature("Contact HMRC partial") {
 
     info("In order to include the Contact HMRC form in other applications")
@@ -34,4 +36,5 @@ class ContactHmrcPartialFeature extends StubbedFeatureSpec {
     }
 
   }
+
 }
