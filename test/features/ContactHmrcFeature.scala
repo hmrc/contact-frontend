@@ -8,6 +8,8 @@ import support.util.Env
 
 class ContactHmrcFeature extends StubbedFeatureSpec {
 
+  override def useJavascript: Boolean = true
+
   feature("Help") {
 
     info("In order to make my views known")
@@ -231,4 +233,5 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
   private val TooLongName = "G"*71
   private val TooLongEmail = "g"*255 + "@x.com"
   private val TooLongComment = "I"*2001
+
 }

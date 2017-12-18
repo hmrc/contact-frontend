@@ -34,23 +34,16 @@ trait NavigationSugar extends WebBrowser with Eventually with Assertions with In
   }
 
   private def waitForPage(page: WebPage)(implicit webDriver: WebDriver): Unit = {
-    val wait = new WebDriverWait(webDriver, 30).ignoring(classOf[StaleElementReferenceException])
+    val wait = new WebDriverWait(webDriver, 30, 1500).ignoring(classOf[StaleElementReferenceException])
     wait.until(
       new ExpectedCondition[Boolean] {
-        override def apply(d: WebDriver) = page.isCurrentPage
-      }
-    )
-
-  }
-
-  def waitForPageToLoad() = {
-    val wait = new WebDriverWait(webDriver, 30)
-    wait.until(
-      new ExpectedCondition[WebElement] {
         override def apply(d: WebDriver) = {
-          d.findElement(By.tagName("body"))
+          println("Waiting for page " + page.url)
+          page.isCurrentPage
         }
       }
     )
+
   }
+
 }

@@ -9,6 +9,8 @@ import support.util.Env
 
 class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
 
+  override def useJavascript: Boolean = false
+
   feature("Feedback about the beta when not signed and with Javascript disabled") {
 
     info("In order to make my views known about the beta")
@@ -17,7 +19,6 @@ class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
 
     scenario("Submit feedback successfully") {
       Given("JavaScript is disabled")
-      Env.useNonJavascriptDriver()
 
       Given("I go to the 'Feedback' page")
       goOn(UnauthenticatedFeedbackPage)
@@ -60,4 +61,5 @@ class FeedbackNotSignedIn_NoJavascriptFeature extends StubbedFeatureSpec {
   private val Name = "Grumpy Bear"
   private val Email = "grumpy@carebears.com"
   private val Comment = "I am writing a comment"
+
 }

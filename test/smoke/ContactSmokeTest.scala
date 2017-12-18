@@ -1,14 +1,13 @@
 package smoke
 
-import org.scalatest.AcceptanceSpec
 import support.StubbedFeatureSpec
-import support.behaviour.NavigationSugar
 import support.page.{ContactHmrcPage, UnauthenticatedFeedbackPage}
-import support.steps.{DeskproSteps, ObservationSteps, SmokeSteps}
+import support.steps.{DeskproSteps, SmokeSteps}
 import uk.gov.hmrc.integration.util.RandomUtils
 
 class ContactSmokeTest extends StubbedFeatureSpec with SmokeSteps with DeskproSteps {
 
+  override def useJavascript: Boolean = true
 
   feature("Contact HMRC") {
 
