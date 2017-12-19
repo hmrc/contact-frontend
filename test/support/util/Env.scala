@@ -1,5 +1,6 @@
 package support.util
 
+import org.openqa.selenium.WebDriver
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import play.api.test.Helpers
 import uk.gov.hmrc.integration.framework.SingletonDriver
@@ -17,62 +18,43 @@ object Env {
 
   val hMRCDeskproBaseUrl = "https://hmrc-deskpro.public.mdtp/deskpro"
 
-  private var jsEnabled = true
+  var driverHolder : DriverWrapper = JsDriverWrapper
 
-  lazy val systemProperties = System.getProperties
+  def driver = driverHolder.getInstance
 
-  def javascriptEnabled: Boolean = {
-    val jsEnabled: String = systemProperties.getProperty("javascriptEnabled")
-    if(jsEnabled == null) systemProperties.setProperty("javascriptEnabled", "true")
-    if (jsEnabled != "false") {
-      true
-    } else {
-      false
+  def useJavascriptDriver() = switchDriver(JsDriverWrapper)
+
+  def useNonJavascriptDriver() = switchDriver(NoJsDriverWrapper)
+
+  def switchDriver(newHolder : DriverWrapper): Unit = {
+    if (driverHolder != newHolder) {
+      driverHolder.stop()
     }
-  }
-
-  def jsDriver = SingletonDriver.getInstance()
-  def htmlUnitDriver = NoJsDriver.getInstance()
-
-  def driver = jsEnabled match {
-    case true => jsDriver
-    case false => htmlUnitDriver
-  }
-
-  def useJavascriptDriver() = {
-    if (!jsEnabled) {
-      NoJsDriver.closeInstance()
-    }
-    jsEnabled = true
-  }
-
-  def useNonJavascriptDriver() = {
-    if (jsEnabled) {
-      SingletonDriver.closeInstance()
-    }
-    NoJsDriver.initialiseBrowser()
-    jsEnabled = false
+    driverHolder = newHolder
   }
 
   def deleteCookies() = {
     driver.manage().deleteAllCookies()
   }
 
-  def deleteAllCookies() = {
-    if (jsEnabled) {
-      jsDriver.manage().deleteAllCookies()
-    } else {
-      htmlUnitDriver.manage().deleteAllCookies()
-    }
-  }
-
   sys addShutdownHook {
     SingletonDriver.closeInstance()
-    NoJsDriver.closeInstance()
+    JsDriverWrapper.stop()
   }
 }
 
-object NoJsDriver {
+trait DriverWrapper {
+  def getInstance : WebDriver
+  def stop() : Unit
+}
+
+object JsDriverWrapper extends DriverWrapper {
+  override def getInstance: WebDriver = SingletonDriver.getInstance()
+
+  override def stop(): Unit = SingletonDriver.closeInstance()
+}
+
+object NoJsDriverWrapper extends DriverWrapper {
   private var instanceOption: Option[HtmlUnitDriver] = None
 
   def getInstance() = {
@@ -85,10 +67,11 @@ object NoJsDriver {
     instance
   }
 
-  def closeInstance() = {
+  def stop() = {
     instanceOption.foreach { instance =>
       instance.close()
       instance.quit()
+      instanceOption = None
     }
   }
 

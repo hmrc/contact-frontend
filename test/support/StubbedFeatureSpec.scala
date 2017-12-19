@@ -2,7 +2,6 @@ package support
 
 import org.scalatest._
 import org.scalatestplus.play.OneServerPerSuite
-import play.api.Logger
 import support.behaviour.NavigationSugar
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs._
@@ -22,8 +21,6 @@ trait StubbedFeatureSpec
     with ObservationSteps
     with OptionValues
     with OneServerPerSuite {
-
-   val logger = Logger("tests")
 
   def useJavascript : Boolean
 
@@ -45,7 +42,7 @@ trait StubbedFeatureSpec
     Login.shutdown()
     Deskpro.shutdown()
     ExternalPages.shutdown()
-    Env.deleteAllCookies()
+    Env.deleteCookies()
   }
 
   override def beforeEach() = {
