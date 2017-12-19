@@ -70,7 +70,7 @@ trait SharedPageModules {
       clickSubmitButton()
 
       if (javascriptEnabled) {
-        val wait = new WebDriverWait(webDriver, 3)
+        val wait = new WebDriverWait(webDriver, 15)
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("feedback-thank-you-header")))
       }
     }

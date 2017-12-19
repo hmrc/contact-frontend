@@ -17,7 +17,6 @@ object Env {
 
   val hMRCDeskproBaseUrl = "https://hmrc-deskpro.public.mdtp/deskpro"
 
-
   private var jsEnabled = true
 
   lazy val systemProperties = System.getProperties
@@ -41,20 +40,18 @@ object Env {
   }
 
   def useJavascriptDriver() = {
+    if (!jsEnabled) {
+      NoJsDriver.closeInstance()
+    }
     jsEnabled = true
   }
 
   def useNonJavascriptDriver() = {
-    NoJsDriver.initialiseBrowser()
-    jsEnabled = false
-  }
-
-  def shutdown() = {
     if (jsEnabled) {
       SingletonDriver.closeInstance()
-    } else {
-      NoJsDriver.closeInstance()
     }
+    NoJsDriver.initialiseBrowser()
+    jsEnabled = false
   }
 
   def deleteCookies() = {
