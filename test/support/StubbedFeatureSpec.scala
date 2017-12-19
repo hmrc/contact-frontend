@@ -46,7 +46,6 @@ trait StubbedFeatureSpec
     Deskpro.shutdown()
     ExternalPages.shutdown()
     Env.deleteAllCookies()
-    Env.shutdown()
   }
 
   override def beforeEach() = {
