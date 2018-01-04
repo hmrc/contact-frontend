@@ -25,11 +25,11 @@ private object AppOverrides{
 private object AppDependencies {
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "bootstrap-play-25" % "0.14.0",
+    "uk.gov.hmrc" %% "bootstrap-play-25" % "1.2.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.14.0",
-    "uk.gov.hmrc" %% "play-ui" % "7.8.0",
+    "uk.gov.hmrc" %% "play-ui" % "7.13.0",
     "uk.gov.hmrc" %% "url-builder" % "2.1.0",
-    "uk.gov.hmrc" %% "auth-client" % "2.3.0",
+    "uk.gov.hmrc" %% "auth-client" % "2.5.0",
     "commons-validator" % "commons-validator" % "1.6",
     "org.apache.httpcomponents" % "httpclient" % DependencyVersions.apacheHttpComponentsCore
   )
@@ -42,7 +42,7 @@ private object AppDependencies {
     "org.jsoup" % "jsoup" % "1.7.3" % "test",
     "com.github.tomakehurst" % "wiremock" % "1.58" % "test",
     "uk.gov.hmrc" %% "scala-webdriver" % "5.18.0",
-    "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % "test"
+    "uk.gov.hmrc" %% "hmrctest" % "3.0" % "test"
   ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
     .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(
     "org.seleniumhq.selenium" % "selenium-java" % "3.7.1" % "test")
