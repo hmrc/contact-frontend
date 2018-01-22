@@ -52,6 +52,21 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
+    "include 'server' and 'backUrl' fields in the returned page if form not filled in correctly" in new FeedbackControllerApplication(fakeApplication) {
+
+      hrmcConnectorWillReturnTheTicketId()
+
+      val result = controller.submitUnauthenticated()(generateInvalidRequestWithBackUrlAndService())
+
+      status(result) should be(400)
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+      page.body().getElementById("feedbackService").attr("value") shouldBe "someService"
+      page.body().getElementById("feedbackBackUrl").attr("value") shouldBe "http://www.back.url"
+
+
+    }
+
     "show errors if call to hmrc-deskpro failed" in new FeedbackControllerApplication(fakeApplication) {
 
       hmrcConnectorWillFail()
@@ -194,6 +209,10 @@ class FeedbackControllerApplication(app: Application) extends MockitoSugar {
     def generateInvalidRequest() = FakeRequest()
       .withHeaders(("referer", feedbackReferer), ("User-Agent", "iAmAUserAgent"))
       .withFormUrlEncodedBody("isJavascript" -> "true")
+
+    def generateInvalidRequestWithBackUrlAndService() = FakeRequest()
+      .withHeaders(("referer", feedbackReferer), ("User-Agent", "iAmAUserAgent"))
+      .withFormUrlEncodedBody("isJavascript" -> "true", "backUrl" -> "http://www.back.url", "service" -> "someService")
 
     val request = generateRequest()
 

@@ -14,7 +14,7 @@
 <form id="feedback-form" action="@externalFeedbackUrl" method="POST" class="form--feedback" novalidate>
     <input type="hidden" name="csrfToken" value="@feedbackForm("csrfToken").value"/>
 
-    <input type="hidden" name="service" value="@extractServiceParameter(feedbackForm, service)"/>
+    <input type="hidden" name="service" id="feedbackService" value="@extractServiceParameter(feedbackForm, service)"/>
 
     <fieldset>
         @inputRadioGroup(
@@ -50,7 +50,7 @@
         <input type="hidden" name="isJavascript" id="isJavascript" value="@feedbackForm.data.get("isJavascript")">
         <input type="hidden" name="referer" id="referer" value="@feedbackForm.data.get("referer")">
         @for(url <- backUrl) {
-            <input type="hidden" name="backUrl" value="@url">
+            <input type="hidden" name="backUrl" id="feedbackBackUrl" value="@url">
         }
 
         <div class="form-field">

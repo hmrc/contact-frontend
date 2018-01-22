@@ -82,7 +82,7 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
     )
 
   private def feedbackView(loggedIn : Boolean, form: Form[FeedbackForm])(implicit request: Request[AnyRef]) = {
-    views.html.feedback(form, loggedIn)
+    views.html.feedback(form, loggedIn, form("service").value, form("backUrl").value)
   }
 
   private def doThanks(implicit loggedIn : Boolean, request: Request[AnyRef], backUrl: Option[String] = None): Future[Result] = {
