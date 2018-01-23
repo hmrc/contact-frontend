@@ -115,7 +115,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
     }
   }
 
-  "Feedback confirmation page" should {
+  "Feedback confirmation page for authenticated user " should {
     "not contain back button if not requested" in new FeedbackControllerApplication(fakeApplication) {
 
       val submit = controller.thanks()(request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
@@ -143,6 +143,37 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
       page.body().getElementById("feedback-back") shouldBe null
 
+    }
+
+    "Feedback confirmation page for anonymous user " should {
+      "not contain back button if not requested" in new FeedbackControllerApplication(fakeApplication) {
+
+        val submit = controller.unauthenticatedThanks()(request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
+        val page = Jsoup.parse(contentAsString(submit))
+
+        page.body().getElementById("feedback-back") shouldBe null
+
+      }
+
+      "contain back button if requested and the back url is valid" in new FeedbackControllerApplication(fakeApplication) {
+
+        val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.valid.url"))(request.
+          withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
+        val page = Jsoup.parse(contentAsString(submit))
+
+        page.body().getElementById("feedback-back").attr("href") shouldBe "http://www.valid.url"
+
+      }
+
+      "not contain back button if requested and the back url is invalid" in new FeedbackControllerApplication(fakeApplication) {
+
+        val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.invalid.url"))(request.
+          withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
+        val page = Jsoup.parse(contentAsString(submit))
+
+        page.body().getElementById("feedback-back") shouldBe null
+
+      }
     }
 
 }
