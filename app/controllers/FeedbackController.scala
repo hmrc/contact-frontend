@@ -14,15 +14,14 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import util.DeskproEmailValidator
+import util.{BackUrlValidator, DeskproEmailValidator}
 
 import scala.concurrent.Future
 
 @Singleton
-class FeedbackController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector, val configuration : Configuration, val environment: Environment)(implicit
-                                                                                    val appConfig : AppConfig,
-                                                                                    override val messagesApi : MessagesApi)
-extends FrontendController with DeskproSubmission with I18nSupport with AuthorisedFunctions with LoginRedirection {
+class FeedbackController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector, val accessibleUrlValidator : BackUrlValidator,
+                                   val configuration : Configuration, val environment: Environment)(implicit val appConfig : AppConfig, override val messagesApi : MessagesApi)
+extends FrontendController with DeskproSubmission with I18nSupport with AuthorisedFunctions with LoginRedirection  {
 
   val formId = "FeedbackForm"
 
@@ -59,8 +58,11 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
   }
 
   def thanks(backUrl: Option[String] = None) = Action.async { implicit request =>
-    loginRedirection(routes.FeedbackController.thanks(backUrl).url)(
-    authorised(AuthProviders(GovernmentGateway)) { doThanks(true, request, backUrl)
+
+    val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
+
+    loginRedirection(routes.FeedbackController.thanks(validatedBackUrl).url)(
+    authorised(AuthProviders(GovernmentGateway)) { doThanks(true, request, validatedBackUrl)
     })
   }
 

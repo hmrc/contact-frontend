@@ -20,6 +20,7 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import util.BackUrlValidator
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -124,13 +125,23 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
     }
 
-    "contain back button if requested" in new FeedbackControllerApplication(fakeApplication) {
+    "contain back button if requested and the back url is valid" in new FeedbackControllerApplication(fakeApplication) {
 
-      val submit = controller.thanks(backUrl = Some("http://back.url"))(request.
+      val submit = controller.thanks(backUrl = Some("http://www.valid.url"))(request.
         withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
       val page = Jsoup.parse(contentAsString(submit))
 
-      page.body().getElementById("feedback-back").attr("href") shouldBe "http://back.url"
+      page.body().getElementById("feedback-back").attr("href") shouldBe "http://www.valid.url"
+
+    }
+
+    "not contain back button if requested and the back url is invalid" in new FeedbackControllerApplication(fakeApplication) {
+
+      val submit = controller.thanks(backUrl = Some("http://www.invalid.url"))(request.
+        withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
+      val page = Jsoup.parse(contentAsString(submit))
+
+      page.body().getElementById("feedback-back") shouldBe null
 
     }
 
@@ -184,9 +195,13 @@ class FeedbackControllerApplication(app: Application) extends MockitoSugar {
     }
   }
 
+  val backUrlValidator = new BackUrlValidator() {
+    override def validate(backUrl: String) = backUrl == "http://www.valid.url"
+  }
+
   val environment: Environment = Environment.simple()
 
-  val controller = new FeedbackController(hmrcDeskproConnector, authConnector, app.configuration, environment)(
+  val controller = new FeedbackController(hmrcDeskproConnector, authConnector, backUrlValidator, app.configuration, environment)(
     new CFConfig(environment, app.configuration), app.injector.instanceOf[MessagesApi])
 
   val enrolments = Some(Enrolments(Set()))
