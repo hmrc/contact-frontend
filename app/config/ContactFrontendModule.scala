@@ -2,12 +2,13 @@ package config
 
 import play.api.inject.Module
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.auth.core.AuthConnector
+import util.{BackUrlValidator, ConfigurationBasedBackUrlValidator}
 
 class ContactFrontendModule extends Module {
   override def bindings(environment: Environment, configuration: Configuration) = {
     Seq(
-      bind[AppConfig].to[CFConfig]
+      bind[AppConfig].to[CFConfig],
+      bind[BackUrlValidator].to[ConfigurationBasedBackUrlValidator]
     )
   }
 }
