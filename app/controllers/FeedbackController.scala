@@ -67,7 +67,10 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
   }
 
   def unauthenticatedThanks(backUrl: Option[String] = None) = Action.async {
-    implicit request => doThanks(false, request, backUrl)
+    implicit request =>
+
+    val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
+    doThanks(false, request, validatedBackUrl)
   }
 
   private def doSubmit(enrolments: Option[Enrolments])(implicit request: Request[AnyContent]): Future[Result] =
