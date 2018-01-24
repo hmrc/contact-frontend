@@ -11,7 +11,7 @@ trait AppConfig {
   val analyticsHost: String
   val externalReportProblemUrl: String
   val externalReportProblemSecureUrl: String
-  val returnUrlHostnameWhitelist: Set[String]
+  val backUrlDestinationWhitelist: Set[String]
   def loginCallback(continueUrl: String): String
   def fallbackURLForLangugeSwitcher: String
   def enableLanguageSwitching: Boolean
@@ -29,7 +29,7 @@ class CFConfig @Inject() (environment: play.api.Environment, configuration : Con
   override lazy val assetsPrefix = loadConfig(s"frontend.assets.url") + loadConfig(s"frontend.assets.version")
   override lazy val analyticsToken = loadConfig(s"govuk-tax.$env.google-analytics.token")
   override lazy val analyticsHost = loadConfig(s"govuk-tax.$env.google-analytics.host")
-  override lazy val returnUrlHostnameWhitelist = loadConfig(s"$env.backUrlHostnameWhitelist").split(',').filter(_.nonEmpty).toSet
+  override lazy val backUrlDestinationWhitelist = loadConfig(s"$env.backUrlDestinationWhitelist").split(',').filter(_.nonEmpty).toSet
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
   override def fallbackURLForLangugeSwitcher = loadConfig(s"govuk-tax.$env.platform.frontend.url")
   override def enableLanguageSwitching = configuration.getBoolean(s"govuk-tax.$env.enableLanguageSwitching").getOrElse(false)
