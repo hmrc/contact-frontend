@@ -6,7 +6,7 @@ This application provides connectivity to Deskpro ticketing system. It provides 
  - contacting HMRC
  - providing BETA feedback
 
-##Partial HTML providers
+## Partial HTML providers
 
 These are the URLs to retrieve and submit the forms. The idea is to have the form and confirmation page (and the related controller) in your own app (using your base template, incl. header, side bars, etc.) and suck in the form part from contact-frontend. Here is a simple sequence how it works.
 
