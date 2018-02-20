@@ -15,7 +15,6 @@ trait AppConfig {
   def loginCallback(continueUrl: String): String
   def fallbackURLForLangugeSwitcher: String
   def enableLanguageSwitching: Boolean
-  def useV2ProblemReportAjax: Boolean
 }
 
 class CFConfig @Inject() (environment: play.api.Environment, configuration : Configuration) extends AppConfig with ServicesConfig {
@@ -33,7 +32,6 @@ class CFConfig @Inject() (environment: play.api.Environment, configuration : Con
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
   override def fallbackURLForLangugeSwitcher = loadConfig(s"govuk-tax.$env.platform.frontend.url")
   override def enableLanguageSwitching = configuration.getBoolean(s"govuk-tax.$env.enableLanguageSwitching").getOrElse(false)
-  override def useV2ProblemReportAjax: Boolean = configuration.getBoolean("feature-flag.v2problemreportajax").getOrElse(false)
 
   override protected def mode = environment.mode
 

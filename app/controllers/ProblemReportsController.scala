@@ -85,12 +85,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   }
 
   def reportFormAjax(service: Option[String]) = UnauthorisedAction { implicit request =>
-    if (appConfig.useV2ProblemReportAjax) {
-      Ok(views.html.partials.error_feedback_inner_v2(ProblemReportFormV2.form, appConfig.externalReportProblemSecureUrl, None, service))
-    }
-    else {
-      Ok(views.html.partials.error_feedback_inner(appConfig.externalReportProblemSecureUrl, None, service))
-    }
+    Ok(views.html.partials.error_feedback_inner(appConfig.externalReportProblemSecureUrl, None, service))
   }
 
   def reportFormNonJavaScript(service: Option[String]) = UnauthorisedAction { implicit request =>
@@ -105,54 +100,27 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   }
 
   private[controllers] def doReport(thankYouMessage: Option[String] = None)(implicit request: Request[AnyRef]) = {
-    if (appConfig.useV2ProblemReportAjax) {
-      ProblemReportFormV2.form.bindFromRequest.fold(
-        (error: Form[ProblemReportV2]) => {
-          if (!error.data.getOrElse("isJavascript", "true").toBoolean) {
-            Future.successful(Ok(views.html.problem_reports_error_nonjavascript()))
-          } else {
-            val errorHtmlAsString =
-              views.html.partials.error_feedback_inner_v2(error, appConfig.externalReportProblemSecureUrl, None, error.data.get("service")).toString()
-            Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> errorHtmlAsString))))
-          }
-        },
-        problemReport => {
-          val referrer = if (problemReport.referrer.exists(_.trim.length > 0)) problemReport.referrer.get else referrerFrom(request)
-          (for {
-            maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
-            ticketId <- createTicketV2(problemReport, request, maybeUserEnrolments, referrer)
-          } yield {
-            if (!problemReport.isJavascript) Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
-            else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
-          }) recover {
-            case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript())
-          }
+    ProblemReportForm.form.bindFromRequest.fold(
+      (error: Form[ProblemReport]) => {
+        if (!error.data.getOrElse("isJavascript", "true").toBoolean) {
+          Future.successful(Ok(views.html.problem_reports_error_nonjavascript()))
+        } else {
+          Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
         }
-      )
-    }
-    else {
-      ProblemReportForm.form.bindFromRequest.fold(
-        (error: Form[ProblemReport]) => {
-          if (!error.data.getOrElse("isJavascript", "true").toBoolean) {
-            Future.successful(Ok(views.html.problem_reports_error_nonjavascript()))
-          } else {
-            Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
-          }
-        },
-        problemReport => {
-          val referrer = if (problemReport.referrer.exists(_.trim.length > 0)) problemReport.referrer.get else referrerFrom(request)
-          (for {
-            maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
-            ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referrer)
-          } yield {
-            if (!problemReport.isJavascript) Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
-            else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
-          }) recover {
-            case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript())
-          }
+      },
+      problemReport => {
+        val referrer = if (problemReport.referrer.exists(_.trim.length > 0)) problemReport.referrer.get else referrerFrom(request)
+        (for {
+          maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
+          ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referrer)
+        } yield {
+          if (!problemReport.isJavascript) Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
+          else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
+        }) recover {
+          case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript())
         }
-      )
-    }
+      }
+    )
   }
 
   private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], referrer: String) = {
