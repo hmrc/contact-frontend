@@ -42,33 +42,6 @@ object ProblemReportForm {
   )
 }
 
-object ProblemReportFormV2 {
-
-  private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
-  private val validateEmail: (String) => Boolean = emailValidator.validate
-
-  val form = Form[ProblemReportV2](
-    mapping(
-      "report-name" -> text
-        .verifying("error.common.problem_report.action_mandatory", action => !action.isEmpty)
-        .verifying("error.common.problem_report.name_too_long", name => name.size <= 70)
-        .verifying("error.common.problem_report.name_invalid_characters", name => name.matches( """^[A-Za-z\-.,()'"\s]+$""")),
-      "report-email" -> text
-        .verifying("error.email", validateEmail)
-        .verifying("deskpro.email_too_long", email => email.size <= 255),
-      "report-action" -> text
-        .verifying("error.common.problem_report.action_mandatory", action => !action.isEmpty)
-        .verifying("error.common.comments_too_long", action => action.size <= 1000),
-      "report-error" -> text
-        .verifying("error.common.problem_report.action_mandatory", error => !error.isEmpty)
-        .verifying("error.common.comments_too_long", error => error.size <= 1000),
-      "isJavascript" -> boolean,
-      "service" -> optional(text),
-      "referrer" -> optional(text)
-    )(ProblemReportV2.apply)(ProblemReportV2.unapply)
-  )
-}
-
 @Singleton
 class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
                                          val authConnector: AuthConnector)(implicit appConfig: AppConfig, override val messagesApi: MessagesApi) extends FrontendController with ContactFrontendActions with I18nSupport {
