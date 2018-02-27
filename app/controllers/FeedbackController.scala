@@ -74,7 +74,7 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
   }
 
   private def doSubmit(enrolments: Option[Enrolments])(implicit request: Request[AnyContent]): Future[Result] =
-    FeedbackFormBind.form.bindFromRequest()(request).fold(
+    FeedbackFormBind.form().bindFromRequest()(request).fold(
       error => Future.successful(BadRequest(feedbackView(enrolments.isDefined, error))),
       data => {
         val ticketIdF = createDeskproFeedback(data, enrolments)
@@ -114,7 +114,7 @@ object FeedbackForm {
       backUrl)
 
   def emptyForm(csrfToken: String, referer: Option[String] = None, backUrl : Option[String])(implicit request: Request[AnyRef]) =
-    FeedbackFormBind.form.fill(FeedbackForm(referer.getOrElse(request.headers.get("Referer").getOrElse("n/a")), csrfToken,
+    FeedbackFormBind.form().fill(FeedbackForm(referer.getOrElse(request.headers.get("Referer").getOrElse("n/a")), csrfToken,
       backUrl))
 }
 
@@ -129,7 +129,7 @@ object FeedbackFormBind {
   private val emailValidator = new DeskproEmailValidator()
   private val validateEmail: (String) => Boolean = emailValidator.validate
 
-  val form = Form[FeedbackForm](mapping(
+  def form(requireComments: Option[Boolean] = None) = Form[FeedbackForm](mapping(
     "feedback-rating" -> optional(text)
       .verifying("error.common.feedback.rating_mandatory", rating => rating.isDefined && !rating.get.trim.isEmpty)
       .verifying("error.common.feedback.rating_valid", rating => rating.map(validExperiences.contains(_)).getOrElse(true)),
@@ -143,7 +143,7 @@ object FeedbackFormBind {
       .verifying("deskpro.email_too_long", email => email.size <= 255),
 
     "feedback-comments" -> text
-      .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)
+      .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty || !requireComments.getOrElse(true))
       .verifying("error.common.comments_too_long", comment => {
         val result = comment.size <= 2000
         Logger.error(s"Comment too long? ${result}")

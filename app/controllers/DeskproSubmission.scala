@@ -33,7 +33,10 @@ trait DeskproSubmission {
       email = data.email,
       rating = data.experienceRating,
       subject = "Beta feedback submission",
-      message = data.comments,
+      message = data.comments match {
+        case "" => "No comment given"
+        case comment => comment
+      },
       referrer = data.referrer,
       isJavascript = data.javascriptEnabled,
       request = request,

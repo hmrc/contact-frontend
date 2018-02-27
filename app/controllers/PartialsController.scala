@@ -54,9 +54,9 @@ class PartialsController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnec
       }
   }
 
-  def submitFeedbackForm(resubmitUrl: String) = Action.async {
+  def submitFeedbackForm(resubmitUrl: String, requireComments: Option[Boolean] = None) = Action.async {
     implicit request =>
-      FeedbackFormBind.form.bindFromRequest()(request).fold(
+      FeedbackFormBind.form(requireComments).bindFromRequest()(request).fold(
         error => {
           Future.successful(BadRequest(views.html.partials.feedback_form(error, resubmitUrl)))
         },
