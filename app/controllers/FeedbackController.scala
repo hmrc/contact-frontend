@@ -14,6 +14,8 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
+import uk.gov.voa.play.form.{Condition, ConditionalMappings}
 import util.{BackUrlValidator, DeskproEmailValidator}
 
 import scala.concurrent.Future
@@ -29,20 +31,20 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
 
   override protected def runModeConfiguration = configuration
 
-  def feedbackForm(service: Option[String] = None, backUrl: Option[String] = None) = Action.async { implicit request =>
+  def feedbackForm(service: Option[String] = None, backUrl: Option[String] = None, canOmitComments : Boolean) = Action.async { implicit request =>
     loginRedirection(routes.FeedbackController.feedbackForm(service, backUrl).url)(authorised(AuthProviders(GovernmentGateway)) {
       Future.successful(
         Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map {
           _.value
-        }.getOrElse(""), backUrl = backUrl), true, service, backUrl))
+        }.getOrElse(""), backUrl = backUrl, canOmitComments = canOmitComments), loggedIn = true, service, backUrl, canOmitComments = canOmitComments))
       )
     })
   }
 
-  def unauthenticatedFeedbackForm(service: Option[String] = None, backUrl: Option[String] = None) = Action.async { implicit request =>
+  def unauthenticatedFeedbackForm(service: Option[String] = None, backUrl: Option[String] = None, canOmitComments : Boolean) = Action.async { implicit request =>
     Future.successful(
       Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map { _.value }.getOrElse(""),
-        backUrl = backUrl), false, service, backUrl))
+        backUrl = backUrl, canOmitComments = canOmitComments), loggedIn = false, service, backUrl, canOmitComments = canOmitComments))
     )
   }
 
@@ -87,7 +89,7 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
     )
 
   private def feedbackView(loggedIn : Boolean, form: Form[FeedbackForm])(implicit request: Request[AnyRef]) = {
-    views.html.feedback(form, loggedIn, form("service").value, form("backUrl").value)
+    views.html.feedback(form, loggedIn, form("service").value, form("backUrl").value, form("canOmitComments").value.exists(_ == "true"))
   }
 
   private def doThanks(implicit loggedIn : Boolean, request: Request[AnyRef], backUrl: Option[String] = None): Future[Result] = {
@@ -99,23 +101,25 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
 
 }
 
-case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"), backUrl: Option[String])
+case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"), backUrl: Option[String],
+                        canOmitComments : Boolean)
 
 object FeedbackForm {
-  def apply(referer: String, csrfToken: String, backUrl : Option[String]): FeedbackForm =
-    FeedbackForm("", "", "", "", javascriptEnabled = false, referer, csrfToken, backUrl = backUrl)
+  def apply(referer: String, csrfToken: String, backUrl : Option[String], canOmitComments : Boolean): FeedbackForm =
+    FeedbackForm("", "", "", "", javascriptEnabled = false, referer, csrfToken, backUrl = backUrl, canOmitComments = canOmitComments)
 
   def apply(
     experienceRating: Option[String], name: String, email: String, comments: String,
     javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String],
-    backUrl: Option[String]
+    backUrl: Option[String],
+    canOmitComments : Boolean
   ): FeedbackForm =
     FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken, service,
-      backUrl)
+      backUrl, canOmitComments)
 
-  def emptyForm(csrfToken: String, referer: Option[String] = None, backUrl : Option[String])(implicit request: Request[AnyRef]) =
+  def emptyForm(csrfToken: String, referer: Option[String] = None, backUrl : Option[String], canOmitComments : Boolean)(implicit request: Request[AnyRef]) =
     FeedbackFormBind.form.fill(FeedbackForm(referer.getOrElse(request.headers.get("Referer").getOrElse("n/a")), csrfToken,
-      backUrl))
+      backUrl, canOmitComments))
 }
 
 object FeedbackFormConfig {
@@ -128,8 +132,10 @@ object FeedbackFormBind {
 
   private val emailValidator = new DeskproEmailValidator()
   private val validateEmail: (String) => Boolean = emailValidator.validate
+  private def not(c : Condition): Condition = m => !c(m)
 
-  val form = Form[FeedbackForm](mapping(
+
+  def form = Form[FeedbackForm](mapping(
     "feedback-rating" -> optional(text)
       .verifying("error.common.feedback.rating_mandatory", rating => rating.isDefined && !rating.get.trim.isEmpty)
       .verifying("error.common.feedback.rating_valid", rating => rating.map(validExperiences.contains(_)).getOrElse(true)),
@@ -142,8 +148,9 @@ object FeedbackFormBind {
       .verifying("error.email", validateEmail)
       .verifying("deskpro.email_too_long", email => email.size <= 255),
 
-    "feedback-comments" -> text
-      .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)
+    "feedback-comments" ->
+      mandatoryIf(not(ConditionalMappings.isTrue("canOmitComments")),
+        text.verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)).transform[String](_.getOrElse(""), value => Some(value))
       .verifying("error.common.comments_too_long", comment => {
         val result = comment.size <= 2000
         Logger.error(s"Comment too long? ${result}")
@@ -154,9 +161,10 @@ object FeedbackFormBind {
     "referer" -> text,
     "csrfToken" -> text,
     "service" -> optional(text),
-    "backUrl" -> optional(text)
+    "backUrl" -> optional(text),
+    "canOmitComments" -> boolean
   )(FeedbackForm.apply)((feedbackForm: FeedbackForm) => {
       import feedbackForm._
-      Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer, csrfToken, service, backUrl ))
+      Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer, csrfToken, service, backUrl, canOmitComments))
     }))
 }

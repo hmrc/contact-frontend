@@ -47,18 +47,19 @@ class PartialsController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnec
       Ok(views.html.partials.contact_hmrc_form_confirmation(ticketId))
   }
 
-  def feedbackForm(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String]) = Action.async {
+  def feedbackForm(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String], canOmitComments : Boolean) = Action.async {
     implicit request =>
       Future.successful {
-        Ok(views.html.partials.feedback_form(FeedbackForm.emptyForm(csrfToken, referer, None), submitUrl, service))
+        Ok(views.html.partials.feedback_form(FeedbackForm.emptyForm(csrfToken, referer, None, canOmitComments = canOmitComments), submitUrl, service, canOmitComments = canOmitComments))
       }
   }
 
   def submitFeedbackForm(resubmitUrl: String) = Action.async {
     implicit request =>
-      FeedbackFormBind.form.bindFromRequest()(request).fold(
+      val form =  FeedbackFormBind.form.bindFromRequest()(request)
+     form.fold(
         error => {
-          Future.successful(BadRequest(views.html.partials.feedback_form(error, resubmitUrl)))
+          Future.successful(BadRequest(views.html.partials.feedback_form(error, resubmitUrl, canOmitComments = form("canOmitComments").value.exists(_ == "true"))))
         },
         data => {
           (for {

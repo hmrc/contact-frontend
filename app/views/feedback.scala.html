@@ -3,15 +3,16 @@
 @(feedbackForm: Form[controllers.FeedbackForm],
   loggedIn : Boolean,
   service: Option[String] = None,
-  backUrl: Option[String] = None)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+  backUrl: Option[String] = None,
+  canOmitComments : Boolean)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
 @main(title = Messages("common.feedback.heading"), userLoggedIn = loggedIn) {
 
     @if(loggedIn) {
-        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submit.url, service, backUrl)
+        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submit.url, service, backUrl, canOmitComments)
     } else {
-        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submitUnauthenticated.url, service, backUrl)
+        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submitUnauthenticated.url, service, backUrl, canOmitComments)
     }
 }
