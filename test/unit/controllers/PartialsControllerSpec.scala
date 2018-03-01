@@ -31,7 +31,7 @@ class PartialsControllerSpec extends UnitSpec with WithFakeApplication {
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitFeedbackForm("tstUrl", Some(true))(generateInvalidRequest())
+      val result = controller.submitFeedbackForm("tstUrl")(generateInvalidRequest())
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
@@ -40,11 +40,11 @@ class PartialsControllerSpec extends UnitSpec with WithFakeApplication {
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
-    "allow comments to be empty if the requireComments flag is set to false" in new PartialsControllerApplication(fakeApplication) {
+    "allow comments to be empty if the canOmitComments flag is set to true" in new PartialsControllerApplication(fakeApplication) {
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitFeedbackForm("tstUrl", Some(false))(generateRequest(comments = ""))
+      val result = controller.submitFeedbackForm("tstUrl")(generateRequest(comments = "", canOmitComments = true))
 
       status(result) should be(200)
       val page = Jsoup.parse(contentAsString(result))
@@ -53,11 +53,11 @@ class PartialsControllerSpec extends UnitSpec with WithFakeApplication {
       verifyRequestMade("No comment given")
     }
 
-    "show errors if no comments are provided and the requireComments flag is set to true" in new PartialsControllerApplication(fakeApplication) {
+    "show errors if no comments are provided and the canOmitComments flag is set to false" in new PartialsControllerApplication(fakeApplication) {
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitFeedbackForm("tstUrl", Some(true))(generateRequest(comments = ""))
+      val result = controller.submitFeedbackForm("tstUrl")(generateRequest(comments = "", canOmitComments = false))
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
@@ -128,7 +128,8 @@ class PartialsControllerApplication(app: Application) extends MockitoSugar {
 
   val enrolments = Some(Enrolments(Set()))
 
-  def generateRequest(javascriptEnabled: Boolean = true, name: String = feedbackName, email: String = feedbackEmail, comments: String = feedbackComment, backUrl: Option[String] = None) = {
+  def generateRequest(javascriptEnabled: Boolean = true, name: String = feedbackName, email: String = feedbackEmail, comments: String = feedbackComment, backUrl: Option[String] = None,
+                      canOmitComments : Boolean = false) = {
 
     val fields = Map("feedback-name" -> name,
       "feedback-email" -> email,
@@ -136,6 +137,7 @@ class PartialsControllerApplication(app: Application) extends MockitoSugar {
       "feedback-comments" -> comments,
       "csrfToken" -> "token",
       "referer" -> feedbackReferer,
+      "canOmitComments" -> canOmitComments.toString,
       "isJavascript" -> javascriptEnabled.toString) ++ backUrl.map("backUrl" -> _)
 
     FakeRequest()

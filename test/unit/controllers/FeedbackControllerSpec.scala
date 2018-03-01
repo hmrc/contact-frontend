@@ -37,7 +37,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
       status(result) should be(303)
       redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks-unauthenticated")
 
-      verifyRequestMade
+      verifyRequestMade()
     }
 
     "show errors if some form not filled in correctly" in new FeedbackControllerApplication(fakeApplication) {
@@ -53,7 +53,30 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
-    "include 'server' and 'backUrl' fields in the returned page if form not filled in correctly" in new FeedbackControllerApplication(fakeApplication) {
+    "succed without comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
+      hrmcConnectorWillReturnTheTicketId()
+
+      val result = controller.submitUnauthenticated()(generateRequest(comments="", canOmitComments = true))
+
+      status(result) should be(303)
+      redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks-unauthenticated")
+
+      verifyRequestMade(comment = "No comment given")
+    }
+
+    "fail without comment if 'canOmitComments' flag is false" in new FeedbackControllerApplication(fakeApplication) {
+      hrmcConnectorWillReturnTheTicketId()
+
+      val result = controller.submitUnauthenticated()(generateRequest(comments="", canOmitComments = false))
+
+      status(result) should be(400)
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+
+      verifyZeroInteractions(hmrcDeskproConnector)
+    }
+
+    "include 'server', 'backUrl' and 'canOmitComments' fields in the returned page if form not filled in correctly" in new FeedbackControllerApplication(fakeApplication) {
 
       hrmcConnectorWillReturnTheTicketId()
 
@@ -64,7 +87,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
       page.body().getElementsByClass("error-notification") shouldNot be(empty)
       page.body().getElementById("feedbackService").attr("value") shouldBe "someService"
       page.body().getElementById("feedbackBackUrl").attr("value") shouldBe "http://www.back.url"
-
+      page.body().getElementById("canOmitComments").attr("value") shouldBe "true"
 
     }
 
@@ -85,7 +108,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
       status(result) should be(303)
       redirectLocation(result) shouldBe Some(s"/contact/beta-feedback/thanks-unauthenticated?backUrl=${URLEncoder.encode("http://www.back.url", "UTF-8")}")
 
-      verifyRequestMade
+      verifyRequestMade()
     }
   }
 
@@ -99,7 +122,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
       status(result) should be(303)
       redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks")
 
-      verifyRequestMade
+      verifyRequestMade()
     }
 
     "redirect to confirmation page with 'back' button if 'back' link provided" in new FeedbackControllerApplication(fakeApplication) {
@@ -111,7 +134,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
       status(result) should be(303)
       redirectLocation(result) shouldBe Some(s"/contact/beta-feedback/thanks?backUrl=${URLEncoder.encode("http://www.back.url", "UTF-8")}")
 
-      verifyRequestMade
+      verifyRequestMade()
     }
   }
 
@@ -206,13 +229,13 @@ class FeedbackControllerApplication(app: Application) extends MockitoSugar {
       any[Option[String]])(any[HeaderCarrier])).thenReturn(result)
   }
 
-  def verifyRequestMade: Unit = {
+  def verifyRequestMade(comment : String = feedbackComment): Unit = {
     verify(hmrcDeskproConnector).createFeedback(
       meq(feedbackName),
       meq(feedbackEmail),
       meq(feedbackRating),
       meq("Beta feedback submission"),
-      meq(feedbackComment),
+      meq(comment),
       meq(feedbackReferer),
       meq(true),
       any[Request[AnyRef]](),
@@ -237,7 +260,7 @@ class FeedbackControllerApplication(app: Application) extends MockitoSugar {
 
   val enrolments = Some(Enrolments(Set()))
 
-  def generateRequest(javascriptEnabled: Boolean = true, name: String = feedbackName, email: String = feedbackEmail, comments: String = feedbackComment, backUrl: Option[String] = None) = {
+  def generateRequest(javascriptEnabled: Boolean = true, name: String = feedbackName, email: String = feedbackEmail, comments: String = feedbackComment, backUrl: Option[String] = None, canOmitComments : Boolean = false) = {
 
     val fields = Map("feedback-name" -> name,
       "feedback-email" -> email,
@@ -245,6 +268,7 @@ class FeedbackControllerApplication(app: Application) extends MockitoSugar {
       "feedback-comments" -> comments,
       "csrfToken" -> "token",
       "referer" -> feedbackReferer,
+      "canOmitComments" -> canOmitComments.toString,
       "isJavascript" -> javascriptEnabled.toString) ++ backUrl.map("backUrl" -> _)
 
     FakeRequest()
@@ -258,7 +282,7 @@ class FeedbackControllerApplication(app: Application) extends MockitoSugar {
 
     def generateInvalidRequestWithBackUrlAndService() = FakeRequest()
       .withHeaders(("referer", feedbackReferer), ("User-Agent", "iAmAUserAgent"))
-      .withFormUrlEncodedBody("isJavascript" -> "true", "backUrl" -> "http://www.back.url", "service" -> "someService")
+      .withFormUrlEncodedBody("isJavascript" -> "true", "backUrl" -> "http://www.back.url", "service" -> "someService", "canOmitComments" -> "true")
 
     val request = generateRequest()
 

@@ -31,6 +31,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "url-builder" % "2.1.0",
     "uk.gov.hmrc" %% "auth-client" % "2.5.0",
     "commons-validator" % "commons-validator" % "1.6",
+    "uk.gov.hmrc" %% "play-conditional-form-mapping" % "0.2.0",
     "org.apache.httpcomponents" % "httpclient" % DependencyVersions.apacheHttpComponentsCore
   )
 
