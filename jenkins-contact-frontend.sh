@@ -2,7 +2,7 @@
 
 cd $WORKSPACE
 rm -rf service-manager-config
-git clone git@github.tools.tax.service.gov.uk:HMRC/service-manager-config.git
+git clone git@github.com:hmrc/service-manager-config.git
 
 echo "Starting ASSETS"
 
