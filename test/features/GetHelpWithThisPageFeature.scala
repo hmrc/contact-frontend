@@ -75,6 +75,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
 
       When("I open the 'Get help with this page' form")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+      i_see("Get help using this service")
 
       Then("The 'Get help with this page' form is visible")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.problemReportHidden must be (false)
@@ -91,6 +92,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)
       UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+      i_see("Get help using this service")
 
       When("I fill in an invalid name")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.typeName("<")
@@ -107,6 +109,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)
       UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+      i_see("Get help using this service")
 
       When("I fill in an invalid email address")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.typeEmail("not@valid.")
@@ -123,6 +126,7 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
       Given("I have the 'Get help with this page' form open")
       goOn(UnauthenticatedFeedbackPage)
       UnauthenticatedFeedbackPage.getHelpWithThisPage.toggleProblemReport
+      i_see("Get help using this service")
 
       When("I fill in an invalid email address")
       UnauthenticatedFeedbackPage.getHelpWithThisPage.clickSubmitButton()
