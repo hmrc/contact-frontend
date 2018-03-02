@@ -29,7 +29,7 @@ trait NavigationSugar extends WebBrowser with Eventually with Assertions with In
     } catch {
       case e: TimeoutException =>
         val className = page.getClass.getSimpleName.replaceAll("\\$", "")
-        throw new TimeoutException(s"Timed out waiting for page: $className\n", e)
+        throw new TimeoutException(s"Timed out waiting for page: $className\n. Seen ${webDriver.getPageSource}", e)
     }
   }
 
