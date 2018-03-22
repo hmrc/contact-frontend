@@ -4,8 +4,9 @@ import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
-import play.api.data.Form
 import play.api.data.Forms._
+import play.api.data.format.Formatter
+import play.api.data.{FieldMapping, Form, FormError}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import play.api.{Configuration, Environment, Logger}
@@ -14,8 +15,6 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
-import uk.gov.voa.play.form.{Condition, ConditionalMappings}
 import util.{BackUrlValidator, DeskproEmailValidator}
 
 import scala.concurrent.Future
@@ -132,7 +131,6 @@ object FeedbackFormBind {
 
   private val emailValidator = new DeskproEmailValidator()
   private val validateEmail: (String) => Boolean = emailValidator.validate
-  private def not(c : Condition): Condition = m => !c(m)
 
 
   def form = Form[FeedbackForm](mapping(
@@ -148,12 +146,21 @@ object FeedbackFormBind {
       .verifying("error.email", validateEmail)
       .verifying("deskpro.email_too_long", email => email.size <= 255),
 
-    "feedback-comments" ->
-      mandatoryIf(not(ConditionalMappings.isTrue("canOmitComments")),
-        text.verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)).transform[String](_.getOrElse(""), value => Some(value))
-      .verifying("error.common.comments_too_long", comment => {
+    "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
+        val commentsCanBeOmitted = data.get("canOmitComments").contains("true")
+        data.get(key) match {
+          case Some(value) if !value.trim.isEmpty || commentsCanBeOmitted => Right(value.trim)
+          case Some(_) => Left(Seq(FormError(key, "error.common.comments_mandatory", Nil)))
+          case None => Left(Seq(FormError(key, "error.required", Nil)))
+        }
+      }
+      override def unbind(key: String, value: String): Map[String, String] = Map(key -> value)
+
+    }).verifying("error.common.comments_too_long", comment => {
         val result = comment.size <= 2000
-        Logger.error(s"Comment too long? ${result}")
+        Logger.error(s"Comment too long? $result")
         result
       }),
 

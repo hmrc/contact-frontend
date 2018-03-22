@@ -53,6 +53,17 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
+    "succed with comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
+      hrmcConnectorWillReturnTheTicketId()
+
+      val result = controller.submitUnauthenticated()(generateRequest(comments="Some comment", canOmitComments = true))
+
+      status(result) should be(303)
+      redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks-unauthenticated")
+
+      verifyRequestMade(comment = "Some comment")
+    }
+
     "succed without comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
       hrmcConnectorWillReturnTheTicketId()
 
