@@ -4,12 +4,11 @@ import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
-import connectors.deskpro.domain.TicketId
 import play.api.{Configuration, Environment}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, Request}
+import play.api.mvc.{Action, AnyContent, Call, Request}
 import play.filters.csrf.CSRF
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
@@ -57,53 +56,78 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
 
   def index = Action.async { implicit request =>
     loginRedirection(routes.ContactHmrcController.index().url)(
-    authorised(AuthProviders(GovernmentGateway))({
-      Future.successful {
-        val referer = request.headers.get("Referer").getOrElse("n/a")
-        val csrfToken = CSRF.getToken(request).map{ _.value }.getOrElse("")
-        Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None))))
-      }
-    }))
+      authorised(AuthProviders(GovernmentGateway))({
+        Future.successful {
+          val referer = request.headers.get("Referer").getOrElse("n/a")
+          val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
+          Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None)), loggedIn = true))
+        }
+      }))
+  }
+
+  def indexUnauthenticated(service: String) = Action.async { implicit request =>
+    Future.successful {
+      val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
+      Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(service, csrfToken, Some(service))), loggedIn = false))
+    }
   }
 
   def submit = Action.async { implicit request =>
-    loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments){
+    loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments) {
       allEnrolments =>
-
-      ContactHmrcForm.form.bindFromRequest()(request).fold(
-        error => {
-          Future.successful(BadRequest(views.html.contact_hmrc(error)))
-        },
-        data => {
-          val ticketIdF: Future[TicketId] = createDeskproTicket(data, Some(allEnrolments))
-
-
-          ticketIdF.map{ ticketId =>
-            Redirect(routes.ContactHmrcController.thanks()).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
-          }.recover {
-            case _ => InternalServerError(deskpro_error())
-          }
-        })
+        handleSubmit(Some(allEnrolments), routes.ContactHmrcController.thanks())
     })
   }
 
-  def thanks =  Action.async { implicit request =>
+  def submitUnauthenticated = Action.async { implicit request =>
+    handleSubmit(None, routes.ContactHmrcController.thanksUnauthenticated())
+  }
+
+  private def handleSubmit(enrolments: Option[Enrolments], thanksRoute: Call)(
+    implicit request: Request[AnyContent]) = {
+    ContactHmrcForm.form.bindFromRequest()(request).fold(
+      error => {
+        Future.successful(BadRequest(views.html.contact_hmrc(error, enrolments.isDefined)))
+      },
+      data => {
+        createDeskproTicket(data, enrolments).map { ticketId =>
+          Redirect(thanksRoute).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+        }.recover {
+          case _ => InternalServerError(deskpro_error())
+        }
+      }
+    )
+  }
+
+  def thanks = Action.async { implicit request =>
     loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway))({
       doThanks(request)
     }))
   }
 
-  def doThanks(implicit request: Request[AnyRef]) = {
+  def thanksUnauthenticated = Action.async { implicit request =>
+    doThanks(request)
+  }
+
+  private def doThanks(implicit request: Request[AnyRef]) = {
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
       Ok(views.html.contact_hmrc_confirmation(ticketId))
     }
     Future.successful(result)
   }
-
 }
 
-case class ContactForm(contactName: String, contactEmail: String, contactComments: String, isJavascript: Boolean, referer: String, csrfToken: String, service: Option[String] = Some("unknown"))
+case class ContactForm(contactName: String,
+                       contactEmail: String,
+                       contactComments: String,
+                       isJavascript: Boolean,
+                       referer: String,
+                       csrfToken: String,
+                       service: Option[String] = Some("unknown"))
 
 object ContactForm {
-  def apply(referer: String, csrfToken: String, service: Option[String]): ContactForm = ContactForm("", "", "", isJavascript = false, referer, csrfToken, service)
+  def apply(referer: String,
+            csrfToken: String,
+            service: Option[String]): ContactForm =
+    ContactForm("", "", "", isJavascript = false, referer, csrfToken, service)
 }

@@ -30,6 +30,12 @@ These are the URLs to retrieve and submit the forms. The idea is to have the for
 
 An example client controller is in [YTA](https://github.tools.tax.service.gov.uk/HMRC/business-tax-account/blob/master/app/controllers/HelpAndContactController.scala).
 
+## Contact HMRC for external services
+
+This is a URL for external services which need to serve the `contact-hmrc` help page to their users. This page requires the external service to pass through its name on the URL.
+
+`GET /contact-hmrc-unauthenticated?service=<your-external-service-name>`
+
 ## Vanila screens (now deprecated)
 
 This still provides endpoints to complete vanilla screens, incl. empty header and wrapped with GovernmentGateway authorisation code. It is recommended to use partials and provide headers / authorisation in your controllers.
