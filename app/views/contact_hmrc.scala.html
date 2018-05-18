@@ -1,9 +1,13 @@
 @import config.AppConfig
 
-@(contactForm: Form[controllers.ContactForm])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@(contactForm: Form[controllers.ContactForm], loggedIn : Boolean)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@main(title = Messages("contact.heading"), supportLinkEnabled = false) {
-    @views.html.partials.contact_hmrc_form(contactForm, routes.ContactHmrcController.submit.url)
+@main(title = Messages("contact.heading"), supportLinkEnabled = false, userLoggedIn = loggedIn) {
+    @if(loggedIn) {
+        @views.html.partials.contact_hmrc_form(contactForm, routes.ContactHmrcController.submit.url)
+    } else {
+        @views.html.partials.contact_hmrc_form(contactForm, routes.ContactHmrcController.submitUnauthenticated.url)
+    }
 }

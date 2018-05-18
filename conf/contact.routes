@@ -10,6 +10,10 @@ GET         /contact-hmrc                                @controllers.ContactHmr
 POST        /contact-hmrc                                @controllers.ContactHmrcController.submit
 GET         /contact-hmrc/thanks                         @controllers.ContactHmrcController.thanks
 
+GET         /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.indexUnauthenticated(service: String)
+POST        /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.submitUnauthenticated
+GET         /contact-hmrc/thanks-unauthenticated         @controllers.ContactHmrcController.thanksUnauthenticated
+
 GET         /problem_reports                             @controllers.ProblemReportsController.reportForm(secure: Option[Boolean], csrfToken: Option[String], service: Option[String])
 GET         /problem_reports_ajax                        @controllers.ProblemReportsController.reportFormAjax(service: Option[String])
 GET         /problem_reports_nonjs                       @controllers.ProblemReportsController.reportFormNonJavaScript(service: Option[String])
