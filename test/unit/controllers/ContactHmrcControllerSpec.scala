@@ -69,7 +69,7 @@ class ContactHmrcControllerSpec
           configuration,
           environment)(appConfig, messages)
 
-      val contactRequest = FakeRequest()
+      val contactRequest = FakeRequest().withHeaders(("Referer", "/some-service-page"))
       val serviceName = "my-fake-service"
 
       When("the unauthenticated Contact HMRC page is requested with a service name")
@@ -79,7 +79,7 @@ class ContactHmrcControllerSpec
       status(contactResult) shouldBe 200
 
       val page = Jsoup.parse(contentAsString(contactResult))
-      page.body().getElementById("referer").attr("value") shouldBe "my-fake-service"
+      page.body().getElementById("referer").attr("value") shouldBe "/some-service-page"
     }
 
     "return expected OK for non-authenticated submit page" in {
