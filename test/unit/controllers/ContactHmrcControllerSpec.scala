@@ -80,6 +80,7 @@ class ContactHmrcControllerSpec
 
       val page = Jsoup.parse(contentAsString(contactResult))
       page.body().getElementById("referer").attr("value") shouldBe "/some-service-page"
+      page.body().getElementById("service").attr("value") shouldBe "my-fake-service"
     }
 
     "return expected OK for non-authenticated submit page" in {
