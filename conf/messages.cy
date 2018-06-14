@@ -57,6 +57,7 @@ form.email.address=Cyfeiriad e-bost
 form.your.comments=Eich sylwadau
 
 form.online.services=Beth yw eich barn am y gwasanaeth ar-lein hwn?
+form.online.services.data=Rydym yn defnyddio''ch adborth i wella ein gwasanaethau.
 form.online.services.very_good=Da iawn
 form.online.services.good=Da
 form.online.services.neutral=Niwtral
