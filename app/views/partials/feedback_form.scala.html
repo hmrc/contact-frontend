@@ -12,6 +12,8 @@
     <h1>@Messages("common.feedback.heading")</h1>
 </header>
 
+    <p>@Messages("form.online.services.data")</p>
+
 <form id="feedback-form" action="@externalFeedbackUrl" method="POST" class="form--feedback" novalidate>
     <input type="hidden" name="csrfToken" value="@feedbackForm("csrfToken").value"/>
 
