@@ -25,7 +25,7 @@ private object AppOverrides{
 private object AppDependencies {
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "bootstrap-play-25" % "1.5.0",
+    "uk.gov.hmrc" %% "bootstrap-play-25" % "1.7.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.14.0",
     "uk.gov.hmrc" %% "play-ui" % "7.14.0",
     "uk.gov.hmrc" %% "url-builder" % "2.1.0",
