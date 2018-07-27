@@ -18,16 +18,28 @@ class CorsFilter @Inject() (environment : Environment, configuration : Configura
   override protected def runModeConfiguration = configuration
 
   val enableAnyOrigin: Boolean = env == "Dev"
+  def allowedOrigins = configuration.getString("corsfilter.allowedOrigins")
 
   def apply(nextFilter: (RequestHeader) => Future[Result])
            (requestHeader: RequestHeader): Future[Result] = {
-    if(enableAnyOrigin) {
+
       nextFilter(requestHeader).map { result =>
-        result.withHeaders("Access-Control-Allow-Origin" -> "*", "Access-Control-Expose-Headers" -> "Location")
+        result.withHeaders("Access-Control-Allow-Origin" -> s"${allowedOrigins}",
+          "Access-Control-Expose-Headers" -> "Location",
+          "Access-Control-Allow-Methods" -> "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers" -> "User-Agent,X-Requested-With,Cache-Control,Connection,Accept-Language,Accept-Encoding,Origin,Referer")
       }
-    } else {
-        nextFilter(requestHeader)
-    }
+
+//    if(enableAnyOrigin) {
+//      nextFilter(requestHeader).map { result =>
+//        result.withHeaders("Access-Control-Allow-Origin" -> s"${allowedOrigins}",
+//          "Access-Control-Expose-Headers" -> "Location",
+//          "Access-Control-Allow-Methods" -> "GET, POST, OPTIONS",
+//          "Access-Control-Allow-Headers" -> "User-Agent,X-Requested-With,Cache-Control,Connection,Accept-Language,Accept-Encoding,Origin,Referer")
+//      }
+//    } else {
+//        nextFilter(requestHeader)
+//    }
   }
 
 }
