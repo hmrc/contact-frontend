@@ -23,10 +23,7 @@ class CorsFilter @Inject() (environment : Environment, configuration : Configura
            (requestHeader: RequestHeader): Future[Result] = {
     if(enableAnyOrigin) {
       nextFilter(requestHeader).map { result =>
-        result.withHeaders("Access-Control-Allow-Origin" -> "https://ewf.companieshouse.gov.uk",
-          "Access-Control-Expose-Headers" -> "Location",
-          "Access-Control-Allow-Methods" -> "GET, POST, OPTIONS",
-          "Access-Control-Allow-Headers" -> "User-Agent,X-Requested-With,Cache-Control,Connection,Accept-Language,Accept-Encoding,Origin,Referer")
+        result.withHeaders("Access-Control-Allow-Origin" -> "*", "Access-Control-Expose-Headers" -> "Location")
       }
     } else {
         nextFilter(requestHeader)
