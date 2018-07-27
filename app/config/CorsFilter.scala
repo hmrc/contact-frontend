@@ -29,17 +29,6 @@ class CorsFilter @Inject() (environment : Environment, configuration : Configura
           "Access-Control-Allow-Methods" -> "GET, POST, OPTIONS",
           "Access-Control-Allow-Headers" -> "User-Agent,X-Requested-With,Cache-Control,Connection,Accept-Language,Accept-Encoding,Origin,Referer")
       }
-
-//    if(enableAnyOrigin) {
-//      nextFilter(requestHeader).map { result =>
-//        result.withHeaders("Access-Control-Allow-Origin" -> s"${allowedOrigins}",
-//          "Access-Control-Expose-Headers" -> "Location",
-//          "Access-Control-Allow-Methods" -> "GET, POST, OPTIONS",
-//          "Access-Control-Allow-Headers" -> "User-Agent,X-Requested-With,Cache-Control,Connection,Accept-Language,Accept-Encoding,Origin,Referer")
-//      }
-//    } else {
-//        nextFilter(requestHeader)
-//    }
   }
 
 }
