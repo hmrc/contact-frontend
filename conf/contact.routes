@@ -34,5 +34,5 @@ GET			/survey/confirmation 	                     @controllers.SurveyController.c
 GET         /switch-to-welsh                             @controllers.LanguageController.switchToWelsh()
 GET         /switch-to-english                           @controllers.LanguageController.switchToEnglish()
 
-OPTIONS /*path                                           @controllers.ApplicationController.options(path)
+
 
