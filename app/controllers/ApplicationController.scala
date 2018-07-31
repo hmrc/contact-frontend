@@ -12,19 +12,24 @@ class ApplicationController @Inject() (environment : Environment, configuration 
 
   override protected def runModeConfiguration = configuration
 
-  def options(path: String) = Action {
-    implicit request =>
-      env match {
-        case "Dev" => Ok.withHeaders(
-          "Access-Control-Allow-Origin" -> "*",
-          "Access-Control-Allow-Methods" -> "GET, POST, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers" -> request.headers.get("Access-Control-Request-Headers").getOrElse(""),
-          "Access-Control-Expose-Headers" -> "Location",
-          "Access-Control-Allow-Credentials" -> "true",
-          "Access-Control-Max-Age" -> (60 * 60 * 24).toString
-        )
-        case _ => Forbidden
-    }
+  def allowedOrigins = configuration.getString("corsfilter.allowedOrigins")
 
+  def options(path: String) = Action {
+    implicit request => Ok.withHeaders(
+      "Access-Control-Allow-Origin" -> "https://ewf.companieshouse.gov.uk",
+      "Access-Control-Allow-Methods" -> "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers" -> "User-Agent,X-Requested-With,Cache-Control,Connection,Accept-Encoding,Origin,Referer,Csrf-Token",
+      "Access-Control-Allow-Credentials" -> "false"
+    )
+//      env match {
+//        case "Dev" => Ok.withHeaders(
+//          "Access-Control-Allow-Origin" -> "*",
+//          "Access-Control-Allow-Headers" -> request.headers.get("Access-Control-Request-Headers").getOrElse(""),
+//          "Access-Control-Expose-Headers" -> "Location",
+//          "Access-Control-Allow-Credentials" -> "true",
+//          "Access-Control-Max-Age" -> (60 * 60 * 24).toString
+//        )
+//        case _ => Forbidden
+//    }
   }
 }
