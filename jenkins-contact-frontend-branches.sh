@@ -32,9 +32,9 @@ echo "Start functional tests..."
 
 if [ "$1" == "--with-publish" ]
   then
-    sbt -Djava.io.tmpdir=${TMPDIR} clean validate test fun:test dist-tgz publish -Dbrowser=chrome -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
+    sbt -Djava.io.tmpdir=${TMPDIR} clean validate test fun:test it:test dist-tgz publish -Dbrowser=chrome -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
   else
-    sbt -Djava.io.tmpdir=${TMPDIR} clean validate test fun:test -Dbrowser=chrome -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
+    sbt -Djava.io.tmpdir=${TMPDIR} clean validate test fun:test it:test -Dbrowser=chrome -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
 fi
 
 SBT_EXIT_CODE=`echo $?`

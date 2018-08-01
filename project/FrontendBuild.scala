@@ -34,20 +34,19 @@ private object AppDependencies {
     "org.apache.httpcomponents" % "httpclient" % DependencyVersions.apacheHttpComponentsCore
   )
 
-  val test = Seq(
-    "org.scalatest" %% "scalatest" % "3.0.4" % "test",
-    "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.1" % "test",
-    "org.mockito" % "mockito-all" % "2.0.2-beta" % "test",
-    "org.pegdown" % "pegdown" % "1.6.0" % "test",
-    "org.jsoup" % "jsoup" % "1.7.3" % "test",
-    "com.github.tomakehurst" % "wiremock" % "1.58" % "test",
-    "uk.gov.hmrc" %% "scala-webdriver" % "5.23.0",
-    "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % "test"
-  ).map(_.exclude("org.seleniumhq.selenium", "selenium-api"))
-    .map(_.exclude("org.seleniumhq.selenium", "selenium-java")) ++ Seq(
-    "org.seleniumhq.selenium" % "selenium-java" % "3.7.1" % "test")
+  def test(scope: String) = Seq(
+    "org.scalatest" %% "scalatest" % "3.0.4" % scope,
+    "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.1" % scope,
+    "org.mockito" % "mockito-all" % "2.0.2-beta" % scope,
+    "org.pegdown" % "pegdown" % "1.6.0" % scope,
+    "org.jsoup" % "jsoup" % "1.7.3" % scope,
+    "com.github.tomakehurst" % "wiremock" % "1.58" % scope,
+    "uk.gov.hmrc" %% "scala-webdriver" % "5.23.0" %scope,
+    "org.seleniumhq.selenium" % "selenium-java" % "3.7.1" % scope,
+    "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope
+  )
 
-  def apply() = compile ++ test
+  def apply() = compile ++ test("test") ++ test("it")
 }
 
 
