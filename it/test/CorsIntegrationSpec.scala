@@ -15,13 +15,6 @@ import scala.concurrent.Await
 import scala.concurrent.duration.{FiniteDuration, _}
 
 class CorsIntegrationSpec extends UnitSpec with GuiceOneAppPerSuite with GivenWhenThen {
-  private val ALLOWED_ORIGIN = "https://ewf.companieshouse.gov.uk"
-
-  override implicit lazy val app: Application = new GuiceApplicationBuilder()
-    .configure(
-      "play.filters.cors.allowedOrigins" -> Seq(ALLOWED_ORIGIN)
-    )
-    .build()
 
   private val fakeRequest = FakeRequest(OPTIONS, "/contact/contact-hmrc",
     FakeHeaders(Seq(
@@ -45,7 +38,7 @@ class CorsIntegrationSpec extends UnitSpec with GuiceOneAppPerSuite with GivenWh
 
       headers(ACCESS_CONTROL_ALLOW_HEADERS) shouldBe USER_AGENT.toLowerCase
       headers(ACCESS_CONTROL_ALLOW_METHODS) shouldBe POST
-      headers(ACCESS_CONTROL_ALLOW_ORIGIN)  shouldBe ALLOWED_ORIGIN
+      headers(ACCESS_CONTROL_ALLOW_ORIGIN)  shouldBe "https://ewf.companieshouse.gov.uk"
     }
 
     "respond with 403 for a disallowed origin" in {
