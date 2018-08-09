@@ -40,6 +40,15 @@ This is a URL for external services which need to serve the `contact-hmrc` help 
 
 This still provides endpoints to complete vanilla screens, incl. empty header and wrapped with GovernmentGateway authorisation code. It is recommended to use partials and provide headers / authorisation in your controllers.
 
+# Cross-Origin Resource Sharing (CORS)
+CORS functionality is supported via the Play Framework [CORSFilter](https://www.playframework.com/documentation/2.5.x/CorsFilter).
+
+Configuration is defined in `contact-frontend.yaml` within the relevant `app-config-xxx` environment. For example:
+```yaml
+play.filters.cors.allowedOrigins.0: "https://ewf.companieshouse.gov.uk"
+play.filters.cors.allowedOrigins.1: "https://www.qa.tax.service.gov.uk"
+```
+
 # Running Tests
 
 The service includes multiple tests:
