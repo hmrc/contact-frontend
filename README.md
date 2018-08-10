@@ -43,7 +43,7 @@ This still provides endpoints to complete vanilla screens, incl. empty header an
 # Cross-Origin Resource Sharing (CORS)
 
 When contact forms are embedded on the service's pages, the client's browser communicates with contact-frontend using AJAX requests.
-This might cause some problems when the service runs on other domain that the one used by contact-frontend (which is `www.tax.service.gov.uk`). In such case user's browser will block cross-domain AJAX requests, considering them as suspicous.
+This might cause problems when the service runs on other domain that the one used by contact-frontend (which is `www.tax.service.gov.uk`). In such case user's browser will block cross-domain AJAX requests, considering them as suspicous.
 If you want to use contact-frontend in the service that runs on other domain, this can be done by explicitly specifying that other domain in configuration of contact-frontend. Contact-frontend service will then use [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) (Cross-Origin Resource Sharing) to allow browser to accept such cross-domain requests.
 
 To achieve that the service uses standard  [CORS Filter](https://www.playframework.com/documentation/2.5.x/CorsFilter) provided by Play Framework.
