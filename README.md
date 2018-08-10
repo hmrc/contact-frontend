@@ -41,10 +41,14 @@ This is a URL for external services which need to serve the `contact-hmrc` help 
 This still provides endpoints to complete vanilla screens, incl. empty header and wrapped with GovernmentGateway authorisation code. It is recommended to use partials and provide headers / authorisation in your controllers.
 
 # Cross-Origin Resource Sharing (CORS)
-CORS functionality is supported via the Play Framework [CORSFilter](https://www.playframework.com/documentation/2.5.x/CorsFilter).
 
-Configuration is defined in `contact-frontend.yaml` within the relevant `app-config-xxx` environment. For example:
-```yaml
+When contact forms are embedded on the service's pages, the client's browser communicates with contact-frontend using AJAX requests.
+This might cause problems when the service runs on other domain that the one used by contact-frontend (which is `www.tax.service.gov.uk`). In such case user's browser will block cross-domain AJAX requests, considering them as suspicous.
+If you want to use contact-frontend in the service that runs on other domain, this can be done by explicitly specifying that other domain in configuration of contact-frontend. Contact-frontend service will then use [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) (Cross-Origin Resource Sharing) to allow browser to accept such cross-domain requests.
+
+To achieve that the service uses standard  [CORS Filter](https://www.playframework.com/documentation/2.5.x/CorsFilter) provided by Play Framework.
+Configuration is defined in `contact-frontend.yaml` within the evenronment specific `app-config`. Here is the example configuration:
+```
 play.filters.cors.allowedOrigins.0: "https://ewf.companieshouse.gov.uk"
 play.filters.cors.allowedOrigins.1: "https://www.qa.tax.service.gov.uk"
 ```
@@ -67,4 +71,4 @@ The command to run these tests: `sbt clean fun:test`.
 Verifies if the service works correctly on the QE environment.
 This test has URL/Deskpro credentials hardcoded and preferably should
 be removed from the project.
-The command to run these tests: `sbt clean smoke:test` 
+The command to run these tests: `sbt clean smoke:test`
