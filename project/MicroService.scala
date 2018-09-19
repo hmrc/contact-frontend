@@ -1,8 +1,10 @@
 import sbt.Keys._
-import sbt.Tests.{SubProcess, Group}
+import sbt.Tests.{Group, SubProcess}
 import sbt._
 import play.routes.compiler.StaticRoutesGenerator
 import play.sbt.routes.RoutesKeys.routesGenerator
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
+import uk.gov.hmrc.versioning.SbtGitVersioning
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 trait MicroService {
@@ -18,7 +20,9 @@ trait MicroService {
 
   lazy val appDependencies : Seq[ModuleID] = ???
   lazy val appOverrides: Set[ModuleID] = ???
-  lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
+  lazy val plugins : Seq[Plugins] = Seq(
+    play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory
+  )
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
   def unitFilter(name: String): Boolean = !funFilter(name) && !smokeFilter(name)
