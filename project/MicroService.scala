@@ -3,6 +3,7 @@ import sbt.Tests.{SubProcess, Group}
 import sbt._
 import play.routes.compiler.StaticRoutesGenerator
 import play.sbt.routes.RoutesKeys.routesGenerator
+import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 trait MicroService {
 
@@ -14,7 +15,6 @@ trait MicroService {
   import TestPhases._
 
   val appName: String
-  val appVersion: String
 
   lazy val appDependencies : Seq[ModuleID] = ???
   lazy val appOverrides: Set[ModuleID] = ???
@@ -28,13 +28,12 @@ trait MicroService {
   lazy val microservice = Project(appName, file("."))
     .enablePlugins(plugins : _*)
     .settings(playSettings : _*)
-    .settings(version := appVersion)
     .settings(scalaSettings: _*)
     .settings(publishingSettings: _*)
     .settings(defaultSettings(): _*)
+    .settings(majorVersion := 3)
     .settings(
       targetJvm := "jvm-1.8",
-      shellPrompt := ShellPrompt(appVersion),
       libraryDependencies ++= appDependencies,
       dependencyOverrides ++= appOverrides,
       parallelExecution in Test := false,
@@ -42,7 +41,6 @@ trait MicroService {
       retrieveManaged := true,
       routesGenerator := StaticRoutesGenerator
     )
-    .settings(Repositories.playPublishingSettings : _*)
     .settings(testOptions in Test := Seq(Tests.Filter(unitFilter)),
       addTestReportOption(Test, "test-reports"),
       unmanagedSourceDirectories in FunTest <<= (baseDirectory in FunTest)(base => Seq(base / "test/unit")),
@@ -54,7 +52,7 @@ trait MicroService {
       Keys.fork in IntegrationTest := false,
       unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "it")),
       addTestReportOption(IntegrationTest, "int-test-reports"),
-      testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
+      testGrouping in IntegrationTest := TestPhases.oneForkedJvmPerTest((definedTests in IntegrationTest).value),
       parallelExecution in IntegrationTest := false)
     .settings(SbtBuildInfo(): _*)
     .configs(FunTest)
@@ -101,19 +99,4 @@ private object TestPhases {
     }
 }
 
-private object Repositories {
 
-  import uk.gov.hmrc._
-  import PublishingSettings._
-  import NexusPublishing._
-
-  lazy val playPublishingSettings : Seq[sbt.Setting[_]] = sbtrelease.ReleasePlugin.releaseSettings ++ Seq(
-
-    credentials += SbtCredentials,
-
-    publishArtifact in(Compile, packageDoc) := false,
-    publishArtifact in(Compile, packageSrc) := false
-  ) ++
-    publishAllArtefacts ++
-    nexusPublishingSettings
-}

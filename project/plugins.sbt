@@ -12,10 +12,14 @@ addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.8.3")
 
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.12")
 
-addSbtPlugin("uk.gov.hmrc" % "sbt-settings" % "3.5.0")
+addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "1.13.0")
 
-addSbtPlugin("uk.gov.hmrc" % "sbt-distributables" % "1.0.0")
+addSbtPlugin("uk.gov.hmrc" % "sbt-settings" % "3.8.0")
 
-addSbtPlugin("uk.gov.hmrc" % "hmrc-resolvers" % "1.2.0")
+addSbtPlugin("uk.gov.hmrc" % "sbt-artifactory" % "0.13.0")
+
+addSbtPlugin("uk.gov.hmrc" % "sbt-git-versioning" % "1.15.0")
+
+addSbtPlugin("uk.gov.hmrc" % "sbt-distributables" % "1.1.0")
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.2")
