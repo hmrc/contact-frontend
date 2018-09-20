@@ -58,7 +58,6 @@ trait MicroService {
       addTestReportOption(IntegrationTest, "int-test-reports"),
       testGrouping in IntegrationTest := TestPhases.oneForkedJvmPerTest((definedTests in IntegrationTest).value),
       parallelExecution in IntegrationTest := false)
-    .settings(SbtBuildInfo(): _*)
     .configs(FunTest)
     .settings(inConfig(FunTest)(Defaults.testSettings): _*)
     .settings(
