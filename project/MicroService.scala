@@ -82,7 +82,8 @@ trait MicroService {
     .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
     .settings(
       resolvers += Resolver.bintrayRepo("hmrc", "releases"),
-      resolvers += Resolver.jcenterRepo
+      resolvers += Resolver.jcenterRepo,
+      resolvers += "HMRC private repository releases" at "https://artefacts.tax.service.gov.uk/artifactory/hmrc-releases"
     )
 }
 
