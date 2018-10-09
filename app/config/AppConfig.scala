@@ -1,9 +1,10 @@
 package config
 
 import javax.inject.Inject
-
 import play.api.Configuration
+import play.api.mvc.Request
 import uk.gov.hmrc.play.config.ServicesConfig
+import util._
 
 trait AppConfig {
   val assetsPrefix: String
@@ -15,6 +16,7 @@ trait AppConfig {
   def loginCallback(continueUrl: String): String
   def fallbackURLForLangugeSwitcher: String
   def enableLanguageSwitching: Boolean
+  val getHelpWithThisPageFeaturePartitioner: FeaturePartitioner[Request[_], GetHelpWithThisPageFeature]
 }
 
 class CFConfig @Inject() (environment: play.api.Environment, configuration : Configuration) extends AppConfig with ServicesConfig {
@@ -22,6 +24,8 @@ class CFConfig @Inject() (environment: play.api.Environment, configuration : Con
   private def loadConfig(key: String) = configuration.getString(key).getOrElse(throw new Exception(s"Missing key: $key"))
 
   private val contactHost = configuration.getString(s"govuk-tax.$env.contact-frontend.host").getOrElse("")
+
+  private val getHelpWithThisPageFeatureSplit = configuration.getInt("features.getHelpWithThisPage.split").getOrElse(0)
 
   override lazy val externalReportProblemUrl = s"$contactHost/contact/problem_reports"
   override lazy val externalReportProblemSecureUrl = s"$contactHost/contact/problem_reports_secure"
@@ -37,5 +41,9 @@ class CFConfig @Inject() (environment: play.api.Environment, configuration : Con
 
   override protected def runModeConfiguration = configuration
 
-
+  override lazy val getHelpWithThisPageFeaturePartitioner: FeaturePartitioner[Request[_], GetHelpWithThisPageFeature] =
+    new DeviceIdFeaturePartitionerDecorator(
+      DeviceIdProvider.deviceIdProvider,
+      new ABTestingFeaturePartitioner(getHelpWithThisPageFeatureSplit,
+        GetHelpWithThisPageFeature_A, GetHelpWithThisPageFeature_B))
 }

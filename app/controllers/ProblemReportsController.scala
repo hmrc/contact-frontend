@@ -1,7 +1,6 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import play.api.data.Forms._
@@ -12,7 +11,7 @@ import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
-import util.DeskproEmailValidator
+import util.{DeskproEmailValidator, GetHelpWithThisPageFeature_A}
 
 import scala.concurrent.Future
 
@@ -20,26 +19,34 @@ object ProblemReportForm {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
   private val validateEmail: (String) => Boolean = emailValidator.validate
 
-  val form = Form[ProblemReport](
+  def form(implicit request: Request[_], appConfig: AppConfig) = Form[ProblemReport](
     mapping(
       "report-name" -> text
-        .verifying("error.common.problem_report.action_mandatory", action => !action.isEmpty)
-        .verifying("error.common.problem_report.name_too_long", name => name.size <= 70)
-        .verifying("error.common.problem_report.name_invalid_characters", name => name.matches( """^[A-Za-z\-.,()'"\s]+$""")),
+        .verifying(s"error.common.problem_report.name_mandatory${featureAorB}", name => !name.isEmpty)
+        .verifying(s"error.common.problem_report.name_too_long${featureAorB}",  name => name.size <= 70)
+        .verifying(s"error.common.problem_report.name_valid${featureAorB}",     name => name.matches( """^[A-Za-z0-9\-\.,()'"\s]+$""")),
       "report-email" -> text
         .verifying("error.email", validateEmail)
         .verifying("deskpro.email_too_long", email => email.size <= 255),
       "report-action" -> text
         .verifying("error.common.problem_report.action_mandatory", action => !action.isEmpty)
-        .verifying("error.common.comments_too_long", action => action.size <= 1000),
+        .verifying("error.common.comments_too_long",               action => action.size <= 1000),
       "report-error" -> text
-        .verifying("error.common.problem_report.action_mandatory", error => !error.isEmpty)
-        .verifying("error.common.comments_too_long", error => error.size <= 1000),
+        .verifying("error.common.problem_report.error_mandatory", error => !error.isEmpty)
+        .verifying("error.common.comments_too_long",              error => error.size <= 1000),
       "isJavascript" -> boolean,
       "service" -> optional(text),
       "referrer" -> optional(text)
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
+
+  private def featureAorB(implicit request: Request[_], appConfig: AppConfig): String = {
+    if (appConfig.getHelpWithThisPageFeaturePartitioner.partition(request) == GetHelpWithThisPageFeature_A) {
+      ""
+    } else {
+      ".b"
+    }
+  }
 }
 
 @Singleton
