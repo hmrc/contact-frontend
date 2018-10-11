@@ -1,9 +1,22 @@
-@(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages)
+@import config.AppConfig
+@import util.GetHelpWithThisPageFeature_A
+@(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 @import uk.gov.hmrc.play.views.html._
 
 <div class="report-error">
-    <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help")</a>
+    @feature = @{appConfig.getHelpWithThisPageFeaturePartitioner.partition(request)}
+
+    @if(feature == GetHelpWithThisPageFeature_A) {
+        <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help")</a>
+    } else {
+        <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help.b")</a>
+    }
+
     <div class="report-error__content js-hidden">
-        @views.html.partials.error_feedback_inner(actionUrl, csrfToken, service)
+        @if(feature == GetHelpWithThisPageFeature_A) {
+            @views.html.partials.error_feedback_inner(actionUrl, csrfToken, service)
+        } else {
+            @views.html.partials.error_feedback_inner_b(actionUrl, csrfToken, service)
+        }
     </div>
 </div>
