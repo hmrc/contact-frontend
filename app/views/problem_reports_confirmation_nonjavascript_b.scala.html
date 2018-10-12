@@ -1,0 +1,12 @@
+@(ticketId: String, thankYouMessage: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
+
+@pageTitle = @{Messages("common.acknowledgment")}
+@main(title = pageTitle, supportLinkEnabled = false)  {
+<header class="page-header">
+    <h1>@pageTitle</h1>
+</header>
+    <article id="report-confirmation">
+        @ticket_created_body_b(ticketId, thankYouMessage)
+    </article>
+
+}
