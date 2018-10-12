@@ -16,7 +16,10 @@ trait AppConfig {
   def loginCallback(continueUrl: String): String
   def fallbackURLForLangugeSwitcher: String
   def enableLanguageSwitching: Boolean
-  val getHelpWithThisPageFeaturePartitioner: FeaturePartitioner[Request[_], GetHelpWithThisPageFeature]
+
+  def hasFeature(f : Feature)(implicit request: Request[_]): Boolean
+
+  def getFeatures(implicit request: Request[_]): Set[Feature]
 }
 
 class CFConfig @Inject() (environment: play.api.Environment, configuration : Configuration) extends AppConfig with ServicesConfig {
@@ -41,9 +44,22 @@ class CFConfig @Inject() (environment: play.api.Environment, configuration : Con
 
   override protected def runModeConfiguration = configuration
 
-  override lazy val getHelpWithThisPageFeaturePartitioner: FeaturePartitioner[Request[_], GetHelpWithThisPageFeature] =
+  lazy val getHelpWithThisPageFeaturePartitioner: FeaturePartitioner[Request[_], GetHelpWithThisPageFeature] =
     new DeviceIdFeaturePartitionerDecorator(
       DeviceIdProvider.deviceIdProvider,
       new ABTestingFeaturePartitioner(getHelpWithThisPageFeatureSplit,
         GetHelpWithThisPageFeature_A, GetHelpWithThisPageFeature_B))
+
+  override def hasFeature(f : Feature)(implicit request: Request[_]): Boolean = {
+    f match {
+      case f : GetHelpWithThisPageFeature => getHelpWithThisPageFeaturePartitioner.partition(request) == f
+      case _ => false
+    }
+  }
+
+  override def getFeatures(implicit request: Request[_]): Set[Feature] = {
+    val getHelpWithThisPageFeature = getHelpWithThisPageFeaturePartitioner.partition(request)
+    Set(getHelpWithThisPageFeature)
+  }
+
 }

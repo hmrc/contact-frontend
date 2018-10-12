@@ -4,16 +4,15 @@
 @import uk.gov.hmrc.play.views.html._
 
 <div class="report-error">
-    @feature = @{appConfig.getHelpWithThisPageFeaturePartitioner.partition(request)}
 
-    @if(feature == GetHelpWithThisPageFeature_A) {
+    @if(appConfig.hasFeature(GetHelpWithThisPageFeature_A)) {
         <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help")</a>
     } else {
         <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help.b")</a>
     }
 
     <div class="report-error__content js-hidden">
-        @if(feature == GetHelpWithThisPageFeature_A) {
+        @if(appConfig.hasFeature(GetHelpWithThisPageFeature_A)) {
             @views.html.partials.error_feedback_inner(actionUrl, csrfToken, service)
         } else {
             @views.html.partials.error_feedback_inner_b(actionUrl, csrfToken, service)

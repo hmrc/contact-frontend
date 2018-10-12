@@ -1,8 +1,8 @@
 package controllers
 
-import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
+import javax.inject.{Inject, Singleton}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -11,7 +11,7 @@ import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
-import util.{DeskproEmailValidator, GetHelpWithThisPageFeature_A, GetHelpWithThisPageFeature_B}
+import util.{DeskproEmailValidator, GetHelpWithThisPageFeature_B}
 
 import scala.concurrent.Future
 
@@ -19,15 +19,22 @@ object ProblemReportForm {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
   private val validateEmail: (String) => Boolean = emailValidator.validate
 
-  val REPORT_NAME_REGEX = """^[A-Za-z0-9\-\.,()'"\s]+$"""
+  val REPORT_NAME_REGEX = """^[A-Za-z0-9\-\.,'\s]+$"""
+
+  val OLD_REPORT_NAME_REGEX = """^[A-Za-z\-.,()'"\s]+$"""
 
   def form(implicit request: Request[_], appConfig: AppConfig) = Form[ProblemReport](
     mapping(
       "report-name" -> text
         .verifying(s"error.common.problem_report.name_mandatory${featureAorB}", name => !name.isEmpty)
         .verifying(s"error.common.problem_report.name_too_long${featureAorB}",  name => name.size <= 70)
-        .verifying(s"error.common.problem_report.name_valid${featureAorB}",     name =>
-          name.matches(REPORT_NAME_REGEX)),
+        .verifying(s"error.common.problem_report.name_valid${featureAorB}",     name => {
+          if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+            name.matches(REPORT_NAME_REGEX)
+          } else {
+            name.matches(OLD_REPORT_NAME_REGEX)
+          }
+        }),
       "report-email" -> text
         .verifying("error.email", validateEmail)
         .verifying("deskpro.email_too_long", email => email.size <= 255),
@@ -44,10 +51,10 @@ object ProblemReportForm {
   )
 
   private def featureAorB(implicit request: Request[_], appConfig: AppConfig): String = {
-    if (appConfig.getHelpWithThisPageFeaturePartitioner.partition(request) == GetHelpWithThisPageFeature_A) {
-      ""
-    } else {
+    if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
       ".b"
+    } else {
+      ""
     }
   }
 }
@@ -97,14 +104,20 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
           ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referrer)
         } yield {
-          if (!problemReport.isJavascript) appConfig.getHelpWithThisPageFeaturePartitioner.partition(request) match {
-            case GetHelpWithThisPageFeature_A => Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
-            case GetHelpWithThisPageFeature_B => Ok(views.html.problem_reports_confirmation_nonjavascript_b(ticketId.ticket_id.toString, thankYouMessage))
-          }
-          else appConfig.getHelpWithThisPageFeaturePartitioner.partition(request) match {
-            case GetHelpWithThisPageFeature_A => Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
-            case GetHelpWithThisPageFeature_B => Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body_b(ticketId.ticket_id.toString, thankYouMessage).toString())))
-          }}) recover {
+            if (!problemReport.isJavascript) {
+              if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+                Ok(views.html.problem_reports_confirmation_nonjavascript_b(ticketId.ticket_id.toString, thankYouMessage))
+              } else {
+                Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
+              }
+            } else {
+              if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+                Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body_b(ticketId.ticket_id.toString, thankYouMessage).toString())))
+              } else {
+                Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
+              }
+            }
+          }) recover {
           case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript())
         }
       }
