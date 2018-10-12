@@ -19,12 +19,15 @@ object ProblemReportForm {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
   private val validateEmail: (String) => Boolean = emailValidator.validate
 
+  val REPORT_NAME_REGEX = """^[A-Za-z0-9\-\.,()'"\s]+$"""
+
   def form(implicit request: Request[_], appConfig: AppConfig) = Form[ProblemReport](
     mapping(
       "report-name" -> text
         .verifying(s"error.common.problem_report.name_mandatory${featureAorB}", name => !name.isEmpty)
         .verifying(s"error.common.problem_report.name_too_long${featureAorB}",  name => name.size <= 70)
-        .verifying(s"error.common.problem_report.name_valid${featureAorB}",     name => name.matches( """^[A-Za-z0-9\-\.,()'"\s]+$""")),
+        .verifying(s"error.common.problem_report.name_valid${featureAorB}",     name =>
+          name.matches(REPORT_NAME_REGEX)),
       "report-email" -> text
         .verifying("error.email", validateEmail)
         .verifying("deskpro.email_too_long", email => email.size <= 255),
