@@ -11,7 +11,7 @@ import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
-import util.{DeskproEmailValidator, GetHelpWithThisPageFeature_A}
+import util.{DeskproEmailValidator, GetHelpWithThisPageFeature_A, GetHelpWithThisPageFeature_B}
 
 import scala.concurrent.Future
 
@@ -94,9 +94,14 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
           ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referrer)
         } yield {
-          if (!problemReport.isJavascript) Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
-          else Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
-        }) recover {
+          if (!problemReport.isJavascript) appConfig.getHelpWithThisPageFeaturePartitioner.partition(request) match {
+            case GetHelpWithThisPageFeature_A => Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
+            case GetHelpWithThisPageFeature_B => Ok(views.html.problem_reports_confirmation_nonjavascript_b(ticketId.ticket_id.toString, thankYouMessage))
+          }
+          else appConfig.getHelpWithThisPageFeaturePartitioner.partition(request) match {
+            case GetHelpWithThisPageFeature_A => Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
+            case GetHelpWithThisPageFeature_B => Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body_b(ticketId.ticket_id.toString, thankYouMessage).toString())))
+          }}) recover {
           case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript())
         }
       }

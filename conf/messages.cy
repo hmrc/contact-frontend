@@ -1,4 +1,5 @@
 common.thank.you=Diolch
+common.acknowledgment=Mae''ch neges wedi dod i law
 error.common.feedback.name_mandatory=Rhowch eich enw.
 error.common.feedback.name_too_long=Ni all eich enw fod yn hirach na 70 o gymeriadau
 error.common.feedback.rating_mandatory=Rhowch wybod i ni beth yw eich barn am y gwasanaeth.
@@ -47,6 +48,7 @@ common.problem_report.error_nojavascript_title=Cafwyd problem wrth anfon eich ym
 deskpro.email_too_long=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
 contact.heading=Cymorth a chysylltiadau
 contact.confirmation.message=Bydd rhywun yn cysylltu â chi cyn pen 2 ddiwrnod gwaith.
+contact.confirmation.message.b=Byddwn yn ateb neu''n rhoi gwybod i chi sut y byddwn yn delio â''ch neges cyn pen 2 ddiwrnod gwaith.
 survey.title=Arolwg
 survey.confirmation.title=Diolch, mae eich adborth wedi dod i law.
 survey.was.answer.helpful.question=Pa mor fodlon ydych gyda''r ateb a gawsoch gennym?
