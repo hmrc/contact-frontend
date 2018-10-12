@@ -2,6 +2,7 @@ import sbt.Keys._
 import sbt.Tests.{Group, SubProcess}
 import sbt._
 import play.routes.compiler.StaticRoutesGenerator
+import play.sbt.PlayImport.PlayKeys
 import play.sbt.routes.RoutesKeys.routesGenerator
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning
@@ -37,6 +38,7 @@ trait MicroService {
     .settings(defaultSettings(): _*)
     .settings(majorVersion := 3)
     .settings(
+      PlayKeys.playDefaultPort := 9250,
       targetJvm := "jvm-1.8",
       libraryDependencies ++= appDependencies,
       dependencyOverrides ++= appOverrides,
