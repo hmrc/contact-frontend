@@ -16,12 +16,15 @@ class ABTestingFeaturePartitioner[H, F <: Feature, F1 <: F, F2 <: F](
     featureB: F2)
     extends FeaturePartitioner[H, F] {
   override def partition(hashable: H): F = {
-    val partition: F =
-      if (math.abs(hashable.hashCode % 100) < threshold) featureA else featureB
 
-    Logger.debug(s"Hashable: [$hashable] landed in partition: [$partition].")
+    val bucket = hashable.hashCode % 100
 
-    partition
+    val chosenFeature: F =
+      if (math.abs(bucket) < threshold) featureA else featureB
+
+    Logger.info(s"Request landed in bucket [$bucket], chosen feature: [$chosenFeature].")
+
+    chosenFeature
   }
 }
 
