@@ -1,12 +1,17 @@
 @(actionUrl: String, service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 @import uk.gov.hmrc.play.views.html._
 @import play.filters.csrf.CSRF
+@import util.GetHelpWithThisPageFeature_B
 
 @main(title = "", supportLinkEnabled = false) {
 
         <div>
             <div class="report-error__content">
-                @views.html.partials.error_feedback_inner(actionUrl, CSRF.getToken(request).map(_.value), service)
+                @if(appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+                    @views.html.partials.error_feedback_inner_b(actionUrl, CSRF.getToken(request).map(_.value), service)
+                } else {
+                    @views.html.partials.error_feedback_inner(actionUrl, CSRF.getToken(request).map(_.value), service)
+                }
             </div>
         </div>
 
