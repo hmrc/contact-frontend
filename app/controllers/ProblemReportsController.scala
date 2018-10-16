@@ -75,7 +75,12 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   }
 
   def reportFormAjax(service: Option[String]) = UnauthorisedAction { implicit request =>
-    Ok(views.html.partials.error_feedback_inner(appConfig.externalReportProblemSecureUrl, None, service))
+
+    if(appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+      Ok(views.html.partials.error_feedback_inner_b(appConfig.externalReportProblemSecureUrl, None, service))
+    } else {
+      Ok(views.html.partials.error_feedback_inner(appConfig.externalReportProblemSecureUrl, None, service))
+    }
   }
 
   def reportFormNonJavaScript(service: Option[String]) = UnauthorisedAction { implicit request =>
