@@ -44,7 +44,6 @@ trait MicroService {
       dependencyOverrides ++= appOverrides,
       parallelExecution in Test := false,
       fork in Test := false,
-      retrieveManaged := true,
       routesGenerator := StaticRoutesGenerator
     )
     .settings(testOptions in Test := Seq(Tests.Filter(unitFilter)),
