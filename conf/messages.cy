@@ -44,6 +44,7 @@ problem_report.action.hint.b=Er enghraifft, mewngofnodi, argraffu rhywbeth, dod 
 problem_report.error=Gyda beth ydych angen help?
 problem_report.error.b=Pa broblem ydych eisiau rhoi gwybod i ni amdani?
 problem_report.error.hint.b=Os cawsoch neges yn dweud bod rhywbeth o''i le, rhowch wybod i ni beth mae''n ei ddweud.
+problem_report.common.size_limit=Gallwch chi nodi hyd at {0} o gymeriadau
 common.problem_report.error_nojavascript_title=Cafwyd problem wrth anfon eich ymholiad
 deskpro.email_too_long=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
 contact.heading=Cymorth a chysylltiadau
