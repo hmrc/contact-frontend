@@ -80,9 +80,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
     val isSecure = secure.getOrElse(false)
     val postEndpoint = if (isSecure) appConfig.externalReportProblemSecureUrl else appConfig.externalReportProblemUrl
-    val csrfToken = preferredCsrfToken.orElse {
-      if (isSecure) Some("{{csrfToken}}") else None
-    }
+    val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
 
     Ok(views.html.partials.error_feedback(ProblemReportForm.emptyForm(service = service), postEndpoint, csrfToken))
   }
@@ -93,9 +91,9 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
 
   private def reportFormAjaxView(form : Form[ProblemReport])(implicit request : Request[_]) =
     if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
-      views.html.partials.error_feedback_inner_b(form, appConfig.externalReportProblemSecureUrl, None)
+      views.html.partials.error_feedback_inner_b(form, appConfig.externalReportProblemSecureUrl, play.filters.csrf.CSRF.getToken(request).map(_.value))
     } else {
-      views.html.partials.error_feedback_inner(form, appConfig.externalReportProblemSecureUrl, None)
+      views.html.partials.error_feedback_inner(form, appConfig.externalReportProblemSecureUrl, play.filters.csrf.CSRF.getToken(request).map(_.value))
     }
 
   def reportFormNonJavaScript(service: Option[String]) = UnauthorisedAction { implicit request =>
@@ -104,7 +102,6 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
 
   def submitSecure: Action[AnyContent] = submit
 
-  //TODO remove once everyone is off play-frontend as this doesn't have CSRF check
   def submit = UnauthorisedAction.async { implicit request =>
     ProblemReportForm.form.bindFromRequest.fold(
       (error: Form[ProblemReport]) => {
