@@ -2,12 +2,13 @@ package controllers
 
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.domain.TicketId
 import javax.inject.{Inject, Singleton}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Request}
+import play.api.mvc.{Action, AnyContent, Request}
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
@@ -46,9 +47,8 @@ object ProblemReportForm {
         .verifying("error.common.comments_too_long",              error => error.size <= 1000),
       "isJavascript" -> boolean,
       "service" -> optional(text),
-      "referrer" -> optional(text)
-    )(ProblemReport.apply)(ProblemReport.unapply)
-  )
+      "referer" -> optional(text)
+    )(ProblemReport.apply)(ProblemReport.unapply))
 
   private def featureAorB(implicit request: Request[_], appConfig: AppConfig): String = {
     if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
@@ -57,6 +57,19 @@ object ProblemReportForm {
       ""
     }
   }
+
+  def emptyForm(referer: Option[String] = None, service : Option[String])(implicit request: Request[_], appConfig: AppConfig): Form[ProblemReport] =
+    ProblemReportForm.form.fill(
+      ProblemReport(
+        reportName = "",
+        reportEmail = "",
+        reportAction = "",
+        reportError = "",
+        isJavascript = false,
+        service = service,
+        referer = referer.orElse(request.headers.get("Referer").orElse(Some("n/a")))
+      )
+    )
 }
 
 @Singleton
@@ -71,56 +84,46 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
       if (isSecure) Some("{{csrfToken}}") else None
     }
 
-    Ok(views.html.partials.error_feedback(postEndpoint, csrfToken, service))
+    Ok(views.html.partials.error_feedback(ProblemReportForm.emptyForm(service = service), postEndpoint, csrfToken))
   }
 
   def reportFormAjax(service: Option[String]) = UnauthorisedAction { implicit request =>
-
-    if(appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
-      Ok(views.html.partials.error_feedback_inner_b(appConfig.externalReportProblemSecureUrl, None, service))
-    } else {
-      Ok(views.html.partials.error_feedback_inner(appConfig.externalReportProblemSecureUrl, None, service))
-    }
+    Ok(reportFormAjaxView(ProblemReportForm.emptyForm(service = service)))
   }
+
+  private def reportFormAjaxView(form : Form[ProblemReport])(implicit request : Request[_]) =
+    if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+      views.html.partials.error_feedback_inner_b(form, appConfig.externalReportProblemSecureUrl, None)
+    } else {
+      views.html.partials.error_feedback_inner(form, appConfig.externalReportProblemSecureUrl, None)
+    }
 
   def reportFormNonJavaScript(service: Option[String]) = UnauthorisedAction { implicit request =>
-    Ok(views.html.problem_reports_nonjavascript(appConfig.externalReportProblemSecureUrl, service))
+    Ok(views.html.problem_reports_nonjavascript(ProblemReportForm.emptyForm(service = service), appConfig.externalReportProblemSecureUrl))
   }
 
-  def submitSecure = submit
+  def submitSecure: Action[AnyContent] = submit
 
   //TODO remove once everyone is off play-frontend as this doesn't have CSRF check
   def submit = UnauthorisedAction.async { implicit request =>
-    doReport()
-  }
-
-  private[controllers] def doReport(thankYouMessage: Option[String] = None)(implicit request: Request[AnyRef]) = {
     ProblemReportForm.form.bindFromRequest.fold(
       (error: Form[ProblemReport]) => {
         if (!error.data.getOrElse("isJavascript", "true").toBoolean) {
-          Future.successful(Ok(views.html.problem_reports_error_nonjavascript()))
+          Future.successful(Ok(views.html.problem_reports_nonjavascript(error, appConfig.externalReportProblemSecureUrl)))
         } else {
-          Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
+          Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> reportFormAjaxView(error).toString()))))
         }
       },
       problemReport => {
-        val referrer = if (problemReport.referrer.exists(_.trim.length > 0)) problemReport.referrer.get else referrerFrom(request)
+        val referer = if (problemReport.referer.exists(_.trim.length > 0)) problemReport.referer.get else refererFrom(request)
         (for {
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
-          ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referrer)
+          ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referer)
         } yield {
             if (!problemReport.isJavascript) {
-              if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
-                Ok(views.html.problem_reports_confirmation_nonjavascript_b(ticketId.ticket_id.toString, thankYouMessage))
-              } else {
-                Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
-              }
+              javascriptConfirmationPage(ticketId)
             } else {
-              if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
-                Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body_b(ticketId.ticket_id.toString, thankYouMessage).toString())))
-              } else {
-                Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
-              }
+              nonJavascriptConfirmationPage(ticketId)
             }
           }) recover {
           case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript())
@@ -129,29 +132,32 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     )
   }
 
-  private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], referrer: String) = {
-    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
-    hmrcDeskproConnector.createDeskProTicket(
-      name = problemReport.reportName,
-      email = problemReport.reportEmail,
-      subject = "Support Request",
-      message = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer = referrer,
-      isJavascript = problemReport.isJavascript,
-      request = request,
-      enrolmentsOption = enrolmentsOption,
-      service = problemReport.service
-    )
+  private def nonJavascriptConfirmationPage(ticketId: TicketId)(implicit request : Request[_]) = {
+    val view = if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+      views.html.ticket_created_body_b(ticketId.ticket_id.toString, None).toString()
+    } else {
+      views.html.ticket_created_body(ticketId.ticket_id.toString, None).toString()
+    }
+    Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
   }
 
-  private def createTicketV2(problemReport: ProblemReportV2, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], referrer: String) = {
+  private def javascriptConfirmationPage(ticketId: TicketId)(implicit request : Request[_]) = {
+    val view = if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+      views.html.problem_reports_confirmation_nonjavascript_b(ticketId.ticket_id.toString, None)
+    } else {
+      views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, None)
+    }
+    Ok(view)
+  }
+
+  private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], referer: String) = {
     implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
     hmrcDeskproConnector.createDeskProTicket(
       name = problemReport.reportName,
       email = problemReport.reportEmail,
       subject = "Support Request",
       message = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer = referrer,
+      referrer = referer,
       isJavascript = problemReport.isJavascript,
       request = request,
       enrolmentsOption = enrolmentsOption,
@@ -169,11 +175,9 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     """
   }
 
-  private def referrerFrom(request: Request[AnyRef]): String = {
+  private def refererFrom(request: Request[AnyRef]): String = {
     request.headers.get("referer").getOrElse("/home")
   }
 }
 
-case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referrer: Option[String])
-
-case class ProblemReportV2(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referrer: Option[String])
+case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referer: Option[String])

@@ -1,6 +1,6 @@
 @import config.AppConfig
 @import util.GetHelpWithThisPageFeature_A
-@(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@(form : Form[controllers.ProblemReport], actionUrl: String, csrfToken: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 @import uk.gov.hmrc.play.views.html._
 
 <div class="report-error">
@@ -13,9 +13,9 @@
 
     <div class="report-error__content js-hidden">
         @if(appConfig.hasFeature(GetHelpWithThisPageFeature_A)) {
-            @views.html.partials.error_feedback_inner(actionUrl, csrfToken, service)
+            @views.html.partials.error_feedback_inner(form, actionUrl, csrfToken)
         } else {
-            @views.html.partials.error_feedback_inner_b(actionUrl, csrfToken, service)
+            @views.html.partials.error_feedback_inner_b(form, actionUrl, csrfToken)
         }
     </div>
 </div>

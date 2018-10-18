@@ -116,6 +116,8 @@ object FeedbackForm {
     FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken, service,
       backUrl, canOmitComments)
 
+
+
   def emptyForm(csrfToken: String, referer: Option[String] = None, backUrl : Option[String], canOmitComments : Boolean)(implicit request: Request[AnyRef]) =
     FeedbackFormBind.form.fill(FeedbackForm(referer.getOrElse(request.headers.get("Referer").getOrElse("n/a")), csrfToken,
       backUrl, canOmitComments))
