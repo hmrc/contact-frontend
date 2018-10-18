@@ -19,7 +19,7 @@ class PartialsController @Inject() (val hmrcDeskproConnector : HmrcDeskproConnec
   def contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean]) = Action.async {
     implicit request =>
       Future.successful {
-        Ok(views.html.partials.contact_hmrc_form(ContactHmrcForm.form.fill(ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service)), submitUrl, renderFormOnly))
+        Ok(views.html.partials.contact_hmrc_form(ContactHmrcForm.form.fill(ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service, None)), submitUrl, renderFormOnly))
       }
   }
 

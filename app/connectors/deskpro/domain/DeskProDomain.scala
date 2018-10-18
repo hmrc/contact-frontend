@@ -17,7 +17,8 @@ case class Ticket private(name: String,
                           areaOfTax: String,
                           sessionId: String,
                           userTaxIdentifiers: UserTaxIdentifiers,
-                          service: Option[String])
+                          service: Option[String],
+                          abFeatures: Option[String])
 
 
 object UserTaxIdentifiers {
@@ -37,7 +38,8 @@ object Ticket extends FieldTransformer {
              hc: HeaderCarrier,
              request: Request[AnyRef],
              enrolments: Option[Enrolments],
-             service: Option[String]): Ticket = {
+             service: Option[String],
+             abFeatures: Option[String]): Ticket = {
     val ticket = Ticket(
       name.trim,
       email,
@@ -50,7 +52,8 @@ object Ticket extends FieldTransformer {
       areaOfTaxOf,
       sessionIdFrom(hc),
       userTaxIdentifiersFromEnrolments(enrolments),
-      service)
+      service,
+      abFeatures)
     Logger.info(s"Creating ticket $ticket")
     ticket
   }
@@ -82,7 +85,8 @@ case class Feedback(name: String,
                     areaOfTax: String,
                     sessionId: String,
                     userTaxIdentifiers: UserTaxIdentifiers,
-                    service: Option[String])
+                    service: Option[String],
+                    abFeatures: Option[String])
 
 
 object Feedback extends FieldTransformer {
@@ -99,7 +103,8 @@ object Feedback extends FieldTransformer {
              hc: HeaderCarrier,
              request: Request[AnyRef],
              enrolments: Option[Enrolments],
-             service: Option[String]): Feedback =
+             service: Option[String],
+             abFeatures: Option[String]): Feedback =
     Feedback(
       name.trim,
       email,
@@ -113,7 +118,8 @@ object Feedback extends FieldTransformer {
       areaOfTaxOf,
       sessionIdFrom(hc),
       userTaxIdentifiersFromEnrolments(enrolments),
-      service)
+      service,
+      abFeatures)
 }
 
 
