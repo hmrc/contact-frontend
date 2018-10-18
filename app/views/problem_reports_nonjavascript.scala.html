@@ -1,4 +1,4 @@
-@(actionUrl: String, service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
+@(form : Form[controllers.ProblemReport], actionUrl: String, service : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 @import uk.gov.hmrc.play.views.html._
 @import play.filters.csrf.CSRF
 
@@ -6,7 +6,7 @@
 
         <div>
             <div class="report-error__content">
-                @views.html.partials.error_feedback_inner(actionUrl, CSRF.getToken(request).map(_.value), service)
+                @views.html.partials.error_feedback_inner(form, actionUrl, CSRF.getToken(request).map(_.value), service)
             </div>
         </div>
 

@@ -3,8 +3,10 @@
 @import util.GetHelpWithThisPageNewLargeInputFields
 @import util.GetHelpWithThisPageImprovedFieldValidation
 @import config.AppConfig
-@(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 @import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
+@import views.helpers.ServiceParameter.extractServiceParameter
+@(problemReportForm : Form[controllers.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @if(appConfig.hasFeature(GetHelpWithThisPageMoreVerboseHeader, service)) {
     <h2>@Messages("common.feedback.title.b")</h2>
@@ -21,76 +23,90 @@
     <input type="hidden" name="csrfToken" value="@{csrfToken.get}"/>
     }
 
-    @if(service.isDefined) {
-    <input type="hidden" name="service" value="@{service.get}"/>
-    }
+    <input type="hidden" name="service" id="feedbackService" value="@extractServiceParameter(problemReportForm, None)"/>
 
     <div id="largeInputFields" class="js-visible js-hidden">
+        @input_radio_group(
+        feedbackForm("feedback-rating"),
+        Vector(("5",Messages("form.online.services.very_good")), ("4",Messages("form.online.services.good")), ("3",Messages("form.online.services.neutral")), ("2",Messages("form.online.services.bad")), ("1",Messages("form.online.services.very_bad"))),
+        '_legend -> Messages("form.online.services"),
+        'divClass -> "multiple-choice"
+        )
+        <br/>
+        @input(
+        feedbackForm("feedback-name"),
+        '_label -> Messages("form.name"),
+        '_divClass -> "form-field",
+        '_inputClass -> "input--fullwidth"
+        )
+        @input(
+        feedbackForm("feedback-email"),
+        '_label -> Messages("form.email.address"),
+        '_divClass -> "form-field",
+        '_inputClass -> "input--fullwidth",
+        '_type -> "email"
+        )
+        @textArea(
+        feedbackForm("feedback-comments"),
+        '_label -> Messages("form.comments"),
+        '_info -> Messages("common.feedback.information.warning"),
+        '_divClass -> "form-field char-counter",
+        '_inputClass -> "input--fullwidth",
+        '_maxlength -> "2000",
+        '_dataCharCounter -> "true",
+        '_dataCharField -> "true"
+        )
+        <input type="hidden" name="isJavascript" id="isJavascript" value="@feedbackForm.data.get("isJavascript")">
+        <input type="hidden" name="referer" id="referer" value="@feedbackForm.data.get("referer")">
+        <input type="hidden" name="canOmitComments" id="canOmitComments" value="@canOmitComments">
+        @for(url <- backUrl) {
+        <input type="hidden" name="backUrl" id="feedbackBackUrl" value="@url">
+        }
+
         <div class="form-field">
-            <label for="report-name-new" class="form-label">@Messages("form.name")</label>
-            @if(appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)) {
-                <input disabled id="report-name-new" maxlength="70" class="input--medium" name="report-name" type="text" data-rule-pattern="@controllers.ProblemReportForm.REPORT_NAME_REGEX" data-msg-pattern='@Messages("error.common.problem_report.name_valid.b")' data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory.b")'>
-            } else {
-                <input disabled id="report-name-new" maxlength="70" class="input--medium" name="report-name" type="text"  data-rule-letterswithbasicpunc="true" data-msg-letterswithbasicpunc='@Messages("error.common.problem_report.name_valid")' data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory")'>
-            }
-        </div>
-        <div class="form-field">
-            <label for="report-email-new" class="form-label">@Messages("problem_report.email.b")</label>
-            <input disabled id="report-email-new" maxlength="255" class="input--medium" name="report-email" type="text" data-msg-email='@Messages("error.common.problem_report.email_valid.b")' data-rule-required="true" data-rule-email="true" data-msg-required='@Messages("error.common.problem_report.email_mandatory.b")'>
-        </div>
-        <div class="form-field">
-            <label for="report-action-new" class="form-label">
-                @Messages("problem_report.action.b")
-                @if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints, service)) {
-                    <span class="form-hint">@Messages("problem_report.action.hint.b")</span>
-                }
-                <textarea disabled id="report-action-new" class="textarea--fullwidth" name="report-action" rows="5" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.action_mandatory.b")' maxlength="1000" data-char-field="true"></textarea>
-                <p>@Messages("problem_report.common.size_limit", 1000)</p>
-            </label>
-        </div>
-        <div class="form-field">
-            <label for="report-error-new" class="form-label">
-                @Messages("problem_report.error.b")
-                @if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints, service)) {
-                    <span class="form-hint">@Messages("problem_report.error.hint.b")</span>
-                }
-                <textarea disabled id="report-error-new" class="textarea--fullwidth" name="report-error" rows="5" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.error_mandatory.b")' maxlength="1000" data-char-field="true"></textarea>
-                <p>@Messages("problem_report.common.size_limit", 1000)</p>
-            </label>
-        </div>
-        <input disabled type="hidden" name="isJavascript" value="false"/>
-        <input disabled type="hidden" name="referrer" value="@{request.headers.get("referer").getOrElse("")}"/>
-        <input disabled type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
-        <div class="form-field">
-            <button id="report-submit-new" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
+            <button class="button" type="submit">@Messages("form.send")</button>
         </div>
     </div>
 
     <fieldset id="smallInputFields">
         <legend class="visuallyhidden">@Messages("common.feedback.title")</legend>
-        <div class="form-group-compound">
-            <label for="report-name" class="form-label">@Messages("form.name")</label>
-            @if(appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)) {
-              <input id="report-name" maxlength="70" class="input--fullwidth form-control" name="report-name" type="text" data-rule-pattern="@controllers.ProblemReportForm.REPORT_NAME_REGEX" data-msg-pattern='@Messages("error.common.problem_report.name_valid.b")' data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory.b")'>
-            } else {
-                <input id="report-name" maxlength="70" class="input--fullwidth form-control" name="report-name" type="text"  data-rule-letterswithbasicpunc="true" data-msg-letterswithbasicpunc='@Messages("error.common.problem_report.name_valid")' data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory")'>
-            }
-        </div>
-        <div class="form-group-compound">
-            <label for="report-email" class="form-label">@Messages("problem_report.email")</label>
-            <input id="report-email" maxlength="255" class="input--fullwidth form-control" name="report-email" type="email" data-msg-email='@Messages("error.common.problem_report.email_valid")' data-rule-required="true" data-rule-email="true" data-msg-required='@Messages("error.common.problem_report.email_mandatory")'>
-        </div>
-        <div class="form-group-compound">
-            <label for="report-action" class="form-label">@Messages("problem_report.action")</label>
-            <input id="report-action" maxlength="1000" class="input--fullwidth form-control" name="report-action" type="text" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.action_mandatory")'>
-        </div>
-        <div class="form-group-compound">
-            <label for="report-error" class="form-label">@Messages("problem_report.error")</label>
-            <input id="report-error" maxlength="1000" class="input--fullwidth form-control" name="report-error"  type="text" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.error_mandatory")'>
-        </div>
-        <input type="hidden" name="isJavascript" value="false"/>
-        <input type="hidden" name="referrer" value="@{request.headers.get("referer").getOrElse("")}"/>
-        <input type="hidden" name="abFeatures" value="GetHelpWithThisPageNewLargeInputFields;@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
+
+        @input(
+        problemReportForm("report-name"),
+        '_label -> Messages("form.name"),
+        '_divClass -> "form-field",
+        '_inputClass -> "input--cleared form-control",
+        '_maxlength -> "70"
+        )
+
+        @input(
+        problemReportForm("report-email"),
+        '_label -> Messages("problem_report.email"),
+        '_divClass -> "form-field",
+        '_inputClass -> "input--cleared form-control",
+        '_maxlength -> "255",
+        '_type -> "email"
+        )
+
+        @textArea(
+        problemReportForm("report-action"),
+        '_label -> Messages("problem_report.action"),
+        '_divClass -> "form-field",
+        '_inputClass -> "input--cleared form-control",
+        '_maxlength -> "1000"
+        )
+
+        @textArea(
+        problemReportForm("report-error"),
+        '_label -> Messages("problem_report.error"),
+        '_divClass -> "form-field",
+        '_inputClass -> "input--cleared form-control",
+        '_maxlength -> "1000"
+        )
+
+        <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
+        <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
+        <input type="hidden" name="version" value="v1"/>
         <div class="form-field">
             <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
         </div>

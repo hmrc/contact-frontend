@@ -4,11 +4,10 @@ import play.api.data.Form
 
 object ServiceParameter {
 
-  def extractServiceParameter(feedbackForm: Form[controllers.FeedbackForm], service: Option[String]) =
+  def extractServiceParameter[T](feedbackForm: Form[T], service: Option[String]) =
     feedbackForm("service").value match {
       case Some("unknown") => service.getOrElse("unknown")
       case Some(service) => service
       case None => "unknown"
     }
-
 }
