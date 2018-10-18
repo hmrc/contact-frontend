@@ -44,6 +44,7 @@ class ContactHmrcControllerSpec
       any[Boolean],
       any[Request[AnyRef]](),
       any[Option[Enrolments]],
+      any[Option[String]],
       any[Option[String]])(any[HeaderCarrier])
     ).thenReturn(result)
 
@@ -107,7 +108,8 @@ class ContactHmrcControllerSpec
         "isJavascript" -> "false",
         "referer" -> "n/a",
         "csrfToken" -> "n/a",
-        "service" -> "scp"
+        "service" -> "scp",
+        "abFeatures" -> "GetHelpWithThisPageFeature_A"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -126,6 +128,7 @@ class ContactHmrcControllerSpec
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
+          any[Option[String]],
           any[Option[String]])(any[HeaderCarrier])
 
       Then("the user is redirected to the thanks page")

@@ -46,6 +46,7 @@ object ProblemReportForm {
         .verifying("error.common.comments_too_long",              error => error.size <= 1000),
       "isJavascript" -> boolean,
       "service" -> optional(text),
+      "abFeatures" -> optional(text),
       "referrer" -> optional(text)
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
@@ -140,22 +141,8 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
       isJavascript = problemReport.isJavascript,
       request = request,
       enrolmentsOption = enrolmentsOption,
-      service = problemReport.service
-    )
-  }
-
-  private def createTicketV2(problemReport: ProblemReportV2, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], referrer: String) = {
-    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
-    hmrcDeskproConnector.createDeskProTicket(
-      name = problemReport.reportName,
-      email = problemReport.reportEmail,
-      subject = "Support Request",
-      message = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer = referrer,
-      isJavascript = problemReport.isJavascript,
-      request = request,
-      enrolmentsOption = enrolmentsOption,
-      service = problemReport.service
+      service = problemReport.service,
+      abFeatures = problemReport.abFeatures
     )
   }
 
@@ -174,6 +161,4 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   }
 }
 
-case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referrer: Option[String])
-
-case class ProblemReportV2(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referrer: Option[String])
+case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], abFeatures: Option[String], referrer: Option[String])

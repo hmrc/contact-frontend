@@ -38,7 +38,8 @@ object ContactHmrcForm {
       "isJavascript" -> boolean,
       "referer" -> text,
       "csrfToken" -> text,
-      "service" -> optional(text)
+      "service" -> optional(text),
+      "abFeatures" -> optional(text)
     )(ContactForm.apply)(ContactForm.unapply)
   )
 }
@@ -60,7 +61,7 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
         Future.successful {
           val referer = request.headers.get("Referer").getOrElse("n/a")
           val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-          Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None)), loggedIn = true))
+          Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None, None)), loggedIn = true))
         }
       }))
   }
@@ -69,7 +70,7 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
     Future.successful {
       val referer = request.headers.get("Referer").getOrElse("n/a")
       val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-      Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, Some(service))), loggedIn = false))
+      Ok(views.html.contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, Some(service), None)), loggedIn = false))
     }
   }
 
@@ -124,11 +125,13 @@ case class ContactForm(contactName: String,
                        isJavascript: Boolean,
                        referer: String,
                        csrfToken: String,
-                       service: Option[String] = Some("unknown"))
+                       service: Option[String] = Some("unknown"),
+                       abFeatures: Option[String] = None)
 
 object ContactForm {
   def apply(referer: String,
             csrfToken: String,
-            service: Option[String]): ContactForm =
-    ContactForm("", "", "", isJavascript = false, referer, csrfToken, service)
+            service: Option[String],
+            abFeatures: Option[String]): ContactForm =
+    ContactForm("", "", "", isJavascript = false, referer, csrfToken, service, abFeatures)
 }

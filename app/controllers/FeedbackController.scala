@@ -100,20 +100,20 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
 
 }
 
-case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"), backUrl: Option[String],
+case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"), abFeatures: Option[String] = None, backUrl: Option[String],
                         canOmitComments : Boolean)
 
 object FeedbackForm {
   def apply(referer: String, csrfToken: String, backUrl : Option[String], canOmitComments : Boolean): FeedbackForm =
-    FeedbackForm("", "", "", "", javascriptEnabled = false, referer, csrfToken, backUrl = backUrl, canOmitComments = canOmitComments)
+    FeedbackForm("", "", "", "", javascriptEnabled = false, referrer = referer, csrfToken = csrfToken, backUrl = backUrl, canOmitComments = canOmitComments)
 
   def apply(
     experienceRating: Option[String], name: String, email: String, comments: String,
-    javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String],
+    javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String], abFeatures: Option[String],
     backUrl: Option[String],
     canOmitComments : Boolean
   ): FeedbackForm =
-    FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken, service,
+    FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken, service, abFeatures,
       backUrl, canOmitComments)
 
   def emptyForm(csrfToken: String, referer: Option[String] = None, backUrl : Option[String], canOmitComments : Boolean)(implicit request: Request[AnyRef]) =
@@ -168,10 +168,11 @@ object FeedbackFormBind {
     "referer" -> text,
     "csrfToken" -> text,
     "service" -> optional(text),
+    "abFeatures" -> optional(text),
     "backUrl" -> optional(text),
     "canOmitComments" -> boolean
   )(FeedbackForm.apply)((feedbackForm: FeedbackForm) => {
       import feedbackForm._
-      Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer, csrfToken, service, backUrl, canOmitComments))
+      Some((Some(experienceRating), name, email, comments, javascriptEnabled, referrer, csrfToken, service, abFeatures, backUrl, canOmitComments))
     }))
 }
