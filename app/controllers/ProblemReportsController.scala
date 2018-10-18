@@ -92,9 +92,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
     val isSecure = secure.getOrElse(false)
     val postEndpoint = if (isSecure) appConfig.externalReportProblemSecureUrl else appConfig.externalReportProblemUrl
-    val csrfToken = preferredCsrfToken.orElse {
-      if (isSecure) Some("{{csrfToken}}") else None
-    }
+    val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
 
     Ok(views.html.partials.error_feedback(ProblemReportForm.emptyForm(service = service), postEndpoint, csrfToken, service))
   }
@@ -112,7 +110,6 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
 
   def submitSecure: Action[AnyContent] = submit
 
-  //TODO remove once everyone is off play-frontend as this doesn't have CSRF check
   def submit = UnauthorisedAction.async { implicit request =>
     ProblemReportForm.form.bindFromRequest.fold(
       (error: Form[ProblemReport]) => {
