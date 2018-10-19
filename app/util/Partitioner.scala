@@ -2,48 +2,44 @@ package util
 
 import play.api.Logger
 import play.api.mvc.Request
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
-import util.DeviceIdProvider.DeviceIdProvider
+import util.BucketCalculator.BucketCalculator
 
-trait FeaturePartitioner[H, F <: Feature] {
-  def partition(hashable: H): F
+trait FeatureSelector {
+  def computeFeatures(request: Request[_]): Set[Feature]
 }
 
-class ABTestingFeaturePartitioner[H, F <: Feature, F1 <: F, F2 <: F](
-    threshold: Int,
-    featureA: F1,
-    featureB: F2)
-    extends FeaturePartitioner[H, F] {
-  override def partition(hashable: H): F = {
+case class FeatureEnablingRule(bucketFrom: Int,
+                               bucketTo: Int,
+                               feature: Feature) {
+  def isApplicable(bucket: Int): Boolean =
+    bucket >= bucketFrom && bucket < bucketTo
+}
 
-    val bucket = hashable.hashCode % 100
+class BucketBasedFeatureSelector(computeBucket: BucketCalculator,
+                                 rules: Iterable[FeatureEnablingRule])
+    extends FeatureSelector {
 
-    val chosenFeature: F =
-      if (math.abs(bucket) < threshold) featureA else featureB
-
-    Logger.info(s"Request landed in bucket [$bucket], chosen feature: [$chosenFeature].")
-
-    chosenFeature
+  override def computeFeatures(request: Request[_]): Set[Feature] = {
+    val bucket = computeBucket(request)
+    val features = computeFeatures(bucket)
+    Logger.info(s"Request assigned to the bucket $bucket, features enabled: ${features.map(_.name).mkString(";")}")
+    features
   }
+
+  private def computeFeatures(bucket: Int): Set[Feature] =
+    (for (rule <- rules if rule.isApplicable(bucket)) yield rule.feature).toSet
 }
 
-class DeviceIdFeaturePartitionerDecorator[F <: Feature](
-    getDeviceId: DeviceIdProvider,
-    decoratedPartitioner: FeaturePartitioner[String, F])
-    extends FeaturePartitioner[Request[_], F] {
-  override def partition(request: Request[_]): F = {
+object BucketCalculator {
+  type BucketCalculator = Request[_] => Int
 
-    val deviceIdMaybe: Option[String] = getDeviceId(
-      HeaderCarrierConverter.fromHeadersAndSession(request.headers,
-                                                   Some(request.session)))
-
-    decoratedPartitioner.partition(deviceIdMaybe.getOrElse(""))
+  val deviceIdBucketCalculator: BucketCalculator = { request =>
+    val deviceIdMaybe: Option[String] = HeaderCarrierConverter
+      .fromHeadersAndSession(request.headers, Some(request.session))
+      .deviceID
+    val deviceId = deviceIdMaybe.getOrElse("")
+    val bucket = math.abs(deviceId.hashCode % 100)
+    bucket
   }
-}
-
-object DeviceIdProvider {
-  type DeviceIdProvider = HeaderCarrier => Option[String]
-
-  val deviceIdProvider: DeviceIdProvider = _.deviceID
 }

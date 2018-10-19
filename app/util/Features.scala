@@ -1,17 +1,27 @@
 package util
 
-trait Feature {
+sealed trait Feature {
   val name: String
 }
 
-sealed trait GetHelpWithThisPageFeature extends Feature
+abstract class FeatureBase(override val name : String) extends Feature
 
-sealed trait GetHelpWithThisPageFeature_A extends GetHelpWithThisPageFeature
-sealed trait GetHelpWithThisPageFeature_B extends GetHelpWithThisPageFeature
+case object GetHelpWithThisPageNewWordingOfEntryLink extends FeatureBase("GetHelpWithThisPageNewWordingOfEntryLink")
+case object GetHelpWithThisPageMoreVerboseHeader extends FeatureBase("GetHelpWithThisPageMoreVerboseHeader")
+case object GetHelpWithThisPageMoreVerboseConfirmation extends FeatureBase("GetHelpWithThisPageMoreVerboseConfirmation")
+case object GetHelpWithThisPageImprovedFieldValidation extends FeatureBase("GetHelpWithThisPageImprovedFieldValidation")
+case object GetHelpWithThisPageNewLargeInputFields extends FeatureBase("GetHelpWithThisPageNewLargeInputFields")
+case object GetHelpWithThisPageFeatureFieldHints extends FeatureBase("GetHelpWithThisPageFeatureFieldHints")
 
-final case object GetHelpWithThisPageFeature_A extends GetHelpWithThisPageFeature_A {
-  override val name: String = "GetHelpWithThisPageFeature_A"
-}
-final case object GetHelpWithThisPageFeature_B extends GetHelpWithThisPageFeature_B {
-  override val name: String = "GetHelpWithThisPageFeature_B"
+object Feature {
+
+  val byName: PartialFunction[String, Feature] = {
+    case GetHelpWithThisPageMoreVerboseHeader.name => GetHelpWithThisPageMoreVerboseHeader
+    case GetHelpWithThisPageMoreVerboseConfirmation.name => GetHelpWithThisPageMoreVerboseConfirmation
+    case GetHelpWithThisPageImprovedFieldValidation.name => GetHelpWithThisPageImprovedFieldValidation
+    case GetHelpWithThisPageNewLargeInputFields.name => GetHelpWithThisPageNewLargeInputFields
+    case GetHelpWithThisPageFeatureFieldHints.name => GetHelpWithThisPageFeatureFieldHints
+    case GetHelpWithThisPageNewWordingOfEntryLink.name => GetHelpWithThisPageNewWordingOfEntryLink
+  }
+
 }

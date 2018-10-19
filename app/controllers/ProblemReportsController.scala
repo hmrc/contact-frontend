@@ -11,7 +11,7 @@ import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
-import util.{DeskproEmailValidator, GetHelpWithThisPageFeature_B}
+import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation}
 
 import scala.concurrent.Future
 
@@ -26,10 +26,10 @@ object ProblemReportForm {
   def form(implicit request: Request[_], appConfig: AppConfig) = Form[ProblemReport](
     mapping(
       "report-name" -> text
-        .verifying(s"error.common.problem_report.name_mandatory${featureAorB}", name => !name.isEmpty)
-        .verifying(s"error.common.problem_report.name_too_long${featureAorB}",  name => name.size <= 70)
-        .verifying(s"error.common.problem_report.name_valid${featureAorB}",     name => {
-          if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+        .verifying(s"error.common.problem_report.name_mandatory${improvedFieldValidationFeatureFlag}", name => !name.isEmpty)
+        .verifying(s"error.common.problem_report.name_too_long${improvedFieldValidationFeatureFlag}", name => name.size <= 70)
+        .verifying(s"error.common.problem_report.name_valid${improvedFieldValidationFeatureFlag}", name => {
+          if (appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation)) {
             name.matches(REPORT_NAME_REGEX)
           } else {
             name.matches(OLD_REPORT_NAME_REGEX)
@@ -51,8 +51,8 @@ object ProblemReportForm {
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
-  private def featureAorB(implicit request: Request[_], appConfig: AppConfig): String = {
-    if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+  private def improvedFieldValidationFeatureFlag(implicit request: Request[_], appConfig: AppConfig): String = {
+    if (appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation)) {
       ".b"
     } else {
       ""
@@ -76,12 +76,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   }
 
   def reportFormAjax(service: Option[String]) = UnauthorisedAction { implicit request =>
-
-    if(appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
-      Ok(views.html.partials.error_feedback_inner_b(appConfig.externalReportProblemSecureUrl, None, service))
-    } else {
       Ok(views.html.partials.error_feedback_inner(appConfig.externalReportProblemSecureUrl, None, service))
-    }
   }
 
   def reportFormNonJavaScript(service: Option[String]) = UnauthorisedAction { implicit request =>
@@ -111,13 +106,13 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
           ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referrer)
         } yield {
             if (!problemReport.isJavascript) {
-              if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+              if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation)) {
                 Ok(views.html.problem_reports_confirmation_nonjavascript_b(ticketId.ticket_id.toString, thankYouMessage))
               } else {
                 Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
               }
             } else {
-              if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
+              if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation)) {
                 Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body_b(ticketId.ticket_id.toString, thankYouMessage).toString())))
               } else {
                 Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))

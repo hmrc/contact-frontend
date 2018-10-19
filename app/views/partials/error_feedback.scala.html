@@ -1,21 +1,17 @@
 @import config.AppConfig
-@import util.GetHelpWithThisPageFeature_A
+@import util.GetHelpWithThisPageNewWordingOfEntryLink
 @(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 @import uk.gov.hmrc.play.views.html._
 
 <div class="report-error">
 
-    @if(appConfig.hasFeature(GetHelpWithThisPageFeature_A)) {
-        <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help")</a>
-    } else {
+    @if(appConfig.hasFeature(GetHelpWithThisPageNewWordingOfEntryLink)) {
         <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help.b")</a>
+    } else {
+        <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help")</a>
     }
 
     <div class="report-error__content js-hidden">
-        @if(appConfig.hasFeature(GetHelpWithThisPageFeature_A)) {
-            @views.html.partials.error_feedback_inner(actionUrl, csrfToken, service)
-        } else {
-            @views.html.partials.error_feedback_inner_b(actionUrl, csrfToken, service)
-        }
+        @views.html.partials.error_feedback_inner(actionUrl, csrfToken, service)
     </div>
 </div>
