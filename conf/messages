@@ -32,6 +32,7 @@ error.common.problem_report.error_mandatory.b=Enter the problem you want to tell
 error.common.comments_mandatory=Enter your comments.
 error.common.comments_too_long=The comment cannot be longer than 2000 characters
 
+
 language-switcher.english=English
 language-switcher.english.hover=Use this account in English
 language-switcher.welsh=Cymraeg
@@ -44,6 +45,7 @@ problem_report.action.hint.b=For example, sign in, print something, find informa
 problem_report.error=What do you need help with?
 problem_report.error.b=What problem do you want to tell us about?
 problem_report.error.hint.b=If you got a message telling you something was wrong, tell us what it says.
+problem_report.common.size_limit=You can enter up to {0} characters
 common.problem_report.error_nojavascript_title=There was a problem sending your query
 deskpro.email_too_long=Your email can''t be longer than 255 characters
 contact.heading=Help and contact
