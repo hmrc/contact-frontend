@@ -2,6 +2,7 @@
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.helpers.ServiceParameter.extractServiceParameter
+@import util.GetHelpWithThisPageFeature_A
 
 <h2>@Messages("common.feedback.title")</h2>
 <p>@Messages("common.feedback.information.warning")</p>
@@ -51,7 +52,7 @@
 
         <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
         <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
-        <input type="hidden" name="version" value="v1"/>
+        <input type="hidden" name="abFeatures" value="@{GetHelpWithThisPageFeature_A.name}"/>
         <div class="form-field">
             <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
         </div>

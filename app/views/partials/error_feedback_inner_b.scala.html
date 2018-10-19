@@ -1,6 +1,7 @@
 @import config.AppConfig
 @(problemReportForm : Form[controllers.ProblemReport], actionUrl: String, csrfToken: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 @import uk.gov.hmrc.play.views.html._
+@import util.GetHelpWithThisPageFeature_B
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.helpers.ServiceParameter.extractServiceParameter
 
@@ -52,7 +53,7 @@
 
     <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
     <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
-    <input type="hidden" name="version" value="v1"/>
+    <input type="hidden" name="abFeatures" value="@{GetHelpWithThisPageFeature_B.name}"/>
     <div class="form-field">
         <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
     </div>

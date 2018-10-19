@@ -1,8 +1,6 @@
 import sbt._
 
 object FrontendBuild extends Build with MicroService {
-  import scala.util.Properties.envOrElse
-  private val commonSettings = net.virtualvoid.sbt.graph.DependencyGraphSettings.graphSettings
   val appName = "contact-frontend"
 
   override lazy val appDependencies: Seq[ModuleID] = AppDependencies()

@@ -94,6 +94,7 @@ class PartialsControllerApplication(app: Application) extends MockitoSugar {
       isJavascript = any[Boolean],
       any[Request[AnyRef]](),
       any[Option[Enrolments]],
+      any[Option[String]],
       any[Option[String]])(any[HeaderCarrier])).thenReturn(result)
   }
 
@@ -108,6 +109,7 @@ class PartialsControllerApplication(app: Application) extends MockitoSugar {
       meq(true),
       any[Request[AnyRef]](),
       any[Option[Enrolments]],
+      any[Option[String]],
       any[Option[String]])(any[HeaderCarrier])
   }
 

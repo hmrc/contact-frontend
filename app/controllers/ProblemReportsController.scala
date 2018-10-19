@@ -47,8 +47,10 @@ object ProblemReportForm {
         .verifying("error.common.comments_too_long",              error => error.size <= 1000),
       "isJavascript" -> boolean,
       "service" -> optional(text),
+      "abFeatures" -> optional(text),
       "referer" -> optional(text)
-    )(ProblemReport.apply)(ProblemReport.unapply))
+    )(ProblemReport.apply)(ProblemReport.unapply)
+  )
 
   private def featureAorB(implicit request: Request[_], appConfig: AppConfig): String = {
     if (appConfig.hasFeature(GetHelpWithThisPageFeature_B)) {
@@ -67,6 +69,7 @@ object ProblemReportForm {
         reportError = "",
         isJavascript = false,
         service = service,
+        abFeatures = Some(featureAorB),
         referer = referer.orElse(request.headers.get("Referer").orElse(Some("n/a")))
       )
     )
@@ -158,7 +161,8 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
       isJavascript = problemReport.isJavascript,
       request = request,
       enrolmentsOption = enrolmentsOption,
-      service = problemReport.service
+      service = problemReport.service,
+      abFeatures = problemReport.abFeatures
     )
   }
 
@@ -177,4 +181,4 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   }
 }
 
-case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], referer: Option[String])
+case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], abFeatures: Option[String], referer: Option[String])
