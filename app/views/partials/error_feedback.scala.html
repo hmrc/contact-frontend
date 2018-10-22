@@ -5,7 +5,7 @@
 
 <div class="report-error">
 
-    @if(appConfig.hasFeature(GetHelpWithThisPageNewWordingOfEntryLink)) {
+    @if(appConfig.hasFeature(GetHelpWithThisPageNewWordingOfEntryLink, service)) {
         <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help.b")</a>
     } else {
         <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help")</a>

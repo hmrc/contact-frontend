@@ -17,9 +17,9 @@ trait AppConfig {
   def fallbackURLForLangugeSwitcher: String
   def enableLanguageSwitching: Boolean
 
-  def hasFeature(f: Feature)(implicit request: Request[_]): Boolean
+  def hasFeature(f: Feature, service : Option[String])(implicit request: Request[_]): Boolean
 
-  def getFeatures(implicit request: Request[_]): Set[Feature]
+  def getFeatures(service : Option[String])(implicit request: Request[_]): Set[Feature]
 }
 
 class CFConfig @Inject()(environment: play.api.Environment,
@@ -73,14 +73,15 @@ class CFConfig @Inject()(environment: play.api.Environment,
       featuresUnderExperiment.map(feature =>
         FeatureEnablingRule(bucketFrom = getHelpWithThisPageFeatureSplit,
                             bucketTo = 100,
+                            servicesLimit = None,
                             feature = feature)
       )
     )
 
-  override def hasFeature(f: Feature)(implicit request: Request[_]): Boolean =
-    featureSelector.computeFeatures(request).contains(f)
+  override def hasFeature(f: Feature, service : Option[String])(implicit request: Request[_]): Boolean =
+    featureSelector.computeFeatures(request, service).contains(f)
 
-  override def getFeatures(implicit request: Request[_]): Set[Feature] =
-    featureSelector.computeFeatures(request)
+  override def getFeatures(service : Option[String])(implicit request: Request[_]): Set[Feature] =
+    featureSelector.computeFeatures(request, service)
 
 }

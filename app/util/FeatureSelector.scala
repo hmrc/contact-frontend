@@ -6,29 +6,40 @@ import uk.gov.hmrc.play.HeaderCarrierConverter
 import util.BucketCalculator.BucketCalculator
 
 trait FeatureSelector {
-  def computeFeatures(request: Request[_]): Set[Feature]
+  def computeFeatures(request: Request[_], service : Option[String]): Set[Feature]
 }
 
 case class FeatureEnablingRule(bucketFrom: Int,
                                bucketTo: Int,
+                               servicesLimit : Option[Seq[String]],
                                feature: Feature) {
-  def isApplicable(bucket: Int): Boolean =
-    bucket >= bucketFrom && bucket < bucketTo
+  def isApplicable(bucket: Int, maybeService : Option[String]): Boolean = {
+    val bucketCriterion = bucket >= bucketFrom && bucket < bucketTo
+    val serviceCriterion = servicesLimit match {
+      case None => true
+      case Some(allowedServices) => maybeService match {
+        case Some(service) => allowedServices.contains(service)
+        case None => false
+      }
+    }
+    bucketCriterion && serviceCriterion
+  }
 }
 
 class BucketBasedFeatureSelector(computeBucket: BucketCalculator,
                                  rules: Iterable[FeatureEnablingRule])
     extends FeatureSelector {
 
-  override def computeFeatures(request: Request[_]): Set[Feature] = {
+  override def computeFeatures(request: Request[_], service : Option[String]): Set[Feature] = {
     val bucket = computeBucket(request)
-    val features = computeFeatures(bucket)
+    val features = computeFeatures(bucket, service)
     Logger.info(s"Request assigned to the bucket $bucket, features enabled: ${features.map(_.name).mkString(";")}")
+
     features
   }
 
-  private def computeFeatures(bucket: Int): Set[Feature] =
-    (for (rule <- rules if rule.isApplicable(bucket)) yield rule.feature).toSet
+  private def computeFeatures(bucket: Int, service : Option[String]): Set[Feature] =
+    (for (rule <- rules if rule.isApplicable(bucket, service)) yield rule.feature).toSet
 }
 
 object BucketCalculator {
