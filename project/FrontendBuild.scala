@@ -40,7 +40,8 @@ private object AppDependencies {
     "com.github.tomakehurst" % "wiremock" % "1.58" % scope,
     "uk.gov.hmrc" %% "scala-webdriver" % "5.23.0" %scope,
     "org.seleniumhq.selenium" % "selenium-java" % "3.7.1" % scope,
-    "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope
+    "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope,
+    "org.scalacheck" %% "scalacheck" % "1.14.0" % "test"
   )
 
   def apply() = compile ++ test("test") ++ test("it")
