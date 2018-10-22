@@ -27,7 +27,8 @@ class GetHelpWithThisPageFeatureISpec
     with GivenWhenThen {
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
-      "features.getHelpWithThisPage.split" -> "50"
+      "features.getHelpWithThisPage.split" -> "50",
+      "features.getHelpWithThisPage.featuresUnderExperiment" -> "GetHelpWithThisPageMoreVerboseHeader;GetHelpWithThisPageMoreVerboseConfirmation;GetHelpWithThisPageImprovedFieldValidation;GetHelpWithThisPageNewLargeInputFields;GetHelpWithThisPageFeatureFieldHints;GetHelpWithThisPageNewWordingOfEntryLink"
     )
     .configure("play.http.filters" -> "test.FeatureTestContactFrontendFilters")
     .build()
