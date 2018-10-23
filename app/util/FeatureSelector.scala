@@ -5,13 +5,15 @@ import play.api.mvc.Request
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import util.BucketCalculator.BucketCalculator
 
+import scala.util.Try
+
 trait FeatureSelector {
   def computeFeatures(request: Request[_], service : Option[String]): Set[Feature]
 }
 
 case class FeatureEnablingRule(bucketFrom: Int,
                                bucketTo: Int,
-                               servicesLimit : Option[Seq[String]],
+                               servicesLimit : Option[Set[String]],
                                feature: Feature) {
   def isApplicable(bucket: Int, maybeService : Option[String]): Boolean = {
     val bucketCriterion = bucket >= bucketFrom && bucket < bucketTo
@@ -23,6 +25,36 @@ case class FeatureEnablingRule(bucketFrom: Int,
       }
     }
     bucketCriterion && serviceCriterion
+  }
+}
+
+object FeatureEnablingRule {
+
+  private def parseStatements(input : String) = {
+    val Statement = "(\\w+)=(.+)".r
+
+    input.split(";").map {
+      case Statement(key, value) => (key, value)
+      case invalid => throw new Exception(s"Unparseable feature enabling rule '$invalid'")
+    }.toMap
+  }
+
+  def parse(input : String) : FeatureEnablingRule = {
+
+    val statements = parseStatements(input)
+
+    val feature: Feature = statements.get("feature").flatMap(Feature.byName.lift)
+      .getOrElse(throw new Exception(s"Cannot find valid 'feature' field in rule '$input'"))
+
+    val bucketFrom: Int = statements.get("bucketFrom").flatMap(value => Try(Integer.parseInt(value)).toOption)
+      .getOrElse(throw new Exception(s"Cannot find valid 'bucketFrom' field in rule '$input'"))
+
+    val bucketTo: Int = statements.get("bucketTo").flatMap(value => Try(Integer.parseInt(value)).toOption)
+      .getOrElse(throw new Exception(s"Cannot find valid 'bucketTo' field in rule '$input'"))
+
+    val services: Option[Set[String]] = statements.get("services").map(_.split(",").toSet)
+
+    FeatureEnablingRule(bucketFrom, bucketTo, services, feature)
   }
 }
 

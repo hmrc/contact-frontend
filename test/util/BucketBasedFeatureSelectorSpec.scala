@@ -20,8 +20,8 @@ class BucketBasedFeatureSelectorSpec extends WordSpec with Matchers {
     mockBucketCalculator,
     Set(FeatureEnablingRule(0, 20, None, testFeature1),
         FeatureEnablingRule(10, 30, None, testFeature2),
-      FeatureEnablingRule(0, 20, Some(Seq("service1", "service2")), testFeature3),
-      FeatureEnablingRule(10, 30, Some(Seq("service1", "service2")), testFeature4)))
+      FeatureEnablingRule(0, 20, Some(Set("service1", "service2")), testFeature3),
+      FeatureEnablingRule(10, 30, Some(Set("service1", "service2")), testFeature4)))
 
   val service = Some("testService")
 
