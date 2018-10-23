@@ -1,6 +1,6 @@
 package util
 
-import org.scalacheck.Gen
+import org.scalacheck.{Gen, Shrink}
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{Matchers, WordSpec}
 import play.api.mvc.Cookie
@@ -8,6 +8,9 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.CookieNames
 
 class DeviceIdBucketCalculatorSpec extends WordSpec with Matchers with PropertyChecks {
+
+  implicit override val generatorDrivenConfig: PropertyCheckConfiguration = PropertyCheckConfig(minSize=100000, maxSize = 200000)
+  implicit def noShrink[T]: Shrink[T] = Shrink.shrinkAny
 
   "Bucket id should be generated consistently nad within range of 0 to 99" in {
 
@@ -20,7 +23,7 @@ class DeviceIdBucketCalculatorSpec extends WordSpec with Matchers with PropertyC
 
         bucket1 shouldBe bucket2
         bucket1 should be >= 0
-        bucket2 should be < 99
+        bucket2 should be < 100
 
       }
   }

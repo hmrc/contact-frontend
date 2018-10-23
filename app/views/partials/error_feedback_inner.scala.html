@@ -5,7 +5,7 @@
 @(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 @import uk.gov.hmrc.play.views.html._
 
-@if(appConfig.hasFeature(GetHelpWithThisPageMoreVerboseHeader)) {
+@if(appConfig.hasFeature(GetHelpWithThisPageMoreVerboseHeader, service)) {
     <h2>@Messages("common.feedback.title.b")</h2>
     <p>@Messages("common.feedback.information.warning1.b")</p>
     <p>@Messages("common.feedback.information.warning2.b")</p>
@@ -24,7 +24,7 @@
     <input type="hidden" name="service" value="@{service.get}"/>
     }
 
-@if(appConfig.hasFeature(GetHelpWithThisPageNewLargeInputFields)) {
+@if(appConfig.hasFeature(GetHelpWithThisPageNewLargeInputFields, service)) {
 
     <div class="form-group-compound">
         <label for="report-name" class="form-label">@Messages("form.name")</label>
@@ -37,7 +37,7 @@
     <div class="form-group-compound">
         <label for="report-action" class="form-label">
             @Messages("problem_report.action.b")
-            @if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints)) {
+            @if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints, service)) {
                 <span class="form-hint">@Messages("problem_report.action.hint.b")</span>
             }
             <textarea id="report-action" class="input--fullwidth" name="report-action" rows="5" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.action_mandatory.b")' maxlength="1000" data-char-field="true"></textarea>
@@ -47,7 +47,7 @@
     <div class="form-group-compound">
         <label for="report-error" class="form-label">
             @Messages("problem_report.error.b")
-            @if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints)) {
+            @if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints, service)) {
                 <span class="form-hint">@Messages("problem_report.error.hint.b")</span>
             }
             <textarea id="report-error" class="input--fullwidth" name="report-error" rows="5" data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.error_mandatory.b")' maxlength="1000" data-char-field="true"></textarea>
@@ -56,7 +56,7 @@
     </div>
     <input type="hidden" name="isJavascript" value="false"/>
     <input type="hidden" name="referrer" value="@{request.headers.get("referer").getOrElse("")}"/>
-    <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures.map(_.name).mkString(";")}"/>
+    <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
     <div class="form-field">
         <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
     </div>
@@ -82,7 +82,7 @@
         </div>
         <input type="hidden" name="isJavascript" value="false"/>
         <input type="hidden" name="referrer" value="@{request.headers.get("referer").getOrElse("")}"/>
-        <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures.map(_.name).mkString(";")}"/>
+        <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
         <div class="form-field">
             <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
         </div>

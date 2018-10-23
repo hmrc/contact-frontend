@@ -27,21 +27,22 @@ class GetHelpWithThisPageFeatureISpec
     with GivenWhenThen {
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
-      "features.getHelpWithThisPage.split" -> "50",
-      "features.getHelpWithThisPage.featuresUnderExperiment" -> "GetHelpWithThisPageMoreVerboseHeader;GetHelpWithThisPageMoreVerboseConfirmation;GetHelpWithThisPageImprovedFieldValidation;GetHelpWithThisPageNewLargeInputFields;GetHelpWithThisPageFeatureFieldHints;GetHelpWithThisPageNewWordingOfEntryLink"
+      "features" -> List(
+        "feature=GetHelpWithThisPageNewWordingOfEntryLink;bucketFrom=0;bucketTo=50")
     )
     .configure("play.http.filters" -> "test.FeatureTestContactFrontendFilters")
     .build()
 
+
   "GetHelpWithThisPageFeature" should {
-    "Display feature A" in {
-      checkFeatureForText("AAAAAA",
+    "Display version with new wording of the entry link if within experiment" in {
+      checkFeatureForText( "BBBBBB",
                           """Is there anything wrong with this page\?""")
 
     }
 
-    "Display feature B" in {
-      checkFeatureForText("BBBBBB", "Tell us about a problem with the service")
+    "Display the old version if within experiment" in {
+      checkFeatureForText("AAAAAA", "Tell us about a problem with the service")
     }
   }
 

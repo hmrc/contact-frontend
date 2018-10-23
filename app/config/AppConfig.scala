@@ -5,6 +5,7 @@ import play.api.Configuration
 import play.api.mvc.Request
 import uk.gov.hmrc.play.config.ServicesConfig
 import util._
+import collection.JavaConversions._
 
 trait AppConfig {
   val assetsPrefix: String
@@ -17,9 +18,9 @@ trait AppConfig {
   def fallbackURLForLangugeSwitcher: String
   def enableLanguageSwitching: Boolean
 
-  def hasFeature(f: Feature)(implicit request: Request[_]): Boolean
+  def hasFeature(f: Feature, service : Option[String])(implicit request: Request[_]): Boolean
 
-  def getFeatures(implicit request: Request[_]): Set[Feature]
+  def getFeatures(service : Option[String])(implicit request: Request[_]): Set[Feature]
 }
 
 class CFConfig @Inject()(environment: play.api.Environment,
@@ -36,12 +37,11 @@ class CFConfig @Inject()(environment: play.api.Environment,
     .getString(s"govuk-tax.$env.contact-frontend.host")
     .getOrElse("")
 
-  private val getHelpWithThisPageFeatureSplit =
-    configuration.getInt("features.getHelpWithThisPage.split").getOrElse(0)
-
-  private val featuresUnderExperiment =
-    configuration.getString("features.getHelpWithThisPage.featuresUnderExperiment")
-      .getOrElse("").split(";").flatMap(Feature.byName.lift(_))
+  private val featureRules: Seq[FeatureEnablingRule] =
+    configuration.getStringList("features")
+      .map(_.toList)
+      .getOrElse(List.empty)
+      .map(FeatureEnablingRule.parse)
 
   override lazy val externalReportProblemUrl =
     s"$contactHost/contact/problem_reports"
@@ -68,19 +68,12 @@ class CFConfig @Inject()(environment: play.api.Environment,
   override protected def runModeConfiguration = configuration
 
   lazy val featureSelector: FeatureSelector =
-    new BucketBasedFeatureSelector(
-      BucketCalculator.deviceIdBucketCalculator,
-      featuresUnderExperiment.map(feature =>
-        FeatureEnablingRule(bucketFrom = getHelpWithThisPageFeatureSplit,
-                            bucketTo = 100,
-                            feature = feature)
-      )
-    )
+    new BucketBasedFeatureSelector(BucketCalculator.deviceIdBucketCalculator, featureRules)
 
-  override def hasFeature(f: Feature)(implicit request: Request[_]): Boolean =
-    featureSelector.computeFeatures(request).contains(f)
+  override def hasFeature(f: Feature, service : Option[String])(implicit request: Request[_]): Boolean =
+    featureSelector.computeFeatures(request, service).contains(f)
 
-  override def getFeatures(implicit request: Request[_]): Set[Feature] =
-    featureSelector.computeFeatures(request)
+  override def getFeatures(service : Option[String])(implicit request: Request[_]): Set[Feature] =
+    featureSelector.computeFeatures(request, service)
 
 }

@@ -23,13 +23,22 @@ object ProblemReportForm {
 
   val OLD_REPORT_NAME_REGEX = """^[A-Za-z\-.,()'"\s]+$"""
 
+  def resolveServiceFromPost(implicit request : Request[_]): Option[String] = {
+    val body = request.body match {
+      case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined => body.asFormUrlEncoded.get
+      case body: play.api.mvc.AnyContent if body.asMultipartFormData.isDefined => body.asMultipartFormData.get.asFormUrlEncoded
+    }
+
+    body.get("service").flatMap(_.headOption)
+  }
+
   def form(implicit request: Request[_], appConfig: AppConfig) = Form[ProblemReport](
     mapping(
       "report-name" -> text
-        .verifying(s"error.common.problem_report.name_mandatory${improvedFieldValidationFeatureFlag}", name => !name.isEmpty)
-        .verifying(s"error.common.problem_report.name_too_long${improvedFieldValidationFeatureFlag}", name => name.size <= 70)
-        .verifying(s"error.common.problem_report.name_valid${improvedFieldValidationFeatureFlag}", name => {
-          if (appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation)) {
+        .verifying(s"error.common.problem_report.name_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}", name => !name.isEmpty)
+        .verifying(s"error.common.problem_report.name_too_long${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}", name => name.size <= 70)
+        .verifying(s"error.common.problem_report.name_valid${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}", name => {
+          if (appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, resolveServiceFromPost)) {
             name.matches(REPORT_NAME_REGEX)
           } else {
             name.matches(OLD_REPORT_NAME_REGEX)
@@ -51,8 +60,8 @@ object ProblemReportForm {
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
-  private def improvedFieldValidationFeatureFlag(implicit request: Request[_], appConfig: AppConfig): String = {
-    if (appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation)) {
+  private def improvedFieldValidationFeatureFlag(service : Option[String])(implicit request: Request[_], appConfig: AppConfig): String = {
+    if (appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)) {
       ".b"
     } else {
       ""
@@ -106,13 +115,13 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
           ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referrer)
         } yield {
             if (!problemReport.isJavascript) {
-              if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation)) {
+              if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation, problemReport.service)) {
                 Ok(views.html.problem_reports_confirmation_nonjavascript_b(ticketId.ticket_id.toString, thankYouMessage))
               } else {
                 Ok(views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, thankYouMessage))
               }
             } else {
-              if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation)) {
+              if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation, problemReport.service)) {
                 Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body_b(ticketId.ticket_id.toString, thankYouMessage).toString())))
               } else {
                 Ok(Json.toJson(Map("status" -> "OK", "message" -> views.html.ticket_created_body(ticketId.ticket_id.toString, thankYouMessage).toString())))
