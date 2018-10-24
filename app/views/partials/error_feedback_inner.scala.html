@@ -1,6 +1,7 @@
 @import util.GetHelpWithThisPageFeatureFieldHints
 @import util.GetHelpWithThisPageMoreVerboseHeader
 @import util.GetHelpWithThisPageNewLargeInputFields
+@import util.GetHelpWithThisPageImprovedFieldValidation
 @import config.AppConfig
 @(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 @import uk.gov.hmrc.play.views.html._
@@ -28,7 +29,11 @@
 
     <div class="form-group-compound">
         <label for="report-name" class="form-label">@Messages("form.name")</label>
-        <input id="report-name" maxlength="70" class="input--fullwidth" name="report-name" type="text" data-rule-pattern="@controllers.ProblemReportForm.REPORT_NAME_REGEX" data-msg-pattern='@Messages("error.common.problem_report.name_valid.b")' data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory.b")'>
+        @if(appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)) {
+            <input id="report-name" maxlength="70" class="input--fullwidth" name="report-name" type="text" data-rule-pattern="@controllers.ProblemReportForm.REPORT_NAME_REGEX" data-msg-pattern='@Messages("error.common.problem_report.name_valid.b")' data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory.b")'>
+        } else {
+            <input id="report-name" maxlength="70" class="input--fullwidth" name="report-name" type="text"  data-rule-letterswithbasicpunc="true" data-msg-letterswithbasicpunc='@Messages("error.common.problem_report.name_valid")' data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory")'>
+        }
     </div>
     <div class="form-group-compound">
         <label for="report-email" class="form-label">@Messages("problem_report.email.b")</label>
@@ -66,7 +71,11 @@
         <legend class="visuallyhidden">@Messages("common.feedback.title")</legend>
         <div class="form-group-compound">
             <label for="report-name" class="form-label">@Messages("form.name")</label>
-            <input id="report-name" maxlength="70" class="input--fullwidth form-control" name="report-name" type="text"  data-rule-letterswithbasicpunc="true" data-msg-letterswithbasicpunc='@Messages("error.common.problem_report.name_valid")' data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory")'>
+            @if(appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)) {
+              <input id="report-name" maxlength="70" class="input--fullwidth form-control" name="report-name" type="text" data-rule-pattern="@controllers.ProblemReportForm.REPORT_NAME_REGEX" data-msg-pattern='@Messages("error.common.problem_report.name_valid.b")' data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory.b")'>
+            } else {
+                <input id="report-name" maxlength="70" class="input--fullwidth form-control" name="report-name" type="text"  data-rule-letterswithbasicpunc="true" data-msg-letterswithbasicpunc='@Messages("error.common.problem_report.name_valid")' data-rule-required="true" data-msg-required='@Messages("error.common.problem_report.name_mandatory")'>
+            }
         </div>
         <div class="form-group-compound">
             <label for="report-email" class="form-label">@Messages("problem_report.email")</label>
