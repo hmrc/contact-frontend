@@ -20,7 +20,7 @@
     <input type="hidden" name="service" id="feedbackService" value="@extractServiceParameter(feedbackForm, service)"/>
 
     <fieldset>
-        @inputRadioGroup(
+        @input_radio_group(
         feedbackForm("feedback-rating"),
         Vector(("5",Messages("form.online.services.very_good")), ("4",Messages("form.online.services.good")), ("3",Messages("form.online.services.neutral")), ("2",Messages("form.online.services.bad")), ("1",Messages("form.online.services.very_bad"))),
         '_legend -> Messages("form.online.services"),

@@ -22,11 +22,11 @@ private object AppOverrides{
 private object AppDependencies {
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "bootstrap-play-25" % "1.7.0",
+    "uk.gov.hmrc" %% "bootstrap-play-25" % "3.13.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.14.0",
-    "uk.gov.hmrc" %% "play-ui" % "7.14.0",
+    "uk.gov.hmrc" %% "play-ui" % "7.25.0-play-25",
     "uk.gov.hmrc" %% "url-builder" % "2.1.0",
-    "uk.gov.hmrc" %% "auth-client" % "2.6.0",
+    "uk.gov.hmrc" %% "auth-client" % "2.17.0-play-25",
     "commons-validator" % "commons-validator" % "1.6",
     "org.apache.httpcomponents" % "httpclient" % DependencyVersions.apacheHttpComponentsCore
   )
@@ -38,9 +38,9 @@ private object AppDependencies {
     "org.pegdown" % "pegdown" % "1.6.0" % scope,
     "org.jsoup" % "jsoup" % "1.7.3" % scope,
     "com.github.tomakehurst" % "wiremock" % "1.58" % scope,
-    "uk.gov.hmrc" %% "scala-webdriver" % "5.23.0" %scope,
+    "uk.gov.hmrc" %% "scala-webdriver" % "7.9.0" %scope,
     "org.seleniumhq.selenium" % "selenium-java" % "3.7.1" % scope,
-    "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope,
+    "uk.gov.hmrc" %% "hmrctest" % "3.2.0" % scope,
     "org.scalacheck" %% "scalacheck" % "1.14.0" % "test"
   )
 
