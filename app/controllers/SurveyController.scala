@@ -32,10 +32,10 @@ class SurveyController @Inject() (auditConnector : AuditConnector)(implicit val 
 
     Future.successful(
       if (validateTicketId(ticketId)) {
+        Ok(views.html.survey(ticketId, serviceId))
+      } else {
         Logger.error(s"Invalid ticket id $ticketId when requesting survey form")
         BadRequest("Invalid ticket id")
-      } else {
-        Ok(views.html.survey(ticketId, serviceId))
       }
     )
   }
