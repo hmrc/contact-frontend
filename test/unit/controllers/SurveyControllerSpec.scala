@@ -20,20 +20,12 @@ class SurveyControllerSpec extends UnitSpec {
 
   "ticketId regex" should {
     "validates correct ticket refs" in new SurveyControllerApplication {
-     controller.validateTicketId("HMRC-Z2V6DUK5") shouldBe true
-     controller.validateTicketId("HMRC-Z2A6DA5") shouldBe true
-     controller.validateTicketId("HMRC-Z2A6") shouldBe true
-     controller.validateTicketId("HMRC-Z") shouldBe true
+     controller.validateTicketId("GFBN-8051-KLNY") shouldBe true
     }
 
     "rejects invalid ticket refs" in new SurveyControllerApplication {
-      controller.validateTicketId("HMRC-") shouldBe false
+      controller.validateTicketId("GFBN-8051-") shouldBe false
       controller.validateTicketId("") shouldBe false
-      controller.validateTicketId("HMRC-Z2A6Z2A6A") shouldBe false
-      controller.validateTicketId("HMRC-Z2V6dUK5") shouldBe false
-      controller.validateTicketId("HMRC-Z2'6DUK5") shouldBe false
-      controller.validateTicketId("HMRC-Z2!6DUK5") shouldBe false
-      controller.validateTicketId("HMRC-Z2 6DUK5") shouldBe false
     }
   }
 
@@ -41,7 +33,7 @@ class SurveyControllerSpec extends UnitSpec {
     "produce an audit result for a valid form" in new SurveyControllerApplication {
       implicit val request = FakeRequest("GET", "/blah", FakeHeaders(), Map[String, Seq[String]](
         "helpful" -> Seq("2"),
-        "ticket-id" -> Seq("HMRC-Z"),
+        "ticket-id" -> Seq("GFBN-8051-KLNY"),
         "service-id" -> Seq("abcdefg")
       ))
 
@@ -55,7 +47,7 @@ class SurveyControllerSpec extends UnitSpec {
         "helpful" -> "2",
         "speed" -> "0",
         "improve" -> "",
-        "ticketId" -> "HMRC-Z",
+        "ticketId" -> "GFBN-8051-KLNY",
         "serviceId" -> "abcdefg"
       )
     }
@@ -63,7 +55,7 @@ class SurveyControllerSpec extends UnitSpec {
     "product errors for an invalid form" in new SurveyControllerApplication {
       implicit val request = FakeRequest("GET", "/blah", FakeHeaders(), Map[String, Seq[String]](
         "helpful" -> Seq("2"),
-        "ticket-id" -> Seq("HMRC-Z"),
+        "ticket-id" -> Seq("GFBN-8051-KLNY"),
         "service-id" -> Seq("abcdefg122445345345dfddfds234234sdf")
       ))
 

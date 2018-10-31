@@ -21,14 +21,22 @@ import scala.util.matching.Regex
 class SurveyController @Inject() (auditConnector : AuditConnector)(implicit val messagesApi : MessagesApi, appConfig : AppConfig)
   extends FrontendController with I18nSupport {
 
-  val TICKET_ID_REGEX      = new Regex("^HMRC-([A-Z0-9]|#){1,8}+$")
-  val TICKET_ID_MAX_LENGTH = 5+8
+  val TicketId      = "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$".r
 
-  def validateTicketId(ticketId:String) = TICKET_ID_REGEX.findFirstIn(ticketId).isDefined
+  def validateTicketId(ticketId:String) = ticketId match {
+    case TicketId() => true
+    case _ => false
+  }
 
   def survey(ticketId: String, serviceId: String) = Action.async { implicit request =>
+
     Future.successful(
-      Ok(views.html.survey(ticketId, serviceId))
+      if (validateTicketId(ticketId)) {
+        Logger.error(s"Invalid ticket id $ticketId when requesting survey form")
+        BadRequest("Invalid ticket id")
+      } else {
+        Ok(views.html.survey(ticketId, serviceId))
+      }
     )
   }
 
@@ -69,7 +77,7 @@ class SurveyController @Inject() (auditConnector : AuditConnector)(implicit val 
       SurveyFormFields.helpful -> ratingScale,
       SurveyFormFields.speed -> ratingScale,
       SurveyFormFields.improve -> optional(text(maxLength = 2500)),
-      SurveyFormFields.ticketId -> optional(text(maxLength = TICKET_ID_MAX_LENGTH)).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
+      SurveyFormFields.ticketId -> optional(text).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
       SurveyFormFields.serviceId -> optional(text(maxLength = 20)).verifying(serviceId => serviceId.getOrElse("").length>0)
     )(SurveyFormData.apply)(SurveyFormData.unapply)
   )
