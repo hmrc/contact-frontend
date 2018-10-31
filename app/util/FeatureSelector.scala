@@ -65,7 +65,7 @@ class BucketBasedFeatureSelector(computeBucket: BucketCalculator,
   override def computeFeatures(request: Request[_], service : Option[String]): Set[Feature] = {
     val bucket = computeBucket(request)
     val features = computeFeatures(bucket, service)
-    Logger.error(s"Request assigned to the bucket $bucket, features enabled: ${features.map(_.name).mkString(";")}")
+    Logger.info(s"Request assigned to the bucket $bucket, features enabled: ${features.map(_.name).mkString(";")}")
 
     features
   }
