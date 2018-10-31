@@ -160,7 +160,6 @@ object FeedbackFormBind {
 
     }).verifying("error.common.comments_too_long", comment => {
         val result = comment.size <= 2000
-        Logger.error(s"Comment too long? $result")
         result
       }),
 
