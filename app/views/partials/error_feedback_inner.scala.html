@@ -26,28 +26,21 @@
     <input type="hidden" name="service" id="feedbackService" value="@extractServiceParameter(problemReportForm, None)"/>
 
     <div id="largeInputFields" class="js-visible js-hidden">
-        @input_radio_group(
-        feedbackForm("feedback-rating"),
-        Vector(("5",Messages("form.online.services.very_good")), ("4",Messages("form.online.services.good")), ("3",Messages("form.online.services.neutral")), ("2",Messages("form.online.services.bad")), ("1",Messages("form.online.services.very_bad"))),
-        '_legend -> Messages("form.online.services"),
-        'divClass -> "multiple-choice"
-        )
-        <br/>
         @input(
-        feedbackForm("feedback-name"),
+        problemReportForm("report-name"),
         '_label -> Messages("form.name"),
         '_divClass -> "form-field",
         '_inputClass -> "input--fullwidth"
         )
         @input(
-        feedbackForm("feedback-email"),
+        problemReportForm("report-email"),
         '_label -> Messages("form.email.address"),
         '_divClass -> "form-field",
         '_inputClass -> "input--fullwidth",
         '_type -> "email"
         )
         @textArea(
-        feedbackForm("feedback-comments"),
+        problemReportForm("report-comments"),
         '_label -> Messages("form.comments"),
         '_info -> Messages("common.feedback.information.warning"),
         '_divClass -> "form-field char-counter",
@@ -56,15 +49,11 @@
         '_dataCharCounter -> "true",
         '_dataCharField -> "true"
         )
-        <input type="hidden" name="isJavascript" id="isJavascript" value="@feedbackForm.data.get("isJavascript")">
-        <input type="hidden" name="referer" id="referer" value="@feedbackForm.data.get("referer")">
-        <input type="hidden" name="canOmitComments" id="canOmitComments" value="@canOmitComments">
-        @for(url <- backUrl) {
-        <input type="hidden" name="backUrl" id="feedbackBackUrl" value="@url">
-        }
+        <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
+        <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
 
         <div class="form-field">
-            <button class="button" type="submit">@Messages("form.send")</button>
+            <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
         </div>
     </div>
 
@@ -106,7 +95,6 @@
 
         <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
         <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
-        <input type="hidden" name="version" value="v1"/>
         <div class="form-field">
             <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
         </div>
