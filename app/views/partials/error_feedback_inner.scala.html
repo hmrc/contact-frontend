@@ -25,81 +25,87 @@
 
     <input type="hidden" name="service" id="feedbackService" value="@extractServiceParameter(problemReportForm, None)"/>
 
-    <div id="largeInputFields" class="js-visible js-hidden">
-        @input(
-        problemReportForm("report-name"),
-        '_label -> Messages("form.name"),
-        '_divClass -> "form-field",
-        '_inputClass -> "input--fullwidth"
-        )
-        @input(
-        problemReportForm("report-email"),
-        '_label -> Messages("form.email.address"),
-        '_divClass -> "form-field",
-        '_inputClass -> "input--fullwidth",
-        '_type -> "email"
-        )
-        @textArea(
-        problemReportForm("report-comments"),
-        '_label -> Messages("form.comments"),
-        '_info -> Messages("common.feedback.information.warning"),
-        '_divClass -> "form-field char-counter",
-        '_inputClass -> "input--fullwidth",
-        '_maxlength -> "2000",
-        '_dataCharCounter -> "true",
-        '_dataCharField -> "true"
-        )
-        <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
-        <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
+    @if(appConfig.hasFeature(GetHelpWithThisPageNewLargeInputFields, service)) {
 
-        <div class="form-field">
-            <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
+        <div id="largeInputFields" class="js-visible js-hidden">
+            @input(
+            problemReportForm("report-name"),
+            '_label -> Messages("form.name"),
+            '_divClass -> "form-field",
+            '_inputClass -> "input--fullwidth"
+            )
+            @input(
+            problemReportForm("report-email"),
+            '_label -> Messages("form.email.address"),
+            '_divClass -> "form-field",
+            '_inputClass -> "input--fullwidth"
+            )
+            @textArea(
+            problemReportForm("report-comments"),
+            '_label -> Messages("form.comments"),
+            '_info -> Messages("common.feedback.information.warning"),
+            '_divClass -> "form-field char-counter",
+            '_inputClass -> "input--fullwidth",
+            '_maxlength -> "2000",
+            '_dataCharCounter -> "true",
+            '_dataCharField -> "true"
+            )
+            <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
+            <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
+            <input disabled type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
+
+
+            <div class="form-field">
+                <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
+            </div>
         </div>
-    </div>
 
-    <fieldset id="smallInputFields">
-        <legend class="visuallyhidden">@Messages("common.feedback.title")</legend>
+    } else {
 
-        @input(
-        problemReportForm("report-name"),
-        '_label -> Messages("form.name"),
-        '_divClass -> "form-field",
-        '_inputClass -> "input--cleared form-control",
-        '_maxlength -> "70"
-        )
+        <fieldset id="smallInputFields">
+            <legend class="visuallyhidden">@Messages("common.feedback.title")</legend>
 
-        @input(
-        problemReportForm("report-email"),
-        '_label -> Messages("problem_report.email"),
-        '_divClass -> "form-field",
-        '_inputClass -> "input--cleared form-control",
-        '_maxlength -> "255",
-        '_type -> "email"
-        )
+            @input(
+            problemReportForm("report-name"),
+            '_label -> Messages("form.name"),
+            '_divClass -> "form-field",
+            '_inputClass -> "input--cleared form-control",
+            '_maxlength -> "70"
+            )
 
-        @textArea(
-        problemReportForm("report-action"),
-        '_label -> Messages("problem_report.action"),
-        '_divClass -> "form-field",
-        '_inputClass -> "input--cleared form-control",
-        '_maxlength -> "1000"
-        )
+            @input(
+            problemReportForm("report-email"),
+            '_label -> Messages("problem_report.email"),
+            '_divClass -> "form-field",
+            '_inputClass -> "input--cleared form-control",
+            '_maxlength -> "255"
+            )
 
-        @textArea(
-        problemReportForm("report-error"),
-        '_label -> Messages("problem_report.error"),
-        '_divClass -> "form-field",
-        '_inputClass -> "input--cleared form-control",
-        '_maxlength -> "1000"
-        )
+            @textArea(
+            problemReportForm("report-action"),
+            '_label -> Messages("problem_report.action"),
+            '_divClass -> "form-field",
+            '_inputClass -> "input--cleared form-control",
+            '_maxlength -> "1000"
+            )
 
-        <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
-        <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
-        <div class="form-field">
-            <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
-        </div>
-    </fieldset>
+            @textArea(
+            problemReportForm("report-error"),
+            '_label -> Messages("problem_report.error"),
+            '_divClass -> "form-field",
+            '_inputClass -> "input--cleared form-control",
+            '_maxlength -> "1000"
+            )
 
+            <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
+            <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
+            <input disabled type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
+
+            <div class="form-field">
+                <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
+            </div>
+        </fieldset>
+    }
 
 </form>
 
