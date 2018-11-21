@@ -113,16 +113,17 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   def submitSecure: Action[AnyContent] = submit
 
   def submit = UnauthorisedAction.async { implicit request =>
+
+    val isAjax = request.headers.get("X-Requested-With").contains("XMLHttpRequest")
+
     ProblemReportForm.form.bindFromRequest.fold(
       (error: Form[ProblemReport]) => {
 
-        val isAjax = request.headers.get("X-Requested-With").contains("XMLHttpRequest")
-
-        if (!isAjax) {
-          Future.successful(Ok(views.html.problem_reports_nonjavascript(error, appConfig.externalReportProblemSecureUrl, error.data.get("service"))))
-        } else {
+        if (isAjax) {
           val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
           Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> reportFormAjaxView(error, error.data.get("service"), csrfToken).toString()))))
+        } else {
+          Future.successful(Ok(views.html.problem_reports_nonjavascript(error, appConfig.externalReportProblemSecureUrl, error.data.get("service"))))
         }
       },
       problemReport => {
@@ -131,19 +132,19 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
           ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referer)
         } yield {
-            if (!problemReport.isJavascript) {
+            if (isAjax) {
               javascriptConfirmationPage(ticketId, problemReport.service)
             } else {
               nonJavascriptConfirmationPage(ticketId, problemReport.service)
             }
           }) recover {
-          case _ if !problemReport.isJavascript => Ok(views.html.problem_reports_error_nonjavascript())
+          case _ if !isAjax=> Ok(views.html.problem_reports_error_nonjavascript())
         }
       }
     )
   }
 
-  private def nonJavascriptConfirmationPage(ticketId: TicketId, service : Option[String])(implicit request : Request[_]) = {
+  private def javascriptConfirmationPage(ticketId: TicketId, service : Option[String])(implicit request : Request[_]) = {
     val view = if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation, service)) {
       views.html.ticket_created_body_b(ticketId.ticket_id.toString, None).toString()
     } else {
@@ -152,7 +153,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
   }
 
-  private def javascriptConfirmationPage(ticketId: TicketId, service : Option[String])(implicit request : Request[_]) = {
+  private def nonJavascriptConfirmationPage(ticketId: TicketId, service : Option[String])(implicit request : Request[_]) = {
     val view = if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation, service)) {
       views.html.problem_reports_confirmation_nonjavascript_b(ticketId.ticket_id.toString, None)
     } else {

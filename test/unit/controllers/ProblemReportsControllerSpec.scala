@@ -143,14 +143,24 @@ class ProblemReportsControllerApplication(app: Application) extends MockitoSugar
 
   val enrolments = Some(Enrolments(Set()))
 
-  def generateRequest(javascriptEnabled: Boolean = true, name: String = deskproName, email: String = deskproEmail) = FakeRequest()
-    .withHeaders(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent"))
-    .withFormUrlEncodedBody("report-name" -> name, "report-email" -> email,
-      "report-action" -> "Some Action", "report-error" -> "Some Error", "isJavascript" -> javascriptEnabled.toString)
+  def generateRequest(javascriptEnabled: Boolean = true, name: String = deskproName, email: String = deskproEmail) = {
 
-  def generateInvalidRequest(javascriptEnabled: Boolean = true) = FakeRequest()
-    .withHeaders(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent"))
-    .withFormUrlEncodedBody("isJavascript" -> javascriptEnabled.toString)
+    val headers = Seq(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent")) ++ Seq(("X-Requested-With", "XMLHttpRequest")).filter(_ => javascriptEnabled)
+
+    FakeRequest()
+      .withHeaders(headers : _*)
+      .withFormUrlEncodedBody("report-name" -> name, "report-email" -> email,
+        "report-action" -> "Some Action", "report-error" -> "Some Error", "isJavascript" -> javascriptEnabled.toString)
+  }
+
+  def generateInvalidRequest(javascriptEnabled: Boolean = true) = {
+
+    val headers = Seq(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent")) ++ Seq(("X-Requested-With", "XMLHttpRequest")).filter(_ => javascriptEnabled)
+
+    FakeRequest()
+      .withHeaders(headers : _*)
+      .withFormUrlEncodedBody("isJavascript" -> javascriptEnabled.toString)
+  }
 
   val request = generateRequest(javascriptEnabled = false)
 
