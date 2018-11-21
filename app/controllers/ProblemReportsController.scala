@@ -115,7 +115,10 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   def submit = UnauthorisedAction.async { implicit request =>
     ProblemReportForm.form.bindFromRequest.fold(
       (error: Form[ProblemReport]) => {
-        if (!error.data.getOrElse("isJavascript", "true").toBoolean) {
+
+        val isAjax = request.headers.get("X-Requested-With").contains("XMLHttpRequest")
+
+        if (!isAjax) {
           Future.successful(Ok(views.html.problem_reports_nonjavascript(error, appConfig.externalReportProblemSecureUrl, error.data.get("service"))))
         } else {
           val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
