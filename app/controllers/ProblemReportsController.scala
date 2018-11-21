@@ -91,6 +91,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
   def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
     val isSecure = secure.getOrElse(false)
+
     val postEndpoint = if (isSecure) appConfig.externalReportProblemSecureUrl else appConfig.externalReportProblemUrl
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
 
@@ -98,11 +99,12 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   }
 
   def reportFormAjax(service: Option[String]) = UnauthorisedAction { implicit request =>
-    Ok(reportFormAjaxView(ProblemReportForm.emptyForm(service = service), service))
+    val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
+    Ok(reportFormAjaxView(ProblemReportForm.emptyForm(service = service), service, csrfToken))
   }
 
-  private def reportFormAjaxView(form : Form[ProblemReport], service : Option[String])(implicit request : Request[_]) =
-      views.html.partials.error_feedback_inner(form, appConfig.externalReportProblemSecureUrl, None, service)
+  private def reportFormAjaxView(form : Form[ProblemReport], service : Option[String], csrfToken : Option[String])(implicit request : Request[_]) =
+      views.html.partials.error_feedback_inner(form, appConfig.externalReportProblemSecureUrl, csrfToken, service)
 
   def reportFormNonJavaScript(service: Option[String]) = UnauthorisedAction { implicit request =>
     Ok(views.html.problem_reports_nonjavascript(ProblemReportForm.emptyForm(service = service), appConfig.externalReportProblemSecureUrl, service))
@@ -116,7 +118,8 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
         if (!error.data.getOrElse("isJavascript", "true").toBoolean) {
           Future.successful(Ok(views.html.problem_reports_nonjavascript(error, appConfig.externalReportProblemSecureUrl, error.data.get("service"))))
         } else {
-          Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> reportFormAjaxView(error, error.data.get("service")).toString()))))
+          val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
+          Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> reportFormAjaxView(error, error.data.get("service"), csrfToken).toString()))))
         }
       },
       problemReport => {

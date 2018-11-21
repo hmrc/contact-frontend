@@ -23,7 +23,7 @@
     <input type="hidden" name="csrfToken" value="@{csrfToken.get}"/>
     }
 
-    <input type="hidden" name="service" id="feedbackService" value="@extractServiceParameter(problemReportForm, None)"/>
+    <input type="hidden" name="service" id="service" value="@extractServiceParameter(problemReportForm, None)"/>
 
     @if(appConfig.hasFeature(GetHelpWithThisPageNewLargeInputFields, service)) {
 
