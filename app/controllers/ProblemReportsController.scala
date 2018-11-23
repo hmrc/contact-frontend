@@ -43,16 +43,17 @@ object ProblemReportForm {
             name.matches(REPORT_NAME_REGEX)
           } else {
             name.matches(OLD_REPORT_NAME_REGEX)
-          }
+          } || name.isEmpty
         }),
       "report-email" -> text
-        .verifying("error.email", validateEmail)
-        .verifying("deskpro.email_too_long", email => email.size <= 255),
+        .verifying(s"error.common.problem_report.email_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}", email => !email.isEmpty)
+        .verifying(s"error.common.problem_report.email_valid${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}", email => validateEmail(email) || email.isEmpty)
+        .verifying("deskpro.email_too_long", email => email.length <= 255),
       "report-action" -> text
-        .verifying("error.common.problem_report.action_mandatory", action => !action.isEmpty)
+        .verifying(s"error.common.problem_report.action_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}", action => !action.isEmpty)
         .verifying("error.common.comments_too_long",               action => action.size <= 1000),
       "report-error" -> text
-        .verifying("error.common.problem_report.error_mandatory", error => !error.isEmpty)
+        .verifying(s"error.common.problem_report.error_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}", error => !error.isEmpty)
         .verifying("error.common.comments_too_long",              error => error.size <= 1000),
       "isJavascript" -> boolean,
       "service" -> optional(text),

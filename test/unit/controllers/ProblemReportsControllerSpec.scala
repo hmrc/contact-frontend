@@ -76,7 +76,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
         document.getElementsByClass("error-notification").size() should be > 0
     }
 
-    "return 200 and a valid json containing validation errors for invalid input and js is enabled" in new ProblemReportsControllerApplication(fakeApplication) {
+    "return 400 and a valid json containing validation errors for invalid input and js is enabled" in new ProblemReportsControllerApplication(fakeApplication) {
 
       val result = controller.submit()(generateInvalidRequest())
 
