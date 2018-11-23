@@ -122,7 +122,7 @@
             )
 
             <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
-            <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
+            <input type="hidden" name="referrer" id="referrer" value="@problemReportForm.data.get("referrer")">
             <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
 
             <div class="form-field">
@@ -157,7 +157,7 @@
                     }
                 },
                 "data-rule-required" -> "true",
-                "data-msg-required" -> Messages("error.common.problem_report.name_mandatory.b")
+                "data-msg-required" -> Messages("error.common.problem_report.name_mandatory")
             ),
             _clientSideValidation = clientSideValidation
             )
@@ -206,7 +206,7 @@
             )
 
             <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
-            <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
+            <input type="hidden" name="referrer" id="referrer" value="@problemReportForm.data.get("referrer")">
             <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
 
             <div class="form-field">

@@ -8,6 +8,8 @@
   bodyClasses: Option[String] = None,
   service: Option[String] = None)(mainContent: Html)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
+
+
 @getHelpForm = {
   @if(supportLinkEnabled) {
     @partials.error_feedback(

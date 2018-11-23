@@ -57,7 +57,7 @@ object ProblemReportForm {
       "isJavascript" -> boolean,
       "service" -> optional(text),
       "abFeatures" -> optional(text),
-      "referer" -> optional(text)
+      "referrer" -> optional(text)
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
@@ -79,7 +79,7 @@ object ProblemReportForm {
         isJavascript = false,
         service = service,
         abFeatures = Some(appConfig.getFeatures(service).mkString(";")),
-        referer = referer.orElse(request.headers.get("Referer").orElse(Some("n/a")))
+        referrer = referer.orElse(request.headers.get("Referer").orElse(Some("n/a")))
       )
     )
 }
@@ -91,7 +91,6 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
   def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
     val isSecure = secure.getOrElse(false)
-
     val postEndpoint = if (isSecure) appConfig.externalReportProblemSecureUrl else appConfig.externalReportProblemUrl
     val csrfToken = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
 
@@ -131,10 +130,10 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
         }
       },
       problemReport => {
-        val referer = if (problemReport.referer.exists(_.trim.length > 0)) problemReport.referer.get else refererFrom(request)
+        val referrer = if (problemReport.referrer.exists(_.trim.length > 0)) problemReport.referrer.get else referrerFrom(request)
         (for {
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
-          ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referer)
+          ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referrer)
         } yield {
             if (isAjax) {
               javascriptConfirmationPage(ticketId, problemReport.service)
@@ -166,14 +165,14 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     Ok(view)
   }
 
-  private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], referer: String) = {
+  private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], referrer: String) = {
     implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
     hmrcDeskproConnector.createDeskProTicket(
       name = problemReport.reportName,
       email = problemReport.reportEmail,
       subject = "Support Request",
       message = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer = referer,
+      referrer = referrer,
       isJavascript = problemReport.isJavascript,
       request = request,
       enrolmentsOption = enrolmentsOption,
@@ -192,9 +191,9 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     """
   }
 
-  private def refererFrom(request: Request[AnyRef]): String = {
+  private def referrerFrom(request: Request[AnyRef]): String = {
     request.headers.get("referer").getOrElse("/home")
   }
 }
 
-case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], abFeatures: Option[String], referer: Option[String])
+case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], abFeatures: Option[String], referrer: Option[String])
