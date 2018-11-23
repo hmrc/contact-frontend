@@ -12,7 +12,7 @@ import play.api.mvc.{Action, AnyContent, Request}
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
-import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation}
+import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation, GetHelpWithThisPageOnlyServerSideValidation}
 
 import scala.concurrent.Future
 
@@ -93,7 +93,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     val isSecure = secure.getOrElse(false)
 
     val postEndpoint = if (isSecure) appConfig.externalReportProblemSecureUrl else appConfig.externalReportProblemUrl
-    val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
+    val csrfToken = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
 
     Ok(views.html.partials.error_feedback(ProblemReportForm.emptyForm(service = service), postEndpoint, csrfToken, service))
   }
@@ -120,8 +120,12 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
       (error: Form[ProblemReport]) => {
 
         if (isAjax) {
-          val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
-          Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> reportFormAjaxView(error, error.data.get("service"), csrfToken).toString()))))
+          if (appConfig.hasFeature(GetHelpWithThisPageOnlyServerSideValidation, error.data.get("service"))) {
+            val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
+            Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> reportFormAjaxView(error, error.data.get("service"), csrfToken).toString()))))
+          } else {
+            Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
+          }
         } else {
           Future.successful(Ok(views.html.problem_reports_nonjavascript(error, appConfig.externalReportProblemSecureUrl, error.data.get("service"))))
         }

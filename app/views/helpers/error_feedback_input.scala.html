@@ -1,0 +1,28 @@
+@(field : play.api.data.Field,
+_id : Option[String] = None,
+_label : Option[String] = None,
+_maxlength : Option[Int] = None,
+_divClass : Option[String] = None,
+_inputClass : Option[String] = None,
+_dataProperties: Map[String, String] = Map.empty,
+_clientSideValidation: Boolean = false)(implicit lang : Lang, messages : Messages)
+
+@id = @{ _id.getOrElse(field.name) }
+<div class="@for(divClass <- _divClass){ @divClass } @if(field.hasErrors){form-field--error}">
+        @for(label <- _label) { <label for="@id" class="form-label">@label</label> }
+        @for(error <- field.errors) { <span class="error-notification">@Messages(error.message)</span> }
+
+        <input
+                id="@id"
+                @for(maxLength <- _maxlength) { maxlength = "@maxLength" }
+        @for(inputClass <- _inputClass) { class = "@inputClass" }
+        name="@{field.name}"
+        type="text"
+        value="@{field.value}"
+        @if(_clientSideValidation) {
+                @for(dataProperty <- _dataProperties) { @{dataProperty._1} = "@{dataProperty._2}" }
+        }
+
+        >
+</div>
+

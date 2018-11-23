@@ -57,6 +57,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
 
         val result = controller.submit()(generateRequest())
 
+
         status(result) should be(200)
 
         val message = contentAsJson(result).\("message").as[String]
@@ -79,14 +80,10 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
 
       val result = controller.submit()(generateInvalidRequest())
 
-      status(result) should be(200)
+      status(result) should be(400)
       verifyZeroInteractions(hmrcDeskproConnector)
 
-      val message = contentAsJson(result).\("message").as[String]
-      contentAsJson(result).\("status").as[String] shouldBe "OK"
-
-      val document = Jsoup.parse(message)
-      document.getElementsByClass("error-notification").size() should be > 0
+      contentAsJson(result).\("status").as[String] shouldBe "ERROR"
     }
 
     "fail if the email has invalid syntax (for DeskPRO)" in new ProblemReportsControllerApplication(fakeApplication) {

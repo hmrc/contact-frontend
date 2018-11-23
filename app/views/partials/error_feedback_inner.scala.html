@@ -2,10 +2,13 @@
 @import util.GetHelpWithThisPageMoreVerboseHeader
 @import util.GetHelpWithThisPageNewLargeInputFields
 @import util.GetHelpWithThisPageImprovedFieldValidation
+@import util.GetHelpWithThisPageOnlyServerSideValidation
 @import config.AppConfig
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
+@import views.html.helpers._
 @import views.helpers.ServiceParameter.extractServiceParameter
+
 @(problemReportForm : Form[controllers.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @if(appConfig.hasFeature(GetHelpWithThisPageMoreVerboseHeader, service)) {
@@ -18,6 +21,9 @@
     <p>@Messages("common.feedback.information.warning")</p>
 }
 
+@improvedNameFieldValidation = @{appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)}
+@clientSideValidation = @{ !appConfig.hasFeature(GetHelpWithThisPageOnlyServerSideValidation, service) }
+
 <form action="@actionUrl" method="POST" id="error-feedback-form" class="form--feedback" novalidate>
     @if(csrfToken.isDefined) {
     <input type="hidden" name="csrfToken" value="@{csrfToken.get}"/>
@@ -27,33 +33,97 @@
 
     @if(appConfig.hasFeature(GetHelpWithThisPageNewLargeInputFields, service)) {
 
-        <div id="largeInputFields" class="js-visible js-hidden">
-            @input(
+        <div id="largeInputFields" class="js-visible">
+
+            @error_feedback_input(
             problemReportForm("report-name"),
-            '_label -> Messages("form.name"),
-            '_divClass -> "form-field",
-            '_inputClass -> "input--fullwidth"
+            _label = Some(Messages("form.name")),
+            _divClass = Some("form-field"),
+            _inputClass = Some("input--medium"),
+            _id = Some("report-name-new"),
+            _maxlength = Some(70),
+            _dataProperties = Map(
+                "data-rule-pattern"-> {
+                    if (improvedNameFieldValidation) {
+                        controllers.ProblemReportForm.REPORT_NAME_REGEX
+                    } else {
+                        controllers.ProblemReportForm.OLD_REPORT_NAME_REGEX
+                    }
+                },
+                "data-msg-pattern" -> {
+                    if (improvedNameFieldValidation) {
+                        Messages("error.common.problem_report.name_valid.b")
+                    } else {
+                        Messages("error.common.problem_report.name_valid")
+                    }
+                },
+                "data-rule-required" -> "true",
+                "data-msg-required" -> Messages("error.common.problem_report.name_mandatory.b")
+            ),
+            _clientSideValidation = clientSideValidation
             )
-            @input(
+
+            @error_feedback_input(
             problemReportForm("report-email"),
-            '_label -> Messages("form.email.address"),
-            '_divClass -> "form-field",
-            '_inputClass -> "input--fullwidth"
+            _label = Some(Messages("problem_report.email.b")),
+            _divClass = Some("form-field"),
+            _inputClass = Some("input--medium"),
+            _id = Some("report-email-new"),
+            _maxlength = Some(255),
+            _dataProperties = Map(
+                "data-rule-email" -> "true",
+                "data-msg-email" -> Messages("error.common.problem_report.email_valid"),
+                "data-rule-required" -> "true",
+                "data-msg-required" -> Messages("error.common.problem_report.email_mandatory.b")
+            ),
+            _clientSideValidation = clientSideValidation
             )
-            @textArea(
-            problemReportForm("report-comments"),
-            '_label -> Messages("form.comments"),
-            '_info -> Messages("common.feedback.information.warning"),
-            '_divClass -> "form-field char-counter",
-            '_inputClass -> "input--fullwidth",
-            '_maxlength -> "2000",
-            '_dataCharCounter -> "true",
-            '_dataCharField -> "true"
+
+            @error_feedback_textarea(
+            problemReportForm("report-action"),
+            _label = Some(Messages("problem_report.action.b")),
+            _divClass = Some("form-field"),
+            _inputClass = Some("textarea--fullwidth"),
+            _id = Some("report-action-new"),
+            _rows = Some(5),
+            _maxlength = Some(255),
+            _dataProperties = Map(
+                "data-rule-required" -> "true",
+                "data-msg-required" -> Messages("error.common.problem_report.action_mandatory.b")
+            ),
+            _hint = if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints, service)) {
+                Some(Messages("problem_report.action.hint.b"))
+            } else {
+                None
+            },
+            _bottomHint = Some(Messages("problem_report.common.size_limit", 1000)),
+            _clientSideValidation = clientSideValidation
             )
+
+            @error_feedback_textarea(
+            problemReportForm("report-error"),
+            _label = Some(Messages("problem_report.error.b")),
+            _divClass = Some("form-field"),
+            _inputClass = Some("textarea--fullwidth"),
+            _id = Some("report-error-new"),
+            _rows = Some(5),
+            _maxlength = Some(255),
+            _dataProperties = Map(
+                "data-rule-required" -> "true",
+                "data-msg-required" -> Messages("error.common.problem_report.error_mandatory.b")
+            ),
+            _hint = if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints, service)) {
+                Some(Messages("problem_report.error.hint.b"))
+            } else {
+                None
+            },
+            _bottomHint = Some(Messages("problem_report.common.size_limit", 1000)),
+            _clientSideValidation = clientSideValidation
+            )
+
             <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
             <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
-            <input disabled type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
-
+            <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
 
             <div class="form-field">
                 <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
@@ -64,42 +134,80 @@
 
         <fieldset id="smallInputFields">
             <legend class="visuallyhidden">@Messages("common.feedback.title")</legend>
-
-            @input(
+            @error_feedback_input(
             problemReportForm("report-name"),
-            '_label -> Messages("form.name"),
-            '_divClass -> "form-field",
-            '_inputClass -> "input--cleared form-control",
-            '_maxlength -> "70"
+            _label = Some(Messages("form.name")),
+            _divClass = Some("form-group-compound"),
+            _inputClass = Some("input--fullwidth form-control"),
+            _id = Some("report-name"),
+            _maxlength = Some(70),
+            _dataProperties = Map(
+                "data-rule-pattern" -> {
+                    if(improvedNameFieldValidation) {
+                        controllers.ProblemReportForm.REPORT_NAME_REGEX
+                    } else {
+                        controllers.ProblemReportForm.OLD_REPORT_NAME_REGEX
+                    }
+                },
+                "data-msg-pattern" -> {
+                    if (improvedNameFieldValidation) {
+                        Messages("error.common.problem_report.name_valid.b")
+                    } else {
+                        Messages("error.common.problem_report.name_valid")
+                    }
+                },
+                "data-rule-required" -> "true",
+                "data-msg-required" -> Messages("error.common.problem_report.name_mandatory.b")
+            ),
+            _clientSideValidation = clientSideValidation
             )
 
-            @input(
+            @error_feedback_input(
             problemReportForm("report-email"),
-            '_label -> Messages("problem_report.email"),
-            '_divClass -> "form-field",
-            '_inputClass -> "input--cleared form-control",
-            '_maxlength -> "255"
+            _label = Some(Messages("problem_report.email")),
+            _divClass = Some("form-group-compound"),
+            _inputClass = Some("input--fullwidth form-control"),
+            _id = Some("report-email"),
+            _maxlength = Some(255),
+            _dataProperties = Map(
+                "data-rule-email" -> "true",
+                "data-msg-email" -> Messages("error.common.problem_report.email_valid"),
+                "data-rule-required" -> "true",
+                "data-msg-required" -> Messages("error.common.problem_report.email_mandatory")
+            ),
+            _clientSideValidation = clientSideValidation
             )
 
-            @textArea(
+            @error_feedback_input(
             problemReportForm("report-action"),
-            '_label -> Messages("problem_report.action"),
-            '_divClass -> "form-field",
-            '_inputClass -> "input--cleared form-control",
-            '_maxlength -> "1000"
+            _label = Some(Messages("problem_report.action")),
+            _divClass = Some("form-group-compound"),
+            _inputClass = Some("input--fullwidth form-control"),
+            _id = Some("report-name"),
+            _maxlength = Some(1000),
+            _dataProperties = Map(
+                "data-rule-required" -> "true",
+                "data-msg-required" -> Messages("error.common.problem_report.action_mandatory")
+            ),
+            _clientSideValidation = clientSideValidation
             )
 
-            @textArea(
+            @error_feedback_input(
             problemReportForm("report-error"),
-            '_label -> Messages("problem_report.error"),
-            '_divClass -> "form-field",
-            '_inputClass -> "input--cleared form-control",
-            '_maxlength -> "1000"
+            _label = Some(Messages("problem_report.error")),
+            _divClass = Some("form-group-compound"),
+            _inputClass = Some("input--cleared form-control"),
+            _maxlength = Some(1000),
+            _dataProperties = Map(
+                "data-rule-required" -> "true",
+                "data-msg-required" -> Messages("error.common.problem_report.error_mandatory")
+            ),
+            _clientSideValidation = clientSideValidation
             )
 
             <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
             <input type="hidden" name="referer" id="referer" value="@problemReportForm.data.get("referer")">
-            <input disabled type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
+            <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
 
             <div class="form-field">
                 <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
