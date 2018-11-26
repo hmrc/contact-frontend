@@ -80,7 +80,7 @@ object ProblemReportForm {
         isJavascript = false,
         service = service,
         abFeatures = Some(appConfig.getFeatures(service).mkString(";")),
-        referrer = referer.orElse(request.headers.get("Referer").orElse(Some("n/a")))
+        referrer = referer.orElse(request.headers.get("Referer").orElse(Some("")))
       )
     )
 }
