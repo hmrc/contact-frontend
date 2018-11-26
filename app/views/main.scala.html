@@ -16,7 +16,8 @@
       form = controllers.ProblemReportForm.emptyForm(service = service),
       actionUrl=appConfig.externalReportProblemSecureUrl,
       csrfToken=play.filters.csrf.CSRF.getToken(request).map(_.value),
-      service=service)
+      service=service,
+      referrer=None)
   }
 }
 
