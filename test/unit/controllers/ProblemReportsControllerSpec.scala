@@ -33,7 +33,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
 
         hrmcConnectorWillReturnTheTicketId
 
-        val result = controller.doReport()(request)
+        val result = controller.submit()(request)
 
         status(result) should be(200)
 
@@ -44,7 +44,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
     "return 200 and a valid html page for a valid request and js is not enabled for an authenticated user" in new ProblemReportsControllerApplication(fakeApplication) {
         when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(enrolments), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
-        val result = controller.doReport()(request.withSession(SessionKeys.authToken -> "authToken"))
+        val result = controller.submit()(request.withSession(SessionKeys.authToken -> "authToken"))
 
         status(result) should be(200)
 
@@ -55,7 +55,8 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
     "return 200 and a valid json for a valid request and js is enabled" in new ProblemReportsControllerApplication(fakeApplication) {
         when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(true), any[Request[AnyRef]](), meq(None), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
-        val result = controller.doReport()(generateRequest())
+        val result = controller.submit()(generateRequest())
+
 
         status(result) should be(200)
 
@@ -65,19 +66,19 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
         message should include("Someone will get back to you within 2 working days.")
     }
 
-    "return 200 and a valid html page for invalid input and js is not enabled" in new ProblemReportsControllerApplication(fakeApplication) {
-        val result = controller.doReport()(generateInvalidRequest(javascriptEnabled = false))
+    "return 200 and a valid html page with validation error for invalid input and js is not enabled" in new ProblemReportsControllerApplication(fakeApplication) {
+        val result = controller.submit()(generateInvalidRequest(javascriptEnabled = false))
 
         status(result) should be(200)
         verifyZeroInteractions(hmrcDeskproConnector)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("report-confirmation-no-data") should not be null
+        document.getElementsByClass("error-notification").size() should be > 0
     }
 
-    "return 400 and a valid json for invalid input and js is enabled" in new ProblemReportsControllerApplication(fakeApplication) {
+    "return 400 and a valid json containing validation errors for invalid input and js is enabled" in new ProblemReportsControllerApplication(fakeApplication) {
 
-      val result = controller.doReport()(generateInvalidRequest())
+      val result = controller.submit()(generateInvalidRequest())
 
       status(result) should be(400)
       verifyZeroInteractions(hmrcDeskproConnector)
@@ -86,29 +87,29 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
     }
 
     "fail if the email has invalid syntax (for DeskPRO)" in new ProblemReportsControllerApplication(fakeApplication) {
-        val submit = controller.doReport()(generateRequest(javascriptEnabled = false, email = "a@a"))
+        val submit = controller.submit()(generateRequest(javascriptEnabled = false, email = "a@a"))
         val page = Jsoup.parse(contentAsString(submit))
 
         status(submit) shouldBe 200
         verifyZeroInteractions(hmrcDeskproConnector)
 
-        page.getElementById("report-confirmation-no-data") should not be null
+        page.getElementsByClass("error-notification").size() should be > 0
     }
 
     "fail if the name has invalid characters - Javascript disabled" in new ProblemReportsControllerApplication(fakeApplication) {
-        val submit = controller.doReport()(generateRequest(javascriptEnabled = false, name ="""<a href="blah.com">something</a>""").withSession(SessionKeys.authToken -> "authToken"))
+        val submit = controller.submit()(generateRequest(javascriptEnabled = false, name ="""<a href="blah.com">something</a>""").withSession(SessionKeys.authToken -> "authToken"))
         val page = Jsoup.parse(contentAsString(submit))
 
         status(submit) shouldBe 200
         verifyZeroInteractions(hmrcDeskproConnector)
 
-        page.getElementById("report-confirmation-no-data") should not be null
+        page.getElementsByClass("error-notification").size() should be > 0
     }
 
     "return error page if the Deskpro ticket creation fails - Javascript disabled" in new ProblemReportsControllerApplication(fakeApplication) {
         when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(None), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.failed(new Exception("failed")))
 
-        val result = controller.doReport()(request)
+        val result = controller.submit()(request)
         status(result) should be(200)
 
         val document = Jsoup.parse(contentAsString(result))
@@ -116,23 +117,6 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
         document.text() should include("Please try again later.")
     }
 
-    "render the thank you message given" in new ProblemReportsControllerApplication(fakeApplication) {
-        hrmcConnectorWillReturnTheTicketId
-
-        val submit = controller.doReport(Some("common.feedback.title"))(request)
-        val page = Jsoup.parse(contentAsString(submit))
-
-        page.text() should include("Get help using this service")
-    }
-
-    "render the default thank you message if one is not provided" in new ProblemReportsControllerApplication(fakeApplication) {
-        hrmcConnectorWillReturnTheTicketId
-
-        val submit = controller.doReport()(request)
-        val page = Jsoup.parse(contentAsString(submit))
-
-        page.text() should include("Someone will get back to you within 2 working days.")
-    }
   }
 }
 
@@ -156,14 +140,24 @@ class ProblemReportsControllerApplication(app: Application) extends MockitoSugar
 
   val enrolments = Some(Enrolments(Set()))
 
-  def generateRequest(javascriptEnabled: Boolean = true, name: String = deskproName, email: String = deskproEmail) = FakeRequest()
-    .withHeaders(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent"))
-    .withFormUrlEncodedBody("report-name" -> name, "report-email" -> email,
-      "report-action" -> "Some Action", "report-error" -> "Some Error", "isJavascript" -> javascriptEnabled.toString)
+  def generateRequest(javascriptEnabled: Boolean = true, name: String = deskproName, email: String = deskproEmail) = {
 
-  def generateInvalidRequest(javascriptEnabled: Boolean = true) = FakeRequest()
-    .withHeaders(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent"))
-    .withFormUrlEncodedBody("isJavascript" -> javascriptEnabled.toString)
+    val headers = Seq(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent")) ++ Seq(("X-Requested-With", "XMLHttpRequest")).filter(_ => javascriptEnabled)
+
+    FakeRequest()
+      .withHeaders(headers : _*)
+      .withFormUrlEncodedBody("report-name" -> name, "report-email" -> email,
+        "report-action" -> "Some Action", "report-error" -> "Some Error", "isJavascript" -> javascriptEnabled.toString)
+  }
+
+  def generateInvalidRequest(javascriptEnabled: Boolean = true) = {
+
+    val headers = Seq(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent")) ++ Seq(("X-Requested-With", "XMLHttpRequest")).filter(_ => javascriptEnabled)
+
+    FakeRequest()
+      .withHeaders(headers : _*)
+      .withFormUrlEncodedBody("isJavascript" -> javascriptEnabled.toString)
+  }
 
   val request = generateRequest(javascriptEnabled = false)
 

@@ -1,6 +1,6 @@
 @import config.AppConfig
 @import util.GetHelpWithThisPageNewWordingOfEntryLink
-@(actionUrl: String, csrfToken: Option[String], service: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@(form : Form[controllers.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 @import uk.gov.hmrc.play.views.html._
 
 <div class="report-error">
@@ -12,6 +12,6 @@
     }
 
     <div class="report-error__content js-hidden">
-        @views.html.partials.error_feedback_inner(actionUrl, csrfToken, service)
+        @views.html.partials.error_feedback_inner(form, actionUrl, csrfToken, service, referrer)
     </div>
 </div>

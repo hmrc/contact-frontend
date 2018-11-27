@@ -12,7 +12,12 @@
 
 @getHelpForm = {
   @if(supportLinkEnabled) {
-    @partials.error_feedback(appConfig.externalReportProblemSecureUrl, play.filters.csrf.CSRF.getToken(request).map(_.value), service)
+    @partials.error_feedback(
+      form = controllers.ProblemReportForm.emptyForm(service = service),
+      actionUrl=appConfig.externalReportProblemSecureUrl,
+      csrfToken=play.filters.csrf.CSRF.getToken(request).map(_.value),
+      service=service,
+      referrer=None)
   }
 }
 
