@@ -1,6 +1,6 @@
 package controllers
 
-import config.AppConfig
+itimport config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import javax.inject.{Inject, Singleton}
@@ -12,7 +12,7 @@ import play.api.mvc.{Action, AnyContent, Request}
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
-import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation, GetHelpWithThisPageOnlyServerSideValidation}
+import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation}
 
 import scala.concurrent.Future
 
@@ -125,12 +125,8 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
         val referrer = error.data.get("referrer").filter(_.trim.nonEmpty).orElse(request.headers.get("referer"))
 
         if (isAjax) {
-          if (appConfig.hasFeature(GetHelpWithThisPageOnlyServerSideValidation, error.data.get("service"))) {
-            val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
-            Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> reportFormAjaxView(error, error.data.get("service"), csrfToken, referrer).toString()))))
-          } else {
-            Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
-          }
+          val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
+          Future.successful(Ok(Json.toJson(Map("status" -> "OK", "message" -> reportFormAjaxView(error, error.data.get("service"), csrfToken, referrer).toString()))))
         } else {
           Future.successful(Ok(views.html.problem_reports_nonjavascript(error, appConfig.externalReportProblemSecureUrl, error.data.get("service"), referrer)))
         }
