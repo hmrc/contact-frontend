@@ -1,6 +1,6 @@
 package controllers
 
-itimport config.AppConfig
+import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import javax.inject.{Inject, Singleton}

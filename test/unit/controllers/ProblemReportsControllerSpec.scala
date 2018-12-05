@@ -76,14 +76,18 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
         document.getElementsByClass("error-notification").size() should be > 0
     }
 
-    "return 400 and a valid json containing validation errors for invalid input and js is enabled" in new ProblemReportsControllerApplication(fakeApplication) {
+    "return 200 and a valid json containing validation the form for invalid input and js is enabled" in new ProblemReportsControllerApplication(fakeApplication) {
 
       val result = controller.submit()(generateInvalidRequest())
+      
+      status(result) should be(200)
 
-      status(result) should be(400)
       verifyZeroInteractions(hmrcDeskproConnector)
 
-      contentAsJson(result).\("status").as[String] shouldBe "ERROR"
+      contentAsJson(result).\("status").as[String] shouldBe "OK"
+      val message = contentAsJson(result).\("message").as[String]
+      val document = Jsoup.parse(message)
+      document.getElementsByClass("error-notification").size() should be > 0
     }
 
     "fail if the email has invalid syntax (for DeskPRO)" in new ProblemReportsControllerApplication(fakeApplication) {
