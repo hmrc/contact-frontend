@@ -1,16 +1,15 @@
 contact-frontend
 ================
 
-The service allows users to contact HMRC Customer Contact team for the catalogue of reasons including:
-* reporting problems and asking questions
-* providing feedback about the service
-* providing feedback about how the issue was solved by HMRC Customer Contact team
+This service allows users to contact the HMRC Customer Contact team for 3 major purposes:
+1) report problems and ask questions ('Get help with this page')
+2) provide feedback about the service ('Help and contact' & 'Providing Beta feedback about services')
+3) provide feedback about how well an issue was resolved by the HMRC Customer Contact team ('Customer Satisfaction')
 
-Contact-frontend retrieves is responsible for showing the forms listed above, validating the input and
-passing user requests to downstream services - DeskPro (reporting problems, service feedback) and Splunk datastore 
-(feedback about customer contact).
+Contact-frontend is responsible for showing forms pertaining to the purposes listed above, validating the input, and
+passing user requests to downstream services - to Deskpro for 'Get help with this page', 'Help and contact' and 'Providing Beta feedback about services', and Splunk datastore for 'Customer Satisfaction'. Although Splunk is currently used to store such responses, these are intended to be migrated to a more suitable datastore at a later date.
 
-The service is not intended to be used standalone, rather to be integrated with other services.
+The service is not intended to be used standalone; rather to be integrated with other services.
 
 # Contents
    * [Forms provided by the Customer Contact Subsystem](#forms-provided-by-the-customer-contact-subsystem)
@@ -33,25 +32,26 @@ The service is not intended to be used standalone, rather to be integrated with 
 ## Contacting HMRC - *Get help with this page* <a name="contacting-hmrc---get-help-with-this-page"></a>
 
 
-This form should be used as a standard way of allowing users to report problems and ask questions about the services.
+This form should be used as the standard way to allow users to report problems and ask questions about the relevant service in which this form is visualised.
 
 Here is a screenshot of the form:
 
 ![alt tag](docs/get-help.png)
 
 This contact form consists of the following fields:
-- an users name
-- an users email address
-- an action performed by the user
-- an error seen by the user
+- the user's name
+- the user's email address
+- the action performed by the user
+- the error seen by the user
 
-Requests of this type are forwarded to *Deskpro* with a subject *"Support Request"*. 
-Contents of *action* and *error* fields is concatenated and placed in the ticket body.
+Requests of this type are forwarded to *Deskpro* with the subject *"Support Request"*. 
+The contents of the *action* and *error* fields are concatenated and stored in the ticket body.
 
-UI components allowing to use the form are provided by the [play-ui](https://github.com/hmrc/play-ui) library.
+UI components allowing implementation of the form are provided by the [play-ui](https://github.com/hmrc/play-ui) library.
 Play UI library contains a Twirl template that allows you to render the "Get help with this page" link in the footer
-of the standard HMRC page, provided that you use *hmrcGovUkTemplate* template. In order to use it, you have add the following changes in the file where you use *hmrcGovUkTemplate*:
-1) Define 'get help form component'
+of a standard HMRC page, provided that you use the *hmrcGovUkTemplate* template. In order to use it, you must add the following lines into the relevant file using the *hmrcGovUkTemplate*:
+
+1) Define the 'get help form component'
 ```
 @getHelpForm = @{
   uiHelpers.reportAProblemLink(
@@ -61,7 +61,7 @@ of the standard HMRC page, provided that you use *hmrcGovUkTemplate* template. I
 } 
 ```
 
-2) Use it when instantiating *hmrcGovUkTemplate*
+2) Use it when instantiating the *hmrcGovUkTemplate*
 
 ```
 @content = {
@@ -81,43 +81,42 @@ of the standard HMRC page, provided that you use *hmrcGovUkTemplate* template. I
 
 ## Contacting HMRC - *Help and contact* <a name="contacting-hmrc---help-and-contact"></a>
 
-This form is very similar to *Get help with this page*.
-There are minor differences in how this form works in comparison to support requests.
+This form is very similar to the *Get help with this page* form.
+There are minor differences in how this form works in comparison to 'Get help with this page'.
 
 This contact form contains only three input fields:
 - name
 - email address
 - comments
 
-Requests of this type are forwarded to *Deskpro* with a subject *"Contact form submission"*
+Requests of this type are forwarded to *Deskpro* with the subject *"Contact form submission"*
 
-This form can be used in two ways:
-
-This functionality can be used by services in two modes:
-* standalone form
-* form included in the underlying page, retrieved by partial
+This functionality can be implemented by consuming services in two modes:
+* as a standalone form
+* as a form included in the underlying page, retrieved by a partial
 
 If you want to use the standalone version of the form, you have to redirect the user to one of the following URLs:
-* if user is unauthenticated - `https://www.development.tax.service.gov.uk/contact/contact-hmrc-unauthenticated?service=${serviceId}`
-* if user is authenticated - `https://www.development.tax.service.gov.uk/contact/contact-hmrc?service=${serviceId}`
+* if the user is unauthenticated - `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc-unauthenticated?service=${serviceId}`
+* if the user is authenticated - `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc?service=${serviceId}`
 
-`Help and contact` also historically was supporting showing *Help and contact* page as a partial - however this
-functionality is deprecated and shouldn't be used.
+'{environment}.' is not included in the case of the production environment.
+
+`Help and contact` historically also supported displaying the *Help and contact* page as a partial; however, this
+functionality is *deprecated* and should not be used.
 
 [[Back to the top]](#top)
 
-## Providing feedback about Digital Customer Support Team <a name="providing-feedback-about-digital-customer-support-team"></a>
-Response emails sent by Digital Customer Support Team contain link inviting users to complete the survey about quality of service.
-This link redirects user to the survey form provided by contact-frontend. Data from the survey are then stored in DeskPro.
+## Providing feedback about the Digital Customer Support Team ('Customer Satisfaction') <a name="providing-feedback-about-digital-customer-support-team"></a>
+Upon resolving a customer issue, response emails are sent by the Digital Customer Support Team containing a link inviting users to complete a survey about the customer's satisfaction with the way their issue was handled, this survey being provided by contact-frontend. Data from the survey are then stored in Deskpro.
 
-Here is an example of email received by the user:
+Here is an example of the email received by the user:
 ![alt tag](docs/support-confirmation-email.png)
 
-Thats how DCST feedback form looks like:
+This is how the DCST feedback form looks:
 
 ![alt tag](docs/survey.png)
 
-Feedback survey results as stored in Splunk as explicit audit events with the following properties:
+Feedback survey results currently are stored in Splunk as explicit audit events with the following properties:
 * *auditSource* - "frontend"
 * *auditType* - "DeskproSurvey"
 * *details* 
@@ -127,12 +126,14 @@ Feedback survey results as stored in Splunk as explicit audit events with the fo
     * *ticketId* - the reference of the case (same as in email)
     * *serviceId* - an identifier of the service - same as provided in the *Get help with this page* page
 
-This functionality is used by Deskpro and shouldn't be used by any of the service.
+This functionality is used by Deskpro and shouldn't be used by any consuming service directly.
 Emails received from Deskpro should contain link in the following format:
 
-`https://www.tax.service.gov.uk/contact/survey?ticketId={deskproTicketKey}&serviceId={serviceId}`
+`https://www.{environment}.tax.service.gov.uk/contact/survey?ticketId={deskproTicketKey}&serviceId={serviceId}`
 
-This link then redirects user to the standalone page where he can fill in the survey.
+'{environment}.' is not included in the case of the production environment.
+
+This link then redirects the user to the standalone page where the survey can be filled in.
 
 [[Back to the top]](#top)
 
@@ -140,73 +141,73 @@ This link then redirects user to the standalone page where he can fill in the su
 
 ![alt tag](docs/beta-feedback.png)
 
-The form consists of the following fields:
+This form consists of the following fields:
 - service rating (radio button group with 5 values)
 - user's name
 - user's email address
 - additional comments (optional)
 
-Feedback responses are forwarded to Deskpro with subject *"Beta feedback submission"*
+Feedback responses are forwarded to Deskpro with the subject *"Beta feedback submission"*
 
-This functionality can be used in two modes:
-* form displayed as a separate, standalone page
-* form included in the underlying page, retrieved by partial and initially hidden
+This functionality can be implemented by consuming services in two modes:
+* as a form displayed within a separate, standalone page
+* as a form included in the underlying page, retrieved by a partial and initially hidden
 
 If you want to display this form as a standalone page, you should render such a link on your page:
-* if user is unauthenticated - `https://www.development.tax.service.gov.uk/contact/beta-feedback-unauthenticated?service=${serviceId}&additinal parameters`
-* if user is authenticated - `https://www.development.tax.service.gov.uk/contact/beta-feedback?service=${serviceId}&additional parameters`
+* if the user is unauthenticated - `https://www.{environment}.tax.service.gov.uk/contact/beta-feedback-unauthenticated?service=${serviceId}&additional parameters`
+* if the user is authenticated - `https://www.{environment}.tax.service.gov.uk/contact/beta-feedback?service=${serviceId}&additional parameters`
+
+'{environment}.' is not included in the case of the production environment.
 
 Customization flags:
-* *service* - consuming services should specify their identifier as a 'service' parameter of requests to contact-frontend. Value of this parameter will be later passed to Splunk and will allow you to properly analyze feedback
-* *canOmitComments* - consuming services can decide that the 'comments' field is optional. In order to to that, the consuming service must add 'canOmitComments=true' field to the request
-* *backURL* - (only for standalone page). Beta feedback form can contain 'Back' button redirecting the user back to the consuming service. In order to achieve that, the consuming service has to specify destination URL.
+* *service* - consuming services should specify their identifier as the 'service' parameter of requests to contact-frontend. The value of this parameter will be later passed to Splunk and will allow you to properly analyze feedback
+* *canOmitComments* - consuming services can decide whether the 'comments' field is optional. To make this the case, the consuming service must add 'canOmitComments=true' field to the request
+* *backURL* - (only for standalone page mode). A 'Back' button redirecting the user back to the consuming service can be embedded into the Beta Feedback form. In order to achieve this, the consuming service has to specify a destination URL.
 
-If you want to embed feedback form on your page, you have to create endpoints in your frontend service that redirect users requests to contact-frontend and wrap HTML code
-returned in a response in your services layout. Three requests need to be handled:
+If you want to embed the feedback form on your page, you have to create endpoints in your frontend service that redirect user requests to contact-frontend and wrap HTML code around the returned in a response in your services layout. Three requests need to be handled:
 
-a) GET endpoint to show the form. This should result in making backend GET call to the endpoint 
-`https://contact-frontend.public.mdtp/contact/beta-feedback/form?{params}`. Where params should consist of:
- * *submitUrl* - url that should be used by user to make POST to submit the form. This form should be handled by the endpoint described below.
- * *service* - consuming services should specify their identifier as a 'service' parameter of requests to contact-frontend. Value of this parameter will be later passed to Splunk and would allow to properly analyze feedback
- * *canOmitComments* - consuming services can decide that 'comments' field is optional. In order to to that, consuming service have to add 'canOmitComments=true' field to the requst
- * *csrfToken* - CSRF token generated from cookies of consuming service. This parameter will be added automatically by [play-partials](https://github.com/hmrc/play-partials) library and service itself shound't add it manually
-This endpoint will return HTML partial than can be then embedded in the page layout.
+a) GET endpoint to show the form. This should result in making a backend GET call to the endpoint 
+`https://contact-frontend.public.mdtp/contact/beta-feedback/form?{params}`, where params should consist of:
+ * *submitUrl* - url that should be used by the user to make a POST request to submit the form. This should be set to the value of the POST endpoint implemented in b).
+ * *service* - consuming services should specify their identifier as the 'service' parameter of requests to contact-frontend. The value of this parameter will later be passed to Splunk and would allow proper analysis of feedback
+ * *canOmitComments* - consuming services can decide whether the 'comments' field is optional. To make it optional, the consuming service must add 'canOmitComments=true' field to the request
+ * *csrfToken* - CSRF token generated from cookies of the consuming service. This parameter will be added automatically by the [play-partials](https://github.com/hmrc/play-partials) library and the service itself should't add it manually.
+This endpoint will return a HTML partial than can then be embedded in the page layout.
 
-b) POST endpoint to submit the form. This should return in making backent POST call to the endpoint
-`https://contact-frontend.public.mdtp/contact/beta-feedback/form?resubmitUrl`. Where *resubmitUrl* is a public facing URL to this endpoint
+b) POST endpoint to submit the form. This should result in making a backend POST call to the endpoint
+`https://contact-frontend.public.mdtp/contact/beta-feedback/form?resubmitUrl`, where the *resubmitUrl* is a public facing URL to this endpoint
 
-In case form submission has succeeded, this endpoint returns HTTP 200 response containing identifier of the ticket
-that has been created. In such case the consuming service should redirect user to the endpoint that displays confirmation page (descripted below).
+In the case where form submission succeeds, this endpoint will return a HTTP 200 response containing the identifier of the ticket that has been created. In such a case, the consuming service should redirect the user to the endpoint that displays the confirmation page (described below).
 
-In case form submission fails, this endpoint returns HTTP 400 response containing HTML snippet containing the form with errors higlighted.
-This snippet has to be displayed again to the user.
+In the case where form submission fails, this endpoint will return a HTTP 400 response with a body of a HTML snippet containing the form with errors higlighted.
+This snippet must be displayed again back to the user.
 
-c) GET endpoint to display a confirmation of the successful submission. This should result in making GET call to the endpoint
-`https://contact-frontend.public.mdtp/contact/beta-feedback-confirmation` which would then return HTML partial
-with confirmation message that should be decorated with the layout of consuming service.
+c) GET endpoint to display confirmation of the successful submission. This should result in making a GET call to the endpoint `https://contact-frontend.public.mdtp/contact/beta-feedback-confirmation`, which will then return HTML partial
+with a confirmation message decorated with the layout of the consuming service.
 
 Handling of partials can be simplified by using [play-partials](https://github.com/hmrc/play-partials) library.
 
-Good example how to integrate feedback form with the service can be found in this repository: [business-rates-valuation-frontend](https://github.com/hmrc/business-rates-valuation-frontend)
+A good example of how to integrate the feedback form with the service can be found in this repository: [business-rates-valuation-frontend](https://github.com/hmrc/business-rates-valuation-frontend)
 
 [[Back to the top]](#top)
 
 # Integration guide <a name="integration-guide"></a>
 
-Below you can find brief description how to use forms provided by contact-frontend in your service
+Below, you can find a brief description of how to use forms provided by contact-frontend in your service.
 
-Detailed integration guide can be found on the [Confluence](https://confluence.tools.tax.service.gov.uk/display/PlatDev/Customer+Contact+Services%3A+Integration+Guide) 
+A detailed integration guide can be found on [Confluence](https://confluence.tools.tax.service.gov.uk/display/PlatDev/Customer+Contact+Services%3A+Integration+Guide).
 
 [[Back to the top]](#top)
 
 ## Cross-Origin Resource Sharing (CORS) <a name="cross-origin-resource-sharing-cors"></a>
 
-When contact forms are embedded on the service's pages, the client's browser communicates with contact-frontend using AJAX requests.
-This might cause problems when the service runs on other domain that the one used by contact-frontend (which is `www.tax.service.gov.uk`). In such case user's browser will block cross-domain AJAX requests, considering them as suspicous.
-If you want to use contact-frontend in the service that runs on other domain, this can be done by explicitly specifying that other domain in configuration of contact-frontend. Contact-frontend service will then use [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) (Cross-Origin Resource Sharing) to allow browser to accept such cross-domain requests.
+When contact forms are embedded on a service's pages, the client's browser communicates with contact-frontend using AJAX requests.
+This may cause problems when the service runs on a different domain from the one used by contact-frontend (which is `www.tax.service.gov.uk`). In such a case, the user's browser will block cross-domain AJAX requests, considering them suspicous.
 
-To achieve that the service uses standard  [CORS Filter](https://www.playframework.com/documentation/2.5.x/CorsFilter) provided by Play Framework.
-Configuration is defined in `contact-frontend.yaml` within the evenronment specific `app-config`. Here is the example configuration:
+If you want to use contact-frontend in a service that runs on another domain, this can be done by explicitly specifying that other domain in the configuration of contact-frontend. Contact-frontend service will then use [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) (Cross-Origin Resource Sharing) to allow the browser to accept such cross-domain requests.
+
+To achieve that, the service uses the standard  [CORS Filter](https://www.playframework.com/documentation/2.5.x/CorsFilter) provided by Play Framework.
+Configuration is defined in `contact-frontend.yaml` within the environment specific `app-config`. Here is example configuration:
 ```
 play.filters.cors.allowedOrigins.0: "https://ewf.companieshouse.gov.uk"
 play.filters.cors.allowedOrigins.1: "https://www.qa.tax.service.gov.uk"
@@ -214,10 +215,10 @@ play.filters.cors.allowedOrigins.1: "https://www.qa.tax.service.gov.uk"
 
 [[Back to the top]](#top)
 
-## Creating own customer contact forms <a name="creating-own-customer-contact-forms"></a>
+## Creating customized customer contact forms <a name="creating-own-customer-contact-forms"></a>
 
 Currently it's not possible to customize forms in ways other than described above. If you have business
-requirement to customize customer contact form, please get in touch with PlatOps team ([#team-ddcops](https://hmrcdigital.slack.com/messages/C0HUAN03S))
+requirements to customize customer contact form, please get in touch with PlatOps team ([#team-platops](https://hmrcdigital.slack.com/messages/C0GS60DK2))
 
 [[Back to the top]](#top)
 
@@ -226,14 +227,14 @@ requirement to customize customer contact form, please get in touch with PlatOps
 ## User details attached to the ticket <a name="user-details-attached-to-the-ticket"></a>
 
 In addition to the information provided by the user, the service collects the following context data:
-* *HTTP Referrer header* - this should be the same as the URL of the page on which the user initiated contact journey. Deskpro uses it to classify issues.
-* *HTTP UserAgent header* - this tells what browser user has
-* *user tax identifiers* - if the user has been logged on, some of his tax identifiers will be attached to the tickets. These identifiers can be later seen in DeskPro
+* *HTTP Referrer header* - this should be the same as the URL of the page on which the user initiated the contact journey. Deskpro uses it to classify issues.
+* *HTTP UserAgent header* - this tells us what browser the user has
+* *user tax identifiers* - if the user his logged in, user tax identifiers will be attached to the tickets. These identifiers can later be seen in Deskpro
 * *whether user's browser uses Javascript* 
-* *user's id* - as provided in HeaderCarrier object
-* *sessionId* - as provided in HeaderCarrier object
+* *user's id* - as provided in the HeaderCarrier object
+* *sessionId* - as provided in the HeaderCarrier object
  
-Here is the list of supported identifiers:
+Here is a list of supported identifiers:
 
 * NIN
 * UTR
@@ -244,22 +245,22 @@ Here is the list of supported identifiers:
 
 ## Location of Javascript code used by the service <a name="location-of-javascript-code-used-by-the-service"></a>
 
-Part of the logic of contact-frontend (mainly related to reporting a problem) is performed by javascript code located in [assets-frontend](https://github.com/hmrc/assets-frontend/blob/master/assets/javascripts/modules/reportAProblem.js) project.
+Part of the logic of contact-frontend (mainly related to reporting a problem) is performed by javascript code located in the [assets-frontend](https://github.com/hmrc/assets-frontend/blob/master/assets/javascripts/modules/reportAProblem.js) project.
 
-When making changes in asset-frontend service be aware that it might take long time to adopt these changes by service maintainers.
+When making changes in the asset-frontend service, be aware that it may take long time for these changes to be adopted by service maintainers.
 
 [[Back to the top]](#top)
 
 ## Related projects, useful links: <a name="appendix__linx"></a>
 
-* [hmrc-deskpro](https://github.com/hmrc/hmrc-deskpro/) - Backend service responsible for forwarding requests from contact-frontend to DeskPro
-* [contact-acceptance-tests](https://github.com/hmrc/contact-acceptance-tests/) - Acceptance tests of CCS subsystem
-* [deskpro-performance-tests](https://github.com/hmrc/deskPro-performance-tests) - Performance tests of CCS subsystem combined with performance tests of DeskPro agent journey
-* [deskpro-mods](https://github.com/hmrc/deskpro-mods) - Modifications of Deskpro which add a button allowing Support Team to lookup for tax identifier of a request sender 
+* [hmrc-deskpro](https://github.com/hmrc/hmrc-deskpro/) - Backend service responsible for forwarding requests from contact-frontend to Deskpro
+* [contact-acceptance-tests](https://github.com/hmrc/contact-acceptance-tests/) - Acceptance tests of the CCS subsystem
+* [deskpro-performance-tests](https://github.com/hmrc/deskPro-performance-tests) - Performance tests of the CCS subsystem combined with performance tests of the DeskPro agent journey
+* [deskpro-mods](https://github.com/hmrc/deskpro-mods) - Modifications of Deskpro that add a button allowing the Support Team to lookup for tax identifier of a request sender 
 
 ## Slack <a name="appendix__links__slack"></a>
-* [#team-plat-services](https://hmrcdigital.slack.com/messages/C705QD804/)
-* [#team-ddcops](https://hmrcdigital.slack.com/messages/C0HUAN03S) - DDCOps is responsible for DeskPro maintenance
+* [#team-platops](https://hmrcdigital.slack.com/messages/C0GS60DK2) - PlatOps is responsible for contact-frontend
+* [#team-ddcops](https://hmrcdigital.slack.com/messages/C0HUAN03S) - DDCOps is responsible for Deskpro maintenance
 
 [[Back to the top]](#top)
 
