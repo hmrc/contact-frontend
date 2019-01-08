@@ -9,17 +9,17 @@ import play.api.Logger
 import scala.util.Try
 
 trait BackUrlValidator {
-  def validate(backUrl : String) : Boolean
+  def validate(backUrl: String): Boolean
 }
 
 @Singleton
 class ConfigurationBasedBackUrlValidator @Inject()(appConfig: AppConfig) extends BackUrlValidator {
 
-  val destinationWhitelist : Set[URL] = appConfig.backUrlDestinationWhitelist.map(new URL(_))
+  val destinationWhitelist: Set[URL] = appConfig.backUrlDestinationWhitelist.map(new URL(_))
 
-  def validate(backUrl : String) : Boolean = {
+  def validate(backUrl: String): Boolean = {
 
-    val parsedUrl = Try(new URL(backUrl)).toOption.toRight(left = "Unparseable URL")
+    val parsedUrl        = Try(new URL(backUrl)).toOption.toRight(left = "Unparseable URL")
     val validationResult = parsedUrl.right.flatMap(checkDomainOnWhitelist)
 
     validationResult match {
@@ -31,7 +31,7 @@ class ConfigurationBasedBackUrlValidator @Inject()(appConfig: AppConfig) extends
 
   }
 
-  private def checkDomainOnWhitelist(url : URL) : Either[String, Unit] = {
+  private def checkDomainOnWhitelist(url: URL): Either[String, Unit] = {
     val host = url.getHost
     if (destinationWhitelist.exists(destinationMatches(_, url))) {
       Right(())
@@ -40,10 +40,9 @@ class ConfigurationBasedBackUrlValidator @Inject()(appConfig: AppConfig) extends
     }
   }
 
-  private def destinationMatches(url1: URL, url2 : URL) : Boolean = {
+  private def destinationMatches(url1: URL, url2: URL): Boolean =
     url1.getHost == url2.getHost &&
       url1.getProtocol == url2.getProtocol &&
       url1.getPort == url2.getPort
-  }
 
 }

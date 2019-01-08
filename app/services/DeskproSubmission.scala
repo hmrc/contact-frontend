@@ -18,55 +18,63 @@ trait DeskproSubmission {
 
   protected def hmrcDeskproConnector: HmrcDeskproConnector
 
-  def createDeskproTicket(data: ContactForm, enrolments: Option[Enrolments])(implicit request: Request[AnyContent], hc: HeaderCarrier) : Future[TicketId] = {
+  def createDeskproTicket(data: ContactForm, enrolments: Option[Enrolments])(
+    implicit request: Request[AnyContent],
+    hc: HeaderCarrier): Future[TicketId] =
     hmrcDeskproConnector.createDeskProTicket(
-      name = data.contactName,
-      email = data.contactEmail,
-      subject = Subject,
-      message = data.contactComments,
-      referrer = data.referer,
-      isJavascript = data.isJavascript,
-      request = request,
+      name             = data.contactName,
+      email            = data.contactEmail,
+      subject          = Subject,
+      message          = data.contactComments,
+      referrer         = data.referer,
+      isJavascript     = data.isJavascript,
+      request          = request,
       enrolmentsOption = enrolments,
-      service = data.service,
-      abFeatures = data.abFeatures)
-  }
+      service          = data.service,
+      abFeatures       = data.abFeatures
+    )
 
-  def createDeskproFeedback(data: FeedbackForm, enrolments: Option[Enrolments])(implicit request: Request[AnyContent], hc: HeaderCarrier) : Future[TicketId] = {
+  def createDeskproFeedback(data: FeedbackForm, enrolments: Option[Enrolments])(
+    implicit request: Request[AnyContent],
+    hc: HeaderCarrier): Future[TicketId] =
     hmrcDeskproConnector.createFeedback(
-      name = data.name,
-      email = data.email,
-      rating = data.experienceRating,
+      name    = data.name,
+      email   = data.email,
+      rating  = data.experienceRating,
       subject = "Beta feedback submission",
       message = data.comments match {
-        case "" => "No comment given"
+        case ""      => "No comment given"
         case comment => comment
       },
-      referrer = data.referrer,
-      isJavascript = data.javascriptEnabled,
-      request = request,
+      referrer         = data.referrer,
+      isJavascript     = data.javascriptEnabled,
+      request          = request,
       enrolmentsOption = enrolments,
-      service = data.service,
-      abFeatures = data.abFeatures)
-  }
+      service          = data.service,
+      abFeatures       = data.abFeatures
+    )
 
-  def createProblemReportsTicket(problemReport: ProblemReport, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], referrer: Option[String])(implicit messages: Messages): Future[TicketId] = {
+  def createProblemReportsTicket(
+    problemReport: ProblemReport,
+    request: Request[AnyRef],
+    enrolmentsOption: Option[Enrolments],
+    referrer: Option[String])(implicit messages: Messages): Future[TicketId] = {
     implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
     hmrcDeskproConnector.createDeskProTicket(
-      name = problemReport.reportName,
-      email = problemReport.reportEmail,
-      subject = "Support Request",
-      message = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer = referrer.getOrElse("/home"),
-      isJavascript = problemReport.isJavascript,
-      request = request,
+      name             = problemReport.reportName,
+      email            = problemReport.reportEmail,
+      subject          = "Support Request",
+      message          = problemMessage(problemReport.reportAction, problemReport.reportError),
+      referrer         = referrer.getOrElse("/home"),
+      isJavascript     = problemReport.isJavascript,
+      request          = request,
       enrolmentsOption = enrolmentsOption,
-      service = problemReport.service,
-      abFeatures = problemReport.abFeatures
+      service          = problemReport.service,
+      abFeatures       = problemReport.abFeatures
     )
   }
 
-  def problemMessage(action: String, error: String)(implicit messages: Messages): String = {
+  def problemMessage(action: String, error: String)(implicit messages: Messages): String =
     s"""
     ${Messages("problem_report.action")}:
     $action
@@ -74,5 +82,4 @@ trait DeskproSubmission {
     ${Messages("problem_report.error")}:
     $error
     """
-  }
 }

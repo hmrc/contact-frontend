@@ -18,13 +18,12 @@ trait AppConfig {
   def fallbackURLForLangugeSwitcher: String
   def enableLanguageSwitching: Boolean
 
-  def hasFeature(f: Feature, service : Option[String])(implicit request: Request[_]): Boolean
+  def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean
 
-  def getFeatures(service : Option[String])(implicit request: Request[_]): Set[Feature]
+  def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature]
 }
 
-class CFConfig @Inject()(environment: play.api.Environment,
-                         configuration: Configuration)
+class CFConfig @Inject()(environment: play.api.Environment, configuration: Configuration)
     extends AppConfig
     with ServicesConfig {
 
@@ -38,7 +37,8 @@ class CFConfig @Inject()(environment: play.api.Environment,
     .getOrElse("")
 
   private val featureRules: Seq[FeatureEnablingRule] =
-    configuration.getStringList("features")
+    configuration
+      .getStringList("features")
       .map(_.toList)
       .getOrElse(List.empty)
       .map(FeatureEnablingRule.parse)
@@ -47,14 +47,11 @@ class CFConfig @Inject()(environment: play.api.Environment,
     s"$contactHost/contact/problem_reports"
   override lazy val externalReportProblemSecureUrl =
     s"$contactHost/contact/problem_reports_secure"
-  override lazy val assetsPrefix = loadConfig(s"frontend.assets.url") + loadConfig(
-    s"frontend.assets.version")
-  override lazy val analyticsToken = loadConfig(
-    s"govuk-tax.$env.google-analytics.token")
-  override lazy val analyticsHost = loadConfig(
-    s"govuk-tax.$env.google-analytics.host")
-  override lazy val backUrlDestinationWhitelist = loadConfig(
-    s"$env.backUrlDestinationWhitelist").split(',').filter(_.nonEmpty).toSet
+  override lazy val assetsPrefix   = loadConfig(s"frontend.assets.url") + loadConfig(s"frontend.assets.version")
+  override lazy val analyticsToken = loadConfig(s"govuk-tax.$env.google-analytics.token")
+  override lazy val analyticsHost  = loadConfig(s"govuk-tax.$env.google-analytics.host")
+  override lazy val backUrlDestinationWhitelist =
+    loadConfig(s"$env.backUrlDestinationWhitelist").split(',').filter(_.nonEmpty).toSet
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
   override def fallbackURLForLangugeSwitcher =
     loadConfig(s"govuk-tax.$env.platform.frontend.url")
@@ -70,10 +67,10 @@ class CFConfig @Inject()(environment: play.api.Environment,
   lazy val featureSelector: FeatureSelector =
     new BucketBasedFeatureSelector(BucketCalculator.deviceIdBucketCalculator, featureRules)
 
-  override def hasFeature(f: Feature, service : Option[String])(implicit request: Request[_]): Boolean =
+  override def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean =
     featureSelector.computeFeatures(request, service).contains(f)
 
-  override def getFeatures(service : Option[String])(implicit request: Request[_]): Set[Feature] =
+  override def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] =
     featureSelector.computeFeatures(request, service)
 
 }
