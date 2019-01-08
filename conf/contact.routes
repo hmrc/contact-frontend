@@ -13,9 +13,9 @@ GET         /contact-hmrc                                @controllers.ContactHmr
 POST        /contact-hmrc                                @controllers.ContactHmrcController.submit
 GET         /contact-hmrc/thanks                         @controllers.ContactHmrcController.thanks
 
-GET         /contact-hmrc/form                           @controllers.PartialsController.contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean])
-POST        /contact-hmrc/form                           @controllers.PartialsController.submitContactHmrcForm(resubmitUrl: String, renderFormOnly: Option[Boolean])
-GET         /contact-hmrc/form/confirmation              @controllers.PartialsController.contactHmrcFormConfirmation(ticketId: String)
+GET         /contact-hmrc/form                           @controllers.ContactHmrcController.contactHmrcPartialForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean])
+POST        /contact-hmrc/form                           @controllers.ContactHmrcController.submitContactHmrcPartialForm(resubmitUrl: String, renderFormOnly: Option[Boolean])
+GET         /contact-hmrc/form/confirmation              @controllers.ContactHmrcController.contactHmrcPartialFormConfirmation(ticketId: String)
 
 GET         /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.indexUnauthenticated(service: String)
 POST        /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.submitUnauthenticated
