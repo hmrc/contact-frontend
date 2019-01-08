@@ -4,13 +4,14 @@ import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import javax.inject.{Inject, Singleton}
+import model.ProblemReport
 import play.api.data.Forms._
 import play.api.data._
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Request}
-import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import services.DeskproSubmission
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
 import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation, GetHelpWithThisPageOnlyServerSideValidation}
 
@@ -87,7 +88,7 @@ object ProblemReportForm {
 
 @Singleton
 class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
-                                         val authConnector: AuthConnector)(implicit appConfig: AppConfig, override val messagesApi: MessagesApi) extends FrontendController with ContactFrontendActions with I18nSupport {
+                                         val authConnector: AuthConnector)(implicit appConfig: AppConfig, override val messagesApi: MessagesApi) extends FrontendController with ContactFrontendActions with DeskproSubmission with I18nSupport {
 
   //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
   def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
@@ -141,7 +142,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
 
         (for {
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
-          ticketId <- createTicket(problemReport, request, maybeUserEnrolments, referrer)
+          ticketId <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
         } yield {
             if (isAjax) {
               javascriptConfirmationPage(ticketId, problemReport.service)
@@ -173,32 +174,5 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     Ok(view)
   }
 
-  private def createTicket(problemReport: ProblemReport, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], referrer: Option[String]) = {
-    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
-    hmrcDeskproConnector.createDeskProTicket(
-      name = problemReport.reportName,
-      email = problemReport.reportEmail,
-      subject = "Support Request",
-      message = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer = referrer.getOrElse("/home"),
-      isJavascript = problemReport.isJavascript,
-      request = request,
-      enrolmentsOption = enrolmentsOption,
-      service = problemReport.service,
-      abFeatures = problemReport.abFeatures
-    )
-  }
-
-  private[controllers] def problemMessage(action: String, error: String): String = {
-    s"""
-    ${Messages("problem_report.action")}:
-    $action
-
-    ${Messages("problem_report.error")}:
-    $error
-    """
-  }
-
 }
 
-case class ProblemReport(reportName: String, reportEmail: String, reportAction: String, reportError: String, isJavascript: Boolean, service: Option[String], abFeatures: Option[String], referrer: Option[String])

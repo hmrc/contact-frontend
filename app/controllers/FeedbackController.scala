@@ -1,15 +1,17 @@
 package controllers
 
-import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
+import javax.inject.{Inject, Singleton}
+import model.FeedbackForm
 import play.api.data.Forms._
 import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, Form, FormError}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Request, Result}
-import play.api.{Configuration, Environment, Logger}
+import play.api.{Configuration, Environment}
 import play.filters.csrf.CSRF
+import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
@@ -32,7 +34,7 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
   def feedbackForm(service: Option[String] = None, backUrl: Option[String] = None, canOmitComments : Boolean) = Action.async { implicit request =>
     loginRedirection(routes.FeedbackController.feedbackForm(service, backUrl).url)(authorised(AuthProviders(GovernmentGateway)) {
       Future.successful(
-        Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map {
+        Ok(views.html.feedback(FeedbackFormBind.emptyForm(CSRF.getToken(request).map {
           _.value
         }.getOrElse(""), backUrl = backUrl, canOmitComments = canOmitComments), loggedIn = true, service, backUrl, canOmitComments = canOmitComments))
       )
@@ -41,7 +43,7 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
 
   def unauthenticatedFeedbackForm(service: Option[String] = None, backUrl: Option[String] = None, canOmitComments : Boolean) = Action.async { implicit request =>
     Future.successful(
-      Ok(views.html.feedback(FeedbackForm.emptyForm(CSRF.getToken(request).map { _.value }.getOrElse(""),
+      Ok(views.html.feedback(FeedbackFormBind.emptyForm(CSRF.getToken(request).map { _.value }.getOrElse(""),
         backUrl = backUrl, canOmitComments = canOmitComments), loggedIn = false, service, backUrl, canOmitComments = canOmitComments))
     )
   }
@@ -100,7 +102,7 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
   def feedbackPartialForm(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String], canOmitComments : Boolean) = Action.async {
     implicit request =>
       Future.successful {
-        Ok(views.html.partials.feedback_form(FeedbackForm.emptyForm(csrfToken, referer, None, canOmitComments = canOmitComments), submitUrl, service, canOmitComments = canOmitComments))
+        Ok(views.html.partials.feedback_form(FeedbackFormBind.emptyForm(csrfToken, referer, None, canOmitComments = canOmitComments), submitUrl, service, canOmitComments = canOmitComments))
       }
   }
 
@@ -131,38 +133,17 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
 
 }
 
-case class FeedbackForm(experienceRating: String, name: String, email: String, comments: String, javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String] = Some("unknown"), abFeatures: Option[String] = None, backUrl: Option[String],
-                        canOmitComments : Boolean)
-
-object FeedbackForm {
-  def apply(referer: String, csrfToken: String, backUrl : Option[String], canOmitComments : Boolean): FeedbackForm =
-    FeedbackForm("", "", "", "", javascriptEnabled = false, referrer = referer, csrfToken = csrfToken, backUrl = backUrl, canOmitComments = canOmitComments)
-
-  def apply(
-    experienceRating: Option[String], name: String, email: String, comments: String,
-    javascriptEnabled: Boolean, referrer: String, csrfToken: String, service: Option[String], abFeatures: Option[String],
-    backUrl: Option[String],
-    canOmitComments : Boolean
-  ): FeedbackForm =
-    FeedbackForm(experienceRating.getOrElse(""), name, email, comments, javascriptEnabled, referrer, csrfToken, service, abFeatures,
-      backUrl, canOmitComments)
-
-  def emptyForm(csrfToken: String, referer: Option[String] = None, backUrl : Option[String], canOmitComments : Boolean)(implicit request: Request[AnyRef]) =
-    FeedbackFormBind.form.fill(FeedbackForm(referer.getOrElse(request.headers.get("Referer").getOrElse("n/a")), csrfToken,
-      backUrl, canOmitComments))
-}
-
-object FeedbackFormConfig {
-  val validExperiences = (5 to 1 by -1) map (_.toString)
-}
 
 object FeedbackFormBind {
 
-  import controllers.FeedbackFormConfig._
+  import model.FeedbackFormConfig._
 
   private val emailValidator = new DeskproEmailValidator()
   private val validateEmail: (String) => Boolean = emailValidator.validate
 
+  def emptyForm(csrfToken: String, referer: Option[String] = None, backUrl : Option[String], canOmitComments : Boolean)(implicit request: Request[AnyRef]) =
+    FeedbackFormBind.form.fill(FeedbackForm(referer.getOrElse(request.headers.get("Referer").getOrElse("n/a")), csrfToken,
+      backUrl, canOmitComments))
 
   def form = Form[FeedbackForm](mapping(
     "feedback-rating" -> optional(text)

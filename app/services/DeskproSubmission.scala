@@ -1,10 +1,14 @@
-package controllers
+package services
 
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
+import controllers.ContactForm
+import model.{FeedbackForm, ProblemReport}
+import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.HeaderCarrierConverter
 
 import scala.concurrent.Future
 
@@ -44,5 +48,31 @@ trait DeskproSubmission {
       enrolmentsOption = enrolments,
       service = data.service,
       abFeatures = data.abFeatures)
+  }
+
+  def createProblemReportsTicket(problemReport: ProblemReport, request: Request[AnyRef], enrolmentsOption: Option[Enrolments], referrer: Option[String])(implicit messages: Messages): Future[TicketId] = {
+    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    hmrcDeskproConnector.createDeskProTicket(
+      name = problemReport.reportName,
+      email = problemReport.reportEmail,
+      subject = "Support Request",
+      message = problemMessage(problemReport.reportAction, problemReport.reportError),
+      referrer = referrer.getOrElse("/home"),
+      isJavascript = problemReport.isJavascript,
+      request = request,
+      enrolmentsOption = enrolmentsOption,
+      service = problemReport.service,
+      abFeatures = problemReport.abFeatures
+    )
+  }
+
+  def problemMessage(action: String, error: String)(implicit messages: Messages): String = {
+    s"""
+    ${Messages("problem_report.action")}:
+    $action
+
+    ${Messages("problem_report.error")}:
+    $error
+    """
   }
 }

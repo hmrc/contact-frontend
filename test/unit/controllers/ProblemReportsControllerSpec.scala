@@ -8,25 +8,25 @@ import org.mockito.Matchers
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.{Application, Environment, Play}
-import play.api.i18n.MessagesApi
-import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.{Application, Environment}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import util.DeskproEmailValidator
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
-  
+
+  implicit val messages: Messages =
+    fakeApplication.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+
   "Reporting a problem" should {
 
     "return 200 and a valid html page for a valid request and js is not enabled for an unauthenticated user" in new ProblemReportsControllerApplication(fakeApplication) {
@@ -133,7 +133,7 @@ class ProblemReportsControllerApplication(app: Application) extends MockitoSugar
   val deskproName: String = "John Densmore"
   val deskproEmail: String = "name@mail.com"
   val deskproSubject: String = "Support Request"
-  val deskproProblemMessage: String = controller.problemMessage("Some Action", "Some Error")
+  val deskproProblemMessage: String = controller.problemMessage("Some Action", "Some Error")(app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en"))))
   val deskproReferrer: String = "/contact/problem_reports"
 
   val hmrcDeskproConnector = controller.hmrcDeskproConnector
