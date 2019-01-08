@@ -14,7 +14,7 @@ import play.api.Environment
 import play.api.i18n.MessagesApi
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{contentAsString, redirectLocation}
+import play.api.test.Helpers.{contentAsJson, contentAsString, redirectLocation}
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
@@ -33,42 +33,11 @@ class ContactHmrcControllerSpec
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val timeout: akka.util.Timeout = 10.seconds
 
-  private def mockDeskproConnector(result: Future[TicketId]): HmrcDeskproConnector = {
-    val hmrcDeskproConnector = mock[HmrcDeskproConnector]
-    when(hmrcDeskproConnector.createDeskProTicket(
-      any[String],
-      any[String],
-      any[String],
-      any[String],
-      any[String],
-      any[Boolean],
-      any[Request[AnyRef]](),
-      any[Option[Enrolments]],
-      any[Option[String]],
-      any[Option[String]])(any[HeaderCarrier])
-    ).thenReturn(result)
-
-    hmrcDeskproConnector
-  }
-
   "ContactHmrcController" should {
 
-    "return expected OK for non-authenticated index page" in {
+    "return expected OK for non-authenticated index page" in new ContactHmrcControllerApplication {
       Given("a GET request")
-      val authConnector = mock[AuthConnector]
-
-      val configuration = fakeApplication.configuration
-      val environment = Environment.simple()
-
-      val appConfig = new CFConfig(environment, configuration)
-      val messages = fakeApplication.injector.instanceOf[MessagesApi]
-
-      val controller =
-        new ContactHmrcController(
-          mockDeskproConnector(Future.successful(TicketId(12345))),
-          authConnector,
-          configuration,
-          environment)(appConfig, messages)
+      mockDeskproConnector(Future.successful(TicketId(12345)))
 
       val contactRequest = FakeRequest().withHeaders(("Referer", "/some-service-page"))
       val serviceName = "my-fake-service"
@@ -84,22 +53,9 @@ class ContactHmrcControllerSpec
       page.body().getElementById("service").attr("value") shouldBe "my-fake-service"
     }
 
-    "return expected OK for non-authenticated submit page" in {
+    "return expected OK for non-authenticated submit page" in new ContactHmrcControllerApplication {
       Given("a POST request containing a valid form")
-      val deskproConnector = mockDeskproConnector(Future.successful(TicketId(12345)))
-      val authConnector = mock[AuthConnector]
-
-      val configuration = fakeApplication.configuration
-      val environment = Environment.simple()
-
-      val appConfig = new CFConfig(environment, configuration)
-      val messages = fakeApplication.injector.instanceOf[MessagesApi]
-
-      val controller =
-        new ContactHmrcController(deskproConnector,
-          authConnector,
-          configuration,
-          environment)(appConfig, messages)
+      mockDeskproConnector(Future.successful(TicketId(12345)))
 
       val fields = Map(
         "contact-name" -> "Bob The Builder",
@@ -119,7 +75,7 @@ class ContactHmrcControllerSpec
 
       Then("the message is sent to the Deskpro connector")
       Mockito
-        .verify(deskproConnector)
+        .verify(hmrcDeskproConnector)
         .createDeskProTicket(any[String],
           any[String],
           any[String],
@@ -136,23 +92,9 @@ class ContactHmrcControllerSpec
       redirectLocation(submitResult).get shouldBe "/contact/contact-hmrc/thanks-unauthenticated"
     }
 
-    "return expected Internal Error when hmrc-deskpro errors for non-authenticated submit page" in {
+    "return expected Internal Error when hmrc-deskpro errors for non-authenticated submit page" in new ContactHmrcControllerApplication {
       Given("a POST request containing a valid form")
-      val deskproConnector = mockDeskproConnector(
-        Future.failed(new Exception("This is an expected test error")))
-      val authConnector = mock[AuthConnector]
-
-      val configuration = fakeApplication.configuration
-      val environment = Environment.simple()
-
-      val appConfig = new CFConfig(environment, configuration)
-      val messages = fakeApplication.injector.instanceOf[MessagesApi]
-
-      val controller =
-        new ContactHmrcController(deskproConnector,
-          authConnector,
-          configuration,
-          environment)(appConfig, messages)
+      mockDeskproConnector(Future.failed(new Exception("This is an expected test error")))
 
       val fields = Map(
         "contact-name" -> "Bob The Builder",
@@ -175,22 +117,8 @@ class ContactHmrcControllerSpec
       status(submitResult) shouldBe 500
     }
 
-    "return expected OK for non-authenticated thanks page" in {
+    "return expected OK for non-authenticated thanks page" in new ContactHmrcControllerApplication {
       Given("a GET request")
-      val authConnector = mock[AuthConnector]
-
-      val configuration = fakeApplication.configuration
-      val environment = Environment.simple()
-
-      val appConfig = new CFConfig(environment, configuration)
-      val messages = fakeApplication.injector.instanceOf[MessagesApi]
-
-      val controller =
-        new ContactHmrcController(
-          mockDeskproConnector(Future.successful(TicketId(12345))),
-          authConnector,
-          configuration,
-          environment)(appConfig, messages)
 
       val contactRequest = FakeRequest().withSession(("ticketId", "12345"))
 
@@ -201,4 +129,184 @@ class ContactHmrcControllerSpec
       status(thanksResult) shouldBe 200
     }
   }
+
+  "Submitting contact hrmc form" should {
+    "return JSON with ticket id for sucessful form submission" in new ContactHmrcControllerApplication {
+      Given("we have a valid reqest")
+
+      val ticketId = TicketId(12345)
+
+      mockDeskproConnector(Future.successful(ticketId))
+
+      val fields = Map(
+        "contact-name" -> "Bob The Builder",
+        "contact-email" -> "bob@build-it.com",
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript" -> "false",
+        "referer" -> "n/a",
+        "csrfToken" -> "n/a",
+        "service" -> "scp",
+        "abFeatures" -> "GetHelpWithThisPageFeature_A"
+      )
+
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+
+      val resubmitUrl = "/contact-frontend/form"
+
+
+      When("we submit the request")
+      val result = await(controller.submitContactHmrcPartialForm(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest))
+
+      Then("ticket is sent to deskpro")
+      Mockito
+        .verify(hmrcDeskproConnector)
+        .createDeskProTicket(any[String],
+          any[String],
+          any[String],
+          any[String],
+          any[String],
+          any[Boolean],
+          any[Request[AnyRef]](),
+          any[Option[Enrolments]],
+          any[Option[String]],
+          any[Option[String]])(any[HeaderCarrier])
+
+
+      And("ticket id is returned to the user")
+      status(result) shouldBe 200
+      val resultAsJson = contentAsJson(result)
+      resultAsJson.as[Int] shouldBe ticketId.ticket_id
+    }
+
+    "redisplay form in case of validation errors - rendering only form without header" in new ContactHmrcControllerApplication {
+      Given("we have an invalid request")
+
+      val fields = Map.empty
+
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+
+      val resubmitUrl = "/contact-frontend/form"
+
+      When("we submit the request")
+      val result = await(controller.submitContactHmrcPartialForm(resubmitUrl = resubmitUrl, renderFormOnly = true)(contactRequest))
+
+      Then("ticket is not sent to deskpro")
+      Mockito.verifyZeroInteractions(hmrcDeskproConnector)
+
+      And("an error message is returned")
+      status(result) shouldBe 400
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+
+      And("a header shouldn't be visible")
+      page.body().getElementsByClass("page-header") should be(empty)
+    }
+
+    "redisplay form in case of validation errors - rendering with header" in new ContactHmrcControllerApplication {
+      Given("we have an invalid request")
+
+      val fields = Map.empty
+
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+
+      val resubmitUrl = "/contact-frontend/form"
+
+      When("we submit the request")
+      val result = await(controller.submitContactHmrcPartialForm(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest))
+
+      Then("ticket is not sent to deskpro")
+      Mockito.verifyZeroInteractions(hmrcDeskproConnector)
+
+      And("an error message is returned")
+      status(result) shouldBe 400
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+
+      And("a header shouldn't be visible")
+      page.body().getElementsByClass("page-header") shouldNot be(empty)
+    }
+
+    "show an error page with bad request HTTP code if sending the data to deskpro failed" in new ContactHmrcControllerApplication {
+      Given("we have a valid reqest")
+
+      val ticketId = TicketId(12345)
+      val fields = Map(
+        "contact-name" -> "Bob The Builder",
+        "contact-email" -> "bob@build-it.com",
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript" -> "false",
+        "referer" -> "n/a",
+        "csrfToken" -> "n/a",
+        "service" -> "scp",
+        "abFeatures" -> "GetHelpWithThisPageFeature_A"
+      )
+
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+
+      val resubmitUrl = "/contact-frontend/form"
+
+      And("Deskpro doesn't work properly")
+      mockDeskproConnector(Future.failed(new Exception("Expected exception")))
+
+      When("we submit the request")
+      val result = await(controller.submitContactHmrcPartialForm(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest))
+
+      Then("ticket is sent to deskpro")
+      Mockito
+        .verify(hmrcDeskproConnector)
+        .createDeskProTicket(any[String],
+          any[String],
+          any[String],
+          any[String],
+          any[String],
+          any[Boolean],
+          any[Request[AnyRef]](),
+          any[Option[Enrolments]],
+          any[Option[String]],
+          any[Option[String]])(any[HeaderCarrier])
+
+
+      And("an error message is returned to the user")
+      status(result) shouldBe 500
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().getElementsByClass("page-header").text() shouldBe "Sorry, we’re experiencing technical difficulties"
+    }
+  }
+
+  class ContactHmrcControllerApplication extends MockitoSugar {
+
+    val authConnector = mock[AuthConnector]
+
+    val configuration = fakeApplication.configuration
+    val environment = Environment.simple()
+
+    implicit val appConfig = new CFConfig(environment, configuration)
+    implicit val messages = fakeApplication.injector.instanceOf[MessagesApi]
+
+    val hmrcDeskproConnector = mock[HmrcDeskproConnector]
+
+    val controller =
+      new ContactHmrcController(
+        hmrcDeskproConnector,
+        authConnector,
+        configuration,
+        environment)(appConfig, messages)
+
+    def mockDeskproConnector(result: Future[TicketId]): Unit = {
+      when(hmrcDeskproConnector.createDeskProTicket(
+        any[String],
+        any[String],
+        any[String],
+        any[String],
+        any[String],
+        any[Boolean],
+        any[Request[AnyRef]](),
+        any[Option[Enrolments]],
+        any[Option[String]],
+        any[Option[String]])(any[HeaderCarrier])
+      ).thenReturn(result)
+    }
+
+  }
+
 }

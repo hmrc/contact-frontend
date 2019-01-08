@@ -9,7 +9,7 @@
 @import views.html.helpers._
 @import views.helpers.ServiceParameter.extractServiceParameter
 
-@(problemReportForm : Form[controllers.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@(problemReportForm : Form[model.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @if(appConfig.hasFeature(GetHelpWithThisPageMoreVerboseHeader, service)) {
     <h2>@Messages("common.feedback.title.b")</h2>

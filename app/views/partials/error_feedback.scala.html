@@ -1,6 +1,6 @@
 @import config.AppConfig
 @import util.GetHelpWithThisPageNewWordingOfEntryLink
-@(form : Form[controllers.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@(form : Form[model.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 @import uk.gov.hmrc.play.views.html._
 
 <div class="report-error">

@@ -30,7 +30,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
     "redirect to confirmation page without 'back' button if 'back' link not provided" in new FeedbackControllerApplication(fakeApplication) {
 
-      hrmcConnectorWillReturnTheTicketId()
+      hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submitUnauthenticated()(request)
 
@@ -42,7 +42,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
     "show errors if some form not filled in correctly" in new FeedbackControllerApplication(fakeApplication) {
 
-      hrmcConnectorWillReturnTheTicketId()
+      hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submitUnauthenticated()(generateInvalidRequest())
 
@@ -54,7 +54,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
     }
 
     "succed with comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
-      hrmcConnectorWillReturnTheTicketId()
+      hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submitUnauthenticated()(generateRequest(comments="Some comment", canOmitComments = true))
 
@@ -65,7 +65,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
     }
 
     "succed without comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
-      hrmcConnectorWillReturnTheTicketId()
+      hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submitUnauthenticated()(generateRequest(comments="", canOmitComments = true))
 
@@ -76,7 +76,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
     }
 
     "fail without comment if 'canOmitComments' flag is false" in new FeedbackControllerApplication(fakeApplication) {
-      hrmcConnectorWillReturnTheTicketId()
+      hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submitUnauthenticated()(generateRequest(comments="", canOmitComments = false))
 
@@ -89,7 +89,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
     "include 'server', 'backUrl' and 'canOmitComments' fields in the returned page if form not filled in correctly" in new FeedbackControllerApplication(fakeApplication) {
 
-      hrmcConnectorWillReturnTheTicketId()
+      hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submitUnauthenticated()(generateInvalidRequestWithBackUrlAndService())
 
@@ -112,7 +112,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
     "redirect to confirmation page with 'back' button if 'back' link provided" in new FeedbackControllerApplication(fakeApplication) {
 
-      hrmcConnectorWillReturnTheTicketId()
+      hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submitUnauthenticated()(requestWithBackLink)
 
@@ -126,7 +126,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
   "Submitting feedback for authenticated user" should {
     "redirect to confirmation page without 'back' button if 'back' link not provided" in new FeedbackControllerApplication(fakeApplication) {
 
-      hrmcConnectorWillReturnTheTicketId()
+      hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submit()(request.withSession(SessionKeys.authToken -> "authToken"))
 
@@ -138,7 +138,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
     "redirect to confirmation page with 'back' button if 'back' link provided" in new FeedbackControllerApplication(fakeApplication) {
 
-      hrmcConnectorWillReturnTheTicketId()
+      hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submit()(requestWithBackLink.withSession(SessionKeys.authToken -> "authToken"))
 
@@ -212,19 +212,64 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
 }
 
-class FeedbackControllerApplication(app: Application) extends MockitoSugar {
+  "Submitting the partial feedback form" should {
+
+    "show errors if the form is not filled in correctly" in new FeedbackControllerApplication(fakeApplication) {
+
+      hmrcConnectorWillReturnTheTicketId()
+
+      val result = controller.submitFeedbackPartialForm("tstUrl")(generateInvalidRequest())
+
+      status(result) should be(400)
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+
+      verifyZeroInteractions(hmrcDeskproConnector)
+    }
+
+    "allow comments to be empty if the canOmitComments flag is set to true" in new FeedbackControllerApplication(fakeApplication) {
+
+      hmrcConnectorWillReturnTheTicketId()
+
+      val result = controller.submitFeedbackPartialForm("tstUrl")(generateRequest(comments = "", canOmitComments = true))
+
+      status(result) should be(200)
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().getElementsByClass("error-notification") should be(empty)
+
+      verifyRequestMade("No comment given")
+    }
+
+    "show errors if no comments are provided and the canOmitComments flag is set to false" in new FeedbackControllerApplication(fakeApplication) {
+
+      hmrcConnectorWillReturnTheTicketId()
+
+      val result = controller.submitFeedbackPartialForm("tstUrl")(generateRequest(comments = "", canOmitComments = false))
+
+      status(result) should be(400)
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+
+      verifyZeroInteractions(hmrcDeskproConnector)
+    }
+  }
+
+
+  class FeedbackControllerApplication(app: Application) extends MockitoSugar {
 
   val hmrcDeskproConnector = mock[HmrcDeskproConnector]
 
   def hmrcConnectorWillFail() = mockHmrcConnector(Future.failed(new Exception("failed")))
 
-  def hrmcConnectorWillReturnTheTicketId() = mockHmrcConnector(Future.successful(TicketId(123)))
+  def hmrcConnectorWillReturnTheTicketId() = mockHmrcConnector(Future.successful(TicketId(123)))
 
   val feedbackName: String = "John Densmore"
   val feedbackRating: String = "2"
   val feedbackEmail: String = "name@mail.com"
   val feedbackComment: String = "Comments"
   val feedbackReferer: String = "/contact/problem_reports"
+
+
 
   private def mockHmrcConnector(result: Future[TicketId]) = {
     when(hmrcDeskproConnector.createFeedback(

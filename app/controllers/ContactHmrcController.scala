@@ -1,7 +1,6 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import play.api.{Configuration, Environment}
@@ -10,10 +9,11 @@ import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, Request}
 import play.filters.csrf.CSRF
+import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
 import util.DeskproEmailValidator
 import views.html.deskpro_error
 
@@ -49,7 +49,8 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
                                       val configuration : Configuration, val environment: Environment)(implicit
                                                                                       val appConfig : AppConfig,
                                                                                       override val messagesApi : MessagesApi)
-  extends FrontendController with DeskproSubmission with AuthorisedFunctions with LoginRedirection with I18nSupport {
+  extends FrontendController with DeskproSubmission with AuthorisedFunctions with LoginRedirection with I18nSupport
+    with ContactFrontendActions {
 
   override protected def mode = environment.mode
 
@@ -116,6 +117,38 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
       Ok(views.html.contact_hmrc_confirmation(ticketId))
     }
     Future.successful(result)
+  }
+
+  def contactHmrcPartialForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Boolean) = Action.async {
+    implicit request =>
+      Future.successful {
+        Ok(views.html.partials.contact_hmrc_form(
+          ContactHmrcForm.form.fill(ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service, None)), submitUrl, renderFormOnly))
+      }
+  }
+
+  def submitContactHmrcPartialForm(resubmitUrl: String, renderFormOnly: Boolean) = Action.async {
+    implicit request =>
+      ContactHmrcForm.form.bindFromRequest()(request).fold(
+        error => {
+          Future.successful(BadRequest(views.html.partials.contact_hmrc_form(error, resubmitUrl, renderFormOnly)))
+        },
+        data => {
+          (for {
+            enrolments <- maybeAuthenticatedUserEnrolments()
+            ticketId <- createDeskproTicket(data, enrolments)
+          } yield {
+            Ok(ticketId.ticket_id.toString)
+          }).recover {
+            case _ => InternalServerError(deskpro_error())
+          }
+        }
+      )
+  }
+
+  def contactHmrcPartialFormConfirmation(ticketId: String) = UnauthorisedAction {
+    implicit request =>
+      Ok(views.html.partials.contact_hmrc_form_confirmation(ticketId))
   }
 }
 
