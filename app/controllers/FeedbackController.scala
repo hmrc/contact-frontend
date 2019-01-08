@@ -1,7 +1,6 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import play.api.data.Forms._
@@ -14,7 +13,7 @@ import play.filters.csrf.CSRF
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
 import util.{BackUrlValidator, DeskproEmailValidator}
 
 import scala.concurrent.Future
@@ -22,7 +21,7 @@ import scala.concurrent.Future
 @Singleton
 class FeedbackController @Inject()(val hmrcDeskproConnector : HmrcDeskproConnector, val authConnector : AuthConnector, val accessibleUrlValidator : BackUrlValidator,
                                    val configuration : Configuration, val environment: Environment)(implicit val appConfig : AppConfig, override val messagesApi : MessagesApi)
-extends FrontendController with DeskproSubmission with I18nSupport with AuthorisedFunctions with LoginRedirection  {
+extends FrontendController with DeskproSubmission with I18nSupport with AuthorisedFunctions with LoginRedirection with ContactFrontendActions {
 
   val formId = "FeedbackForm"
 
@@ -96,6 +95,38 @@ extends FrontendController with DeskproSubmission with I18nSupport with Authoris
       Ok(views.html.feedback_confirmation(ticketId, loggedIn, backUrl))
     }
     Future.successful(result)
+  }
+
+  def feedbackPartialForm(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String], canOmitComments : Boolean) = Action.async {
+    implicit request =>
+      Future.successful {
+        Ok(views.html.partials.feedback_form(FeedbackForm.emptyForm(csrfToken, referer, None, canOmitComments = canOmitComments), submitUrl, service, canOmitComments = canOmitComments))
+      }
+  }
+
+  def submitFeedbackPartialForm(resubmitUrl: String) = Action.async {
+    implicit request =>
+      val form =  FeedbackFormBind.form.bindFromRequest()(request)
+      form.fold(
+        error => {
+          Future.successful(BadRequest(views.html.partials.feedback_form(error, resubmitUrl, canOmitComments = form("canOmitComments").value.exists(_ == "true"))))
+        },
+        data => {
+          (for {
+            enrolments <- maybeAuthenticatedUserEnrolments()
+            ticketId <- createDeskproFeedback(data, enrolments)
+          } yield {
+            Ok(ticketId.ticket_id.toString)
+          }).recover {
+            case _ => InternalServerError
+          }
+        }
+      )
+  }
+
+  def feedbackPartialFormConfirmation(ticketId: String) = UnauthorisedAction {
+    implicit request =>
+      Ok(views.html.partials.feedback_form_confirmation(ticketId, None))
   }
 
 }

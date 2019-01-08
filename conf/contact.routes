@@ -5,10 +5,17 @@ POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackCo
 GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks(backUrl: Option[String])
 GET         /beta-feedback/thanks-unauthenticated        @controllers.FeedbackController.unauthenticatedThanks(backUrl: Option[String])
 
+GET         /beta-feedback/form                          @controllers.FeedbackController.feedbackPartialForm(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String], canOmitComments: Boolean ?= false)
+POST        /beta-feedback/form                          @controllers.FeedbackController.submitFeedbackPartialForm(resubmitUrl: String)
+GET         /beta-feedback/form/confirmation             @controllers.FeedbackController.feedbackPartialFormConfirmation(ticketId: String)
 
 GET         /contact-hmrc                                @controllers.ContactHmrcController.index
 POST        /contact-hmrc                                @controllers.ContactHmrcController.submit
 GET         /contact-hmrc/thanks                         @controllers.ContactHmrcController.thanks
+
+GET         /contact-hmrc/form                           @controllers.PartialsController.contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean])
+POST        /contact-hmrc/form                           @controllers.PartialsController.submitContactHmrcForm(resubmitUrl: String, renderFormOnly: Option[Boolean])
+GET         /contact-hmrc/form/confirmation              @controllers.PartialsController.contactHmrcFormConfirmation(ticketId: String)
 
 GET         /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.indexUnauthenticated(service: String)
 POST        /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.submitUnauthenticated
@@ -19,13 +26,6 @@ GET         /problem_reports_ajax                        @controllers.ProblemRep
 GET         /problem_reports_nonjs                       @controllers.ProblemReportsController.reportFormNonJavaScript(service: Option[String])
 POST        /problem_reports                             @controllers.ProblemReportsController.submit
 POST        /problem_reports_secure                      @controllers.ProblemReportsController.submitSecure
-
-GET         /contact-hmrc/form                           @controllers.PartialsController.contactHmrcForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean])
-POST        /contact-hmrc/form                           @controllers.PartialsController.submitContactHmrcForm(resubmitUrl: String, renderFormOnly: Option[Boolean])
-GET         /contact-hmrc/form/confirmation              @controllers.PartialsController.contactHmrcFormConfirmation(ticketId: String)
-GET         /beta-feedback/form                          @controllers.PartialsController.feedbackForm(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String], canOmitComments: Boolean ?= false)
-POST        /beta-feedback/form                          @controllers.PartialsController.submitFeedbackForm(resubmitUrl: String)
-GET         /beta-feedback/form/confirmation             @controllers.PartialsController.feedbackFormConfirmation(ticketId: String)
 
 GET			/survey				 	                     @controllers.SurveyController.survey(ticketId: String, serviceId: String)
 POST		/submitSurvey                                @controllers.SurveyController.submit()
