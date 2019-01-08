@@ -13,8 +13,8 @@ GET         /contact-hmrc                                @controllers.ContactHmr
 POST        /contact-hmrc                                @controllers.ContactHmrcController.submit
 GET         /contact-hmrc/thanks                         @controllers.ContactHmrcController.thanks
 
-GET         /contact-hmrc/form                           @controllers.ContactHmrcController.contactHmrcPartialForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean])
-POST        /contact-hmrc/form                           @controllers.ContactHmrcController.submitContactHmrcPartialForm(resubmitUrl: String, renderFormOnly: Option[Boolean])
+GET         /contact-hmrc/form                           @controllers.ContactHmrcController.contactHmrcPartialForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Boolean ?= false)
+POST        /contact-hmrc/form                           @controllers.ContactHmrcController.submitContactHmrcPartialForm(resubmitUrl: String, renderFormOnly: Boolean ?= false)
 GET         /contact-hmrc/form/confirmation              @controllers.ContactHmrcController.contactHmrcPartialFormConfirmation(ticketId: String)
 
 GET         /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.indexUnauthenticated(service: String)

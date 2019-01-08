@@ -118,14 +118,15 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
     Future.successful(result)
   }
 
-  def contactHmrcPartialForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Option[Boolean]) = Action.async {
+  def contactHmrcPartialForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Boolean) = Action.async {
     implicit request =>
       Future.successful {
-        Ok(views.html.partials.contact_hmrc_form(ContactHmrcForm.form.fill(ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service, None)), submitUrl, renderFormOnly))
+        Ok(views.html.partials.contact_hmrc_form(
+          ContactHmrcForm.form.fill(ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service, None)), submitUrl, renderFormOnly))
       }
   }
 
-  def submitContactHmrcPartialForm(resubmitUrl: String, renderFormOnly: Option[Boolean]) = Action.async {
+  def submitContactHmrcPartialForm(resubmitUrl: String, renderFormOnly: Boolean) = Action.async {
     implicit request =>
       ContactHmrcForm.form.bindFromRequest()(request).fold(
         error => {
