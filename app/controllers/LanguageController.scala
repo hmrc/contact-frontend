@@ -10,25 +10,27 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.LanguageUtils
 
 @Singleton
-class LanguageController @Inject() (override val messagesApi: MessagesApi)(implicit appConfig : AppConfig) extends FrontendController with I18nSupport{
+class LanguageController @Inject()(override val messagesApi: MessagesApi)(implicit appConfig: AppConfig)
+    extends FrontendController
+    with I18nSupport {
 
-    val english = Lang("en")
-    val welsh = Lang("cy")
+  val english = Lang("en")
+  val welsh   = Lang("cy")
 
   def switchToEnglish = switchToLang(english)
 
   def switchToWelsh = switchToLang(welsh)
-  
+
   private def switchToLang(lang: Lang) = Action { implicit request =>
     val newLang = if (appConfig.enableLanguageSwitching) lang else english
 
     request.headers.get(REFERER) match {
       case Some(referrer) => Redirect(referrer).withLang(newLang).flashing(LanguageUtils.flashWithSwitchIndicator)
       case None => {
-          Logger.warn(s"Unable to get the referrer, so sending them to ${appConfig.fallbackURLForLangugeSwitcher}")
-          Redirect(appConfig.fallbackURLForLangugeSwitcher).withLang(newLang)
-        }
+        Logger.warn(s"Unable to get the referrer, so sending them to ${appConfig.fallbackURLForLangugeSwitcher}")
+        Redirect(appConfig.fallbackURLForLangugeSwitcher).withLang(newLang)
+      }
     }
   }
-  
+
 }
