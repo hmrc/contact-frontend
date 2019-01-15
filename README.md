@@ -7,7 +7,7 @@ This service allows users to contact the HMRC Customer Contact team for 3 major 
 3) provide feedback about how well an issue was resolved by the HMRC Customer Contact team ('Customer Satisfaction')
 
 Contact-frontend is responsible for showing forms pertaining to the purposes listed above, validating the input, and
-passing user requests to downstream services - to [Deskpro](#https://confluence.tools.tax.service.gov.uk/x/4oadBg) for 'Get help with this page', 'Help and contact' and 'Providing Beta feedback about services', and Splunk datastore for 'Customer Satisfaction'. Although Splunk is currently used to store such responses, these are intended to be migrated to a more suitable datastore at a later date.
+passing user requests to downstream services - to [Deskpro](https://confluence.tools.tax.service.gov.uk/x/4oadBg) for 'Get help with this page', 'Help and contact' and 'Providing Beta feedback about services', and Splunk datastore for 'Customer Satisfaction'. Although Splunk is currently used to store such responses, these are intended to be migrated to a more suitable datastore at a later date.
 
 The service is not intended to be used standalone; rather to be integrated with other services.
 
