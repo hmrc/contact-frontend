@@ -3,7 +3,7 @@ package controllers
 import config.CFConfig
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.MessagesApi
 import play.api.test.{FakeHeaders, FakeRequest}
