@@ -2,7 +2,7 @@ package features
 
 import org.skyscreamer.jsonassert.JSONCompareMode._
 import support.StubbedFeatureSpec
-import support.page.{ContactHmrcPage, ExternalPage, TechnicalDifficultiesPage}
+import support.page.{ContactHmrcPage, ExternalPage, SpamInfoPage, TechnicalDifficultiesPage}
 import support.stubs._
 import support.util.Env
 
@@ -221,6 +221,25 @@ class ContactHmrcFeature extends StubbedFeatureSpec {
           |}
         """.stripMargin, LENIENT)
     }
+
+    scenario("Comments with ideographic characters are rejected") {
+
+      Given("I am logged in and I go to the 'Help' page")
+      goOn(ContactHmrcPage)
+
+      When("I use ideographic characters in the message")
+      ContactHmrcPage.fillContactForm("Grumpy Bear", "grumpy@carebears.com", "金 golden opportunity")
+
+      And("I try to send the contact form")
+      ContactHmrcPage.submitContactForm()
+
+      Then("I am on the page intended for spammers")
+      on(SpamInfoPage)
+
+      And("the Deskpro endpoint '/deskpro/ticket' has not been hit")
+      Deskpro.verify_post_no_hit("/deskpro/get-help-ticket")
+    }
+
   }
 
 
