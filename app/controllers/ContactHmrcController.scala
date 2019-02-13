@@ -1,13 +1,14 @@
 package controllers
 
-import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
-import play.api.{Configuration, Environment}
+import controllers.SpamHandler.ignoreIfSpam
+import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, Request}
+import play.api.mvc._
+import play.api.{Configuration, Environment}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -105,7 +106,7 @@ class ContactHmrcController @Inject()(
         error => {
           Future.successful(BadRequest(views.html.contact_hmrc(error, enrolments.isDefined)))
         },
-        data => {
+        data => ignoreIfSpam(data) {
           createDeskproTicket(data, enrolments)
             .map { ticketId =>
               Redirect(thanksRoute).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
