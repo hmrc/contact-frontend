@@ -16,7 +16,7 @@ object SpamHandler {
 
       import contactForm._
       Logger.warn(s"Rejecting spammer's form submission, additional info: " +
-        s"[email: $contactEmail, message: $contactComments, referrer: $referer, service: $service]")
+        s"[name: $contactName, email: $contactEmail, message: $contactComments, referrer: $referer, service: $service]")
       // returning 200 and no useful info on purpose for now
       Future.successful(Results.Ok("Error submitting form. Apologies for any inconvenience caused."))
     } else {
