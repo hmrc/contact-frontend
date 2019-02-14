@@ -10,7 +10,10 @@ object SpamHandler {
     def hasIdeographicCharacters(s: String): Boolean =
       s.exists(c => Character.isIdeographic(c))
 
-    if (hasIdeographicCharacters(contactForm.contactComments)) {
+    if (hasIdeographicCharacters(contactForm.contactComments)
+      || hasIdeographicCharacters(contactForm.contactEmail)
+      || hasIdeographicCharacters(contactForm.contactName)) {
+
       import contactForm._
       Logger.warn(s"Rejecting spammer's form submission, additional info: " +
         s"[email: $contactEmail, message: $contactComments, referrer: $referer, service: $service]")
