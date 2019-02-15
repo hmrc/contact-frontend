@@ -47,6 +47,8 @@
 
     <logger name="com.google.inject" level="INFO"/>
 
+    <logger name="services.CaptchaServiceV3" level="INFO"/>
+
     <logger name="application" level="WARN"/>
 
     <logger name="connector" level="TRACE">

@@ -19,6 +19,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import org.jsoup.Jsoup
+import services.CaptchaServiceV3
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -285,10 +286,15 @@ class ContactHmrcControllerSpec
 
     val hmrcDeskproConnector = mock[HmrcDeskproConnector]
 
+    val captchaServiceV3 = mock[CaptchaServiceV3]
+
+    when(captchaServiceV3.isLikelyABot(any())(any())).thenReturn(Future.successful(false))
+
     val controller =
       new ContactHmrcController(
         hmrcDeskproConnector,
         authConnector,
+        captchaServiceV3,
         configuration,
         environment)(appConfig, messages)
 

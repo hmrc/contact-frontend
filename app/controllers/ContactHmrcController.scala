@@ -10,7 +10,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.api.{Configuration, Environment}
 import play.filters.csrf.CSRF
-import services.DeskproSubmission
+import services.{CaptchaServiceV3, DeskproSubmission}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
@@ -40,7 +40,8 @@ object ContactHmrcForm {
       "referer"      -> text,
       "csrfToken"    -> text,
       "service"      -> optional(text),
-      "abFeatures"   -> optional(text)
+      "abFeatures"   -> optional(text),
+      "recaptcha-v3-response" -> optional(text)
     )(ContactForm.apply)(ContactForm.unapply)
   )
 }
@@ -49,6 +50,7 @@ object ContactHmrcForm {
 class ContactHmrcController @Inject()(
   val hmrcDeskproConnector: HmrcDeskproConnector,
   val authConnector: AuthConnector,
+  val captchaServiceV3: CaptchaServiceV3,
   val configuration: Configuration,
   val environment: Environment)(
   implicit
@@ -84,7 +86,9 @@ class ContactHmrcController @Inject()(
       Ok(
         views.html.contact_hmrc(
           ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, Some(service), None)),
-          loggedIn = false))
+          loggedIn = false,
+          reCaptchaClientKey = Some(captchaServiceV3.clientKey))
+      )
     }
   }
 
@@ -96,8 +100,11 @@ class ContactHmrcController @Inject()(
   }
 
   def submitUnauthenticated = Action.async { implicit request =>
+
+
     handleSubmit(None, routes.ContactHmrcController.thanksUnauthenticated())
   }
+
 
   private def handleSubmit(enrolments: Option[Enrolments], thanksRoute: Call)(implicit request: Request[AnyContent]) =
     ContactHmrcForm.form
@@ -107,13 +114,21 @@ class ContactHmrcController @Inject()(
           Future.successful(BadRequest(views.html.contact_hmrc(error, enrolments.isDefined)))
         },
         data => ignoreIfSpam(data) {
-          createDeskproTicket(data, enrolments)
-            .map { ticketId =>
-              Redirect(thanksRoute).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
-            }
-            .recover {
-              case _ => InternalServerError(deskpro_error())
-            }
+          captchaServiceV3.isLikelyABot(data.reCaptchaV3Response.getOrElse("not-provided")).flatMap {
+            case true =>
+              throw new Exception("we should redisplay a form here with errors or something else nice for the user!!!!")
+
+            case false =>
+              createDeskproTicket(data, enrolments)
+                .map { ticketId =>
+                  Redirect(thanksRoute).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+                }
+                .recover {
+                  case _ => InternalServerError(deskpro_error())
+                }
+          }
+
+
         }
       )
 
@@ -179,9 +194,14 @@ case class ContactForm(
   referer: String,
   csrfToken: String,
   service: Option[String]    = Some("unknown"),
-  abFeatures: Option[String] = None)
+  abFeatures: Option[String] = None,
+  reCaptchaV3Response: Option[String] = None // todo(konrad) should not be optional
+)
 
 object ContactForm {
-  def apply(referer: String, csrfToken: String, service: Option[String], abFeatures: Option[String]): ContactForm =
+  def apply(referer: String,
+            csrfToken: String,
+            service: Option[String],
+            abFeatures: Option[String]): ContactForm =
     ContactForm("", "", "", isJavascript = false, referer, csrfToken, service, abFeatures)
 }
