@@ -1,0 +1,12 @@
+@(captchaClientKey: String, action : String, enabled : Boolean)
+@if(enabled) {
+<input type="hidden" name="recaptcha-v3-response" id="recaptcha-v3-response">
+<script src="https://www.google.com/recaptcha/api.js?render=@captchaClientKey"></script>
+<script>
+    grecaptcha.ready(function() {
+        grecaptcha.execute('@captchaClientKey', { action: '@action' }).then(function(token) {
+            document.getElementById('recaptcha-v3-response').value = token;
+        });
+    });
+</script>
+}

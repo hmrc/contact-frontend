@@ -1,6 +1,6 @@
 @import config.AppConfig
 
-@(contactForm: Form[controllers.ContactForm], loggedIn : Boolean, reCaptchaClientKey: Option[String] = None)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@(contactForm: Form[controllers.ContactForm], loggedIn : Boolean, reCaptchaComponent: Option[Html] = None)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
@@ -12,7 +12,7 @@
             contactForm            = contactForm,
             externalContactHmrcUrl = routes.ContactHmrcController.submitUnauthenticated.url,
             renderFormOnly         = false,
-            reCaptchaClientKey     = reCaptchaClientKey
+            reCaptchaComponent     = reCaptchaComponent
         )
     }
 }

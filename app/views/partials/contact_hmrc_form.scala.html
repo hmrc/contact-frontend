@@ -1,8 +1,7 @@
 @(contactForm: Form[controllers.ContactForm],
   externalContactHmrcUrl: String,
   renderFormOnly: Boolean = false,
-  reCaptchaClientKey: Option[String] = None)( // todo(konrad) captcha should not be optional
-  implicit request: Request[_], lang : Lang, messages : Messages)
+  reCaptchaComponent: Option[Html] = None)(implicit request: Request[_], lang : Lang, messages : Messages)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
@@ -50,20 +49,7 @@
         <input type="hidden" name="isJavascript" id="isJavascript" value="@contactForm.data.get("isJavascript")">
         <input type="hidden" name="referer" id="referer" value="@contactForm.data.get("referer")">
 
-        @reCaptchaClientKey.map { key =>
-            <input type="hidden" name="recaptcha-v3-response" id="recaptcha-v3-response">
-            @**************************************************@
-            @* todo(konrad) google url should be configurable *@
-            @**************************************************@
-            <script src="https://www.google.com/recaptcha/api.js?render=@key"></script>
-            <script>
-                grecaptcha.ready(function() {
-                    grecaptcha.execute('@key', { action: 'contact_hmrc_unauthenticated' }).then(function(token) {
-                        document.getElementById('recaptcha-v3-response').value = token;
-                    });
-                });
-            </script>
-        }
+        @reCaptchaComponent.map { component => @component }
 
         <div class="form-field">
             <button class="button" type="submit">@Messages("form.send")</button>

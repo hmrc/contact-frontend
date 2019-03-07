@@ -5,6 +5,7 @@ import akka.stream.ActorMaterializer
 import config.CFConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
+import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -15,11 +16,10 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, contentAsString, redirectLocation}
+import services.CaptchaService
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import org.jsoup.Jsoup
-import services.CaptchaServiceV3
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -66,13 +66,18 @@ class ContactHmrcControllerSpec
         "referer" -> "n/a",
         "csrfToken" -> "n/a",
         "service" -> "scp",
-        "abFeatures" -> "GetHelpWithThisPageFeature_A"
+        "abFeatures" -> "GetHelpWithThisPageFeature_A",
+        "recaptcha-v3-response" -> "xx"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      val submitResult = controller.submitUnauthenticated(contactRequest)
+      val submitResult = await(controller.submitUnauthenticated(contactRequest))
+
+      Then("the user is redirected to the thanks page")
+      status(submitResult) shouldBe 303
+      redirectLocation(submitResult).get shouldBe "/contact/contact-hmrc/thanks-unauthenticated"
 
       Then("the message is sent to the Deskpro connector")
       Mockito
@@ -87,10 +92,6 @@ class ContactHmrcControllerSpec
           any[Option[Enrolments]],
           any[Option[String]],
           any[Option[String]])(any[HeaderCarrier])
-
-      Then("the user is redirected to the thanks page")
-      status(submitResult) shouldBe 303
-      redirectLocation(submitResult).get shouldBe "/contact/contact-hmrc/thanks-unauthenticated"
     }
 
     "return expected Internal Error when hmrc-deskpro errors for non-authenticated submit page" in new ContactHmrcControllerApplication {
@@ -104,7 +105,8 @@ class ContactHmrcControllerSpec
         "isJavascript" -> "false",
         "referer" -> "n/a",
         "csrfToken" -> "n/a",
-        "service" -> "scp"
+        "service" -> "scp",
+        "recaptcha-v3-response" -> "xx"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -286,15 +288,16 @@ class ContactHmrcControllerSpec
 
     val hmrcDeskproConnector = mock[HmrcDeskproConnector]
 
-    val captchaServiceV3 = mock[CaptchaServiceV3]
-
-    when(captchaServiceV3.isLikelyABot(any())(any())).thenReturn(Future.successful(false))
+    val captchaService = new CaptchaService {
+      override def validateCaptcha(response: String)(implicit headerCarrier: HeaderCarrier): Future[Boolean] =
+        Future.successful(true)
+    }
 
     val controller =
       new ContactHmrcController(
         hmrcDeskproConnector,
         authConnector,
-        captchaServiceV3,
+        captchaService,
         configuration,
         environment)(appConfig, messages)
 

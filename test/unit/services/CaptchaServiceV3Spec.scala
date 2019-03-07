@@ -1,12 +1,14 @@
 package services
 
+import com.codahale.metrics.MetricRegistry
+import com.kenshoo.play.metrics.Metrics
 import connectors.{CaptchaApiResponseV3, CaptchaConnectorV3}
 import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{Matchers, WordSpec}
-import play.api.Configuration
+import support.util.TestAppConfig
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
@@ -31,9 +33,15 @@ class CaptchaServiceV3Spec extends WordSpec with Matchers with MockitoSugar with
       isBot shouldBe true
     }
 
-    "take 'action' into account" in new Fixtures {
-      pending
-      fail("Verify that action belongs to a particular form")
+    "add the result to metrics" in new Fixtures {
+      forAll(scoreGen, scoreGen) { (minScoreRequired, actualScore) =>
+
+        metricsStub.defaultRegistry.remove("recaptchaScore")
+
+        service(minScoreRequired).checkIfBot(CaptchaApiResponseV3(success = true, actualScore, "action"))
+
+        metricsStub.defaultRegistry.histogram("recaptchaScore").getSnapshot.getValues.shouldBe(Array((actualScore * 100).toLong))
+      }
     }
 
   }
@@ -41,13 +49,21 @@ class CaptchaServiceV3Spec extends WordSpec with Matchers with MockitoSugar with
   trait Fixtures {
     implicit val hc = HeaderCarrier()
 
+    lazy val metricsStub = new Metrics {
+      override lazy val defaultRegistry: MetricRegistry = new MetricRegistry
+
+      override def toJson: String = ???
+    }
+
     val scoreGen: Gen[BigDecimal] =
-      Gen.chooseNum[Double](0,1).map(BigDecimal(_))
+          Gen.chooseNum[Double](0,1).map(BigDecimal(_))
 
     def service(minScore: BigDecimal = 0.5) = new CaptchaServiceV3(
       mock[CaptchaConnectorV3],
-      Configuration("captcha.v3.minScore" -> minScore)
-    )(ExecutionContext.global)
+      new TestAppConfig {
+        override def captchaMinScore: BigDecimal = minScore
+      }, metricsStub)(ExecutionContext.global)
+
   }
 
 
