@@ -8,15 +8,20 @@ import util._
 import collection.JavaConversions._
 
 trait AppConfig {
-  val assetsPrefix: String
-  val analyticsToken: String
-  val analyticsHost: String
-  val externalReportProblemUrl: String
-  val externalReportProblemSecureUrl: String
-  val backUrlDestinationWhitelist: Set[String]
+  def assetsPrefix: String
+  def analyticsToken: String
+  def analyticsHost: String
+  def externalReportProblemUrl: String
+  def externalReportProblemSecureUrl: String
+  def backUrlDestinationWhitelist: Set[String]
   def loginCallback(continueUrl: String): String
   def fallbackURLForLangugeSwitcher: String
   def enableLanguageSwitching: Boolean
+  def captchaEnabled: Boolean
+  def captchaMinScore: BigDecimal
+  def captchaClientKey: String
+  def captchaServerKey: String
+  def captchaVerifyUrl : String
 
   def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean
 
@@ -59,6 +64,16 @@ class CFConfig @Inject()(environment: play.api.Environment, configuration: Confi
     configuration
       .getBoolean(s"govuk-tax.$env.enableLanguageSwitching")
       .getOrElse(false)
+
+  override lazy val captchaEnabled: Boolean = getBoolean("captcha.v3.enabled")
+
+  override lazy val captchaMinScore: BigDecimal = BigDecimal(getString("captcha.v3.minScore"))
+
+  override lazy val captchaClientKey: String = getString("captcha.v3.keys.client")
+
+  override lazy val captchaServerKey: String = getString("captcha.v3.keys.server")
+
+  override lazy val captchaVerifyUrl : String = getString("captcha.v3.verifyUrl")
 
   override protected def mode = environment.mode
 
