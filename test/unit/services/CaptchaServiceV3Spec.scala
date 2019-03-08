@@ -2,7 +2,7 @@ package services
 
 import com.codahale.metrics.MetricRegistry
 import com.kenshoo.play.metrics.Metrics
-import connectors.{CaptchaApiResponseV3, CaptchaConnectorV3}
+import connectors.{CaptchaApiResponseV3, CaptchaConnectorV3, SuccessfulCaptchaApiResponse, UnsuccessfulCaptchaApiResponse}
 import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -19,7 +19,7 @@ class CaptchaServiceV3Spec extends WordSpec with Matchers with MockitoSugar with
 
     "classify as bot if score < min required score" in new Fixtures {
       forAll(scoreGen, scoreGen) { (minScoreRequired, actualScore) =>
-        val isBot = service(minScoreRequired).checkIfBot(CaptchaApiResponseV3(success = true, actualScore, "action"))
+        val isBot = service(minScoreRequired).checkIfBot(SuccessfulCaptchaApiResponse(actualScore, "action"))
         isBot shouldBe (actualScore < minScoreRequired)
       }
     }
@@ -28,7 +28,7 @@ class CaptchaServiceV3Spec extends WordSpec with Matchers with MockitoSugar with
       val minScore = 0.5
       val actualScore = 0.6
 
-      val isBot = service(minScore).checkIfBot(CaptchaApiResponseV3(success = false, actualScore, "action"))
+      val isBot = service(minScore).checkIfBot(UnsuccessfulCaptchaApiResponse(Seq("error")))
 
       isBot shouldBe true
     }
@@ -38,7 +38,7 @@ class CaptchaServiceV3Spec extends WordSpec with Matchers with MockitoSugar with
 
         metricsStub.defaultRegistry.remove("recaptchaScore")
 
-        service(minScoreRequired).checkIfBot(CaptchaApiResponseV3(success = true, actualScore, "action"))
+        service(minScoreRequired).checkIfBot(SuccessfulCaptchaApiResponse(actualScore, "action"))
 
         metricsStub.defaultRegistry.histogram("recaptchaScore").getSnapshot.getValues.shouldBe(Array((actualScore * 100).toLong))
       }

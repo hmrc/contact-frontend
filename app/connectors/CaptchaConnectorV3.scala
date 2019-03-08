@@ -41,7 +41,7 @@ class CaptchaConnectorV3 @Inject()(http: HttpClient, appConfig: AppConfig)(impli
   */
 
 sealed trait CaptchaApiResponseV3
-case class SuccessfulCaptchaApiResponse(score : BigDecimal, action : BigDecimal) extends CaptchaApiResponseV3
+case class SuccessfulCaptchaApiResponse(score : BigDecimal, action : String) extends CaptchaApiResponseV3
 case class UnsuccessfulCaptchaApiResponse(errorCodes : Seq[String]) extends CaptchaApiResponseV3
 
 
