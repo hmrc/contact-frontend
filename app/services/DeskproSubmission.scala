@@ -31,7 +31,8 @@ trait DeskproSubmission {
       request          = request,
       enrolmentsOption = enrolments,
       service          = data.service,
-      abFeatures       = data.abFeatures
+      abFeatures       = data.abFeatures,
+      userAction       = data.userAction
     )
 
   def createDeskproFeedback(data: FeedbackForm, enrolments: Option[Enrolments])(
@@ -70,7 +71,8 @@ trait DeskproSubmission {
       request          = request,
       enrolmentsOption = enrolmentsOption,
       service          = problemReport.service,
-      abFeatures       = problemReport.abFeatures
+      abFeatures       = problemReport.abFeatures,
+      userAction       = problemReport.userAction
     )
   }
 

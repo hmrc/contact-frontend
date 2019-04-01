@@ -8,7 +8,8 @@ case class ProblemReport(
   isJavascript: Boolean,
   service: Option[String],
   abFeatures: Option[String],
-  referrer: Option[String])
+  referrer: Option[String],
+  userAction: Option[String])
 
 case class FeedbackForm(
   experienceRating: String,

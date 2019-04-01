@@ -42,7 +42,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
     }
 
     "return 200 and a valid html page for a valid request and js is not enabled for an authenticated user" in new ProblemReportsControllerApplication(fakeApplication) {
-        when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(enrolments), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
+        when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(enrolments), meq(None), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
         val result = controller.submit()(request.withSession(SessionKeys.authToken -> "authToken"))
 
@@ -53,7 +53,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
     }
 
     "return 200 and a valid json for a valid request and js is enabled" in new ProblemReportsControllerApplication(fakeApplication) {
-        when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(true), any[Request[AnyRef]](), meq(None), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
+        when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(true), any[Request[AnyRef]](), meq(None), meq(None), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.successful(TicketId(123)))
 
         val result = controller.submit()(generateRequest())
 
@@ -107,7 +107,7 @@ class ProblemReportsControllerSpec extends UnitSpec with WithFakeApplication {
     }
 
     "return error page if the Deskpro ticket creation fails - Javascript disabled" in new ProblemReportsControllerApplication(fakeApplication) {
-        when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(None), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.failed(new Exception("failed")))
+        when(hmrcDeskproConnector.createDeskProTicket(meq("John Densmore"), meq("name@mail.com"), meq("Support Request"), meq(controller.problemMessage("Some Action", "Some Error")), meq("/contact/problem_reports"), meq(false), any[Request[AnyRef]](), meq(None), meq(None), meq(None), meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(Future.failed(new Exception("failed")))
 
         val result = controller.submit()(request)
         status(result) should be(200)
@@ -174,6 +174,7 @@ class ProblemReportsControllerApplication(app: Application) extends MockitoSugar
       meq(deskproReferrer),
       meq(false),
       any[Request[AnyRef]](),
+      meq(None),
       meq(None),
       meq(None),
       meq(None))(Matchers.any(classOf[HeaderCarrier]))).thenReturn(result)

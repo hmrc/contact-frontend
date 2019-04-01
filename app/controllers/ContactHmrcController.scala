@@ -39,7 +39,8 @@ object ContactHmrcForm {
       "referer"      -> text,
       "csrfToken"    -> text,
       "service"      -> optional(text),
-      "abFeatures"   -> optional(text)
+      "abFeatures"   -> optional(text),
+      "userAction"   -> optional(text)
     )(ContactForm.apply)(ContactForm.unapply)
   )
 }
@@ -73,18 +74,18 @@ class ContactHmrcController @Inject()(
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
         Ok(
           views.html
-            .contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None, None)), loggedIn = true))
+            .contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None, None, None)), loggedIn = true))
       }
     }))
   }
 
-  def indexUnauthenticated(service: String) = Action.async { implicit request =>
+  def indexUnauthenticated(service: String, userAction: Option[String]) = Action.async { implicit request =>
     Future.successful {
       val referer   = request.headers.get("Referer").getOrElse("n/a")
       val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
       Ok(
         views.html.contact_hmrc(
-          ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, Some(service), None)),
+          ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, Some(service), None, userAction)),
           loggedIn = false,
           reCaptchaComponent = Some(recaptchaFormComponent("contact-hmrc")))
       )
@@ -149,7 +150,7 @@ class ContactHmrcController @Inject()(
         Ok(
           views.html.partials.contact_hmrc_form(
             ContactHmrcForm.form.fill(
-              ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service, None)),
+              ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service, None, None)),
             submitUrl,
             renderFormOnly))
       }
@@ -188,13 +189,15 @@ case class ContactForm(
   referer: String,
   csrfToken: String,
   service: Option[String]    = Some("unknown"),
-  abFeatures: Option[String] = None
+  abFeatures: Option[String] = None,
+  userAction: Option[String] = None
 )
 
 object ContactForm {
   def apply(referer: String,
             csrfToken: String,
             service: Option[String],
-            abFeatures: Option[String]): ContactForm =
-    ContactForm("", "", "", isJavascript = false, referer, csrfToken, service, abFeatures)
+            abFeatures: Option[String],
+            userAction: Option[String]): ContactForm =
+    ContactForm("", "", "", isJavascript = false, referer, csrfToken, service, abFeatures, userAction)
 }
