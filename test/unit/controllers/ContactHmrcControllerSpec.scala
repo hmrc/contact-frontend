@@ -44,7 +44,7 @@ class ContactHmrcControllerSpec
       val serviceName = "my-fake-service"
 
       When("the unauthenticated Contact HMRC page is requested with a service name")
-      val contactResult = controller.indexUnauthenticated(serviceName)(contactRequest)
+      val contactResult = controller.indexUnauthenticated(serviceName, None)(contactRequest)
 
       Then("the expected page should be returned")
       status(contactResult) shouldBe 200
