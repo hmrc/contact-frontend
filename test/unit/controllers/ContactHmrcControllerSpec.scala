@@ -44,7 +44,7 @@ class ContactHmrcControllerSpec
       val serviceName = "my-fake-service"
 
       When("the unauthenticated Contact HMRC page is requested with a service name")
-      val contactResult = controller.indexUnauthenticated(serviceName)(contactRequest)
+      val contactResult = controller.indexUnauthenticated(serviceName, None)(contactRequest)
 
       Then("the expected page should be returned")
       status(contactResult) shouldBe 200
@@ -67,7 +67,8 @@ class ContactHmrcControllerSpec
         "csrfToken" -> "n/a",
         "service" -> "scp",
         "abFeatures" -> "GetHelpWithThisPageFeature_A",
-        "recaptcha-v3-response" -> "xx"
+        "recaptcha-v3-response" -> "xx",
+        "userAction" -> "/some-service-page"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -90,6 +91,7 @@ class ContactHmrcControllerSpec
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
+          any[Option[String]],
           any[Option[String]],
           any[Option[String]])(any[HeaderCarrier])
     }
@@ -171,6 +173,7 @@ class ContactHmrcControllerSpec
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
+          any[Option[String]],
           any[Option[String]],
           any[Option[String]])(any[HeaderCarrier])
 
@@ -266,6 +269,7 @@ class ContactHmrcControllerSpec
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
+          any[Option[String]],
           any[Option[String]])(any[HeaderCarrier])
 
 
@@ -311,6 +315,7 @@ class ContactHmrcControllerSpec
         any[Boolean],
         any[Request[AnyRef]](),
         any[Option[Enrolments]],
+        any[Option[String]],
         any[Option[String]],
         any[Option[String]])(any[HeaderCarrier])
       ).thenReturn(result)

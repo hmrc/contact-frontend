@@ -19,7 +19,8 @@ case class Ticket private (
   sessionId: String,
   userTaxIdentifiers: UserTaxIdentifiers,
   service: Option[String],
-  abFeatures: Option[String])
+  abFeatures: Option[String],
+  userAction: Option[String])
 
 object UserTaxIdentifiers {
   implicit val formats = Json.format[UserTaxIdentifiers]
@@ -40,7 +41,8 @@ object Ticket extends FieldTransformer {
     request: Request[AnyRef],
     enrolments: Option[Enrolments],
     service: Option[String],
-    abFeatures: Option[String]): Ticket = {
+    abFeatures: Option[String],
+    userAction: Option[String]): Ticket = {
     val ticket = Ticket(
       name.trim,
       email,
@@ -54,7 +56,8 @@ object Ticket extends FieldTransformer {
       sessionIdFrom(hc),
       userTaxIdentifiersFromEnrolments(enrolments),
       service,
-      abFeatures
+      abFeatures,
+      userAction
     )
     Logger.info(s"Creating ticket $ticket")
     ticket

@@ -75,7 +75,8 @@ object ProblemReportForm {
       "isJavascript" -> boolean,
       "service"      -> optional(text),
       "abFeatures"   -> optional(text),
-      "referrer"     -> optional(text)
+      "referrer"     -> optional(text),
+      "userAction"   -> optional(text)
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
@@ -97,7 +98,8 @@ object ProblemReportForm {
         isJavascript = false,
         service      = service,
         abFeatures   = Some(appConfig.getFeatures(service).mkString(";")),
-        referrer     = request.headers.get("Referer")
+        referrer     = request.headers.get("Referer"),
+        userAction   = None
       )
     )
 }
