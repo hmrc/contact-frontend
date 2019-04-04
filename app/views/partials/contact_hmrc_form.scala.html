@@ -48,7 +48,7 @@
 
         <input type="hidden" name="isJavascript" id="isJavascript" value="@contactForm.data.get("isJavascript")">
         <input type="hidden" name="referer" id="referer" value="@contactForm.data.get("referer")">
-        <input type="hidden" name="userAction" id="userAction">
+        <input type="hidden" name="userAction" id="userAction" value="@contactForm("userAction").value" />
 
         @reCaptchaComponent.map { component => @component }
 
