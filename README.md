@@ -177,7 +177,7 @@ This endpoint will return a HTML partial than can then be embedded in the page l
 b) POST endpoint to submit the form. This should result in making a backend POST call to the endpoint
 `https://contact-frontend.public.mdtp/contact/beta-feedback/form?resubmitUrl`, where the *resubmitUrl* is a public facing URL to this endpoint
 
-In the case where form submission succeeds, this endpoint will return a HTTP 200 response containing the identifier of the ticket that has been created. In such a case, the consuming service should redirect the user to the endpoint that displays the confirmation page (described below).
+In the case where form submission succeeds, this endpoint will return a HTTP 200 response containing the identifier of the ticket that has been created. In this case, the consuming service should redirect the user to the endpoint that displays the confirmation page (described below).
 
 In the case where form submission fails, this endpoint will return a HTTP 400 response with a body of a HTML snippet containing the form with errors higlighted.
 This snippet must be displayed again back to the user.
