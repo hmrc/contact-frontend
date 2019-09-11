@@ -34,5 +34,6 @@ GET			/survey/confirmation 	                     @controllers.SurveyController.c
 GET         /switch-to-welsh                             @controllers.LanguageController.switchToWelsh()
 GET         /switch-to-english                           @controllers.LanguageController.switchToEnglish()
 
-
-
+GET         /accessibility                               @controllers.AccessibilityController.accessibilityForm(service: Option[String], userAction: Option[String])
+POST        /accessibility                               @controllers.AccessibilityController.submitAccessibilityForm()
+GET         /accessibility/thanks                        @controllers.AccessibilityController.thanks()
