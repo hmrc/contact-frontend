@@ -87,3 +87,20 @@ form.comments=Comments
 form.name=Name
 problem_report.email=Email
 problem_report.email.b=Email address
+
+accessibility.describe.the.problem=Describe the accessibility problem you have found
+accessibility.heading=Report an accessibility problem
+accessibility.message.para1=Please only use this form to report any accessibility problems you have found when using this service. Do not include personal or financial information, for example your National Insurance number or credit card details.
+accessibility.message.para2=We review and try to resolve all accessibility problems reported to us.
+accessibility.subheading.problem=Describe the accessibility problem you have found
+accessibility.subheading.contact=Your contact details (optional)
+accessibility.message.contact=If you would like a response to the problem you are reporting, tell us your name and email address.
+form.report.problem=Report Problem
+accessibility.hint.contact=We''ll only use this to reply to your message.
+error.common.accessibility.problem.required=Please enter details of the accessibility problem.
+error.common.accessibility.problem.toolong=The comment cannot be longer than 2000 characters
+
+accessibility.confirmation.title=Your problem has been reported
+what.happens.next=What happens next
+accessibility.thanks.text=We review and try to resolve all accessibility problems reported. If you have given us your contact details we will let you know about the progress of your report.
+accessibility.close.window=You can now close this window or tab.

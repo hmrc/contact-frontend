@@ -3,7 +3,7 @@ package services
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import controllers.ContactForm
-import model.{FeedbackForm, ProblemReport}
+import model.{AccessibilityForm, FeedbackForm, ProblemReport}
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
@@ -84,4 +84,21 @@ trait DeskproSubmission {
     ${Messages("problem_report.error")}:
     $error
     """
+
+  def createAccessibilityTicket(accessibilityForm: AccessibilityForm, enrolments: Option[Enrolments])(implicit req: Request[AnyContent], hc: HeaderCarrier): Future[TicketId] = {
+
+    hmrcDeskproConnector.createDeskProTicket(
+      name = accessibilityForm.name,
+      email = accessibilityForm.email,
+      subject = "Accessibility Problem",
+      message = accessibilityForm.problemDescription,
+      referrer = accessibilityForm.referrer,
+      isJavascript = accessibilityForm.isJavascript,
+      request = req,
+      enrolmentsOption = enrolments,
+      service = accessibilityForm.service,
+      abFeatures = None,
+      userAction = accessibilityForm.userAction
+    )
+  }
 }

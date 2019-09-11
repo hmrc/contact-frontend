@@ -1,5 +1,15 @@
 package model
 
+case class AccessibilityForm(
+  problemDescription: String,
+  name: String,
+  email: String,
+  isJavascript: Boolean,
+  referrer: String,
+  csrfToken: String,
+  service: Option[String] = Some("unknown"),
+  userAction: Option[String] = None)
+
 case class ProblemReport(
   reportName: String,
   reportEmail: String,

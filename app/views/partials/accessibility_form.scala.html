@@ -1,0 +1,63 @@
+@(accessibilityForm: Form[model.AccessibilityForm],
+  submitUrl: String,
+  renderFormOnly: Boolean = false)(implicit request: Request[_], lang : Lang, messages : Messages)
+
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@if(!renderFormOnly) {
+    <header class="page-header">
+        <h1>@Messages("accessibility.heading")</h1>
+    </header>
+    <p>@Messages("accessibility.message.para1")</p>
+    <p>@Messages("accessibility.message.para2")</p>
+}
+
+<form action="@submitUrl" method="POST" class="form--feedback" novalidate="novalidate" id="accessibility-form">
+
+    <input type="hidden" name="csrfToken" value="@accessibilityForm("csrfToken").value"/>
+
+    <input type="hidden" name="service" id="service" value="@accessibilityForm("service").value"/>
+
+    <fieldset>
+        @textArea(
+            accessibilityForm("problemDescription"),
+            '_label           -> Messages("accessibility.subheading.problem"),
+            '_labelClass      -> "bold-large",
+            '_divClass        -> "form-field char-counter",
+            '_inputClass      -> "input--fullwidth",
+            '_maxlength       -> "2000",
+            '_dataCharCounter -> "true",
+            '_dataCharField   -> "true"
+        )
+
+        <span class="bold-large">@Messages("accessibility.subheading.contact")</span>
+        <p>@Messages("accessibility.message.contact")</p>
+        @input(
+            accessibilityForm("name"),
+            '_label      -> Messages("form.name"),
+            '_divClass   -> "form-field",
+            '_inputClass -> "input--fullwidth",
+            '_type       -> "name"
+
+        )
+
+        @input(
+            accessibilityForm("email"),
+            '_label      -> Messages("form.email.address"),
+            '_inputHint  -> Messages("accessibility.hint.contact"),
+            '_divClass   -> "form-field",
+            '_inputClass -> "input--fullwidth",
+            '_type       -> "email",
+            '_hintId     -> "report-email-hint"
+        )
+
+        <input type="hidden" name="isJavascript" id="isJavascript" value="@accessibilityForm("isJavascript").value">
+        <input type="hidden" name="referer" id="referer" value="@accessibilityForm("referer").value">
+        <input type="hidden" name="userAction" id="userAction" value="@accessibilityForm("userAction").value">
+
+        <div class="form-field">
+            <button class="button" type="submit">@Messages("form.report.problem")</button>
+        </div>
+
+    </fieldset>
+</form>

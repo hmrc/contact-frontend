@@ -1,0 +1,14 @@
+@import config.AppConfig
+@import model.AccessibilityForm
+
+@(accessibilityForm: Form[AccessibilityForm], submitUrl: String)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@main(title = Messages("accessibility.heading"), supportLinkEnabled = false) {
+    @views.html.partials.accessibility_form(
+        accessibilityForm = accessibilityForm,
+        submitUrl = submitUrl,
+        renderFormOnly = false
+    )
+}
