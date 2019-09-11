@@ -36,7 +36,9 @@
             accessibilityForm("name"),
             '_label      -> Messages("form.name"),
             '_divClass   -> "form-field",
-            '_inputClass -> "input--fullwidth"
+            '_inputClass -> "input--fullwidth",
+            '_type       -> "name"
+
         )
 
         @input(
@@ -45,7 +47,8 @@
             '_inputHint  -> Messages("accessibility.hint.contact"),
             '_divClass   -> "form-field",
             '_inputClass -> "input--fullwidth",
-            '_type       -> "email"
+            '_type       -> "email",
+            '_hintId     -> "report-email-hint"
         )
 
         <input type="hidden" name="isJavascript" id="isJavascript" value="@accessibilityForm("isJavascript").value">

@@ -96,7 +96,7 @@ accessibility.subheading.problem=Describe the accessibility problem you have fou
 accessibility.subheading.contact=Your contact details (optional)
 accessibility.message.contact=If you would like a response to the problem you are reporting, tell us your name and email address.
 form.report.problem=Report Problem
-accessibility.hint.contact=We’ll only use this to reply to your message.
+accessibility.hint.contact=We''ll only use this to reply to your message.
 error.common.accessibility.problem.required=Please enter details of the accessibility problem.
 error.common.accessibility.problem.toolong=The comment cannot be longer than 2000 characters
 
