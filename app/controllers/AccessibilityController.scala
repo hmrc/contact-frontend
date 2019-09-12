@@ -92,8 +92,7 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
             Future.successful(BadRequest(views.html.accessibility(error, routes.AccessibilityController.submitAccessibilityForm().url))),
           data => {
             for {
-              ticket <- createAccessibilityTicket(data, None)
-              endpage = s"ticket id: ${ticket.ticket_id}"
+              _ <- createAccessibilityTicket(data, None)
             } yield Redirect(routes.AccessibilityController.thanks())
           }
         )

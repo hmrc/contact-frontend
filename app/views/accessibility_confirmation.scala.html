@@ -4,21 +4,6 @@
 
 @main(title = Messages("accessibility.heading"), supportLinkEnabled = false) {
 
-    <header class="page-header">
-        <h1></h1>
-    </header>
-
-    <section id="content" class="l-constrained--topBordered">
-        <div class="alert alert--success">
-            <h1>@Messages("accessibility.confirmation.title")</h1>
-        </div>
-        <article id="report-confirmation">
-            <h2 id="feedback-thank-you-header">@Messages("what.happens.next")</h2>
-            <p>@Messages("accessibility.thanks.text")</p>
-
-            <p>@Messages("accessibility.close.window")</p>
-        </article>
-
-    </section>
+ @views.html.partials.accessibility_form_confirmation()
 
 }
