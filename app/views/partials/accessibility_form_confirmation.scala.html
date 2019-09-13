@@ -1,0 +1,14 @@
+@()(implicit request: Request[_], lang : Lang, messages : Messages)
+
+<section id="content" class="l-constrained--topBordered">
+    <div class="govuk-box-highlight" style="background:#00703c">
+        <h1 class="bold-xlarge" style="margin-bottom: 0">@Messages("accessibility.confirmation.title")</h1>
+    </div>
+    <article id="report-confirmation">
+        <h2 id="feedback-thank-you-header">@Messages("what.happens.next")</h2>
+        <p>@Messages("accessibility.thanks.text")</p>
+
+        <p>@Messages("accessibility.close.window")</p>
+    </article>
+
+</section>

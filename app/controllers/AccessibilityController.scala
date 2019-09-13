@@ -4,22 +4,25 @@ import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import javax.inject.Inject
 import model.AccessibilityForm
+import play.api.Mode.Mode
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.{Configuration, Environment}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, Request}
+import play.api.mvc.{Action, AnyContent, Request, Result}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions}
+import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
 
 import scala.concurrent.Future
 
 object AccessibilityFormBind {
-  private val emailValidator                     = new DeskproEmailValidator()
-  private val validateEmail: (String) => Boolean = emailValidator.validate
+  private val emailValidator                     = DeskproEmailValidator()
+  private val validateEmail: String => Boolean = emailValidator.validate
 
   def emptyForm(csrfToken: String,
                 referer: Option[String] = None,
@@ -39,7 +42,7 @@ object AccessibilityFormBind {
       ))
   }
 
-  def form(implicit request: Request[_]) = Form[AccessibilityForm](
+  def form(implicit request: Request[_]): Form[AccessibilityForm] = Form[AccessibilityForm](
     mapping(
       "problemDescription" -> text
         .verifying("error.common.accessibility.problem.toolong", msg => msg.length <= 2000)
@@ -69,37 +72,102 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
     with I18nSupport
     with AuthorisedFunctions
     with LoginRedirection
+    with ContactFrontendActions
 {
 
-  override protected def mode = environment.mode
+  override protected def mode: Mode = environment.mode
 
-  override protected def runModeConfiguration = configuration
+  override protected def runModeConfiguration: Configuration = configuration
 
-  def accessibilityForm(service: Option[String], userAction: Option[String]) = Action.async { implicit request =>
-    Future.successful{
-      val referer   = request.headers.get("Referer")
-      val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-      val form      = AccessibilityFormBind.emptyForm(csrfToken, referer, service, userAction)
-      Ok(views.html.accessibility(form, routes.AccessibilityController.submitAccessibilityForm().url))
+  /** Authenticated routes */
+
+  def accessibilityForm(service: Option[String], userAction: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+    if( request.session.get(SessionKeys.authToken).isEmpty) {
+      Future.successful {
+        Redirect(routes.AccessibilityController.unauthenticatedAccessibilityForm(service, userAction))
+      }
+    } else {
+      loginRedirection(routes.AccessibilityController.accessibilityForm(service, userAction).url)(
+        authorised(AuthProviders(GovernmentGateway)) {
+
+          Future.successful {
+            val referer   = request.headers.get("Referer")
+            val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
+            val form      = AccessibilityFormBind.emptyForm(csrfToken, referer, service, userAction)
+            Ok(views.html.accessibility(form, routes.AccessibilityController.submitAccessibilityForm().url, loggedIn = true))
+          }
+
+        })
     }
   }
 
-  def submitAccessibilityForm() = Action.async { implicit request =>
-    AccessibilityFormBind.form
-      .bindFromRequest()(request)
-        .fold(
-          (error: Form[AccessibilityForm]) =>
-            Future.successful(BadRequest(views.html.accessibility(error, routes.AccessibilityController.submitAccessibilityForm().url))),
-          data => {
-            for {
-              ticket <- createAccessibilityTicket(data, None)
-              endpage = s"ticket id: ${ticket.ticket_id}"
-            } yield Redirect(routes.AccessibilityController.thanks())
-          }
-        )
+  def submitAccessibilityForm(): Action[AnyContent] = Action.async { implicit request =>
+    loginRedirection(routes.AccessibilityController.submitAccessibilityForm().url)(
+      authorised(AuthProviders(GovernmentGateway)) {
+
+        AccessibilityFormBind.form
+          .bindFromRequest()(request)
+          .fold(
+            (error: Form[AccessibilityForm]) =>
+              Future.successful(BadRequest(views.html.accessibility(error, routes.AccessibilityController.submitAccessibilityForm().url, loggedIn = true))),
+            data => {
+              for {
+                maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
+                _                   <- createAccessibilityTicket(data, maybeUserEnrolments)
+                thanks               = routes.AccessibilityController.thanks()
+              } yield Redirect(thanks)
+            }
+          )
+
+      })
   }
 
-  def thanks() = Action.async { implicit request =>
+  def thanks(): Action[AnyContent] = Action.async { implicit request =>
+    loginRedirection(routes.AccessibilityController.thanks().url)(
+      authorised(AuthProviders(GovernmentGateway)) {
+        Future.successful(Ok(views.html.accessibility_confirmation("", loggedIn = true)))
+      })
+  }
+
+
+  /** Unauthenticated routes */
+
+  def unauthenticatedAccessibilityForm(service: Option[String], userAction: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+    Future.successful {
+      val referer   = request.headers.get("Referer")
+      val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
+      val form      = AccessibilityFormBind.emptyForm(csrfToken, referer, service, userAction)
+      Ok(views.html.accessibility(form, routes.AccessibilityController.submitUnauthenticatedAccessibilityForm().url, loggedIn = false))
+    }
+  }
+
+  def submitUnauthenticatedAccessibilityForm(): Action[AnyContent] = Action.async { implicit request =>
+    AccessibilityFormBind.form
+      .bindFromRequest()(request)
+      .fold(
+        (error: Form[AccessibilityForm]) =>
+          Future.successful(BadRequest(views.html.accessibility(error, routes.AccessibilityController.submitUnauthenticatedAccessibilityForm().url, loggedIn = false))),
+        data => {
+          for {
+            _      <- createAccessibilityTicket(data, None)
+            thanks  = routes.AccessibilityController.unauthenticatedThanks()
+          } yield Redirect(thanks)
+        }
+      )
+  }
+
+  def unauthenticatedThanks(): Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok(views.html.accessibility_confirmation("")))
   }
+
+  private[controllers] def doForm(service: Option[String], userAction: Option[String], loggedIn:Boolean = false)(implicit request: Request[AnyContent]) : Future[Result] = {
+    Future.successful {
+      val referer   = request.headers.get("Referer")
+      val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
+      val form      = AccessibilityFormBind.emptyForm(csrfToken, referer, service, userAction)
+      Ok(views.html.accessibility(form, routes.AccessibilityController.submitAccessibilityForm().url, loggedIn = true))
+    }
+  }
+
+
 }
