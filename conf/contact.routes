@@ -37,3 +37,7 @@ GET         /switch-to-english                           @controllers.LanguageCo
 GET         /accessibility                               @controllers.AccessibilityController.accessibilityForm(service: Option[String], userAction: Option[String])
 POST        /accessibility                               @controllers.AccessibilityController.submitAccessibilityForm()
 GET         /accessibility/thanks                        @controllers.AccessibilityController.thanks()
+
+GET         /accessibility-unauthenticated               @controllers.AccessibilityController.unauthenticatedAccessibilityForm(service: Option[String], userAction: Option[String])
+POST        /accessibility-unauthenticated               @controllers.AccessibilityController.submitUnauthenticatedAccessibilityForm()
+GET         /accessibility-unauthenticated/thanks        @controllers.AccessibilityController.unauthenticatedThanks()

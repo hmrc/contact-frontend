@@ -87,8 +87,8 @@ form.name=Enw
 problem_report.email=E-bost
 problem_report.email.b=Cyfeiriad e-bost
 
-accessibility.close.window=You can now close this window or tab.
-accessibility.confirmation.title=Your problem has been reported
+accessibility.close.window=Gallwch nawr cau''r ffenestr neu''r tab hwn.
+accessibility.confirmation.title=Mae''ch problem wedi ei nodi
 accessibility.describe.the.problem=Disgrifiwch y broblem hygyrchedd rydych wedi dod o hyd iddi
 accessibility.heading=Rhoi gwybod am broblem hygyrchedd
 accessibility.hint.contact=Byddwn ond yn defnyddio hwn i ateb eich neges.
@@ -97,8 +97,10 @@ accessibility.message.para1=Dylech dim ond defnyddio''r ffurflen hon i roi gwybo
 accessibility.message.para2=Rydym yn adolygu ac yn ceisio mynd i''r afael ag unrhyw broblem hygyrchedd rydym y cael gwybod amdani.
 accessibility.subheading.contact=Eich manylion cyswllt
 accessibility.subheading.problem=Disgrifiwch y broblem hygyrchedd rydych wedi dod o hyd iddi
-accessibility.thanks.text=We review and try to resolve all accessibility problems reported. If you have given us your contact details we will let you know about the progress of your report.
-error.common.accessibility.problem.required=Please enter details of the accessibility problem.
+accessibility.thanks.text=Rydym yn adolygu ac yn ceisio mynd i''r afael ag unrhyw broblem hygyrchedd y rhoddir gwybod amdani. Os ydych wedi rhoi''ch manylion cyswllt i ni, rhown wybod i chi am hynt eich gwybodaeth.
+error.common.accessibility.problem.required=Rhowch eich sylwadau.
 error.common.accessibility.problem.toolong=Ni all y sylwadau fod yn hirach na 2000 o gymeriadau
 form.report.problem=Anfon
-what.happens.next=What happens next
+what.happens.next=Yr hyn sy''n digwydd nesaf
+
+
