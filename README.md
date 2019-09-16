@@ -17,6 +17,7 @@ The service is not intended to be used standalone; rather to be integrated with 
       * [Contacting HMRC - <em>Help and contact</em>](#contacting-hmrc---help-and-contact)
       * [Providing feedback about Digital Customer Support Team](#providing-feedback-about-digital-customer-support-team)
       * [Providing Beta feedback about services](#providing-beta-feedback-about-services)
+      * [Report an accessibility problem](#report-an-accessibility-problem) 
    * [Integration guide](#integration-guide)
       * [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
       * [Creating own customer contact forms](#creating-own-customer-contact-forms)
@@ -191,6 +192,33 @@ A good example of how to integrate the feedback form with the service can be fou
 
 [[Back to the top]](#top)
 
+## Report an Accessibility Problem <a name="report-an-accessibility-problem"></a>
+
+![alt tag](docs/accessibility.png)
+
+This form consists of the following fields:
+- Description of accessibility problem
+- user's name
+- user's email address
+
+Accessibility problems are forwards to Deskpro with the subject *"Accessibility Problem"*.
+
+This functionality is presently only implemented as a standalone page.
+
+To display the standalone page, create a link from your accessibility statement page:
+* if the user is unauthenticated - `https://www.{environment}.tax.service.gov.uk/contact/accessibility-unauthenticated?service=${serviceId}&userAction=${useraction}`
+* if the user is authenticated - `https://www.{environment}.tax.service.gov.uk/contact/accessility?service=${serviceId}&userAction=${useraction}`
+
+`{environment}` is not included in the case of the production environment.
+
+URL parameters:
+* *service* - consuming services should specify their identifier as the 'service' parameter of requests to contact-frontend. The value of this parameter will be later passed to Splunk and will allow you to properly analyze feedback
+* *userAction* - path of page the user reported in accessibility problem on. Since they arrive at the form from the accessibility statement page, we cannot rely on the referer header to track this, so we use this field to store the this value
+
+The form is intended to be displayed in a new tab or window. When the form is completed they are redirected to a confirmation page and prompted to close the tab or window.
+
+[[Back to the top]](#top)
+
 # Integration guide <a name="integration-guide"></a>
 
 Below, you can find a brief description of how to use forms provided by contact-frontend in your service.
@@ -198,6 +226,7 @@ Below, you can find a brief description of how to use forms provided by contact-
 A detailed integration guide can be found on [Confluence](https://confluence.tools.tax.service.gov.uk/display/PlatDev/Customer+Contact+Services%3A+Integration+Guide).
 
 [[Back to the top]](#top)
+
 
 ## Cross-Origin Resource Sharing (CORS) <a name="cross-origin-resource-sharing-cors"></a>
 
