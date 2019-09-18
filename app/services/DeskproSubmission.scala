@@ -4,6 +4,7 @@ import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import controllers.ContactForm
 import model.{AccessibilityForm, FeedbackForm, ProblemReport}
+import org.apache.http.client.utils.URIBuilder
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
@@ -26,7 +27,7 @@ trait DeskproSubmission {
       email            = data.contactEmail,
       subject          = Subject,
       message          = data.contactComments,
-      referrer         = data.referer,
+      referrer         = DeskproSubmission.rebuildReferer(Option(data.referer), data.userAction),
       isJavascript     = data.isJavascript,
       request          = request,
       enrolmentsOption = enrolments,
@@ -47,7 +48,7 @@ trait DeskproSubmission {
         case ""      => "No comment given"
         case comment => comment
       },
-      referrer         = data.referrer,
+      referrer         = DeskproSubmission.rebuildReferer(Some(data.referrer), None),
       isJavascript     = data.javascriptEnabled,
       request          = request,
       enrolmentsOption = enrolments,
@@ -66,7 +67,7 @@ trait DeskproSubmission {
       email            = problemReport.reportEmail,
       subject          = "Support Request",
       message          = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer         = referrer.getOrElse("/home"),
+      referrer         = DeskproSubmission.rebuildReferer(referrer, problemReport.userAction),
       isJavascript     = problemReport.isJavascript,
       request          = request,
       enrolmentsOption = enrolmentsOption,
@@ -92,7 +93,7 @@ trait DeskproSubmission {
       email = accessibilityForm.email,
       subject = "Accessibility Problem",
       message = accessibilityForm.problemDescription,
-      referrer = accessibilityForm.referrer,
+      referrer = DeskproSubmission.rebuildReferer(Option(accessibilityForm.referrer), accessibilityForm.userAction),
       isJavascript = accessibilityForm.isJavascript,
       request = req,
       enrolmentsOption = enrolments,
@@ -101,4 +102,19 @@ trait DeskproSubmission {
       userAction = accessibilityForm.userAction
     )
   }
+
+}
+
+object DeskproSubmission {
+
+  def rebuildReferer(referer: Option[String], userAction: Option[String]): String = {
+    (referer, userAction) match {
+      case (None, None)                       => "N/A"
+      case (None, Some(ua))                   => ua
+      case (Some(rf), None)                   => rf
+      case (Some(rf), Some(ua)) if ua.isEmpty => rf
+      case (Some(rf), Some(ua))               => new URIBuilder(rf).setPath(ua).build().toASCIIString
+    }
+  }
+
 }
