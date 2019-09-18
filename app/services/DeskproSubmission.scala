@@ -12,6 +12,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 
 import scala.concurrent.Future
+import scala.util.Try
 
 trait DeskproSubmission {
 
@@ -113,8 +114,12 @@ object DeskproSubmission {
       case (None, Some(ua))                   => ua
       case (Some(rf), None)                   => rf
       case (Some(rf), Some(ua)) if ua.isEmpty => rf
-      case (Some(rf), Some(ua))               => new URIBuilder(rf).setPath(ua).build().toASCIIString
+      case (Some(rf), Some(ua))               => buildUri(rf).setPath(ua).build().toASCIIString
     }
   }
+
+  private def buildUri(referer: String) : URIBuilder =
+    Try(new URIBuilder(referer)).getOrElse(new URIBuilder())
+
 
 }

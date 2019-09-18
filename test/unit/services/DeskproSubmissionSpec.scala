@@ -44,6 +44,19 @@ class DeskproSubmissionSpec  extends WordSpec with Matchers  {
       res should be ("https://tax.gov.uk" + "/" + userAction)
     }
 
+    "produces just path if referer is a blank string and userAction set" in {
+      val userAction = "/servicesome-page/123"
+      val res = rebuildReferer(Some(""), Some(userAction))
+      res should be (userAction)
+    }
+
+    "handles invalid uris in referer field" in {
+      val referer = "hello world"
+      val userAction = "/service/some-page"
+      val res = rebuildReferer(Some(referer), Some(userAction))
+      res should be (userAction)
+    }
+
   }
 
   }
