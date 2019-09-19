@@ -18,7 +18,7 @@ import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object AccessibilityFormBind {
   private val emailValidator                     = DeskproEmailValidator()
@@ -159,15 +159,5 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
   def unauthenticatedThanks(): Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok(views.html.accessibility_confirmation("")))
   }
-
-  private[controllers] def doForm(service: Option[String], userAction: Option[String], loggedIn:Boolean = false)(implicit request: Request[AnyContent]) : Future[Result] = {
-    Future.successful {
-      val referer   = request.headers.get("Referer")
-      val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-      val form      = AccessibilityFormBind.emptyForm(csrfToken, referer, service, userAction)
-      Ok(views.html.accessibility(form, routes.AccessibilityController.submitAccessibilityForm().url, loggedIn = true))
-    }
-  }
-
 
 }
