@@ -6,6 +6,7 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 
 @main(title = Messages("accessibility.heading"), supportLinkEnabled = false, userLoggedIn = loggedIn) {
+    @helpers.wcag_style()
     @views.html.partials.accessibility_form(
         accessibilityForm = accessibilityForm,
         submitUrl = submitUrl,
