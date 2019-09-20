@@ -6,7 +6,7 @@
   userLoggedIn: Boolean = true, 
   supportLinkEnabled: Boolean = true, 
   bodyClasses: Option[String] = None,
-  service: Option[String] = None)(mainContent: Html)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+  service: Option[String] = None, scripts: Option[Html] = None)(mainContent: Html)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 
 
@@ -27,4 +27,4 @@
   mainContent = layouts.article(mainContent),
   userLoggedIn = userLoggedIn,
   getHelpForm = getHelpForm,
-  enableLanguageSwitching = appConfig.enableLanguageSwitching)
+  enableLanguageSwitching = appConfig.enableLanguageSwitching, scripts = scripts)
