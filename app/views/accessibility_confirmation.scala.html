@@ -2,7 +2,7 @@
 
 @(ticketId:String, loggedIn: Boolean = false)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
-@main(title = Messages("accessibility.heading"), supportLinkEnabled = false, userLoggedIn = loggedIn) {
+@main(title = Messages("accessibility.heading"), supportLinkEnabled = false, userLoggedIn = loggedIn, style = Some(helpers.wcag_style.render())) {
 
  @views.html.partials.accessibility_form_confirmation()
 
