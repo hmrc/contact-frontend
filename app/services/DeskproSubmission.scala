@@ -12,9 +12,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 
 import scala.concurrent.Future
-import scala.util.Try
+import scala.util.{Success, Try}
 
 trait DeskproSubmission {
+
+  import DeskproSubmission.replaceRefererPath
 
   private val Subject = "Contact form submission"
 
@@ -28,7 +30,7 @@ trait DeskproSubmission {
       email            = data.contactEmail,
       subject          = Subject,
       message          = data.contactComments,
-      referrer         = DeskproSubmission.rebuildReferer(Option(data.referer), data.userAction),
+      referrer         = replaceRefererPath(data.referer, data.userAction),
       isJavascript     = data.isJavascript,
       request          = request,
       enrolmentsOption = enrolments,
@@ -49,7 +51,7 @@ trait DeskproSubmission {
         case ""      => "No comment given"
         case comment => comment
       },
-      referrer         = DeskproSubmission.rebuildReferer(Some(data.referrer), None),
+      referrer         = data.referrer,
       isJavascript     = data.javascriptEnabled,
       request          = request,
       enrolmentsOption = enrolments,
@@ -68,7 +70,7 @@ trait DeskproSubmission {
       email            = problemReport.reportEmail,
       subject          = "Support Request",
       message          = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer         = DeskproSubmission.rebuildReferer(referrer, problemReport.userAction),
+      referrer         = replaceRefererPath(referrer.getOrElse(""), problemReport.userAction),
       isJavascript     = problemReport.isJavascript,
       request          = request,
       enrolmentsOption = enrolmentsOption,
@@ -90,17 +92,17 @@ trait DeskproSubmission {
   def createAccessibilityTicket(accessibilityForm: AccessibilityForm, enrolments: Option[Enrolments])(implicit req: Request[AnyContent], hc: HeaderCarrier): Future[TicketId] = {
 
     hmrcDeskproConnector.createDeskProTicket(
-      name = accessibilityForm.name,
-      email = accessibilityForm.email,
-      subject = "Accessibility Problem",
-      message = accessibilityForm.problemDescription,
-      referrer = DeskproSubmission.rebuildReferer(Option(accessibilityForm.referrer), accessibilityForm.userAction),
-      isJavascript = accessibilityForm.isJavascript,
-      request = req,
+      name             = accessibilityForm.name,
+      email            = accessibilityForm.email,
+      subject          = "Accessibility Problem",
+      message          = accessibilityForm.problemDescription,
+      referrer         = replaceRefererPath(accessibilityForm.referrer, accessibilityForm.userAction),
+      isJavascript     = accessibilityForm.isJavascript,
+      request          = req,
       enrolmentsOption = enrolments,
-      service = accessibilityForm.service,
-      abFeatures = None,
-      userAction = accessibilityForm.userAction
+      service          = accessibilityForm.service,
+      abFeatures       = None,
+      userAction       = accessibilityForm.userAction
     )
   }
 
@@ -108,15 +110,11 @@ trait DeskproSubmission {
 
 object DeskproSubmission {
 
-  def rebuildReferer(referer: Option[String], userAction: Option[String]): String = {
-    (referer, userAction) match {
-      case (None, None)                       => "N/A"
-      case (None, Some(ua))                   => ua
-      case (Some(rf), None)                   => rf
-      case (Some(rf), Some(ua)) if ua.isEmpty => rf
-      case (Some(rf), Some(ua))               => buildUri(rf).setPath(ua).build().toASCIIString
-    }
-  }
+    def replaceRefererPath(referer: String, path: Option[String]): String =
+      path.map(p => buildUri(referer).setPath(p).build().toASCIIString).getOrElse(referer)
+
+
+
 
   private def buildUri(referer: String) : URIBuilder =
     Try(new URIBuilder(referer)).getOrElse(new URIBuilder())
