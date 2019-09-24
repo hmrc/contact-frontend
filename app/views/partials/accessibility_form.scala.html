@@ -4,6 +4,26 @@
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
+    @if(accessibilityForm.hasErrors) {
+
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+            <h2 class="govuk-error-summary__title" id="error-summary-title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                @accessibilityForm.errors.map{ error:FormError =>
+                    <li>
+                        <a href="#@{error.key}">@Messages(error.messages)</a>
+                    </li>
+
+                }
+                </ul>
+            </div>
+        </div>
+    }
+
+
 @if(!renderFormOnly) {
     <header class="page-header">
         <h1>@Messages("accessibility.heading")</h1>
@@ -12,7 +32,10 @@
     <p>@Messages("accessibility.message.para2")</p>
 }
 
+
+
 <form action="@submitUrl" method="POST" class="form--feedback" novalidate="novalidate" id="accessibility-form">
+
 
     <input type="hidden" name="csrfToken" value="@accessibilityForm("csrfToken").value"/>
 
