@@ -4,6 +4,7 @@ import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import controllers.ContactForm
 import model.{AccessibilityForm, FeedbackForm, ProblemReport}
+import org.apache.commons.lang3.StringUtils
 import org.apache.http.client.utils.URIBuilder
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
@@ -111,10 +112,10 @@ trait DeskproSubmission {
 object DeskproSubmission {
 
     def replaceRefererPath(referer: String, path: Option[String]): String =
-      path.map(p => buildUri(referer).setPath(p).build().toASCIIString).getOrElse(referer)
-
-
-
+      path
+        .filterNot(StringUtils.isEmpty)
+        .map(p => buildUri(referer).setPath(p).build().toASCIIString)
+        .getOrElse(referer)
 
   private def buildUri(referer: String) : URIBuilder =
     Try(new URIBuilder(referer)).getOrElse(new URIBuilder())
