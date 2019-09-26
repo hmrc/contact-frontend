@@ -47,9 +47,15 @@ class DeskproSubmissionSpec  extends WordSpec with Matchers  {
       res should be (userAction)
     }
 
-    "doesn't replace path if userAction is a blank string" in {
+    "doesn't replace path if userAction is a empty string" in {
       val referer = "https://tax.gov.uk/service/accessibility-statement"
       val res = replaceRefererPath(referer, Some(""))
+      res should be (referer)
+    }
+
+    "doesn't replace path if userAction is just whitespace" in {
+      val referer = "https://tax.gov.uk/service/accessibility-statement"
+      val res = replaceRefererPath(referer, Some("         "))
       res should be (referer)
     }
   }

@@ -4,7 +4,6 @@ import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import controllers.ContactForm
 import model.{AccessibilityForm, FeedbackForm, ProblemReport}
-import org.apache.commons.lang3.StringUtils
 import org.apache.http.client.utils.URIBuilder
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
@@ -13,7 +12,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 
 import scala.concurrent.Future
-import scala.util.{Success, Try}
+import scala.util.Try
 
 trait DeskproSubmission {
 
@@ -113,7 +112,7 @@ object DeskproSubmission {
 
     def replaceRefererPath(referer: String, path: Option[String]): String =
       path
-        .filterNot(StringUtils.isEmpty)
+        .filter(_.trim.nonEmpty)
         .map(p => buildUri(referer).setPath(p).build().toASCIIString)
         .getOrElse(referer)
 
