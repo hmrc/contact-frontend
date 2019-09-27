@@ -1,6 +1,6 @@
 common.thank.you=Thank you
 common.acknowledgment=Message received
-error.common.feedback.name_mandatory=Please provide your name.
+error.common.feedback.name_mandatory=Enter your name.
 error.common.feedback.name_too_long=Your name can''t be longer than 70 characters
 error.common.feedback.rating_mandatory=Tell us what you think of the service.
 error.common.feedback.rating_valid=Please select a valid experience rating
@@ -31,6 +31,7 @@ error.common.problem_report.error_mandatory=Please enter details of what went wr
 error.common.problem_report.error_mandatory.b=Enter the problem you want to tell us about
 error.common.comments_mandatory=Enter your comments.
 error.common.comments_too_long=The comment cannot be longer than 2000 characters
+error.summary.title=There is a problem
 
 
 language-switcher.english=English
@@ -99,7 +100,7 @@ accessibility.message.para2=We review and try to resolve all accessibility probl
 accessibility.subheading.contact=Your contact details
 accessibility.subheading.problem=Describe the accessibility problem you have found
 accessibility.thanks.text=We review and try to resolve all accessibility problems reported. If you have given us your contact details we will let you know about the progress of your report.
-error.common.accessibility.problem.required=Please enter details of the accessibility problem.
+error.common.accessibility.problem.required=Enter details of the accessibility problem.
 error.common.accessibility.problem.toolong=The comment cannot be longer than 2000 characters
 form.report.problem=Report Problem
 what.happens.next=What happens next
