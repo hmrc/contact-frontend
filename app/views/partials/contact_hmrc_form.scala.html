@@ -23,27 +23,23 @@
     <input type="hidden" name="service" id="service" value="@contactForm("service").value"/>
 
     <fieldset>
-        @input(
-        contactForm("contact-name"),
-        '_label -> Messages("form.your.name"),
-        '_divClass -> "form-field",
-        '_inputClass -> "input--fullwidth"
+        @input_text(
+            contactForm("contact-name"),
+            label = Messages("form.your.name"),
+            inputClass = Some("form-control-3-4")
         )
-        @input(
-        contactForm("contact-email"),
-        '_label -> Messages("form.email.address"),
-        '_divClass -> "form-field",
-        '_inputClass -> "input--fullwidth",
-        '_type -> "email"
+
+        @input_text(
+            contactForm("contact-email"),
+            label =  Messages("form.email.address"),
+            inputClass = Some("form-control-3-4"),
+            inputType = Some("email")
         )
-        @textArea(
-        contactForm("contact-comments"),
-        '_label -> Messages("form.your.comments"),
-        '_divClass -> "form-field char-counter",
-        '_inputClass -> "input--fullwidth",
-        '_maxlength -> "2000",
-        '_dataCharCounter -> "true",
-        '_dataCharField -> "true"
+
+        @input_textarea(
+            field = contactForm("contact-comments"),
+            label = Messages("form.your.comments"),
+            charLimit = Some(2000)
         )
 
         <input type="hidden" name="isJavascript" id="isJavascript" value="@contactForm.data.get("isJavascript")">
