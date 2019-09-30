@@ -20,36 +20,38 @@
     <input type="hidden" name="service" id="feedbackService" value="@extractServiceParameter(feedbackForm, service)"/>
 
     <fieldset>
-        @input_radio_group(
-        feedbackForm("feedback-rating"),
-        Vector(("5",Messages("form.online.services.very_good")), ("4",Messages("form.online.services.good")), ("3",Messages("form.online.services.neutral")), ("2",Messages("form.online.services.bad")), ("1",Messages("form.online.services.very_bad"))),
-        '_legend -> Messages("form.online.services"),
-        'divClass -> "multiple-choice"
+        @input_radio(
+            feedbackForm("feedback-rating"),
+            legend = Messages("form.online.services"),
+            inputs = Seq(
+                ("5", "5", Messages("form.online.services.very_good")),
+                ("4", "4", Messages("form.online.services.good")),
+                ("3", "3", Messages("form.online.services.neutral")),
+                ("2", "2", Messages("form.online.services.bad")),
+                ("1", "1", Messages("form.online.services.very_bad"))
+            )
         )
-        <br/>
-        @input(
-        feedbackForm("feedback-name"),
-        '_label -> Messages("form.name"),
-        '_divClass -> "form-field",
-        '_inputClass -> "input--fullwidth"
+
+        @input_text(
+            field = feedbackForm("feedback-name"),
+            label = Messages("form.name"),
+            inputClass = Some("form-control-3-4")
         )
-        @input(
-        feedbackForm("feedback-email"),
-        '_label -> Messages("form.email.address"),
-        '_divClass -> "form-field",
-        '_inputClass -> "input--fullwidth",
-        '_type -> "email"
+
+        @input_text(
+            field = feedbackForm("feedback-email"),
+            label = Messages("form.email.address"),
+            inputClass = Some("form-control-3-4"),
+            inputType = Some("email")
         )
-        @textArea(
-        feedbackForm("feedback-comments"),
-        '_label -> Messages("form.comments"),
-        '_info -> Messages("common.feedback.information.warning"),
-        '_divClass -> "form-field char-counter",
-        '_inputClass -> "input--fullwidth",
-        '_maxlength -> "2000",
-        '_dataCharCounter -> "true",
-        '_dataCharField -> "true"
+        @input_textarea(
+            field = feedbackForm("feedback-comments"),
+            label = Messages("form.comments"),
+            inputClass = Some("input--fullwidth"),
+            hint = Some(Messages("common.feedback.information.warning")),
+            charLimit = Some(2000)
         )
+
         <input type="hidden" name="isJavascript" id="isJavascript" value="@feedbackForm.data.get("isJavascript")">
         <input type="hidden" name="referer" id="referer" value="@feedbackForm.data.get("referer")">
         <input type="hidden" name="canOmitComments" id="canOmitComments" value="@canOmitComments">

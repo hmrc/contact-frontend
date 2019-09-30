@@ -48,7 +48,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+      page.body().getElementsByClass("error-message") shouldNot be(empty)
 
       verifyZeroInteractions(hmrcDeskproConnector)
     }
@@ -82,7 +82,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+      page.body().getElementsByClass("error-message") shouldNot be(empty)
 
       verifyZeroInteractions(hmrcDeskproConnector)
     }
@@ -95,7 +95,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+      page.body().getElementsByClass("error-message") shouldNot be(empty)
       page.body().getElementById("feedbackService").attr("value") shouldBe "someService"
       page.body().getElementById("feedbackBackUrl").attr("value") shouldBe "http://www.back.url"
       page.body().getElementById("canOmitComments").attr("value") shouldBe "true"
@@ -222,7 +222,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+      page.body().getElementsByClass("error-message") shouldNot be(empty)
 
       verifyZeroInteractions(hmrcDeskproConnector)
     }
@@ -235,7 +235,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
       status(result) should be(200)
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-notification") should be(empty)
+      page.body().getElementsByClass("error-message") should be(empty)
 
       verifyRequestMade("No comment given")
     }
@@ -248,7 +248,7 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+      page.body().getElementsByClass("error-message") shouldNot be(empty)
 
       verifyZeroInteractions(hmrcDeskproConnector)
     }

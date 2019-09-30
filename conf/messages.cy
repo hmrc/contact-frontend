@@ -31,6 +31,7 @@ error.common.problem_report.error_mandatory=Rhowch fanylion yr hyn a aeth o''i l
 error.common.problem_report.error_mandatory.b=Nodwch y broblem rydych eisiau rhoi gwybod i ni amdani
 error.common.comments_mandatory=Rhowch eich sylwadau.
 error.common.comments_too_long=Ni all y sylwadau fod yn hirach na 2000 o gymeriadau
+error.summary.title=Mae problem wedi codi
 
 language-switcher.english=English
 language-switcher.english.hover=Use this account in English

@@ -71,7 +71,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors = document.getElementsByClass("error-notification").asScala
+      val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(3)
 
       errors.exists(_.text().equals(Messages("error.common.accessibility.problem.required"))) shouldBe true
@@ -90,7 +90,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors = document.getElementsByClass("error-notification").asScala
+      val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(1)
 
       errors.exists(_.text().equals(Messages("error.common.accessibility.problem.toolong"))) shouldBe true
@@ -107,7 +107,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors = document.getElementsByClass("error-notification").asScala
+      val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(1)
 
       errors.exists(_.text().equals(Messages("error.email"))) shouldBe true
@@ -124,7 +124,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors = document.getElementsByClass("error-notification").asScala
+      val errors = document.getElementsByClass("error-message").asScala
       errors.exists(_.text().equals(Messages("deskpro.email_too_long"))) shouldBe true
     }
 
@@ -139,7 +139,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors = document.getElementsByClass("error-notification").asScala
+      val errors = document.getElementsByClass("error-message").asScala
       errors.exists(_.text().equals(Messages("error.common.feedback.name_too_long"))) shouldBe true
     }
 
@@ -190,7 +190,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors = document.getElementsByClass("error-notification").asScala
+      val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(3)
 
       errors.exists(_.text().equals(Messages("error.common.accessibility.problem.required"))) shouldBe true
@@ -209,7 +209,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors = document.getElementsByClass("error-notification").asScala
+      val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(1)
 
       errors.exists(_.text().equals(Messages("error.common.accessibility.problem.toolong"))) shouldBe true
@@ -226,7 +226,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors = document.getElementsByClass("error-notification").asScala
+      val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(1)
 
       errors.exists(_.text().equals(Messages("error.email"))) shouldBe true
@@ -243,7 +243,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors = document.getElementsByClass("error-notification").asScala
+      val errors = document.getElementsByClass("error-message").asScala
       errors.exists(_.text().equals(Messages("deskpro.email_too_long"))) shouldBe true
     }
 
@@ -258,7 +258,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors = document.getElementsByClass("error-notification").asScala
+      val errors = document.getElementsByClass("error-message").asScala
       errors.exists(_.text().equals(Messages("error.common.feedback.name_too_long"))) shouldBe true
     }
 

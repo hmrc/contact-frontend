@@ -202,7 +202,7 @@ class ContactHmrcControllerSpec
       And("an error message is returned")
       status(result) shouldBe 400
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+      page.body().getElementsByClass("error-message") shouldNot be(empty)
 
       And("a header shouldn't be visible")
       page.body().getElementsByClass("page-header") should be(empty)
@@ -226,7 +226,7 @@ class ContactHmrcControllerSpec
       And("an error message is returned")
       status(result) shouldBe 400
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-notification") shouldNot be(empty)
+      page.body().getElementsByClass("error-message") shouldNot be(empty)
 
       And("a header shouldn't be visible")
       page.body().getElementsByClass("page-header") shouldNot be(empty)
