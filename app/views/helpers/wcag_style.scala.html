@@ -256,14 +256,11 @@
         textarea.form-control-error:focus,
         input.form-control-error[type="text"]:focus,
         input.form-control-error[type="password"]:focus,
-        input.form-control-error[type="email"]:focus,
-        .error-summary:focus {
+        input.form-control-error[type="email"]:focus {
             border-color: #0b0c0c;
             -webkit-box-shadow: none;
             box-shadow: none;
         }
-
-
 
         a:focus,
         .error-summary .error-summary-list a:focus,
@@ -353,6 +350,11 @@
             .char-counter {
                 display: block;
             }
+        }
+
+        /* AF fixes */
+        .char-counter-text {
+            text-align: left;
         }
 </style>
 

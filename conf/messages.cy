@@ -15,6 +15,7 @@ common.feedback.get.help=A oes unrhyw beth o''i le gyda''r dudalen hon?
 common.feedback.get.help.b=Rhowch wybod i ni am broblem gyda''r gwasanaeth
 common.feedback.title=Help i ddefnyddio''r gwasanaeth hwn
 common.feedback.title.b=Rhowch wybod i ni am broblem gyda''r gwasanaeth
+error.browser.title.prefix=Gwall:
 error.common.problem_report.name_mandatory=Rhowch eich enw.
 error.common.problem_report.name_mandatory.b=Nodwch enw
 error.common.problem_report.name_too_long=Ni all eich enw fod yn hirach na 70 o gymeriadau

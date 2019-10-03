@@ -15,6 +15,7 @@ common.feedback.get.help=Is there anything wrong with this page?
 common.feedback.get.help.b=Tell us about a problem with the service
 common.feedback.title=Get help using this service
 common.feedback.title.b=Tell us about a problem with the service
+error.browser.title.prefix=Error:
 error.common.problem_report.name_mandatory=Please provide your name.
 error.common.problem_report.name_mandatory.b=Enter a name
 error.common.problem_report.name_too_long=Your name can''t be longer than 70 characters
