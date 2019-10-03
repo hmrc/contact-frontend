@@ -40,8 +40,8 @@
         id="@{field.id}"
         name="@{field.id}"
         value="@{field.value}"
-        aria-describedby="error-message-@{field.id}-input"
-            @if(charLimit.isDefined){maxLength="@{charLimit}"}
+        @if(field.hasErrors){aria-describedby="error-message-@{field.id}-input"}
+        @if(charLimit.isDefined){maxLength="@{charLimit}"}
         data-char-field
         cols="40"
         rows="5"
