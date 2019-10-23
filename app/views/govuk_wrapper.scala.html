@@ -67,4 +67,4 @@
       getHelpForm = getHelpForm)
 }
 
-@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, None ,true)(content)
+@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links(None)) ,true)(content)
