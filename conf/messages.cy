@@ -102,6 +102,7 @@ accessibility.subheading.problem=Disgrifiwch y broblem hygyrchedd rydych wedi do
 accessibility.thanks.text=Rydym yn adolygu ac yn ceisio mynd i''r afael ag unrhyw broblem hygyrchedd y rhoddir gwybod amdani. Os ydych wedi rhoi''ch manylion cyswllt i ni, rhown wybod i chi am hynt eich gwybodaeth.
 error.common.accessibility.problem.required=Rhowch eich sylwadau.
 error.common.accessibility.problem.toolong=Ni all y sylwadau fod yn hirach na 2000 o gymeriadau
+error.common.accessibility.problem.email_mandatory=Nodwch gyfeiriad e-bost.
 form.report.problem=Anfon
 what.happens.next=Yr hyn sy''n digwydd nesaf
 

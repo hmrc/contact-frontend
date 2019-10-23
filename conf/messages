@@ -91,7 +91,7 @@ problem_report.email=Email
 problem_report.email.b=Email address
 
 accessibility.close.window=You can now close this window or tab.
-accessibility.confirmation.title=Your problem has been reported
+accessibility.confirmation.title=Your accessibility problem has been reported.
 accessibility.describe.the.problem=Describe the accessibility problem you have found
 accessibility.heading=Report an accessibility problem
 accessibility.hint.contact=We''ll only use this to reply to your message.
@@ -100,9 +100,9 @@ accessibility.message.para1=Please only use this form to report any accessibilit
 accessibility.message.para2=We review and try to resolve all accessibility problems reported to us.
 accessibility.subheading.contact=Your contact details
 accessibility.subheading.problem=Describe the accessibility problem you have found
-accessibility.thanks.text=We review and try to resolve all accessibility problems reported. If you have given us your contact details we will let you know about the progress of your report.
+accessibility.thanks.text=We have received your message and will reply, or let you know how we are dealing with this, within 2 working days.
 error.common.accessibility.problem.required=Enter details of the accessibility problem.
 error.common.accessibility.problem.toolong=The comment cannot be longer than 2000 characters
+error.common.accessibility.problem.email_mandatory=Enter an email address.
 form.report.problem=Report Problem
 what.happens.next=What happens next
-

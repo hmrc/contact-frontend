@@ -45,10 +45,11 @@
         data-char-field
         cols="40"
         rows="5"
+        aria-describedby="@{field.id}-wordcount"
         >@field.value</textarea>
         @if(charLimit.isDefined){
             <noscript>
-                <p class="char-counter-text flush">@messages("site.textarea.char_limit", charLimit.get)</p>
+                <p id="@{field.id}-wordcount" class="char-counter-text flush" aira->@messages("site.textarea.char_limit", charLimit.get)</p>
             </noscript>
         }
     </div>

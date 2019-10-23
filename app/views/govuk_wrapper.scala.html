@@ -17,7 +17,18 @@
     <meta name="format-detection" content="telephone=no" />
 }
 
-@insideHeader = {}
+@insideHeader = {
+    <div class="header-proposition">
+        <div class="content">
+            <nav id="proposition-menu" class="header__menu" role="navigation">
+                <ul id="proposition-links" class="header__menu__proposition-links">
+                    @partials.language_selection(enableLanguageSwitching)
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+}
 
 @afterHeader = {}
 
@@ -29,6 +40,8 @@
       scriptElem = None,
       gaCalls = None)
 }
+
+
 
 @footerTop = {}
 @footerLinks = {}
@@ -54,4 +67,4 @@
       getHelpForm = getHelpForm)
 }
 
-@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, HtmlFormat.empty, footerTop, Some(uiLayouts.footer_links(Some(partials.language_selection(enableLanguageSwitching)))),true)(content)
+@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links(None)) ,true)(content)

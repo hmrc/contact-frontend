@@ -3,9 +3,17 @@
 @if(enableLanguageSwitching) {
 
 @if(lang.code == "cy") {
-    <li><a title="@Messages("language-switcher.english.hover")" href="@controllers.routes.LanguageController.switchToEnglish" data-journey-click="Language:Click:English">@Messages("language-switcher.english")</a></li>
+    <li>
+
+        <a title="@Messages("language-switcher.english.hover")" href="@controllers.routes.LanguageController.switchToEnglish" data-journey-click="Language:Click:English">@Messages("language-switcher.english")</a>
+
+        <span class="faded-text--small bold">| @Messages("language-switcher.welsh")</span>
+    </li>
 } else {
-    <li><a title="@Messages("language-switcher.welsh.hover")" href="@controllers.routes.LanguageController.switchToWelsh" data-journey-click="Language:Click:Welsh">@Messages("language-switcher.welsh")</a></li>
+    <li>
+        <span class="faded-text--small bold">@Messages("language-switcher.english") |</span>
+
+        <a title="@Messages("language-switcher.welsh.hover")" href="@controllers.routes.LanguageController.switchToWelsh" data-journey-click="Language:Click:Welsh">@Messages("language-switcher.welsh")</a></li>
 }
 }
 
