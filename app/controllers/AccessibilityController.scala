@@ -51,7 +51,7 @@ object AccessibilityFormBind {
         .verifying("error.common.feedback.name_mandatory", name => !name.trim.isEmpty)
         .verifying("error.common.feedback.name_too_long", name => name.length <= 70),
       "email"        -> text
-        .verifying("error.email", validateEmail)
+        .verifying("error.common.accessibility.problem.email_mandatory", validateEmail)
         .verifying("deskpro.email_too_long", email => email.length <= 255),
       "isJavascript" -> boolean,
       "referer"      -> text,

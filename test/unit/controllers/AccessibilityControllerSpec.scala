@@ -78,7 +78,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       document.title() should be("Error: " + Messages("accessibility.heading"))
       errors.exists(_.text().equals(Messages("error.common.accessibility.problem.required"))) shouldBe true
       errors.exists(_.text().equals(Messages("error.common.feedback.name_mandatory"))) shouldBe true
-      errors.exists(_.text().equals(Messages("error.email"))) shouldBe true
+      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
     }
 
     "display error messages when message size exceeds limit" in new AccessibilityControllerApplication(fakeApplication) {
@@ -114,7 +114,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().equals(Messages("error.email"))) shouldBe true
+      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
     }
 
     "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
@@ -203,7 +203,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
 
       errors.exists(_.text().equals(Messages("error.common.accessibility.problem.required"))) shouldBe true
       errors.exists(_.text().equals(Messages("error.common.feedback.name_mandatory"))) shouldBe true
-      errors.exists(_.text().equals(Messages("error.email"))) shouldBe true
+      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
     }
 
     "display error messages when message size exceeds limit" in new AccessibilityControllerApplication(fakeApplication) {
@@ -239,7 +239,7 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().equals(Messages("error.email"))) shouldBe true
+      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
     }
 
     "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
