@@ -1,7 +1,7 @@
 package support
 
 import org.scalatest._
-import org.scalatestplus.play.OneServerPerSuite
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import support.behaviour.NavigationSugar
 import support.steps.{ApiSteps, NavigationSteps, ObservationSteps}
 import support.stubs._
@@ -20,7 +20,7 @@ trait StubbedFeatureSpec
     with ApiSteps
     with ObservationSteps
     with OptionValues
-    with OneServerPerSuite {
+    with GuiceOneServerPerSuite {
 
   def useJavascript : Boolean
 

@@ -7,9 +7,11 @@ import play.api.Application
 import play.api.http.DefaultHttpFilters
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsNull
+import play.api.mvc.Cookie
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest, Helpers}
 import play.filters.cors.CORSFilter
+import uk.gov.hmrc.http.CookieNames
 import uk.gov.hmrc.play.bootstrap.filters.FrontendFilters
 import uk.gov.hmrc.play.bootstrap.filters.frontend.deviceid.DeviceIdFilter
 import uk.gov.hmrc.play.test.UnitSpec
@@ -49,8 +51,9 @@ class GetHelpWithThisPageFeatureISpec
   private def checkFeatureForText(deviceID: String, text: String): Unit = {
     val request = FakeRequest(Helpers.GET,
                               "/contact/beta-feedback-unauthenticated",
-                              FakeHeaders(Seq("deviceID" -> deviceID)),
+                              FakeHeaders(Seq.empty),
                               JsNull)
+      .withCookies(Cookie(CookieNames.deviceID, deviceID))
 
     val response = route(app, request).get
 

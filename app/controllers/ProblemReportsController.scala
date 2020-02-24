@@ -7,15 +7,15 @@ import javax.inject.{Inject, Singleton}
 import model.ProblemReport
 import play.api.data.Forms._
 import play.api.data._
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Lang}
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation, GetHelpWithThisPageOnlyServerSideValidation}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object ProblemReportForm {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
@@ -105,13 +105,17 @@ object ProblemReportForm {
 }
 
 @Singleton
-class ProblemReportsController @Inject()(
-  val hmrcDeskproConnector: HmrcDeskproConnector,
-  val authConnector: AuthConnector)(implicit appConfig: AppConfig, override val messagesApi: MessagesApi)
-    extends FrontendController
+class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
+                                         val authConnector: AuthConnector,
+                                         mcc: MessagesControllerComponents)
+                                        (implicit appConfig: AppConfig,
+                                         val executionContext: ExecutionContext)
+    extends FrontendController(mcc)
     with ContactFrontendActions
     with DeskproSubmission
     with I18nSupport {
+
+  implicit val lang: Lang = Lang.defaultLang
 
   //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
   def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String], service: Option[String]) = Action {
@@ -125,7 +129,7 @@ class ProblemReportsController @Inject()(
           .error_feedback(ProblemReportForm.emptyForm(service = service), postEndpoint, csrfToken, service, None))
   }
 
-  def reportFormAjax(service: Option[String]) = UnauthorisedAction { implicit request =>
+  def reportFormAjax(service: Option[String]) = Action { implicit request =>
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
     val referrer  = request.headers.get("referer")
     Ok(reportFormAjaxView(ProblemReportForm.emptyForm(service = service), service, csrfToken, referrer))
@@ -139,7 +143,7 @@ class ProblemReportsController @Inject()(
     views.html.partials
       .error_feedback_inner(form, appConfig.externalReportProblemSecureUrl, csrfToken, service, referrer)
 
-  def reportFormNonJavaScript(service: Option[String]) = UnauthorisedAction { implicit request =>
+  def reportFormNonJavaScript(service: Option[String]) = Action { implicit request =>
     val referrer = request.headers.get("referer")
     Ok(
       views.html.problem_reports_nonjavascript(
@@ -151,7 +155,7 @@ class ProblemReportsController @Inject()(
 
   def submitSecure: Action[AnyContent] = submit
 
-  def submit = UnauthorisedAction.async { implicit request =>
+  def submit = Action.async { implicit request =>
     val isAjax = request.headers.get("X-Requested-With").contains("XMLHttpRequest")
 
     ProblemReportForm.form.bindFromRequest.fold(

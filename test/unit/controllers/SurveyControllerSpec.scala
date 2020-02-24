@@ -4,14 +4,14 @@ import config.CFConfig
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.i18n.MessagesApi
 import play.api.test.{FakeHeaders, FakeRequest}
-import play.api.{Configuration, Environment}
+import play.api.{Configuration, Environment, Mode}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import uk.gov.hmrc.play.test.UnitSpec
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
@@ -73,5 +73,14 @@ class SurveyControllerSpec extends UnitSpec {
 
 
 class SurveyControllerApplication extends MockitoSugar {
-  val controller = new SurveyController( mock[AuditConnector])(mock[MessagesApi], new CFConfig(Environment.simple(), Configuration()))
+  val configuration = Configuration()
+  val runMode = new RunMode(configuration, Mode.Prod)
+  val servicesConfig = new ServicesConfig(configuration, runMode)
+
+  val controller = new SurveyController(
+    mock[AuditConnector],
+    Stubs.stubMessagesControllerComponents()
+  )(new CFConfig(Environment.simple(), configuration, servicesConfig),
+    ExecutionContext.Implicits.global
+  )
 }

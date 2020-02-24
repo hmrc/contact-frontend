@@ -12,7 +12,7 @@ class DeviceIdBucketCalculatorSpec extends WordSpec with Matchers with PropertyC
   implicit override val generatorDrivenConfig: PropertyCheckConfiguration = PropertyCheckConfig(minSize=100000, maxSize = 200000)
   implicit def noShrink[T]: Shrink[T] = Shrink.shrinkAny
 
-  "Bucket id should be generated consistently nad within range of 0 to 99" in {
+  "Bucket id should be generated consistently and within range of 0 to 99" in {
 
     forAll(Gen.alphaNumStr) { deviceId =>
 

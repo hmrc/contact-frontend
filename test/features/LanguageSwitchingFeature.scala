@@ -2,22 +2,21 @@ package features
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import play.api.test.FakeApplication
 import support.StubbedFeatureSpec
 import support.page.SurveyPage._
 import support.page.{SurveyConfirmationPageWelsh, SurveyPageWithTicketAndServiceIds, UnauthenticatedFeedbackPage}
+import play.api.inject.guice.GuiceApplicationBuilder
 
 @RunWith(classOf[JUnitRunner])
 class LanguageSwitchingFeature extends StubbedFeatureSpec {
 
   override def useJavascript: Boolean = true
 
-  override lazy val app = FakeApplication(
-    additionalConfiguration = Map(
+  override lazy val app = new GuiceApplicationBuilder()
+    .configure(
       "application.langs" -> "en,cy",
-      "govuk-tax.Test.enableLanguageSwitching" -> true
-    )
-  )
+      "enableLanguageSwitching" -> true)
+    .build
 
   feature("Language Switching") {
 //    MoveToAcceptanceTest

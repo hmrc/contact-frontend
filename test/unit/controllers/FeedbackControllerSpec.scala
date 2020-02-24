@@ -14,11 +14,13 @@ import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.{Application, Environment}
+import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import util.BackUrlValidator
 
@@ -312,9 +314,11 @@ class FeedbackControllerSpec extends UnitSpec with WithFakeApplication {
   }
 
   val environment: Environment = Environment.simple()
+    val runMode = new RunMode(app.configuration, Mode.Prod)
+    val servicesConfig = new ServicesConfig(app.configuration, runMode)
 
-  val controller = new FeedbackController(hmrcDeskproConnector, authConnector, backUrlValidator, app.configuration, environment)(
-    new CFConfig(environment, app.configuration), app.injector.instanceOf[MessagesApi])
+  val controller = new FeedbackController(hmrcDeskproConnector, authConnector, backUrlValidator, app.configuration, environment, Stubs.stubMessagesControllerComponents())(
+    new CFConfig(environment, app.configuration, servicesConfig), ExecutionContext.Implicits.global)
 
   val enrolments = Some(Enrolments(Set()))
 

@@ -11,17 +11,20 @@ import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.GivenWhenThen
 import org.scalatest.mockito.MockitoSugar
-import play.api.Environment
-import play.api.i18n.MessagesApi
+import play.api.{Environment, Mode}
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, contentAsString, redirectLocation}
+import play.i18n.Langs
 import services.CaptchaService
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
 class ContactHmrcControllerSpec
@@ -286,8 +289,10 @@ class ContactHmrcControllerSpec
 
     val configuration = fakeApplication.configuration
     val environment = Environment.simple()
+    val runMode = new RunMode(configuration, Mode.Prod)
 
-    implicit val appConfig = new CFConfig(environment, configuration)
+    implicit val appConfig = new CFConfig(environment, configuration, new ServicesConfig(configuration, runMode))
+    implicit val executionContext = ExecutionContext.Implicits.global
     implicit val messages = fakeApplication.injector.instanceOf[MessagesApi]
 
     val hmrcDeskproConnector = mock[HmrcDeskproConnector]
@@ -303,7 +308,9 @@ class ContactHmrcControllerSpec
         authConnector,
         captchaService,
         configuration,
-        environment)(appConfig, messages)
+        environment,
+        Stubs.stubMessagesControllerComponents(messagesApi = messages)
+    )
 
     def mockDeskproConnector(result: Future[TicketId]): Unit = {
       when(hmrcDeskproConnector.createDeskProTicket(

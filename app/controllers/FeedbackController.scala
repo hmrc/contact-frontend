@@ -7,38 +7,37 @@ import model.FeedbackForm
 import play.api.data.Forms._
 import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, Form, FormError}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.i18n.{I18nSupport, Lang}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import play.api.{Configuration, Environment}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
-import uk.gov.hmrc.auth.core.retrieve.Retrievals
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
-import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class FeedbackController @Inject()(
-  val hmrcDeskproConnector: HmrcDeskproConnector,
-  val authConnector: AuthConnector,
-  val accessibleUrlValidator: BackUrlValidator,
-  val configuration: Configuration,
-  val environment: Environment)(implicit val appConfig: AppConfig, override val messagesApi: MessagesApi)
-    extends FrontendController
+@Singleton class FeedbackController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
+                                              val authConnector: AuthConnector,
+                                              val accessibleUrlValidator: BackUrlValidator,
+                                              val configuration: Configuration,
+                                              val environment: Environment,
+                                              mcc: MessagesControllerComponents)
+                                             (implicit val appConfig: AppConfig,
+                                              val executionContext: ExecutionContext)
+  extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport
     with AuthorisedFunctions
     with LoginRedirection
     with ContactFrontendActions {
 
+  implicit val lang: Lang = Lang.defaultLang
+
   val formId = "FeedbackForm"
-
-  override protected def mode = environment.mode
-
-  override protected def runModeConfiguration = configuration
 
   def feedbackForm(service: Option[String] = None, backUrl: Option[String] = None, canOmitComments: Boolean) =
     Action.async { implicit request =>
@@ -178,7 +177,7 @@ class FeedbackController @Inject()(
     )
   }
 
-  def feedbackPartialFormConfirmation(ticketId: String) = UnauthorisedAction { implicit request =>
+  def feedbackPartialFormConfirmation(ticketId: String) = Action { implicit request =>
     Ok(views.html.partials.feedback_form_confirmation(ticketId, None))
   }
 

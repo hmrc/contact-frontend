@@ -4,11 +4,10 @@ import config.AppConfig
 import play.api.Configuration
 import play.api.mvc.{Result, Results}
 import uk.gov.hmrc.auth.core.NoActiveSession
-import uk.gov.hmrc.play.config.RunMode
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait LoginRedirection extends Results with RunMode {
+trait LoginRedirection extends Results {
 
   def appConfig: AppConfig
 
@@ -23,11 +22,11 @@ trait LoginRedirection extends Results with RunMode {
   private def redirectForLogin(continueUrl: String): Result = {
 
     val origin: String = configuration
-      .getString("sosOrigin")
-      .orElse(configuration.getString("appName"))
+      .getOptional[String]("sosOrigin")
+      .orElse(configuration.getOptional[String]("appName"))
       .getOrElse("undefined")
 
-    lazy val companyAuthUrl = configuration.getString(s"govuk-tax.$env.company-auth.host").getOrElse("")
+    lazy val companyAuthUrl = configuration.getOptional[String](s"company-auth.host").getOrElse("")
     val loginURL: String    = s"$companyAuthUrl/gg/sign-in"
     val continueURL: String = appConfig.loginCallback(continueUrl)
 

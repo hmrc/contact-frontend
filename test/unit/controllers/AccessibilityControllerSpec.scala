@@ -5,22 +5,23 @@ import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import controllers.AccessibilityController
 import org.jsoup.Jsoup
+import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => meq, _}
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application, Configuration, Environment}
-import play.utils.UriEncoding
-import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
+import play.api.{Application, Configuration, Environment, Mode}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import util.BackUrlValidator
+import play.api.test.Helpers._
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -310,17 +311,19 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       override def validate(backUrl: String) = backUrl == "http://www.valid.url"
     }
 
-
     val environment: Environment = Environment.simple()
+    val runMode = new RunMode(app.configuration, Mode.Prod)
+    val servicesConfig = new ServicesConfig(app.configuration, runMode)
 
-    implicit val cconfig: CFConfig = new CFConfig(environment, app.configuration)
+    implicit val cconfig: CFConfig = new CFConfig(environment, app.configuration, servicesConfig)
 
     val controller = new AccessibilityController(
       hmrcDeskproConnector,
       authConnector,
       backUrlValidator,
       Configuration(),
-      environment)(cconfig, app.injector.instanceOf[MessagesApi])
+      environment,
+      Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]))(cconfig, ExecutionContext.Implicits.global)
 
 
     def generateRequest(desc: String, formName: String, email: String, isJavascript: Boolean, referrer: String) = {

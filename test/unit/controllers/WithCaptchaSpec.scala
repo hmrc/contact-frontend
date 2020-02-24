@@ -6,18 +6,18 @@ import config.AppConfig
 import controllers.WithCaptcha
 import org.scalatest.GivenWhenThen
 import org.scalatest.mockito.MockitoSugar
-import play.api.i18n.{DefaultLangs, DefaultMessagesApi, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, Request, Results}
 import play.api.test.FakeRequest
-import play.api.{Configuration, Environment}
 import services.CaptchaService
 import support.util.TestAppConfig
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 class WithCaptchaSpec extends UnitSpec
   with GivenWhenThen
@@ -79,7 +79,8 @@ class WithCaptchaSpec extends UnitSpec
 
     "succeed if required fields not found but captcha not enabled"
 
-    class TestController(enabled : Boolean = true) extends WithCaptcha {
+    class TestController(enabled : Boolean = true)
+      extends WithCaptcha(Stubs.stubMessagesControllerComponents(messagesApi = fakeApplication.injector.instanceOf[MessagesApi])) {
       override implicit val appConfig: AppConfig = new TestAppConfig {
         override def captchaEnabled: Boolean = enabled
       }
@@ -88,21 +89,17 @@ class WithCaptchaSpec extends UnitSpec
           Future.successful(response == "notABot")
       }
 
-      val env = Environment.simple()
-      val configuration = Configuration.load(env)
-
-      override def messagesApi: MessagesApi = new DefaultMessagesApi(env, configuration, new DefaultLangs(configuration))
+      override implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
 
       def action(request : Request[AnyContent]) = {
         validateCaptcha(request) {
           Future(Ok("not a bot"))
         }
       }
+
+
     }
 
   }
-
-
-
 
 }
