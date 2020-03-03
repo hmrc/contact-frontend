@@ -23,7 +23,7 @@ class SurveyController @Inject()(auditConnector: AuditConnector, mcc: MessagesCo
     extends FrontendController(mcc)
     with I18nSupport {
 
-  implicit val lang: Lang = Lang.defaultLang
+  implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   val TicketId = "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$".r
 
