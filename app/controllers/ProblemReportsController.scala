@@ -115,7 +115,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     with DeskproSubmission
     with I18nSupport {
 
-  implicit val lang: Lang = Lang.defaultLang
+  implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
   def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String], service: Option[String]) = Action {

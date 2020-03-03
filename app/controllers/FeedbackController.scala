@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
     with LoginRedirection
     with ContactFrontendActions {
 
-  implicit val lang: Lang = Lang.defaultLang
+  implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   val formId = "FeedbackForm"
 

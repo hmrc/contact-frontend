@@ -22,7 +22,7 @@ abstract class WithCaptcha @Inject()(mcc: MessagesControllerComponents) extends
 
   implicit val executionContext: ExecutionContext
 
-  implicit val lang: Lang = Lang.defaultLang
+  implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   case class Recaptcha(response : String)
 

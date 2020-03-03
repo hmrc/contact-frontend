@@ -76,7 +76,7 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
     with LoginRedirection
     with ContactFrontendActions {
 
-  implicit val lang: Lang = Lang.defaultLang
+  implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   /** Authenticated routes */
 
