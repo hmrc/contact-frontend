@@ -13,11 +13,13 @@ import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.{Application, Environment}
+import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -128,7 +130,11 @@ class ProblemReportsControllerApplication(app: Application) extends MockitoSugar
     }
   }
 
-  val controller = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector)(new CFConfig(Environment.simple(), app.configuration), app.injector.instanceOf[MessagesApi])
+  val runMode = new RunMode(app.configuration, Mode.Prod)
+  val servicesConfig = new ServicesConfig(app.configuration, runMode)
+
+  val controller = new ProblemReportsController(mock[HmrcDeskproConnector], authConnector, Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]))(
+    new CFConfig(Environment.simple(), app.configuration, servicesConfig), ExecutionContext.Implicits.global)
 
   val deskproName: String = "John Densmore"
   val deskproEmail: String = "name@mail.com"

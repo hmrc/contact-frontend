@@ -3,9 +3,10 @@ package config
 import javax.inject.Inject
 import play.api.Configuration
 import play.api.mvc.Request
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import util._
 import collection.JavaConversions._
+import scala.util.Try
 
 trait AppConfig {
   def assetsPrefix: String
@@ -28,22 +29,23 @@ trait AppConfig {
   def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature]
 }
 
-class CFConfig @Inject()(environment: play.api.Environment, configuration: Configuration)
-    extends AppConfig
-    with ServicesConfig {
+class CFConfig @Inject()(environment: play.api.Environment,
+                         configuration: Configuration,
+                         servicesConfig: ServicesConfig)
+    extends AppConfig {
 
   private def loadConfig(key: String) =
     configuration
-      .getString(key)
+      .getOptional[String](key)
       .getOrElse(throw new Exception(s"Missing key: $key"))
 
   private val contactHost = configuration
-    .getString(s"govuk-tax.$env.contact-frontend.host")
+    .getOptional[String]("contact-frontend.host")
     .getOrElse("")
 
   private val featureRules: Seq[FeatureEnablingRule] =
-    configuration
-      .getStringList("features")
+    Try(configuration.underlying.getStringList("features"))
+      .toOption
       .map(_.toList)
       .getOrElse(List.empty)
       .map(FeatureEnablingRule.parse)
@@ -52,32 +54,28 @@ class CFConfig @Inject()(environment: play.api.Environment, configuration: Confi
     s"$contactHost/contact/problem_reports"
   override lazy val externalReportProblemSecureUrl =
     s"$contactHost/contact/problem_reports_secure"
-  override lazy val assetsPrefix   = loadConfig(s"frontend.assets.url") + loadConfig(s"frontend.assets.version")
-  override lazy val analyticsToken = loadConfig(s"govuk-tax.$env.google-analytics.token")
-  override lazy val analyticsHost  = loadConfig(s"govuk-tax.$env.google-analytics.host")
+  override lazy val assetsPrefix   = loadConfig("frontend.assets.url") + loadConfig(s"frontend.assets.version")
+  override lazy val analyticsToken = loadConfig("google-analytics.token")
+  override lazy val analyticsHost  = loadConfig("google-analytics.host")
   override lazy val backUrlDestinationWhitelist =
-    loadConfig(s"$env.backUrlDestinationWhitelist").split(',').filter(_.nonEmpty).toSet
+    loadConfig("backUrlDestinationWhitelist").split(',').filter(_.nonEmpty).toSet
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
   override def fallbackURLForLangugeSwitcher =
-    loadConfig(s"govuk-tax.$env.platform.frontend.url")
+    loadConfig("platform.frontend.url")
   override def enableLanguageSwitching =
     configuration
-      .getBoolean(s"govuk-tax.$env.enableLanguageSwitching")
+      .getOptional[Boolean]("enableLanguageSwitching")
       .getOrElse(false)
 
-  override lazy val captchaEnabled: Boolean = getBoolean("captcha.v3.enabled")
+  override lazy val captchaEnabled: Boolean = servicesConfig.getBoolean("captcha.v3.enabled")
 
-  override lazy val captchaMinScore: BigDecimal = BigDecimal(getString("captcha.v3.minScore"))
+  override lazy val captchaMinScore: BigDecimal = BigDecimal(servicesConfig.getString("captcha.v3.minScore"))
 
-  override lazy val captchaClientKey: String = getString("captcha.v3.keys.client")
+  override lazy val captchaClientKey: String = servicesConfig.getString("captcha.v3.keys.client")
 
-  override lazy val captchaServerKey: String = getString("captcha.v3.keys.server")
+  override lazy val captchaServerKey: String = servicesConfig.getString("captcha.v3.keys.server")
 
-  override lazy val captchaVerifyUrl : String = getString("captcha.v3.verifyUrl")
-
-  override protected def mode = environment.mode
-
-  override protected def runModeConfiguration = configuration
+  override lazy val captchaVerifyUrl : String = servicesConfig.getString("captcha.v3.verifyUrl")
 
   lazy val featureSelector: FeatureSelector =
     new BucketBasedFeatureSelector(BucketCalculator.deviceIdBucketCalculator, featureRules)

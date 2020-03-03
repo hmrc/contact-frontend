@@ -6,23 +6,24 @@ import config.AppConfig
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data.{Form, FormError}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, Request, Result}
+import play.api.i18n.{I18nSupport, Lang}
+import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import scala.util.matching.Regex
 
 @Singleton
-class SurveyController @Inject()(auditConnector: AuditConnector)(
-  implicit val messagesApi: MessagesApi,
-  appConfig: AppConfig)
-    extends FrontendController
+class SurveyController @Inject()(auditConnector: AuditConnector, mcc: MessagesControllerComponents)
+                                (implicit appConfig: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
     with I18nSupport {
+
+  implicit val lang: Lang = Lang.defaultLang
 
   val TicketId = "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$".r
 

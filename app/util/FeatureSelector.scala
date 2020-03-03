@@ -85,7 +85,7 @@ object BucketCalculator {
 
   val deviceIdBucketCalculator: BucketCalculator = { request =>
     val deviceIdMaybe: Option[String] = HeaderCarrierConverter
-      .fromHeadersAndSession(request.headers, Some(request.session))
+      .fromHeadersAndSessionAndRequest(request.headers, Some(request.session), Some(request))
       .deviceID
     val deviceId = deviceIdMaybe.getOrElse("")
     val bucket   = math.abs(deviceId.hashCode % 100)

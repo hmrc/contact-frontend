@@ -4,12 +4,11 @@ import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import javax.inject.Inject
 import model.AccessibilityForm
-import play.api.Mode.Mode
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.i18n.{I18nSupport, Lang}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.api.{Configuration, Environment}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Request, Result}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -66,18 +65,18 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
                                         val authConnector: AuthConnector,
                                         val accessibleUrlValidator: BackUrlValidator,
                                         val configuration: Configuration,
-                                        val environment: Environment)(implicit val appConfig: AppConfig, override val messagesApi: MessagesApi)
-    extends FrontendController
+                                        val environment: Environment,
+                                        mcc: MessagesControllerComponents)
+                                       (implicit val appConfig: AppConfig,
+                                        val executionContext: ExecutionContext)
+    extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport
     with AuthorisedFunctions
     with LoginRedirection
-    with ContactFrontendActions
-{
+    with ContactFrontendActions {
 
-  override protected def mode: Mode = environment.mode
-
-  override protected def runModeConfiguration: Configuration = configuration
+  implicit val lang: Lang = Lang.defaultLang
 
   /** Authenticated routes */
 

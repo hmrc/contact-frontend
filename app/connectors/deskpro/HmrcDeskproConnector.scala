@@ -6,16 +6,18 @@ import play.api.{Configuration, Environment}
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, Upstream5xxResponse}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class HmrcDeskproConnector @Inject()(http: HttpClient, environment: Environment, configuration: Configuration)
-    extends ServicesConfig {
+class HmrcDeskproConnector @Inject()(http: HttpClient,
+                                     environment: Environment,
+                                     configuration: Configuration,
+                                     servicesConfig: ServicesConfig)
+                                    (implicit executionContext: ExecutionContext) {
 
-  def serviceUrl: String = baseUrl("hmrc-deskpro")
+  def serviceUrl: String = servicesConfig.baseUrl("hmrc-deskpro")
 
   def createDeskProTicket(
     name: String,
@@ -70,7 +72,4 @@ class HmrcDeskproConnector @Inject()(http: HttpClient, environment: Environment,
 
   private def requestUrl[B, A](uri: String): String = s"$serviceUrl$uri"
 
-  override protected def mode = environment.mode
-
-  override protected def runModeConfiguration = configuration
 }

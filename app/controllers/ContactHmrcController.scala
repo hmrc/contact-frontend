@@ -5,19 +5,18 @@ import connectors.deskpro.HmrcDeskproConnector
 import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Environment}
 import play.filters.csrf.CSRF
-import services.{CaptchaService, CaptchaServiceV3, DeskproSubmission}
+import services.{CaptchaService, DeskproSubmission}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.Retrievals
-import uk.gov.hmrc.play.bootstrap.controller.{FrontendController, UnauthorisedAction}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import util.DeskproEmailValidator
 import views.html.deskpro_error
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object ContactHmrcForm {
 
@@ -46,26 +45,20 @@ object ContactHmrcForm {
 }
 
 @Singleton
-class ContactHmrcController @Inject()(
-  val hmrcDeskproConnector: HmrcDeskproConnector,
-  val authConnector: AuthConnector,
-  val captchaService: CaptchaService,
-  val configuration: Configuration,
-  val environment: Environment)(
-  implicit
-  val appConfig: AppConfig,
-  override val messagesApi: MessagesApi)
-    extends FrontendController
+class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
+                                      val authConnector: AuthConnector,
+                                      val captchaService: CaptchaService,
+                                      val configuration: Configuration,
+                                      val environment: Environment,
+                                      mcc: MessagesControllerComponents)
+                                     (implicit val appConfig: AppConfig,
+                                      val executionContext: ExecutionContext)
+    extends WithCaptcha(mcc)
     with DeskproSubmission
     with AuthorisedFunctions
     with LoginRedirection
     with I18nSupport
-    with ContactFrontendActions
-    with WithCaptcha {
-
-  override protected def mode = environment.mode
-
-  override protected def runModeConfiguration = configuration
+    with ContactFrontendActions {
 
   def index = Action.async { implicit request =>
     loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway))({
@@ -176,7 +169,7 @@ class ContactHmrcController @Inject()(
       )
   }
 
-  def contactHmrcPartialFormConfirmation(ticketId: String) = UnauthorisedAction { implicit request =>
+  def contactHmrcPartialFormConfirmation(ticketId: String) = Action { implicit request =>
     Ok(views.html.partials.contact_hmrc_form_confirmation(ticketId))
   }
 }

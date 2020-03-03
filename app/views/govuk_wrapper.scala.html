@@ -1,9 +1,9 @@
 @(title: String,
   bodyClasses: Option[String] = None,
   contentHeader: Option[Html] = None,
-  mainContent: Html = HtmlFormat.empty,
+  mainContent: Html = play.twirl.api.HtmlFormat.empty,
   userLoggedIn: Boolean = true,
-  getHelpForm: Html  = HtmlFormat.empty,
+  getHelpForm: Html  = play.twirl.api.HtmlFormat.empty,
   enableLanguageSwitching : Boolean,
   style: Option[Html] = None)(implicit request: Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 
@@ -48,7 +48,7 @@
 
 @serviceInfo = {
     @uiLayouts.serviceInfo(
-      betaBanner = HtmlFormat.empty,
+      betaBanner = play.twirl.api.HtmlFormat.empty,
       includeGridWrapper = false,
       serviceInfoContent = None)
 }

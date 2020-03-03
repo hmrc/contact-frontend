@@ -1,14 +1,15 @@
 package controllers
 
 import play.api.mvc.Request
-import uk.gov.hmrc.auth.core.retrieve.Retrievals
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait ContactFrontendActions extends AuthorisedFunctions {
+
+  implicit val executionContext: ExecutionContext
 
   protected def maybeAuthenticatedUserEnrolments()(
     implicit hc: HeaderCarrier,

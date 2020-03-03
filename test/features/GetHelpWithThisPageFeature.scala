@@ -3,8 +3,7 @@ package features
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.ScalaFutures
-import play.api.libs.ws.WS
-import play.api.libs.ws.ning.{NingAsyncHttpClientConfigBuilder, NingWSClient, NingWSClientConfig}
+import play.api.libs.ws.ahc.AhcWSClient
 import play.api.test.Helpers
 import support.StubbedFeatureSpec
 import support.page.UnauthenticatedFeedbackPage
@@ -53,11 +52,11 @@ class GetHelpWithThisPageFeature extends StubbedFeatureSpec with ScalaFutures {
 
       implicit val system = ActorSystem()
       implicit val materializer = ActorMaterializer()
-      val asyncClientConfig = new NingAsyncHttpClientConfigBuilder(NingWSClientConfig()).build()
-      implicit val wsClient = new NingWSClient(asyncClientConfig)
+      val wsClient              = AhcWSClient()
+      val wsRequest            = wsClient.url(s"$baseUrl/contact/problem_reports_secure")
 
-      val eventualResponse = WS.clientUrl(s"$baseUrl/contact/problem_reports_secure")
-        .withHeaders("Content-Type" -> "application/x-www-form-urlencoded")
+      val eventualResponse     = wsRequest
+        .withHttpHeaders(("Content-Type", "application/x-www-form-urlencoded"))
         .post(s"report-name=Mike&report-email=mike@example.com&report-action=Action&report-error=error")
 
       And("I get a bad request error")

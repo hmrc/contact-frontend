@@ -9,11 +9,14 @@ import com.github.tomakehurst.wiremock.client.{MappingBuilder, RequestPatternBui
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import org.scalatest.MustMatchers
 import org.skyscreamer.jsonassert.JSONCompareMode
-import play.api.libs.Crypto
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.crypto.CookieSigner
 import play.api.test.Helpers
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.crypto.{CompositeSymmetricCrypto, PlainText}
 import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCryptoProvider
 
 trait Stubs {
   def stubFor(stub: Stub) {
@@ -96,12 +99,17 @@ trait Stub extends MustMatchers {
 
 
 trait SessionCookieBaker {
+
+  val app = new GuiceApplicationBuilder().configure("metrics.jvm" -> false).build
+  val cookieSignerCache = Application.instanceCache[CookieSigner]
+  val cookieSigner: CookieSigner = cookieSignerCache(app)
+
   def cookieValue(sessionData: Map[String, String]) = {
     def encode(data: Map[String, String]): String = {
       val encoded = data.map {
         case (k, v) => URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v, "UTF-8")
       }.mkString("&")
-      Crypto.sign(encoded, "yNhI04vHs9<_HWbC`]20u`37=NGLGYY5:0Tg5?y`W<NoJnXWqmjcgZBec@rOxb^G".getBytes) + "-" + encoded
+      cookieSigner.sign(encoded, "yNhI04vHs9<_HWbC`]20u`37=NGLGYY5:0Tg5?y`W<NoJnXWqmjcgZBec@rOxb^G".getBytes) + "-" + encoded
     }
 
     val encodedCookie = encode(sessionData)
