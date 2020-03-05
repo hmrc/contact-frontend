@@ -288,10 +288,8 @@ class ContactHmrcControllerSpec
     val authConnector = mock[AuthConnector]
 
     val configuration = fakeApplication.configuration
-    val environment = Environment.simple()
-    val runMode = new RunMode(configuration, Mode.Prod)
 
-    implicit val appConfig = new CFConfig(environment, configuration, new ServicesConfig(configuration, runMode))
+    implicit val appConfig = new CFConfig(configuration)
     implicit val executionContext = ExecutionContext.Implicits.global
     implicit val messages = fakeApplication.injector.instanceOf[MessagesApi]
 
@@ -308,7 +306,6 @@ class ContactHmrcControllerSpec
         authConnector,
         captchaService,
         configuration,
-        environment,
         Stubs.stubMessagesControllerComponents(messagesApi = messages)
     )
 

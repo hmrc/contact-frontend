@@ -4,11 +4,11 @@ import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import javax.inject.Inject
 import model.AccessibilityForm
+import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
-import play.api.{Configuration, Environment}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -65,7 +65,6 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
                                         val authConnector: AuthConnector,
                                         val accessibleUrlValidator: BackUrlValidator,
                                         val configuration: Configuration,
-                                        val environment: Environment,
                                         mcc: MessagesControllerComponents)
                                        (implicit val appConfig: AppConfig,
                                         val executionContext: ExecutionContext)

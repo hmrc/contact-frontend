@@ -1,8 +1,7 @@
 package connectors.deskpro
 
-import javax.inject.Inject
 import connectors.deskpro.domain.{Feedback, Ticket, TicketId}
-import play.api.{Configuration, Environment}
+import javax.inject.Inject
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, Upstream5xxResponse}
@@ -12,8 +11,6 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import scala.concurrent.{ExecutionContext, Future}
 
 class HmrcDeskproConnector @Inject()(http: HttpClient,
-                                     environment: Environment,
-                                     configuration: Configuration,
                                      servicesConfig: ServicesConfig)
                                     (implicit executionContext: ExecutionContext) {
 
