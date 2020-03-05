@@ -3,9 +3,9 @@ package config
 import javax.inject.Inject
 import play.api.Configuration
 import play.api.mvc.Request
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import util._
-import collection.JavaConversions._
+
+import scala.collection.JavaConversions._
 import scala.util.Try
 
 trait AppConfig {
@@ -29,15 +29,12 @@ trait AppConfig {
   def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature]
 }
 
-class CFConfig @Inject()(environment: play.api.Environment,
-                         configuration: Configuration,
-                         servicesConfig: ServicesConfig)
-    extends AppConfig {
+class CFConfig @Inject()(configuration: Configuration) extends AppConfig {
 
-  private def loadConfig(key: String) =
+  private def loadConfigString(key: String): String =
     configuration
       .getOptional[String](key)
-      .getOrElse(throw new Exception(s"Missing key: $key"))
+      .getOrElse(configNotFoundError(key))
 
   private val contactHost = configuration
     .getOptional[String]("contact-frontend.host")
@@ -52,30 +49,42 @@ class CFConfig @Inject()(environment: play.api.Environment,
 
   override lazy val externalReportProblemUrl =
     s"$contactHost/contact/problem_reports"
+
   override lazy val externalReportProblemSecureUrl =
     s"$contactHost/contact/problem_reports_secure"
-  override lazy val assetsPrefix   = loadConfig("frontend.assets.url") + loadConfig(s"frontend.assets.version")
-  override lazy val analyticsToken = loadConfig("google-analytics.token")
-  override lazy val analyticsHost  = loadConfig("google-analytics.host")
+
+  override lazy val assetsPrefix =
+    loadConfigString("frontend.assets.url") + loadConfigString(s"frontend.assets.version")
+
+  override lazy val analyticsToken = loadConfigString("google-analytics.token")
+
+  override lazy val analyticsHost  = loadConfigString("google-analytics.host")
+
   override lazy val backUrlDestinationWhitelist =
-    loadConfig("backUrlDestinationWhitelist").split(',').filter(_.nonEmpty).toSet
+    loadConfigString("backUrlDestinationWhitelist").split(',').filter(_.nonEmpty).toSet
+
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
+
   override def fallbackURLForLangugeSwitcher =
-    loadConfig("platform.frontend.url")
+    loadConfigString("platform.frontend.url")
+
   override def enableLanguageSwitching =
     configuration
       .getOptional[Boolean]("enableLanguageSwitching")
       .getOrElse(false)
 
-  override lazy val captchaEnabled: Boolean = servicesConfig.getBoolean("captcha.v3.enabled")
+  override lazy val captchaEnabled: Boolean =
+    configuration
+      .getOptional[Boolean]("captcha.v3.enabled")
+      .getOrElse(configNotFoundError("captcha.v3.enabled"))
 
-  override lazy val captchaMinScore: BigDecimal = BigDecimal(servicesConfig.getString("captcha.v3.minScore"))
+  override lazy val captchaMinScore: BigDecimal = BigDecimal(loadConfigString("captcha.v3.minScore"))
 
-  override lazy val captchaClientKey: String = servicesConfig.getString("captcha.v3.keys.client")
+  override lazy val captchaClientKey: String = loadConfigString("captcha.v3.keys.client")
 
-  override lazy val captchaServerKey: String = servicesConfig.getString("captcha.v3.keys.server")
+  override lazy val captchaServerKey: String = loadConfigString("captcha.v3.keys.server")
 
-  override lazy val captchaVerifyUrl : String = servicesConfig.getString("captcha.v3.verifyUrl")
+  override lazy val captchaVerifyUrl : String = loadConfigString("captcha.v3.verifyUrl")
 
   lazy val featureSelector: FeatureSelector =
     new BucketBasedFeatureSelector(BucketCalculator.deviceIdBucketCalculator, featureRules)
@@ -86,4 +95,6 @@ class CFConfig @Inject()(environment: play.api.Environment,
   override def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] =
     featureSelector.computeFeatures(request, service)
 
+  private def configNotFoundError(key: String) =
+    throw new RuntimeException(s"Could not find config key '$key'")
 }

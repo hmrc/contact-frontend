@@ -12,16 +12,15 @@ import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.api.{Application, Configuration, Environment, Mode}
+import play.api.test.Helpers._
+import play.api.{Application, Configuration}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import util.BackUrlValidator
-import play.api.test.Helpers._
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
-import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -311,18 +310,13 @@ class AccessibilityControllerSpec extends UnitSpec with WithFakeApplication {
       override def validate(backUrl: String) = backUrl == "http://www.valid.url"
     }
 
-    val environment: Environment = Environment.simple()
-    val runMode = new RunMode(app.configuration, Mode.Prod)
-    val servicesConfig = new ServicesConfig(app.configuration, runMode)
-
-    implicit val cconfig: CFConfig = new CFConfig(environment, app.configuration, servicesConfig)
+    implicit val cconfig: CFConfig = new CFConfig(app.configuration)
 
     val controller = new AccessibilityController(
       hmrcDeskproConnector,
       authConnector,
       backUrlValidator,
       Configuration(),
-      environment,
       Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]))(cconfig, ExecutionContext.Implicits.global)
 
 

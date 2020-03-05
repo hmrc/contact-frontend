@@ -3,11 +3,11 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import javax.inject.{Inject, Singleton}
+import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import play.api.{Configuration, Environment}
 import play.filters.csrf.CSRF
 import services.{CaptchaService, DeskproSubmission}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -49,7 +49,6 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
                                       val authConnector: AuthConnector,
                                       val captchaService: CaptchaService,
                                       val configuration: Configuration,
-                                      val environment: Environment,
                                       mcc: MessagesControllerComponents)
                                      (implicit val appConfig: AppConfig,
                                       val executionContext: ExecutionContext)

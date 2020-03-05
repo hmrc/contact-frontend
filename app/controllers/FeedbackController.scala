@@ -24,7 +24,6 @@ import scala.concurrent.{ExecutionContext, Future}
                                               val authConnector: AuthConnector,
                                               val accessibleUrlValidator: BackUrlValidator,
                                               val configuration: Configuration,
-                                              val environment: Environment,
                                               mcc: MessagesControllerComponents)
                                              (implicit val appConfig: AppConfig,
                                               val executionContext: ExecutionContext)
