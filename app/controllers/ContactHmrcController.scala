@@ -29,7 +29,7 @@ object ContactHmrcForm {
         .verifying("error.common.problem_report.name_mandatory", name => !name.trim.isEmpty)
         .verifying("error.common.problem_report.name_too_long", name => name.size <= 70),
       "contact-email" -> text
-        .verifying("error.email", validateEmail)
+        .verifying("error.common.problem_report.email_valid", validateEmail)
         .verifying("deskpro.email_too_long", email => email.size <= 255),
       "contact-comments" -> text
         .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)

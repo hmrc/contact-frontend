@@ -210,7 +210,7 @@ object FeedbackFormBind {
           .verifying("error.common.feedback.name_mandatory", name => !name.trim.isEmpty)
           .verifying("error.common.feedback.name_too_long", name => name.size <= 70),
         "feedback-email" -> text
-          .verifying("error.email", validateEmail)
+          .verifying("error.common.problem_report.email_valid", validateEmail)
           .verifying("deskpro.email_too_long", email => email.size <= 255),
         "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
 
