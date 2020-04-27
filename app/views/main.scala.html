@@ -1,5 +1,12 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import config.AppConfig
-@import uk.gov.hmrc.play.views.html.layouts
+@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
+
+@this(govUkWrapper: views.html.govuk_wrapper, layoutsArticle: uiLayouts.Article, errorFeedback: partials.error_feedback)
 
 @(
   title: String,
@@ -12,7 +19,7 @@
 
 @getHelpForm = {
   @if(supportLinkEnabled) {
-    @partials.error_feedback(
+    @errorFeedback(
       form = controllers.ProblemReportForm.emptyForm(service = service),
       actionUrl=appConfig.externalReportProblemSecureUrl,
       csrfToken=play.filters.csrf.CSRF.getToken(request).map(_.value),
@@ -21,10 +28,10 @@
   }
 }
 
-@govuk_wrapper(
+@govUkWrapper(
   title = title,
   bodyClasses = bodyClasses,
-  mainContent = uk.gov.hmrc.play.views.html.layouts.article(mainContent),
+  mainContent = layoutsArticle(mainContent),
   userLoggedIn = userLoggedIn,
   getHelpForm = getHelpForm,
   enableLanguageSwitching = appConfig.enableLanguageSwitching,

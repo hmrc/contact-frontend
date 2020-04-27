@@ -1,7 +1,14 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@this(mainContent: views.html.main)
+
 @()(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 
 @pageTitle = @{Messages("common.problem_report.error_nojavascript_title")}
-@main(title = pageTitle, supportLinkEnabled = false) {
+@mainContent(title = pageTitle, supportLinkEnabled = false) {
 <header class="page-header">
     <h1>@pageTitle</h1>
 </header>

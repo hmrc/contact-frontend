@@ -1,9 +1,13 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package connectors
 
 import config.AppConfig
 import javax.inject.Inject
 import play.api.libs.json.{Json, _}
-import play.mvc.Http.Response
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 

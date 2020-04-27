@@ -1,7 +1,14 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import config.AppConfig
+
+@this(mainContent: views.html.main, feedbackFormConfirmation: views.html.partials.feedback_form_confirmation)
 
 @(ticketId:String, loggedIn: Boolean, backUrl: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
-@main(title = Messages("common.feedback.heading"), userLoggedIn = loggedIn) {
-    @views.html.partials.feedback_form_confirmation(ticketId, backUrl)
+@mainContent(title = Messages("common.feedback.heading"), userLoggedIn = loggedIn) {
+    @feedbackFormConfirmation(ticketId, backUrl)
 }

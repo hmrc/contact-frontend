@@ -1,12 +1,18 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package util
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import util.BucketCalculator.BucketCalculator
 
 
-class BucketBasedFeatureSelectorSpec extends WordSpec with Matchers {
+class BucketBasedFeatureSelectorSpec extends AnyWordSpec with Matchers {
 
   val testFeature1 = GetHelpWithThisPageFeatureFieldHints
   val testFeature2 = GetHelpWithThisPageImprovedFieldValidation

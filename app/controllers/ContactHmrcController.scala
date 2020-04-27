@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package controllers
 
 import config.AppConfig
@@ -14,7 +19,9 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import util.DeskproEmailValidator
-import views.html.deskpro_error
+import views.html.helpers.recaptcha
+import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
+import views.html.{contact_hmrc, contact_hmrc_confirmation, deskpro_error}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -49,10 +56,16 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
                                       val authConnector: AuthConnector,
                                       val captchaService: CaptchaService,
                                       val configuration: Configuration,
-                                      mcc: MessagesControllerComponents)
+                                      mcc: MessagesControllerComponents,
+                                      contactPage: contact_hmrc,
+                                      contactConfirmationPage: contact_hmrc_confirmation,
+                                      contactHmrcForm: contact_hmrc_form,
+                                      contactHmrcFormConfirmation: contact_hmrc_form_confirmation,
+                                      deskproErrorPage: deskpro_error,
+                                      recaptcha: recaptcha)
                                      (implicit val appConfig: AppConfig,
                                       val executionContext: ExecutionContext)
-    extends WithCaptcha(mcc)
+    extends WithCaptcha(mcc, deskproErrorPage, recaptcha)
     with DeskproSubmission
     with AuthorisedFunctions
     with LoginRedirection
@@ -64,9 +77,7 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
       Future.successful {
         val referer   = request.headers.get("Referer").getOrElse("n/a")
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-        Ok(
-          views.html
-            .contact_hmrc(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None, None, None)), loggedIn = true))
+        Ok(contactPage(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None, None, None)), loggedIn = true))
       }
     }))
   }
@@ -76,7 +87,7 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
       val referer   = request.headers.get("Referer").getOrElse("n/a")
       val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
       Ok(
-        views.html.contact_hmrc(
+        contactPage(
           ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, Some(service), None, userAction)),
           loggedIn = false,
           reCaptchaComponent = Some(recaptchaFormComponent("contact-hmrc")))
@@ -106,7 +117,7 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
       .bindFromRequest()(request)
       .fold(
         error => {
-          Future.successful(BadRequest(views.html.contact_hmrc(error, enrolments.isDefined)))
+          Future.successful(BadRequest(contactPage(error, enrolments.isDefined)))
         },
         data =>
 
@@ -115,7 +126,7 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
               Redirect(thanksRoute).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
             }
             .recover {
-              case _ => InternalServerError(deskpro_error())
+              case _ => InternalServerError(deskproErrorPage())
             }
       )
 
@@ -131,7 +142,7 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
 
   private def doThanks(implicit request: Request[AnyRef]) = {
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
-      Ok(views.html.contact_hmrc_confirmation(ticketId))
+      Ok(contactConfirmationPage(ticketId))
     }
     Future.successful(result)
   }
@@ -140,7 +151,7 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
     Action.async { implicit request =>
       Future.successful {
         Ok(
-          views.html.partials.contact_hmrc_form(
+          contactHmrcForm(
             ContactHmrcForm.form.fill(
               ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service, None, None)),
             submitUrl,
@@ -153,7 +164,7 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
       .bindFromRequest()(request)
       .fold(
         error => {
-          Future.successful(BadRequest(views.html.partials.contact_hmrc_form(error, resubmitUrl, renderFormOnly)))
+          Future.successful(BadRequest(contactHmrcForm(error, resubmitUrl, renderFormOnly)))
         },
         data => {
           (for {
@@ -162,14 +173,14 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
           } yield {
             Ok(ticketId.ticket_id.toString)
           }).recover {
-            case _ => InternalServerError(deskpro_error())
+            case _ => InternalServerError(deskproErrorPage())
           }
         }
       )
   }
 
   def contactHmrcPartialFormConfirmation(ticketId: String) = Action { implicit request =>
-    Ok(views.html.partials.contact_hmrc_form_confirmation(ticketId))
+    Ok(contactHmrcFormConfirmation(ticketId))
   }
 }
 

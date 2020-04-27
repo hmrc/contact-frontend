@@ -1,4 +1,11 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import config.AppConfig
+
+@this(ticketCreatedBody: views.html.ticket_created_body)
 
 @(ticketId: String)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
@@ -6,4 +13,4 @@
   <h1>@Messages("contact.heading")</h1>
 </header>
 
-@ticket_created_body(ticketId, None)
+@ticketCreatedBody(ticketId, None)

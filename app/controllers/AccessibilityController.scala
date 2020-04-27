@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package controllers
 
 import config.AppConfig
@@ -16,6 +21,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions}
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
+import views.html.{accessibility, accessibility_confirmation}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -26,8 +32,7 @@ object AccessibilityFormBind {
   def emptyForm(csrfToken: String,
                 referer: Option[String] = None,
                 service: Option[String] = None,
-                userAction :Option[String] = None)
-               (implicit request: Request[_]): Form[AccessibilityForm] = {
+                userAction :Option[String] = None): Form[AccessibilityForm] = {
     AccessibilityFormBind.form.fill(
       AccessibilityForm(
         problemDescription = "",
@@ -41,7 +46,7 @@ object AccessibilityFormBind {
       ))
   }
 
-  def form(implicit request: Request[_]): Form[AccessibilityForm] = Form[AccessibilityForm](
+  def form: Form[AccessibilityForm] = Form[AccessibilityForm](
     mapping(
       "problemDescription" -> text
         .verifying("error.common.accessibility.problem.toolong", msg => msg.length <= 2000)
@@ -65,7 +70,9 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
                                         val authConnector: AuthConnector,
                                         val accessibleUrlValidator: BackUrlValidator,
                                         val configuration: Configuration,
-                                        mcc: MessagesControllerComponents)
+                                        mcc: MessagesControllerComponents,
+                                        accessibilityPage: accessibility,
+                                        accessibilityConfirmationPage: accessibility_confirmation)
                                        (implicit val appConfig: AppConfig,
                                         val executionContext: ExecutionContext)
     extends FrontendController(mcc)
@@ -92,7 +99,7 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
             val referer   = request.headers.get("Referer")
             val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
             val form      = AccessibilityFormBind.emptyForm(csrfToken, referer, service, userAction)
-            Ok(views.html.accessibility(form, routes.AccessibilityController.submitAccessibilityForm().url, loggedIn = true))
+            Ok(accessibilityPage(form, routes.AccessibilityController.submitAccessibilityForm().url, loggedIn = true))
           }
 
         })
@@ -107,7 +114,7 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
           .bindFromRequest()(request)
           .fold(
             (error: Form[AccessibilityForm]) =>
-              Future.successful(BadRequest(views.html.accessibility(error, routes.AccessibilityController.submitAccessibilityForm().url, loggedIn = true))),
+              Future.successful(BadRequest(accessibilityPage(error, routes.AccessibilityController.submitAccessibilityForm().url, loggedIn = true))),
             data => {
               for {
                 maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
@@ -123,7 +130,7 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
   def thanks(): Action[AnyContent] = Action.async { implicit request =>
     loginRedirection(routes.AccessibilityController.thanks().url)(
       authorised(AuthProviders(GovernmentGateway)) {
-        Future.successful(Ok(views.html.accessibility_confirmation("", loggedIn = true)))
+        Future.successful(Ok(accessibilityConfirmationPage("", loggedIn = true)))
       })
   }
 
@@ -135,7 +142,7 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
       val referer   = request.headers.get("Referer")
       val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
       val form      = AccessibilityFormBind.emptyForm(csrfToken, referer, service, userAction)
-      Ok(views.html.accessibility(form, routes.AccessibilityController.submitUnauthenticatedAccessibilityForm().url, loggedIn = false))
+      Ok(accessibilityPage(form, routes.AccessibilityController.submitUnauthenticatedAccessibilityForm().url, loggedIn = false))
     }
   }
 
@@ -144,7 +151,7 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
       .bindFromRequest()(request)
       .fold(
         (error: Form[AccessibilityForm]) =>
-          Future.successful(BadRequest(views.html.accessibility(error, routes.AccessibilityController.submitUnauthenticatedAccessibilityForm().url, loggedIn = false))),
+          Future.successful(BadRequest(accessibilityPage(error, routes.AccessibilityController.submitUnauthenticatedAccessibilityForm().url, loggedIn = false))),
         data => {
           for {
             _      <- createAccessibilityTicket(data, None)
@@ -155,7 +162,7 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
   }
 
   def unauthenticatedThanks(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.accessibility_confirmation("")))
+    Future.successful(Ok(accessibilityConfirmationPage("")))
   }
 
 }

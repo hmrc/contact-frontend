@@ -1,15 +1,21 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package util
 
 import org.scalacheck.{Gen, Shrink}
-import org.scalatest.prop.PropertyChecks
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.matchers.should.Matchers
 import play.api.mvc.{AnyContentAsEmpty, Cookie}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.CookieNames
 
-class DeviceIdBucketCalculatorSpec extends WordSpec with Matchers with PropertyChecks {
+class DeviceIdBucketCalculatorSpec extends AnyWordSpec with Matchers with ScalaCheckPropertyChecks {
 
-  implicit override val generatorDrivenConfig: PropertyCheckConfiguration = PropertyCheckConfig(minSize=100000, maxSize = 200000)
+  implicit override val generatorDrivenConfig: PropertyCheckConfiguration = PropertyCheckConfiguration(minSize=100000, sizeRange = 200000)
   implicit def noShrink[T]: Shrink[T] = Shrink.shrinkAny
 
   "Bucket id should be generated consistently and within range of 0 to 99" in {

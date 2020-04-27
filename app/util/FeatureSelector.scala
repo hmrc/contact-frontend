@@ -1,6 +1,11 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package util
 
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.Request
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import util.BucketCalculator.BucketCalculator
@@ -66,12 +71,12 @@ object FeatureEnablingRule {
 }
 
 class BucketBasedFeatureSelector(computeBucket: BucketCalculator, rules: Iterable[FeatureEnablingRule])
-    extends FeatureSelector {
+    extends FeatureSelector with Logging {
 
   override def computeFeatures(request: Request[_], service: Option[String]): Set[Feature] = {
     val bucket   = computeBucket(request)
     val features = computeFeatures(bucket, service)
-    Logger.info(s"Request assigned to the bucket $bucket, features enabled: ${features.map(_.name).mkString(";")}")
+    logger.info(s"Request assigned to the bucket $bucket, features enabled: ${features.map(_.name).mkString(";")}")
 
     features
   }

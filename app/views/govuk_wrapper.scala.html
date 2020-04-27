@@ -1,3 +1,13 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
+@import layouts.GovUkTemplate
+
+@this(govUkTemplate: GovUkTemplate, layoutsHead: uiLayouts.Head, layoutsFooter: uiLayouts.Footer, layoutsFooterLinks: uiLayouts.FooterLinks, layoutsServiceInfo: uiLayouts.ServiceInfo, layoutsMainContentHeader: uiLayouts.MainContentHeader, layoutsMainContent: uiLayouts.MainContent)
+
 @(title: String,
   bodyClasses: Option[String] = None,
   contentHeader: Option[Html] = None,
@@ -7,11 +17,8 @@
   enableLanguageSwitching : Boolean,
   style: Option[Html] = None)(implicit request: Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 
-@import layouts.{govuk_template => hmrcGovUkTemplate}
-@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
-
 @head = {
-    @uiLayouts.head(
+    @layoutsHead(
       linkElem = style,
       headScripts = None)
     <meta name="format-detection" content="telephone=no" />
@@ -33,7 +40,7 @@
 @afterHeader = {}
 
 @bodyEnd = {
-    @uiLayouts.footer(
+    @layoutsFooter(
       analyticsToken = Some(appConfig.analyticsToken),
       analyticsHost = appConfig.analyticsHost,
       ssoUrl = None,
@@ -47,7 +54,7 @@
 @footerLinks = {}
 
 @serviceInfo = {
-    @uiLayouts.serviceInfo(
+    @layoutsServiceInfo(
       betaBanner = play.twirl.api.HtmlFormat.empty,
       includeGridWrapper = false,
       serviceInfoContent = None)
@@ -55,16 +62,16 @@
 
 @mainContentHeader = {
     @if(contentHeader.isDefined) {
-        @uiLayouts.main_content_header(contentHeader = contentHeader.get)
+        @layoutsMainContentHeader(contentHeader = contentHeader.get)
     }
 }
 
 @content = {
-    @uiLayouts.main_content(
+    @layoutsMainContent(
       article = mainContent,
       mainContentHeader = mainContentHeader,
       serviceInfo = serviceInfo,
       getHelpForm = getHelpForm)
 }
 
-@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links(None)) ,true)(content)
+@govUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(layoutsFooterLinks(None)), true)(content)

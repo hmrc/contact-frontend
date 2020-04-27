@@ -1,12 +1,19 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@this(mainContent: views.html.main, ticketCreatedBody: views.html.ticket_created_body)
+
 @(ticketId: String, thankYouMessage: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 
 @pageTitle = @{Messages("common.thank.you")}
-@main(title = pageTitle, supportLinkEnabled = false)  {
+@mainContent(title = pageTitle, supportLinkEnabled = false)  {
 <header class="page-header">
     <h1>@pageTitle</h1>
 </header>
     <article id="report-confirmation">
-        @ticket_created_body(ticketId, thankYouMessage)
+        @ticketCreatedBody(ticketId, thankYouMessage)
     </article>
 
 }

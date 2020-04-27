@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package controllers
 
 import config.AppConfig
@@ -9,7 +14,7 @@ import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
-import play.api.{Configuration, Environment}
+import play.api.Configuration
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -17,6 +22,8 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
+import views.html.partials.{feedback_form, feedback_form_confirmation}
+import views.html.{feedback, feedback_confirmation}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -24,7 +31,11 @@ import scala.concurrent.{ExecutionContext, Future}
                                               val authConnector: AuthConnector,
                                               val accessibleUrlValidator: BackUrlValidator,
                                               val configuration: Configuration,
-                                              mcc: MessagesControllerComponents)
+                                              mcc: MessagesControllerComponents,
+                                              feedbackPage: feedback,
+                                              feedbackConfirmationPage: feedback_confirmation,
+                                              feedbackFormPartial: feedback_form,
+                                              feedbackFormConfirmationPartial: feedback_form_confirmation)
                                              (implicit val appConfig: AppConfig,
                                               val executionContext: ExecutionContext)
   extends FrontendController(mcc)
@@ -44,7 +55,7 @@ import scala.concurrent.{ExecutionContext, Future}
         authorised(AuthProviders(GovernmentGateway)) {
           Future.successful(
             Ok(
-              views.html.feedback(
+              feedbackPage(
                 FeedbackFormBind.emptyForm(
                   CSRF
                     .getToken(request)
@@ -69,7 +80,7 @@ import scala.concurrent.{ExecutionContext, Future}
     canOmitComments: Boolean) = Action.async { implicit request =>
     Future.successful(
       Ok(
-        views.html.feedback(
+        feedbackPage(
           FeedbackFormBind.emptyForm(
             CSRF.getToken(request).map { _.value }.getOrElse(""),
             backUrl         = backUrl,
@@ -122,7 +133,7 @@ import scala.concurrent.{ExecutionContext, Future}
       )
 
   private def feedbackView(loggedIn: Boolean, form: Form[FeedbackForm])(implicit request: Request[AnyRef]) =
-    views.html.feedback(
+    feedbackPage(
       form,
       loggedIn,
       form("service").value,
@@ -132,9 +143,9 @@ import scala.concurrent.{ExecutionContext, Future}
   private def doThanks(
     implicit loggedIn: Boolean,
     request: Request[AnyRef],
-    backUrl: Option[String] = None): Future[Result] = {
+    backUrl: Option[String]): Future[Result] = {
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
-      Ok(views.html.feedback_confirmation(ticketId, loggedIn, backUrl))
+      Ok(feedbackConfirmationPage(ticketId, loggedIn, backUrl))
     }
     Future.successful(result)
   }
@@ -146,8 +157,7 @@ import scala.concurrent.{ExecutionContext, Future}
     referer: Option[String],
     canOmitComments: Boolean) = Action.async { implicit request =>
     Future.successful {
-      Ok(
-        views.html.partials.feedback_form(
+      Ok(feedbackFormPartial(
           FeedbackFormBind.emptyForm(csrfToken, referer, None, canOmitComments = canOmitComments),
           submitUrl,
           service,
@@ -160,8 +170,7 @@ import scala.concurrent.{ExecutionContext, Future}
     form.fold(
       error => {
         Future.successful(
-          BadRequest(views.html.partials
-            .feedback_form(error, resubmitUrl, canOmitComments = form("canOmitComments").value.exists(_ == "true"))))
+          BadRequest(feedbackFormPartial(error, resubmitUrl, canOmitComments = form("canOmitComments").value.exists(_ == "true"))))
       },
       data => {
         (for {
@@ -177,7 +186,7 @@ import scala.concurrent.{ExecutionContext, Future}
   }
 
   def feedbackPartialFormConfirmation(ticketId: String) = Action { implicit request =>
-    Ok(views.html.partials.feedback_form_confirmation(ticketId, None))
+    Ok(feedbackFormConfirmationPartial(ticketId, None))
   }
 
 }

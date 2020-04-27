@@ -2,6 +2,8 @@ package test
 
 import javax.inject.Inject
 import org.scalatest.GivenWhenThen
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.DefaultHttpFilters
@@ -14,7 +16,6 @@ import play.filters.cors.CORSFilter
 import uk.gov.hmrc.http.CookieNames
 import uk.gov.hmrc.play.bootstrap.filters.FrontendFilters
 import uk.gov.hmrc.play.bootstrap.filters.frontend.deviceid.DeviceIdFilter
-import uk.gov.hmrc.play.test.UnitSpec
 
 class FeatureTestContactFrontendFilters @Inject()(
     defaultFilters: FrontendFilters,
@@ -24,7 +25,8 @@ class FeatureTestContactFrontendFilters @Inject()(
         .filterNot(_.isInstanceOf[DeviceIdFilter]): _*)
 
 class GetHelpWithThisPageFeatureISpec
-    extends UnitSpec
+    extends AnyWordSpec
+    with Matchers
     with GuiceOneAppPerSuite
     with GivenWhenThen {
   override implicit lazy val app: Application = new GuiceApplicationBuilder()

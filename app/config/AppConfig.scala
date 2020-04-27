@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package config
 
 import javax.inject.Inject
@@ -5,7 +10,7 @@ import play.api.Configuration
 import play.api.mvc.Request
 import util._
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.util.Try
 
 trait AppConfig {
@@ -43,7 +48,7 @@ class CFConfig @Inject()(configuration: Configuration) extends AppConfig {
   private val featureRules: Seq[FeatureEnablingRule] =
     Try(configuration.underlying.getStringList("features"))
       .toOption
-      .map(_.toList)
+      .map(_.asScala.toList)
       .getOrElse(List.empty)
       .map(FeatureEnablingRule.parse)
 

@@ -1,3 +1,10 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@this()
+
 @(captchaClientKey: String, action : String, enabled : Boolean)
 @if(enabled) {
 <input type="hidden" name="recaptcha-v3-response" id="recaptcha-v3-response">
