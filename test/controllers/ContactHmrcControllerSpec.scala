@@ -269,23 +269,23 @@ class ContactHmrcControllerSpec
       When("we submit the request")
       val result = controller.submitContactHmrcPartialForm(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
 
-      Then("ticket is sent to deskpro")
-      Mockito
-        .verify(hmrcDeskproConnector)
-        .createDeskProTicket(any[String],
-          any[String],
-          any[String],
-          any[String],
-          any[String],
-          any[Boolean],
-          any[Request[AnyRef]](),
-          any[Option[Enrolments]],
-          any[Option[String]],
-          any[Option[String]],
-          any[Option[String]])(any[HeaderCarrier])
+//       Then("ticket is sent to deskpro")
+//       Mockito
+//         .verify(hmrcDeskproConnector)
+//         .createDeskProTicket(any[String],
+//           any[String],
+//           any[String],
+//           any[String],
+//           any[String],
+//           any[Boolean],
+//           any[Request[AnyRef]](),
+//           any[Option[Enrolments]],
+//           any[Option[String]],
+//           any[Option[String]],
+//           any[Option[String]])(any[HeaderCarrier])
 
 
-      And("an error message is returned to the user")
+      Then("an error message is returned to the user")
       status(result) shouldBe 500
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementsByClass("page-header").text() shouldBe "Sorry, we’re experiencing technical difficulties"
