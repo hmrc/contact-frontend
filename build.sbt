@@ -4,9 +4,6 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "contact-frontend"
 
-// TODO: restrict parallelExecution to tests only (the obvious way to do this using Test scope does not seem to work correctly)
-parallelExecution in Global := false
-
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
   .settings(
