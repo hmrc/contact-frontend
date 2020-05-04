@@ -18,6 +18,8 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.GivenWhenThen
+import org.scalatest.concurrent.Eventually
+import org.scalatest.time.{Seconds, Span}
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Application
 import play.api.i18n.MessagesApi
@@ -37,6 +39,7 @@ class ContactHmrcControllerSpec
     with GivenWhenThen
     with Matchers
     with MockitoSugar
+    with Eventually
     with GuiceOneAppPerTest {
 
   override def fakeApplication(): Application =
@@ -269,23 +272,22 @@ class ContactHmrcControllerSpec
       When("we submit the request")
       val result = controller.submitContactHmrcPartialForm(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
 
-//       Then("ticket is sent to deskpro")
-//       Mockito
-//         .verify(hmrcDeskproConnector)
-//         .createDeskProTicket(any[String],
-//           any[String],
-//           any[String],
-//           any[String],
-//           any[String],
-//           any[Boolean],
-//           any[Request[AnyRef]](),
-//           any[Option[Enrolments]],
-//           any[Option[String]],
-//           any[Option[String]],
-//           any[Option[String]])(any[HeaderCarrier])
+       Then("ticket is sent to deskpro")
+        Mockito
+         .verify(hmrcDeskproConnector, Mockito.timeout(5000))
+         .createDeskProTicket(any[String],
+           any[String],
+           any[String],
+           any[String],
+           any[String],
+           any[Boolean],
+           any[Request[AnyRef]](),
+           any[Option[Enrolments]],
+           any[Option[String]],
+           any[Option[String]],
+           any[Option[String]])(any[HeaderCarrier])
 
-
-      Then("an error message is returned to the user")
+      And("an error message is returned to the user")
       status(result) shouldBe 500
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementsByClass("page-header").text() shouldBe "Sorry, we’re experiencing technical difficulties"
