@@ -1,7 +1,15 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import config.AppConfig
 @import util.GetHelpWithThisPageNewWordingOfEntryLink
-@(form : Form[model.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 @import uk.gov.hmrc.play.views.html._
+
+@this(errorFeedbackInner: views.html.partials.error_feedback_inner)
+
+@(form : Form[model.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 <div class="report-error">
 
@@ -12,6 +20,6 @@
     }
 
     <div class="report-error__content js-hidden">
-        @views.html.partials.error_feedback_inner(form, actionUrl, csrfToken, service, referrer)
+        @errorFeedbackInner(form, actionUrl, csrfToken, service, referrer)
     </div>
 </div>

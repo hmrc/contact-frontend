@@ -1,20 +1,19 @@
 package test
 
 import org.scalatest.GivenWhenThen
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.http.HeaderNames.{HOST, ORIGIN}
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsNull, JsValue}
+import play.api.libs.json.JsNull
 import play.api.mvc.Result
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{FiniteDuration, _}
+import scala.concurrent.duration._
 
-class CorsIntegrationSpec extends UnitSpec with GuiceOneAppPerSuite with GivenWhenThen {
+class CorsIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with GivenWhenThen {
 
   private val fakeRequest = FakeRequest(OPTIONS, "/contact/contact-hmrc",
     FakeHeaders(Seq(

@@ -1,17 +1,23 @@
-@(ticketId: String, serviceId: String)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
 
-@import uk.gov.hmrc.play.views.html.helpers.form
+@import uk.gov.hmrc.play.views.html.helpers.FormWithCSRF
 @import controllers.SurveyFormFields
 
+@this(mainContent: views.html.main, helpersForm: uk.gov.hmrc.play.views.html.helpers.FormWithCSRF)
+
+@(ticketId: String, serviceId: String)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 
 
-@main(title = Messages("survey.title"), bodyClasses = Some("full-width")) {
+@mainContent(title = Messages("survey.title"), bodyClasses = Some("full-width")) {
 
 	<header class="page-header">
 		<h1>@Messages("survey.title")</h1>
 	</header>
 
-	@form(action=controllers.routes.SurveyController.submit, 'class -> "form") {
+	@helpersForm(action=controllers.routes.SurveyController.submit, 'class -> "form") {
 
         <input type="hidden" value="@ticketId" id="ticket-id" name="ticket-id">
         <input type="hidden" value="@serviceId" id="service-id" name="service-id">

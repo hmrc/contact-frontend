@@ -1,9 +1,16 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import config.AppConfig
+
+@this(mainContent: views.html.main)
 
 @()(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @import uk.gov.hmrc.play.views.html.helpers._
-@main(title = Messages("contact.heading"), supportLinkEnabled = false) {
+@mainContent(title = Messages("contact.heading"), supportLinkEnabled = false) {
 
 <header class="page-header">
     <h1>@Messages("global.error.InternalServerError500.heading")</h1>

@@ -1,9 +1,13 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package controllers
 
 import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
-import play.api.Logger
+import play.api.Logging
 import play.api.data.Forms._
 import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
@@ -12,20 +16,24 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import views.html.{survey, survey_confirmation}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-import scala.util.matching.Regex
 
 @Singleton
-class SurveyController @Inject()(auditConnector: AuditConnector, mcc: MessagesControllerComponents)
+class SurveyController @Inject()(auditConnector: AuditConnector,
+                                 mcc: MessagesControllerComponents,
+                                 surveyPage: survey,
+                                 surveyConfirmationPage: survey_confirmation)
                                 (implicit appConfig: AppConfig, executionContext: ExecutionContext)
     extends FrontendController(mcc)
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  val TicketId = "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$".r
+  private val TicketId = "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$".r
 
   def validateTicketId(ticketId: String) = ticketId match {
     case TicketId() => true
@@ -35,9 +43,9 @@ class SurveyController @Inject()(auditConnector: AuditConnector, mcc: MessagesCo
   def survey(ticketId: String, serviceId: String) = Action.async { implicit request =>
     Future.successful(
       if (validateTicketId(ticketId)) {
-        Ok(views.html.survey(ticketId, serviceId))
+        Ok(surveyPage(ticketId, serviceId))
       } else {
-        Logger.error(s"Invalid ticket id $ticketId when requesting survey form")
+        logger.error(s"Invalid ticket id $ticketId when requesting survey form")
         BadRequest("Invalid ticket id")
       }
     )
@@ -49,7 +57,7 @@ class SurveyController @Inject()(auditConnector: AuditConnector, mcc: MessagesCo
 
   def confirmation() = Action.async { implicit request =>
     Future.successful(
-      Ok(views.html.survey_confirmation())
+      Ok(surveyConfirmationPage())
     )
   }
 
@@ -70,15 +78,14 @@ class SurveyController @Inject()(auditConnector: AuditConnector, mcc: MessagesCo
         }
       case Right(errors) =>
         errors foreach { error =>
-          Logger.error(
+          logger.error(
             s"Error processing survey form field: '${error.key}' message='${error.message}' args='${error.args.mkString(",")}'")
         }
     }
     Redirect(routes.SurveyController.confirmation())
   }
 
-  private[controllers] def buildAuditEvent(
-    formData: SurveyFormData)(implicit request: Request[_], hc: HeaderCarrier): Future[DataEvent] =
+  private[controllers] def buildAuditEvent(formData: SurveyFormData)(implicit hc: HeaderCarrier): Future[DataEvent] =
     Future.successful(
       DataEvent(
         auditSource = "frontend",

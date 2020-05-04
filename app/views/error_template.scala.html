@@ -1,4 +1,11 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import config.AppConfig
+
+@this(govUkWrapper: views.html.govuk_wrapper)
 
 @(pageTitle: String, heading: String, message: String)(implicit rh: Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
@@ -10,4 +17,4 @@
   <p>@message</p>
 }
 
-@govuk_wrapper(title = pageTitle, contentHeader = Some(contentHeader), mainContent = mainContent, enableLanguageSwitching = appConfig.enableLanguageSwitching)
+@govUkWrapper(title = pageTitle, contentHeader = Some(contentHeader), mainContent = mainContent, enableLanguageSwitching = appConfig.enableLanguageSwitching)

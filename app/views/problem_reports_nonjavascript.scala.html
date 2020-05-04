@@ -1,12 +1,19 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@this(mainContent: views.html.main, feedbackFormInner: views.html.partials.error_feedback_inner)
+
 @(form : Form[model.ProblemReport], actionUrl: String, service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 @import uk.gov.hmrc.play.views.html._
 @import play.filters.csrf.CSRF
 
-@main(title = "", supportLinkEnabled = false) {
+@mainContent(title = "", supportLinkEnabled = false) {
 
         <div>
             <div class="report-error__content">
-                @views.html.partials.error_feedback_inner(form, actionUrl, CSRF.getToken(request).map(_.value), service, referrer)
+                @feedbackFormInner(form, actionUrl, CSRF.getToken(request).map(_.value), service, referrer)
             </div>
         </div>
 

@@ -1,9 +1,16 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@this()
+
 @(contactForm: Form[controllers.ContactForm],
   externalContactHmrcUrl: String,
   renderFormOnly: Boolean = false,
   reCaptchaComponent: Option[Html] = None)(implicit request: Request[_], lang : Lang, messages : Messages)
-
-@import uk.gov.hmrc.play.views.html.helpers._
 
 @if(!renderFormOnly) {
     <header class="page-header">

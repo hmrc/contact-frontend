@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package services
 
 import com.kenshoo.play.metrics.Metrics
@@ -5,7 +10,6 @@ import config.AppConfig
 import connectors.{CaptchaApiResponseV3, CaptchaConnectorV3, SuccessfulCaptchaApiResponse, UnsuccessfulCaptchaApiResponse}
 import javax.inject.Inject
 import org.slf4j.LoggerFactory
-import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,7 +31,7 @@ class CaptchaServiceV3 @Inject()(captchaConnector: CaptchaConnectorV3, appConfig
       checkIfBot(apiResponse)
     }.recover {
       case NonFatal(ex) =>
-        Logger.error("Error checking captcha, letting the form go through", ex)
+        logger.error("Error checking captcha, letting the form go through", ex)
         false
     }
 

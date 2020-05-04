@@ -1,5 +1,12 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import config.AppConfig
 @import model.AccessibilityForm
+
+@this(mainContent: views.html.main, accessibilityFormPartial: views.html.partials.accessibility_form)
 
 @(accessibilityForm: Form[AccessibilityForm], submitUrl: String, loggedIn: Boolean = false)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
@@ -9,9 +16,9 @@
     if(accessibilityForm.hasErrors){Messages("error.browser.title.prefix")+" "+Messages("accessibility.heading")} else Messages("accessibility.heading")
 }
 
-@main(title = pageTitle, supportLinkEnabled = false, userLoggedIn = loggedIn, style = Some(helpers.wcag_style.render())) {
+@mainContent(title = pageTitle, supportLinkEnabled = false, userLoggedIn = loggedIn, style = Some(helpers.wcag_style.render())) {
 
-    @views.html.partials.accessibility_form(
+    @accessibilityFormPartial(
         accessibilityForm = accessibilityForm,
         submitUrl = submitUrl,
         renderFormOnly = false

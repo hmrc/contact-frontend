@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package model
 
 case class AccessibilityForm(

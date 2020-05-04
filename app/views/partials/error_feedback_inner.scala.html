@@ -1,3 +1,8 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import util.GetHelpWithThisPageFeatureFieldHints
 @import util.GetHelpWithThisPageMoreVerboseHeader
 @import util.GetHelpWithThisPageNewLargeInputFields
@@ -8,6 +13,8 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.html.helpers._
 @import views.helpers.ServiceParameter.extractServiceParameter
+
+@this()
 
 @(problemReportForm : Form[model.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 

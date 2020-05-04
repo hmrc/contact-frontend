@@ -1,14 +1,21 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import config.AppConfig
+
+@this(mainContent: views.html.main, contactHmrcForm: views.html.partials.contact_hmrc_form)
 
 @(contactForm: Form[controllers.ContactForm], loggedIn : Boolean, reCaptchaComponent: Option[Html] = None)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@main(title = Messages("contact.heading"), supportLinkEnabled = false, userLoggedIn = loggedIn) {
+@mainContent(title = Messages("contact.heading"), supportLinkEnabled = false, userLoggedIn = loggedIn) {
     @if(loggedIn) {
-        @views.html.partials.contact_hmrc_form(contactForm, routes.ContactHmrcController.submit.url)
+        @contactHmrcForm(contactForm, routes.ContactHmrcController.submit.url)
     } else {
-        @views.html.partials.contact_hmrc_form(
+        @contactHmrcForm(
             contactForm            = contactForm,
             externalContactHmrcUrl = routes.ContactHmrcController.submitUnauthenticated.url,
             renderFormOnly         = false,

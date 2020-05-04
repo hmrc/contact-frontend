@@ -1,6 +1,13 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@this(mainContent: views.html.main)
+
 @()(implicit request : Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 
-@main(title = Messages("survey.title"), supportLinkEnabled = false) {
+@mainContent(title = Messages("survey.title"), supportLinkEnabled = false) {
 
     <header class="page-header">
         <h1>@Messages("survey.confirmation.title")</h1>

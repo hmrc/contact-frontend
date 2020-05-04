@@ -1,7 +1,14 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import config.AppConfig
+
+@this(mainContent: views.html.main, contactHmrcFormConfirmation: views.html.partials.contact_hmrc_form_confirmation)
 
 @(ticketId: String)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
-@main(title = Messages("contact.heading"), supportLinkEnabled = false) {
-  @views.html.partials.contact_hmrc_form_confirmation(ticketId)
+@mainContent(title = Messages("contact.heading"), supportLinkEnabled = false) {
+  @contactHmrcFormConfirmation(ticketId)
 }

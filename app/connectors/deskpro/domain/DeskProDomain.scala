@@ -1,6 +1,11 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package connectors.deskpro.domain
 
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.Enrolments
@@ -26,7 +31,7 @@ object UserTaxIdentifiers {
   implicit val formats = Json.format[UserTaxIdentifiers]
 }
 
-object Ticket extends FieldTransformer {
+object Ticket extends FieldTransformer with Logging {
 
   implicit val formats = Json.format[Ticket]
 
@@ -59,7 +64,7 @@ object Ticket extends FieldTransformer {
       abFeatures,
       userAction
     )
-    Logger.info(s"Creating ticket $ticket")
+    logger.info(s"Creating ticket $ticket")
     ticket
   }
 }

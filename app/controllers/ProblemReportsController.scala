@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package controllers
 
 import config.AppConfig
@@ -14,6 +19,8 @@ import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation, GetHelpWithThisPageOnlyServerSideValidation}
+import views.html.partials.{error_feedback, error_feedback_inner}
+import views.html.{problem_reports_confirmation_nonjavascript, problem_reports_confirmation_nonjavascript_b, problem_reports_error_nonjavascript, problem_reports_nonjavascript, ticket_created_body, ticket_created_body_b}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -107,7 +114,16 @@ object ProblemReportForm {
 @Singleton
 class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
                                          val authConnector: AuthConnector,
-                                         mcc: MessagesControllerComponents)
+                                         mcc: MessagesControllerComponents,
+                                         problemReportsPage: problem_reports_nonjavascript,
+                                         problemReportsErrorPage: problem_reports_error_nonjavascript,
+                                         problemReportsConfirmationPage: problem_reports_confirmation_nonjavascript,
+                                         problemReportsConfirmationPage_B: problem_reports_confirmation_nonjavascript_b,
+                                         errorFeedbackForm: error_feedback,
+                                         errorFeedbackFormInner: error_feedback_inner,
+                                         ticketCreatedBody: ticket_created_body,
+                                         ticketCreatedBody_B: ticket_created_body_b
+                                        )
                                         (implicit appConfig: AppConfig,
                                          val executionContext: ExecutionContext)
     extends FrontendController(mcc)
@@ -124,9 +140,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
       val postEndpoint = if (isSecure) appConfig.externalReportProblemSecureUrl else appConfig.externalReportProblemUrl
       val csrfToken    = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
 
-      Ok(
-        views.html.partials
-          .error_feedback(ProblemReportForm.emptyForm(service = service), postEndpoint, csrfToken, service, None))
+      Ok(errorFeedbackForm(ProblemReportForm.emptyForm(service = service), postEndpoint, csrfToken, service, None))
   }
 
   def reportFormAjax(service: Option[String]) = Action { implicit request =>
@@ -140,13 +154,12 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     service: Option[String],
     csrfToken: Option[String],
     referrer: Option[String])(implicit request: Request[_]) =
-    views.html.partials
-      .error_feedback_inner(form, appConfig.externalReportProblemSecureUrl, csrfToken, service, referrer)
+    errorFeedbackFormInner(form, appConfig.externalReportProblemSecureUrl, csrfToken, service, referrer)
 
   def reportFormNonJavaScript(service: Option[String]) = Action { implicit request =>
     val referrer = request.headers.get("referer")
     Ok(
-      views.html.problem_reports_nonjavascript(
+      problemReportsPage(
         ProblemReportForm.emptyForm(service = service),
         appConfig.externalReportProblemSecureUrl,
         service,
@@ -177,7 +190,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
         } else {
           Future.successful(
             Ok(
-              views.html.problem_reports_nonjavascript(
+              problemReportsPage(
                 error,
                 appConfig.externalReportProblemSecureUrl,
                 error.data.get("service"),
@@ -198,7 +211,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
             nonJavascriptConfirmationPage(ticketId, problemReport.service)
           }
         }) recover {
-          case _ if !isAjax => Ok(views.html.problem_reports_error_nonjavascript())
+          case _ if !isAjax => Ok(problemReportsErrorPage())
         }
       }
     )
@@ -206,9 +219,9 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
 
   private def javascriptConfirmationPage(ticketId: TicketId, service: Option[String])(implicit request: Request[_]) = {
     val view = if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation, service)) {
-      views.html.ticket_created_body_b(ticketId.ticket_id.toString, None).toString()
+      ticketCreatedBody_B(ticketId.ticket_id.toString, None).toString()
     } else {
-      views.html.ticket_created_body(ticketId.ticket_id.toString, None).toString()
+      ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
     }
     Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
   }
@@ -216,9 +229,9 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
   private def nonJavascriptConfirmationPage(ticketId: TicketId, service: Option[String])(
     implicit request: Request[_]) = {
     val view = if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation, service)) {
-      views.html.problem_reports_confirmation_nonjavascript_b(ticketId.ticket_id.toString, None)
+      problemReportsConfirmationPage_B(ticketId.ticket_id.toString, None)
     } else {
-      views.html.problem_reports_confirmation_nonjavascript(ticketId.ticket_id.toString, None)
+      problemReportsConfirmationPage(ticketId.ticket_id.toString, None)
     }
     Ok(view)
   }

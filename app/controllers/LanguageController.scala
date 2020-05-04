@@ -1,32 +1,38 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package controllers
 
 import javax.inject.{Inject, Singleton}
 import config.AppConfig
-import play.api.Logger
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.mvc.{Action, MessagesControllerComponents}
+import play.api.Logging
+import play.api.i18n.{I18nSupport, Lang}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.LanguageUtils
 
 @Singleton
 class LanguageController @Inject()(mcc: MessagesControllerComponents)(implicit appConfig: AppConfig)
     extends FrontendController(mcc)
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   val english = Lang("en")
   val welsh   = Lang("cy")
 
-  def switchToEnglish = switchToLang(english)
+  def switchToEnglish: Action[AnyContent] = switchToLang(english)
 
-  def switchToWelsh = switchToLang(welsh)
+  def switchToWelsh: Action[AnyContent] = switchToLang(welsh)
 
-  private def switchToLang(lang: Lang) = Action { implicit request =>
+  private def switchToLang(lang: Lang): Action[AnyContent] = Action { implicit request =>
     val newLang = if (appConfig.enableLanguageSwitching) lang else english
 
     request.headers.get(REFERER) match {
       case Some(referrer) => Redirect(referrer).withLang(newLang).flashing(LanguageUtils.flashWithSwitchIndicator)
       case None => {
-        Logger.warn(s"Unable to get the referrer, so sending them to ${appConfig.fallbackURLForLangugeSwitcher}")
+        logger.warn(s"Unable to get the referrer, so sending them to ${appConfig.fallbackURLForLangugeSwitcher}")
         Redirect(appConfig.fallbackURLForLangugeSwitcher).withLang(newLang)
       }
     }

@@ -1,10 +1,15 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package util
 
 import java.net.URL
 import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
-import play.api.Logger
+import play.api.Logging
 
 import scala.util.Try
 
@@ -13,7 +18,7 @@ trait BackUrlValidator {
 }
 
 @Singleton
-class ConfigurationBasedBackUrlValidator @Inject()(appConfig: AppConfig) extends BackUrlValidator {
+class ConfigurationBasedBackUrlValidator @Inject()(appConfig: AppConfig) extends BackUrlValidator with Logging {
 
   val destinationWhitelist: Set[URL] = appConfig.backUrlDestinationWhitelist.map(new URL(_))
 
@@ -25,7 +30,7 @@ class ConfigurationBasedBackUrlValidator @Inject()(appConfig: AppConfig) extends
     validationResult match {
       case Right(_) => true
       case Left(reason) =>
-        Logger.error(s"Back URL validation failed. URL: $backUrl, reason: $reason.")
+        logger.error(s"Back URL validation failed. URL: $backUrl, reason: $reason.")
         false
     }
 

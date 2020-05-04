@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ */
+
 package util
 
 import org.apache.commons.validator.routines.EmailValidator

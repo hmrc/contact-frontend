@@ -1,4 +1,12 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
 @import config.AppConfig
+
+@this(mainContent: views.html.main, feedbackPartialForm: views.html.partials.feedback_form)
+
 @(feedbackForm: Form[model.FeedbackForm],
   loggedIn : Boolean,
   service: Option[String] = None,
@@ -7,11 +15,11 @@
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@main(title = Messages("common.feedback.heading"), userLoggedIn = loggedIn) {
+@mainContent(title = Messages("common.feedback.heading"), userLoggedIn = loggedIn) {
 
     @if(loggedIn) {
-        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submit.url, service, backUrl, canOmitComments)
+        @feedbackPartialForm(feedbackForm, routes.FeedbackController.submit.url, service, backUrl, canOmitComments)
     } else {
-        @views.html.partials.feedback_form(feedbackForm, routes.FeedbackController.submitUnauthenticated.url, service, backUrl, canOmitComments)
+        @feedbackPartialForm(feedbackForm, routes.FeedbackController.submitUnauthenticated.url, service, backUrl, canOmitComments)
     }
 }
