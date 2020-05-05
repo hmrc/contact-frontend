@@ -4,14 +4,12 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "contact-frontend"
 
-
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
   .settings(
     scalaVersion        := "2.12.10",
     majorVersion        := 3,
-    libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it")),
-    libraryDependencies += ws
+    libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it"))
   )
   .settings(publishingSettings: _*)
   .configs(IntegrationTest)
