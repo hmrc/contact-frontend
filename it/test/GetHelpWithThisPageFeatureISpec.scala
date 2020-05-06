@@ -41,7 +41,7 @@ class GetHelpWithThisPageFeatureISpec
   "GetHelpWithThisPageFeature" should {
     "Display version with new wording of the entry link if within experiment" in {
       checkFeatureForText( "BBBBBB",
-                          """Is there anything wrong with this page\?""")
+                          """Is this page not working properly\?""")
 
     }
 

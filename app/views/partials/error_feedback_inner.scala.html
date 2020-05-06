@@ -20,11 +20,13 @@
 
 @if(appConfig.hasFeature(GetHelpWithThisPageMoreVerboseHeader, service)) {
     <h2>@Messages("common.feedback.title.b")</h2>
+    <p>@Messages("common.feedback.only_use_form")</p>
     <p>@Messages("common.feedback.information.warning1.b")</p>
     <p>@Messages("common.feedback.information.warning2.b")</p>
     <p>@Messages("common.feedback.information.warning3.b")</p>
 } else {
     <h2>@Messages("common.feedback.title")</h2>
+    <p>@Messages("common.feedback.only_use_form")</p>
     <p>@Messages("common.feedback.information.warning")</p>
 }
 
