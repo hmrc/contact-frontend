@@ -16,7 +16,7 @@ class BucketBasedFeatureSelectorSpec extends AnyWordSpec with Matchers {
 
   val testFeature1 = GetHelpWithThisPageFeatureFieldHints
   val testFeature2 = GetHelpWithThisPageImprovedFieldValidation
-  val testFeature4 = GetHelpWithThisPageMoreVerboseConfirmation
+  val testFeature3 = GetHelpWithThisPageMoreVerboseConfirmation
 
   val mockBucketCalculator: BucketCalculator = request =>
     request.headers.get("bucket").map(_.toInt).getOrElse(0)
@@ -25,7 +25,7 @@ class BucketBasedFeatureSelectorSpec extends AnyWordSpec with Matchers {
     mockBucketCalculator,
     Set(FeatureEnablingRule(0, 20, None, testFeature1),
         FeatureEnablingRule(10, 30, None, testFeature2),
-      FeatureEnablingRule(10, 30, Some(Set("service1", "service2")), testFeature4)))
+      FeatureEnablingRule(10, 30, Some(Set("service1", "service2")), testFeature3)))
 
   val service = Some("testService")
 
