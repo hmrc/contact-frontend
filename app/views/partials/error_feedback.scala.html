@@ -4,7 +4,6 @@
  *@
 
 @import config.AppConfig
-@import util.GetHelpWithThisPageNewWordingOfEntryLink
 @import uk.gov.hmrc.play.views.html._
 
 @this(errorFeedbackInner: views.html.partials.error_feedback_inner)
@@ -13,11 +12,7 @@
 
 <div class="report-error">
 
-    @if(appConfig.hasFeature(GetHelpWithThisPageNewWordingOfEntryLink, service)) {
-        <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help.b")</a>
-    } else {
-        <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@Messages("common.feedback.get.help")</a>
-    }
+    <a class="report-error__toggle js-visible" id="get-help-action" href="#error-feedback-form">@messages("common.feedback.get.help")</a>
 
     <div class="report-error__content js-hidden">
         @errorFeedbackInner(form, actionUrl, csrfToken, service, referrer)

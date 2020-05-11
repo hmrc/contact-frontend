@@ -16,7 +16,6 @@ class BucketBasedFeatureSelectorSpec extends AnyWordSpec with Matchers {
 
   val testFeature1 = GetHelpWithThisPageFeatureFieldHints
   val testFeature2 = GetHelpWithThisPageImprovedFieldValidation
-  val testFeature3 = GetHelpWithThisPageMoreVerboseHeader
   val testFeature4 = GetHelpWithThisPageMoreVerboseConfirmation
 
   val mockBucketCalculator: BucketCalculator = request =>
@@ -26,7 +25,6 @@ class BucketBasedFeatureSelectorSpec extends AnyWordSpec with Matchers {
     mockBucketCalculator,
     Set(FeatureEnablingRule(0, 20, None, testFeature1),
         FeatureEnablingRule(10, 30, None, testFeature2),
-      FeatureEnablingRule(0, 20, Some(Set("service1", "service2")), testFeature3),
       FeatureEnablingRule(10, 30, Some(Set("service1", "service2")), testFeature4)))
 
   val service = Some("testService")
@@ -59,7 +57,7 @@ class BucketBasedFeatureSelectorSpec extends AnyWordSpec with Matchers {
   "ResquestBasedFeatureSelector with service provided" should {
     "enable feature if the service is on the whitelist" in {
       val request: Request[AnyRef] = FakeRequest().withHeaders(("bucket", "5"))
-      testInstance.computeFeatures(request, Some("service1")) shouldBe Set(testFeature1, testFeature3)
+      testInstance.computeFeatures(request, Some("service1")) shouldBe Set(testFeature1)
     }
 
     "not enable feature if the service is not on the whitelist" in {

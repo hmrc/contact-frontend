@@ -4,7 +4,6 @@
  *@
 
 @import util.GetHelpWithThisPageFeatureFieldHints
-@import util.GetHelpWithThisPageMoreVerboseHeader
 @import util.GetHelpWithThisPageNewLargeInputFields
 @import util.GetHelpWithThisPageImprovedFieldValidation
 @import util.GetHelpWithThisPageOnlyServerSideValidation
@@ -18,20 +17,12 @@
 
 @(problemReportForm : Form[model.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
-@if(appConfig.hasFeature(GetHelpWithThisPageMoreVerboseHeader, service)) {
-    <h2>@Messages("common.feedback.title.b")</h2>
-    <p>@Messages("common.feedback.only_use_form")</p>
-    <p>@Messages("common.feedback.information.warning1.b")</p>
-    <p>@Messages("common.feedback.information.warning2.b")</p>
-    <p>@Messages("common.feedback.information.warning3.b")</p>
-} else {
-    <h2>@Messages("common.feedback.title")</h2>
-    <p>@Messages("common.feedback.only_use_form")</p>
-    <p>@Messages("common.feedback.information.warning")</p>
-}
-
 @improvedNameFieldValidation = @{appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)}
 @clientSideValidation = @{ !appConfig.hasFeature(GetHelpWithThisPageOnlyServerSideValidation, service) }
+
+<h2>@Messages("common.feedback.title")</h2>
+<p>@Messages("common.feedback.only_use_form")</p>
+<p>@Messages("common.feedback.information.warning")</p>
 
 <form action="@actionUrl" method="POST" id="error-feedback-form" class="form--feedback" novalidate>
     @if(csrfToken.isDefined) {
