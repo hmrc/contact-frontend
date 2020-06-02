@@ -8,10 +8,10 @@ object AppDependencies {
   }
 
   private val compile = Seq(
-    "uk.gov.hmrc"               %% "bootstrap-frontend-play-27" % "2.8.0",
-    "uk.gov.hmrc"               %% "govuk-template"             % "5.54.0-play-26",
-    "uk.gov.hmrc"               %% "play-ui"                    % "8.9.0-play-26",
-    "uk.gov.hmrc"               %% "url-builder"                % "3.3.0-play-26",
+    "uk.gov.hmrc"               %% "bootstrap-frontend-play-27" % "2.14.0",
+    "uk.gov.hmrc"               %% "govuk-template"             % "5.55.0-play-27",
+    "uk.gov.hmrc"               %% "play-ui"                    % "8.10.0-play-27",
+    "uk.gov.hmrc"               %% "url-builder"                % "3.4.0-play-27",
     "uk.gov.hmrc"               %% "auth-client"                % "3.0.0-play-27",
     "commons-validator"         %  "commons-validator"          % "1.6",
     "org.apache.httpcomponents" %  "httpclient"                 % "4.4.1"
@@ -28,8 +28,8 @@ object AppDependencies {
     "org.jsoup"               %  "jsoup"                   % "1.11.3" % scope,
     "com.github.tomakehurst"  %  "wiremock"                % "1.58" % scope,
     "org.scalacheck"          %% "scalacheck"              % "1.14.0" % scope,
-    "uk.gov.hmrc"             %% "bootstrap-test-play-27"  % "2.4.0" % scope,
-    "uk.gov.hmrc"             %% "domain"                  %"5.6.0-play-26" % scope,
-    "com.vladsch.flexmark"  %   "flexmark-all"             % "0.35.10" % scope,
+    "uk.gov.hmrc"             %% "bootstrap-test-play-27"  % "2.14.0" % scope,
+    "uk.gov.hmrc"             %% "domain"                  %"5.9.0-play-27" % scope,
+    "com.vladsch.flexmark"  %   "flexmark-all"             % "0.35.10" % scope
   )
 }
