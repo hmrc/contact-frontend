@@ -21,7 +21,7 @@ import scala.util.Try
 
 trait DeskproSubmission {
 
-  import DeskproSubmission.replaceRefererPath
+  import DeskproSubmission.replaceReferrerPath
 
   private val Subject = "Contact form submission"
 
@@ -35,7 +35,7 @@ trait DeskproSubmission {
       email            = data.contactEmail,
       subject          = Subject,
       message          = data.contactComments,
-      referrer         = replaceRefererPath(data.referer, data.userAction),
+      referrer         = replaceReferrerPath(data.referrer, data.userAction),
       isJavascript     = data.isJavascript,
       request          = request,
       enrolmentsOption = enrolments,
@@ -75,7 +75,7 @@ trait DeskproSubmission {
       email            = problemReport.reportEmail,
       subject          = "Support Request",
       message          = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer         = replaceRefererPath(referrer.getOrElse(""), problemReport.userAction),
+      referrer         = replaceReferrerPath(referrer.getOrElse(""), problemReport.userAction),
       isJavascript     = problemReport.isJavascript,
       request          = request,
       enrolmentsOption = enrolmentsOption,
@@ -101,7 +101,7 @@ trait DeskproSubmission {
       email            = accessibilityForm.email,
       subject          = "Accessibility Problem",
       message          = accessibilityForm.problemDescription,
-      referrer         = replaceRefererPath(accessibilityForm.referrer, accessibilityForm.userAction),
+      referrer         = replaceReferrerPath(accessibilityForm.referrer, accessibilityForm.userAction),
       isJavascript     = accessibilityForm.isJavascript,
       request          = req,
       enrolmentsOption = enrolments,
@@ -115,14 +115,14 @@ trait DeskproSubmission {
 
 object DeskproSubmission {
 
-    def replaceRefererPath(referer: String, path: Option[String]): String =
+    def replaceReferrerPath(referrer: String, path: Option[String]): String =
       path
         .filter(_.trim.nonEmpty)
-        .map(p => buildUri(referer).setPath(p).build().toASCIIString)
-        .getOrElse(referer)
+        .map(p => buildUri(referrer).setPath(p).build().toASCIIString)
+        .getOrElse(referrer)
 
-  private def buildUri(referer: String) : URIBuilder =
-    Try(new URIBuilder(referer)).getOrElse(new URIBuilder())
+  private def buildUri(referrer: String) : URIBuilder =
+    Try(new URIBuilder(referrer)).getOrElse(new URIBuilder())
 
 
 }

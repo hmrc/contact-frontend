@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
 import views.html.partials.{feedback_form, feedback_form_confirmation}
 import views.html.{feedback, feedback_confirmation}
-
+import play.api.http.HeaderNames._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton class FeedbackController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
@@ -155,10 +155,11 @@ import scala.concurrent.{ExecutionContext, Future}
     csrfToken: String,
     service: Option[String],
     referer: Option[String],
-    canOmitComments: Boolean) = Action.async { implicit request =>
+    canOmitComments: Boolean,
+    referrerUrl: Option[String]) = Action.async { implicit request =>
     Future.successful {
       Ok(feedbackFormPartial(
-          FeedbackFormBind.emptyForm(csrfToken, referer, None, canOmitComments = canOmitComments),
+          FeedbackFormBind.emptyForm(csrfToken, referrerUrl orElse referer, None, canOmitComments = canOmitComments),
           submitUrl,
           service,
           canOmitComments = canOmitComments))
@@ -198,11 +199,11 @@ object FeedbackFormBind {
   private val emailValidator                     = new DeskproEmailValidator()
   private val validateEmail: (String) => Boolean = emailValidator.validate
 
-  def emptyForm(csrfToken: String, referer: Option[String] = None, backUrl: Option[String], canOmitComments: Boolean)(
+  def emptyForm(csrfToken: String, referrer: Option[String] = None, backUrl: Option[String], canOmitComments: Boolean)(
     implicit request: Request[AnyRef]) =
     FeedbackFormBind.form.fill(
       FeedbackForm(
-        referer.getOrElse(request.headers.get("Referer").getOrElse("n/a")),
+        referrer.getOrElse(request.headers.get(REFERER).getOrElse("n/a")),
         csrfToken,
         backUrl,
         canOmitComments))
@@ -238,7 +239,7 @@ object FeedbackFormBind {
           result
         }),
         "isJavascript"    -> boolean,
-        "referer"         -> text,
+        "referrer"        -> text,
         "csrfToken"       -> text,
         "service"         -> optional(text),
         "abFeatures"      -> optional(text),
