@@ -102,6 +102,17 @@ If you want to use the standalone version of the form, you have to redirect the 
 
 '{environment}.' is not included in the case of the production environment.
 
+### Cross-domain linking
+
+For cross-domain linking situations, an optional querystring parameter, referrerUrl, can also be supplied to the unauthenticated 
+standalone page. This parameter should contain the full, absolute, properly encoded URL of the page the user was on before they navigated to
+the contact form. For example, a link from the SCP sign in page would look like 
+`https://www.tax.service.gov.uk/contact/contact-hmrc-unauthenticated?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds`
+
+The referer field is passed to the DeskPro service and lets operators know which page the user was on when they asked to
+contact HMRC. If the referrerUrl is not supplied, the application will attempt to use the HTTP Header and userAction parameter (if present). 
+However, this mechanism is not recommended because it relies on browsers correctly forwarding the HTTP Referer header in all situations.
+
 `Help and contact` historically also supported displaying the *Help and contact* page as a partial; however, this
 functionality is *deprecated* and should not be used.
 

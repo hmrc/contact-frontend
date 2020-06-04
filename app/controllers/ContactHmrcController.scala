@@ -82,9 +82,10 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
     }))
   }
 
-  def indexUnauthenticated(service: String, userAction: Option[String]) = Action.async { implicit request =>
+  def indexUnauthenticated(service: String, userAction: Option[String], referrerUrl: Option[String]) = Action.async { implicit request =>
     Future.successful {
-      val referer   = request.headers.get("Referer").getOrElse("n/a")
+      val httpReferer = request.headers.get("Referer")
+      val referer = referrerUrl getOrElse (httpReferer getOrElse "n/a")
       val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
       Ok(
         contactPage(
