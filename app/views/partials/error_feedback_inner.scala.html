@@ -4,7 +4,6 @@
  *@
 
 @import util.GetHelpWithThisPageFeatureFieldHints
-@import util.GetHelpWithThisPageMoreVerboseHeader
 @import util.GetHelpWithThisPageNewLargeInputFields
 @import util.GetHelpWithThisPageImprovedFieldValidation
 @import util.GetHelpWithThisPageOnlyServerSideValidation
@@ -18,18 +17,12 @@
 
 @(problemReportForm : Form[model.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
-@if(appConfig.hasFeature(GetHelpWithThisPageMoreVerboseHeader, service)) {
-    <h2>@Messages("common.feedback.title.b")</h2>
-    <p>@Messages("common.feedback.information.warning1.b")</p>
-    <p>@Messages("common.feedback.information.warning2.b")</p>
-    <p>@Messages("common.feedback.information.warning3.b")</p>
-} else {
-    <h2>@Messages("common.feedback.title")</h2>
-    <p>@Messages("common.feedback.information.warning")</p>
-}
-
 @improvedNameFieldValidation = @{appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)}
 @clientSideValidation = @{ !appConfig.hasFeature(GetHelpWithThisPageOnlyServerSideValidation, service) }
+
+<h2>@messages("common.feedback.title")</h2>
+<p>@messages("common.feedback.only_use_form")</p>
+<p>@messages("common.feedback.information.warning")</p>
 
 <form action="@actionUrl" method="POST" id="error-feedback-form" class="form--feedback" novalidate>
     @if(csrfToken.isDefined) {
@@ -44,7 +37,7 @@
 
             @error_feedback_input(
             problemReportForm("report-name"),
-            _label = Some(Messages("form.name")),
+            _label = Some(messages("form.name")),
             _divClass = Some("form-field"),
             _inputClass = Some("input--medium"),
             _id = Some("report-name-new"),
@@ -59,36 +52,36 @@
                 },
                 "data-msg-pattern" -> {
                     if (improvedNameFieldValidation) {
-                        Messages("error.common.problem_report.name_valid.b")
+                        messages("error.common.problem_report.name_valid.b")
                     } else {
-                        Messages("error.common.problem_report.name_valid")
+                        messages("error.common.problem_report.name_valid")
                     }
                 },
                 "data-rule-required" -> "true",
-                "data-msg-required" -> Messages("error.common.problem_report.name_mandatory.b")
+                "data-msg-required" -> messages("error.common.problem_report.name_mandatory.b")
             ),
             _clientSideValidation = clientSideValidation
             )
 
             @error_feedback_input(
             problemReportForm("report-email"),
-            _label = Some(Messages("problem_report.email.b")),
+            _label = Some(messages("problem_report.email.b")),
             _divClass = Some("form-field"),
             _inputClass = Some("input--medium"),
             _id = Some("report-email-new"),
             _maxlength = Some(255),
             _dataProperties = Map(
                 "data-rule-email" -> "true",
-                "data-msg-email" -> Messages("error.common.problem_report.email_valid"),
+                "data-msg-email" -> messages("error.common.problem_report.email_valid"),
                 "data-rule-required" -> "true",
-                "data-msg-required" -> Messages("error.common.problem_report.email_mandatory.b")
+                "data-msg-required" -> messages("error.common.problem_report.email_mandatory.b")
             ),
             _clientSideValidation = clientSideValidation
             )
 
             @error_feedback_textarea(
             problemReportForm("report-action"),
-            _label = Some(Messages("problem_report.action.b")),
+            _label = Some(messages("problem_report.action.b")),
             _divClass = Some("form-field"),
             _inputClass = Some("textarea--fullwidth"),
             _id = Some("report-action-new"),
@@ -96,20 +89,20 @@
             _maxlength = Some(255),
             _dataProperties = Map(
                 "data-rule-required" -> "true",
-                "data-msg-required" -> Messages("error.common.problem_report.action_mandatory.b")
+                "data-msg-required" -> messages("error.common.problem_report.action_mandatory.b")
             ),
             _hint = if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints, service)) {
-                Some(Messages("problem_report.action.hint.b"))
+                Some(messages("problem_report.action.hint.b"))
             } else {
                 None
             },
-            _bottomHint = Some(Messages("problem_report.common.size_limit", 1000)),
+            _bottomHint = Some(messages("problem_report.common.size_limit", 1000)),
             _clientSideValidation = clientSideValidation
             )
 
             @error_feedback_textarea(
             problemReportForm("report-error"),
-            _label = Some(Messages("problem_report.error.b")),
+            _label = Some(messages("problem_report.error.b")),
             _divClass = Some("form-field"),
             _inputClass = Some("textarea--fullwidth"),
             _id = Some("report-error-new"),
@@ -117,14 +110,14 @@
             _maxlength = Some(255),
             _dataProperties = Map(
                 "data-rule-required" -> "true",
-                "data-msg-required" -> Messages("error.common.problem_report.error_mandatory.b")
+                "data-msg-required" -> messages("error.common.problem_report.error_mandatory.b")
             ),
             _hint = if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints, service)) {
-                Some(Messages("problem_report.error.hint.b"))
+                Some(messages("problem_report.error.hint.b"))
             } else {
                 None
             },
-            _bottomHint = Some(Messages("problem_report.common.size_limit", 1000)),
+            _bottomHint = Some(messages("problem_report.common.size_limit", 1000)),
             _clientSideValidation = clientSideValidation
             )
 
@@ -135,17 +128,17 @@
             <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
 
             <div class="form-field">
-                <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
+                <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@messages("form.send")</button>
             </div>
         </div>
 
     } else {
 
         <fieldset id="smallInputFields">
-            <legend class="visuallyhidden">@Messages("common.feedback.title")</legend>
+            <legend class="visuallyhidden">@messages("common.feedback.title")</legend>
             @error_feedback_input(
             problemReportForm("report-name"),
-            _label = Some(Messages("form.name")),
+            _label = Some(messages("form.name")),
             _divClass = Some("form-group-compound"),
             _inputClass = Some("input--fullwidth form-control"),
             _id = Some("report-name"),
@@ -160,57 +153,57 @@
                 },
                 "data-msg-pattern" -> {
                     if (improvedNameFieldValidation) {
-                        Messages("error.common.problem_report.name_valid.b")
+                        messages("error.common.problem_report.name_valid.b")
                     } else {
-                        Messages("error.common.problem_report.name_valid")
+                        messages("error.common.problem_report.name_valid")
                     }
                 },
                 "data-rule-required" -> "true",
-                "data-msg-required" -> Messages("error.common.problem_report.name_mandatory")
+                "data-msg-required" -> messages("error.common.problem_report.name_mandatory")
             ),
             _clientSideValidation = clientSideValidation
             )
 
             @error_feedback_input(
             problemReportForm("report-email"),
-            _label = Some(Messages("problem_report.email")),
+            _label = Some(messages("problem_report.email")),
             _divClass = Some("form-group-compound"),
             _inputClass = Some("input--fullwidth form-control"),
             _id = Some("report-email"),
             _maxlength = Some(255),
             _dataProperties = Map(
                 "data-rule-email" -> "true",
-                "data-msg-email" -> Messages("error.common.problem_report.email_valid"),
+                "data-msg-email" -> messages("error.common.problem_report.email_valid"),
                 "data-rule-required" -> "true",
-                "data-msg-required" -> Messages("error.common.problem_report.email_mandatory")
+                "data-msg-required" -> messages("error.common.problem_report.email_mandatory")
             ),
             _clientSideValidation = clientSideValidation
             )
 
             @error_feedback_input(
             problemReportForm("report-action"),
-            _label = Some(Messages("problem_report.action")),
+            _label = Some(messages("problem_report.action")),
             _divClass = Some("form-group-compound"),
             _inputClass = Some("input--fullwidth form-control"),
             _id = Some("report-action"),
             _maxlength = Some(1000),
             _dataProperties = Map(
                 "data-rule-required" -> "true",
-                "data-msg-required" -> Messages("error.common.problem_report.action_mandatory")
+                "data-msg-required" -> messages("error.common.problem_report.action_mandatory")
             ),
             _clientSideValidation = clientSideValidation
             )
 
             @error_feedback_input(
             problemReportForm("report-error"),
-            _label = Some(Messages("problem_report.error")),
+            _label = Some(messages("problem_report.error")),
             _divClass = Some("form-group-compound"),
             _inputClass = Some("input--cleared form-control"),
             _id = Some("report-error"),
             _maxlength = Some(1000),
             _dataProperties = Map(
                 "data-rule-required" -> "true",
-                "data-msg-required" -> Messages("error.common.problem_report.error_mandatory")
+                "data-msg-required" -> messages("error.common.problem_report.error_mandatory")
             ),
             _clientSideValidation = clientSideValidation
             )
@@ -222,7 +215,7 @@
             <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
 
             <div class="form-field">
-                <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@Messages("form.send")</button>
+                <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@messages("form.send")</button>
             </div>
         </fieldset>
     }
