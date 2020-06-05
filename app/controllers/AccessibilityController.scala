@@ -30,7 +30,7 @@ object AccessibilityFormBind {
   private val validateEmail: String => Boolean = emailValidator.validate
 
   def emptyForm(csrfToken: String,
-                referer: Option[String] = None,
+                referrer: Option[String] = None,
                 service: Option[String] = None,
                 userAction :Option[String] = None): Form[AccessibilityForm] = {
     AccessibilityFormBind.form.fill(
@@ -39,7 +39,7 @@ object AccessibilityFormBind {
         name = "",
         email = "",
         isJavascript = false,
-        referrer = referer.getOrElse("n/a"),
+        referrer = referrer.getOrElse("n/a"),
         csrfToken = csrfToken,
         service = service,
         userAction = userAction
@@ -58,7 +58,7 @@ object AccessibilityFormBind {
         .verifying("error.common.accessibility.problem.email_mandatory", validateEmail)
         .verifying("deskpro.email_too_long", email => email.length <= 255),
       "isJavascript" -> boolean,
-      "referer"      -> text,
+      "referrer"     -> text,
       "csrfToken"    -> text,
       "service"      -> optional(text),
       "userAction"   -> optional(text)
@@ -96,9 +96,9 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
         authorised(AuthProviders(GovernmentGateway)) {
 
           Future.successful {
-            val referer   = request.headers.get("Referer")
+            val referrer  = request.headers.get(REFERER)
             val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-            val form      = AccessibilityFormBind.emptyForm(csrfToken, referer, service, userAction)
+            val form      = AccessibilityFormBind.emptyForm(csrfToken, referrer, service, userAction)
             Ok(accessibilityPage(form, routes.AccessibilityController.submitAccessibilityForm().url, loggedIn = true))
           }
 
@@ -139,9 +139,9 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
 
   def unauthenticatedAccessibilityForm(service: Option[String], userAction: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     Future.successful {
-      val referer   = request.headers.get("Referer")
+      val referrer  = request.headers.get(REFERER)
       val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-      val form      = AccessibilityFormBind.emptyForm(csrfToken, referer, service, userAction)
+      val form      = AccessibilityFormBind.emptyForm(csrfToken, referrer, service, userAction)
       Ok(accessibilityPage(form, routes.AccessibilityController.submitUnauthenticatedAccessibilityForm().url, loggedIn = false))
     }
   }

@@ -39,6 +39,30 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       .configure("metrics.jvm" -> false, "metrics.enabled" -> false)
       .build()
 
+  "feedbackPartialForm" should {
+    val submitUrl = "https:/abcdefg.com"
+    val csrfToken = "CSRF"
+    val service = Some("scp")
+    val referer = Some("https://www.example.com/some-service")
+    val canOmitComments = false
+
+    "use the (deprecated) referer parameter if supplied" in new FeedbackControllerApplication(fakeApplication) {
+      val result = controller.feedbackPartialForm(submitUrl, csrfToken, service, referer, canOmitComments, None)(request)
+
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().getElementById("referrer").attr("value") shouldBe "https://www.example.com/some-service"
+    }
+
+    "use the referrerUrl parameter if supplied" in new FeedbackControllerApplication(fakeApplication) {
+      val referrerUrl = Some("https://www.other-example.com/some-service")
+
+      val result = controller.feedbackPartialForm(submitUrl, csrfToken, service, referer, canOmitComments, referrerUrl)(request)
+
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().getElementById("referrer").attr("value") shouldBe "https://www.other-example.com/some-service"
+    }
+  }
+
   "Submitting the feedback for unauthenticated user" should {
 
     "redirect to confirmation page without 'back' button if 'back' link not provided" in new FeedbackControllerApplication(fakeApplication) {
@@ -280,7 +304,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
   val feedbackRating: String = "2"
   val feedbackEmail: String = "name@mail.com"
   val feedbackComment: String = "Comments"
-  val feedbackReferer: String = "/contact/problem_reports"
+  val feedbackReferrer: String = "/contact/problem_reports"
 
 
 
@@ -306,7 +330,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       meq(feedbackRating),
       meq("Beta feedback submission"),
       meq(comment),
-      meq(feedbackReferer),
+      meq(feedbackReferrer),
       meq(true),
       any[Request[AnyRef]](),
       any[Option[Enrolments]],
@@ -349,21 +373,21 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       "feedback-rating" -> "2",
       "feedback-comments" -> comments,
       "csrfToken" -> "token",
-      "referer" -> feedbackReferer,
+      "referrer" -> feedbackReferrer,
       "canOmitComments" -> canOmitComments.toString,
       "isJavascript" -> javascriptEnabled.toString) ++ backUrl.map("backUrl" -> _)
 
     FakeRequest()
-      .withHeaders(("referer", feedbackReferer), ("User-Agent", "iAmAUserAgent"))
+      .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
       .withFormUrlEncodedBody(fields.toSeq: _*)
   }
 
     def generateInvalidRequest() = FakeRequest()
-      .withHeaders(("referer", feedbackReferer), ("User-Agent", "iAmAUserAgent"))
+      .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
       .withFormUrlEncodedBody("isJavascript" -> "true")
 
     def generateInvalidRequestWithBackUrlAndService() = FakeRequest()
-      .withHeaders(("referer", feedbackReferer), ("User-Agent", "iAmAUserAgent"))
+      .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
       .withFormUrlEncodedBody("isJavascript" -> "true", "backUrl" -> "http://www.back.url", "service" -> "someService", "canOmitComments" -> "true")
 
     val request = generateRequest()

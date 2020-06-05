@@ -126,7 +126,7 @@ class FieldTransformerScope {
   val email: String = "email"
   val subject: String = "subject"
   val message: String = "message"
-  val referrer: String = "referer"
+  val referrer: String = "referrer"
   lazy val request = FakeRequest().withHeaders(("User-Agent", userAgent))
   lazy val requestAuthenticatedByIda = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession((SessionKeys.authProvider, "IDA"))
 

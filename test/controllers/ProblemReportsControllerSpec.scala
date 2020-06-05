@@ -176,7 +176,7 @@ class ProblemReportsControllerApplication(app: Application) extends MockitoSugar
 
   def generateRequest(javascriptEnabled: Boolean = true, name: String = deskproName, email: String = deskproEmail) = {
 
-    val headers = Seq(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent")) ++ Seq(("X-Requested-With", "XMLHttpRequest")).filter(_ => javascriptEnabled)
+    val headers = Seq((REFERER, deskproReferrer), ("User-Agent", "iAmAUserAgent")) ++ Seq(("X-Requested-With", "XMLHttpRequest")).filter(_ => javascriptEnabled)
 
     FakeRequest()
       .withHeaders(headers : _*)
@@ -186,7 +186,7 @@ class ProblemReportsControllerApplication(app: Application) extends MockitoSugar
 
   def generateInvalidRequest(javascriptEnabled: Boolean = true) = {
 
-    val headers = Seq(("referer", deskproReferrer), ("User-Agent", "iAmAUserAgent")) ++ Seq(("X-Requested-With", "XMLHttpRequest")).filter(_ => javascriptEnabled)
+    val headers = Seq((REFERER, deskproReferrer), ("User-Agent", "iAmAUserAgent")) ++ Seq(("X-Requested-With", "XMLHttpRequest")).filter(_ => javascriptEnabled)
 
     FakeRequest()
       .withHeaders(headers : _*)

@@ -60,7 +60,7 @@
         )
 
         <input type="hidden" name="isJavascript" id="isJavascript" value="@feedbackForm.data.get("isJavascript")">
-        <input type="hidden" name="referer" id="referer" value="@feedbackForm.data.get("referer")">
+        <input type="hidden" name="referrer" id="referrer" value="@feedbackForm.data.get("referrer")">
         <input type="hidden" name="canOmitComments" id="canOmitComments" value="@canOmitComments">
         @for(url <- backUrl) {
             <input type="hidden" name="backUrl" id="feedbackBackUrl" value="@url">

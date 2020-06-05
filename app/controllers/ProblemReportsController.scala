@@ -21,7 +21,7 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation, GetHelpWithThisPageOnlyServerSideValidation}
 import views.html.partials.{error_feedback, error_feedback_inner}
 import views.html.{problem_reports_confirmation_nonjavascript, problem_reports_confirmation_nonjavascript_b, problem_reports_error_nonjavascript, problem_reports_nonjavascript, ticket_created_body, ticket_created_body_b}
-
+import play.api.http.HeaderNames._
 import scala.concurrent.{ExecutionContext, Future}
 
 object ProblemReportForm {
@@ -105,7 +105,7 @@ object ProblemReportForm {
         isJavascript = false,
         service      = service,
         abFeatures   = Some(appConfig.getFeatures(service).mkString(";")),
-        referrer     = request.headers.get("Referer"),
+        referrer     = request.headers.get(REFERER),
         userAction   = None
       )
     )
@@ -145,7 +145,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
 
   def reportFormAjax(service: Option[String]) = Action { implicit request =>
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
-    val referrer  = request.headers.get("referer")
+    val referrer  = request.headers.get(REFERER)
     Ok(reportFormAjaxView(ProblemReportForm.emptyForm(service = service), service, csrfToken, referrer))
   }
 
@@ -157,7 +157,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     errorFeedbackFormInner(form, appConfig.externalReportProblemSecureUrl, csrfToken, service, referrer)
 
   def reportFormNonJavaScript(service: Option[String]) = Action { implicit request =>
-    val referrer = request.headers.get("referer")
+    val referrer = request.headers.get(REFERER)
     Ok(
       problemReportsPage(
         ProblemReportForm.emptyForm(service = service),
@@ -174,7 +174,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     ProblemReportForm.form.bindFromRequest.fold(
       (error: Form[ProblemReport]) => {
 
-        val referrer = error.data.get("referrer").filter(_.trim.nonEmpty).orElse(request.headers.get("referer"))
+        val referrer = error.data.get("referrer").filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
 
         if (isAjax) {
           if (appConfig.hasFeature(GetHelpWithThisPageOnlyServerSideValidation, error.data.get("service"))) {
@@ -199,7 +199,7 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
       },
       problemReport => {
 
-        val referrer = problemReport.referrer.filter(_.trim.nonEmpty).orElse(request.headers.get("referer"))
+        val referrer = problemReport.referrer.filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
 
         (for {
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments

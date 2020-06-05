@@ -40,14 +40,14 @@ case class FeedbackForm(
   canOmitComments: Boolean)
 
 object FeedbackForm {
-  def apply(referer: String, csrfToken: String, backUrl: Option[String], canOmitComments: Boolean): FeedbackForm =
+  def apply(referrer: String, csrfToken: String, backUrl: Option[String], canOmitComments: Boolean): FeedbackForm =
     FeedbackForm(
       "",
       "",
       "",
       "",
       javascriptEnabled = false,
-      referrer          = referer,
+      referrer          = referrer,
       csrfToken         = csrfToken,
       backUrl           = backUrl,
       canOmitComments   = canOmitComments)

@@ -12,6 +12,7 @@ import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
+import org.mockito.Matchers.{eq => mockitoEq}
 import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -56,18 +57,50 @@ class ContactHmrcControllerSpec
       Given("a GET request")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
-      val contactRequest = FakeRequest().withHeaders(("Referer", "/some-service-page"))
+      val contactRequest = FakeRequest().withHeaders((REFERER, "/some-service-page"))
       val serviceName = "my-fake-service"
 
       When("the unauthenticated Contact HMRC page is requested with a service name")
-      val contactResult = controller.indexUnauthenticated(serviceName, None)(contactRequest)
+      val contactResult = controller.indexUnauthenticated(serviceName, None, None)(contactRequest)
 
       Then("the expected page should be returned")
       status(contactResult) shouldBe 200
 
       val page = Jsoup.parse(contentAsString(contactResult))
-      page.body().getElementById("referer").attr("value") shouldBe "/some-service-page"
+      page.body().getElementById("referrer").attr("value") shouldBe "/some-service-page"
       page.body().getElementById("service").attr("value") shouldBe "my-fake-service"
+    }
+
+    "use the referrerUrl parameter if supplied" in new ContactHmrcControllerApplication {
+      Given("a GET request")
+      mockDeskproConnector(Future.successful(TicketId(12345)))
+
+      val contactRequest = FakeRequest().withHeaders((REFERER, "/some-service-page"))
+      val serviceName = "my-fake-service"
+      val referrerUrl = Some("https://www.example.com/some-service")
+
+      When("the unauthenticated Contact HMRC page is requested with a service name and a referrer url")
+      val contactResult = controller.indexUnauthenticated(serviceName, None, referrerUrl)(contactRequest)
+
+      Then("the referrer hidden input should contain that value")
+      val page = Jsoup.parse(contentAsString(contactResult))
+      page.body().getElementById("referrer").attr("value") shouldBe "https://www.example.com/some-service"
+    }
+
+    "fallback to n/a if no referrer information is available" in new ContactHmrcControllerApplication {
+      Given("a GET request")
+      mockDeskproConnector(Future.successful(TicketId(12345)))
+
+      val contactRequest = FakeRequest()
+      val serviceName = "my-fake-service"
+      val referrerUrl = Some("https://www.example.com/some-service")
+
+      When("the unauthenticated Contact HMRC page is requested with a service name")
+      val contactResult = controller.indexUnauthenticated(serviceName, None, None)(contactRequest)
+
+      Then("the referrer hidden input should be n/a")
+      val page = Jsoup.parse(contentAsString(contactResult))
+      page.body().getElementById("referrer").attr("value") shouldBe "n/a"
     }
 
     "return expected OK for non-authenticated submit page" in new ContactHmrcControllerApplication {
@@ -79,7 +112,7 @@ class ContactHmrcControllerSpec
         "contact-email" -> "bob@build-it.com",
         "contact-comments" -> "Can We Fix It?",
         "isJavascript" -> "false",
-        "referer" -> "n/a",
+        "referrer" -> "n/a",
         "csrfToken" -> "n/a",
         "service" -> "scp",
         "abFeatures" -> "GetHelpWithThisPageFeature_A",
@@ -112,6 +145,82 @@ class ContactHmrcControllerSpec
           any[Option[String]])(any[HeaderCarrier])
     }
 
+    "send the referrer URL to DeskPro" in new ContactHmrcControllerApplication {
+      Given("a POST request containing a valid form")
+      mockDeskproConnector(Future.successful(TicketId(12345)))
+
+      val fields = Map(
+        "contact-name" -> "Bob The Builder",
+        "contact-email" -> "bob@build-it.com",
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript" -> "false",
+        "referrer" -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken" -> "n/a",
+        "service" -> "scp",
+        "abFeatures" -> "GetHelpWithThisPageFeature_A",
+        "recaptcha-v3-response" -> "xx",
+        "userAction" -> ""
+      )
+
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+
+      When("the request is POSTed to unauthenticated submit contact page")
+      val submitResult = controller.submitUnauthenticated(contactRequest)
+
+      Then("the message is sent to the Deskpro connector")
+      Mockito
+        .verify(hmrcDeskproConnector)
+        .createDeskProTicket(any[String],
+          any[String],
+          any[String],
+          any[String],
+          mockitoEq[String]("https://www.other-gov-domain.gov.uk/path/to/service/page"),
+          any[Boolean],
+          any[Request[AnyRef]](),
+          any[Option[Enrolments]],
+          any[Option[String]],
+          any[Option[String]],
+          any[Option[String]])(any[HeaderCarrier])
+    }
+
+    "send the referrer information to DeskPro with userAction replacing the path if non-empty" in new ContactHmrcControllerApplication {
+      Given("a POST request containing a valid form")
+      mockDeskproConnector(Future.successful(TicketId(12345)))
+
+      val fields = Map(
+        "contact-name" -> "Bob The Builder",
+        "contact-email" -> "bob@build-it.com",
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript" -> "false",
+        "referrer" -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken" -> "n/a",
+        "service" -> "scp",
+        "abFeatures" -> "GetHelpWithThisPageFeature_A",
+        "recaptcha-v3-response" -> "xx",
+        "userAction" -> "/overridden/path"
+      )
+
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+
+      When("the request is POSTed to unauthenticated submit contact page")
+      val submitResult = controller.submitUnauthenticated(contactRequest)
+
+      Then("the message is sent to the Deskpro connector")
+      Mockito
+        .verify(hmrcDeskproConnector)
+        .createDeskProTicket(any[String],
+          any[String],
+          any[String],
+          any[String],
+          mockitoEq[String]("https://www.other-gov-domain.gov.uk/overridden/path"),
+          any[Boolean],
+          any[Request[AnyRef]](),
+          any[Option[Enrolments]],
+          any[Option[String]],
+          any[Option[String]],
+          any[Option[String]])(any[HeaderCarrier])
+    }
+
     "return expected Internal Error when hmrc-deskpro errors for non-authenticated submit page" in new ContactHmrcControllerApplication {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.failed(new Exception("This is an expected test error")))
@@ -121,7 +230,7 @@ class ContactHmrcControllerSpec
         "contact-email" -> "bob@build-it.com",
         "contact-comments" -> "Can We Fix It?",
         "isJavascript" -> "false",
-        "referer" -> "n/a",
+        "referrer" -> "n/a",
         "csrfToken" -> "n/a",
         "service" -> "scp",
         "recaptcha-v3-response" -> "xx"
@@ -164,7 +273,7 @@ class ContactHmrcControllerSpec
         "contact-email" -> "bob@build-it.com",
         "contact-comments" -> "Can We Fix It?",
         "isJavascript" -> "false",
-        "referer" -> "n/a",
+        "referrer" -> "n/a",
         "csrfToken" -> "n/a",
         "service" -> "scp",
         "abFeatures" -> "GetHelpWithThisPageFeature_A"
@@ -256,7 +365,7 @@ class ContactHmrcControllerSpec
         "contact-email" -> "bob@build-it.com",
         "contact-comments" -> "Can We Fix It?",
         "isJavascript" -> "false",
-        "referer" -> "n/a",
+        "referrer" -> "n/a",
         "csrfToken" -> "n/a",
         "service" -> "scp",
         "abFeatures" -> "GetHelpWithThisPageFeature_A"

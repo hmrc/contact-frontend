@@ -102,6 +102,17 @@ If you want to use the standalone version of the form, you have to redirect the 
 
 '{environment}.' is not included in the case of the production environment.
 
+### Cross-domain linking
+
+For cross-domain linking situations, an optional querystring parameter, referrerUrl, can also be supplied to the unauthenticated 
+standalone page. This parameter should contain the full, absolute, properly encoded URL of the page the user was on before they navigated to
+the contact form. For example, a link from the SCP sign in page would look like 
+`https://www.tax.service.gov.uk/contact/contact-hmrc-unauthenticated?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds`
+
+The referrer field is passed to the DeskPro service and lets operators know which page the user was on when they asked to
+contact HMRC. If the referrerUrl is not supplied, the application will attempt to use the HTTP Header and userAction parameter (if present). 
+However, this mechanism is not recommended because it relies on browsers correctly forwarding the HTTP Referer header in all situations.
+
 `Help and contact` historically also supported displaying the *Help and contact* page as a partial; however, this
 functionality is *deprecated* and should not be used.
 
@@ -173,6 +184,7 @@ a) GET endpoint to show the form. This should result in making a backend GET cal
  * *service* - consuming services should specify their identifier as the 'service' parameter of requests to contact-frontend. The value of this parameter will later be passed to Splunk and would allow proper analysis of feedback
  * *canOmitComments* - consuming services can decide whether the 'comments' field is optional. To make it optional, the consuming service must add 'canOmitComments=true' field to the request
  * *csrfToken* - CSRF token generated from cookies of the consuming service. This parameter will be added automatically by the [play-partials](https://github.com/hmrc/play-partials) library and the service itself should't add it manually.
+ * *referrerUrl* - the full, absolute URL of the page the user is submitting feedback about.
 This endpoint will return a HTML partial than can then be embedded in the page layout.
 
 b) POST endpoint to submit the form. This should result in making a backend POST call to the endpoint
@@ -213,7 +225,7 @@ To display the standalone page, create a link from your accessibility statement 
 
 URL parameters:
 * *service* - consuming services should specify their identifier as the 'service' parameter of requests to contact-frontend. The value of this parameter will be later passed to Splunk and will allow you to properly analyze feedback
-* *userAction* - path of page the user reported in accessibility problem on. Since they arrive at the form from the accessibility statement page, we cannot rely on the referer header to track this, so we use this field to store the this value
+* *userAction* - path of page the user reported in accessibility problem on. Since they arrive at the form from the accessibility statement page, we cannot rely on the referrer header to track this, so we use this field to store the this value
 
 The form is intended to be displayed in a new tab or window. When the form is completed they are redirected to a confirmation page and prompted to close the tab or window.
 

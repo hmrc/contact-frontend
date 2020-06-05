@@ -22,6 +22,7 @@ import util.DeskproEmailValidator
 import views.html.helpers.recaptcha
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
 import views.html.{contact_hmrc, contact_hmrc_confirmation, deskpro_error}
+import play.api.http.HeaderNames._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,7 +43,7 @@ object ContactHmrcForm {
         .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)
         .verifying("error.common.comments_too_long", comment => comment.size <= 2000),
       "isJavascript" -> boolean,
-      "referer"      -> text,
+      "referrer"     -> text,
       "csrfToken"    -> text,
       "service"      -> optional(text),
       "abFeatures"   -> optional(text),
@@ -75,20 +76,21 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
   def index = Action.async { implicit request =>
     loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway))({
       Future.successful {
-        val referer   = request.headers.get("Referer").getOrElse("n/a")
+        val referrer  = request.headers.get(REFERER).getOrElse("n/a")
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-        Ok(contactPage(ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, None, None, None)), loggedIn = true))
+        Ok(contactPage(ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, None, None, None)), loggedIn = true))
       }
     }))
   }
 
-  def indexUnauthenticated(service: String, userAction: Option[String]) = Action.async { implicit request =>
+  def indexUnauthenticated(service: String, userAction: Option[String], referrerUrl: Option[String]) = Action.async { implicit request =>
     Future.successful {
-      val referer   = request.headers.get("Referer").getOrElse("n/a")
+      val httpReferrer = request.headers.get(REFERER)
+      val referrer = referrerUrl orElse httpReferrer getOrElse "n/a"
       val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
       Ok(
         contactPage(
-          ContactHmrcForm.form.fill(ContactForm(referer, csrfToken, Some(service), None, userAction)),
+          ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, Some(service), None, userAction)),
           loggedIn = false,
           reCaptchaComponent = Some(recaptchaFormComponent("contact-hmrc")))
       )
@@ -153,7 +155,7 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
         Ok(
           contactHmrcForm(
             ContactHmrcForm.form.fill(
-              ContactForm(request.headers.get("Referer").getOrElse("n/a"), csrfToken, service, None, None)),
+              ContactForm(request.headers.get(REFERER).getOrElse("n/a"), csrfToken, service, None, None)),
             submitUrl,
             renderFormOnly))
       }
@@ -189,7 +191,7 @@ case class ContactForm(
   contactEmail: String,
   contactComments: String,
   isJavascript: Boolean,
-  referer: String,
+  referrer: String,
   csrfToken: String,
   service: Option[String]    = Some("unknown"),
   abFeatures: Option[String] = None,
@@ -197,10 +199,10 @@ case class ContactForm(
 )
 
 object ContactForm {
-  def apply(referer: String,
+  def apply(referrer: String,
             csrfToken: String,
             service: Option[String],
             abFeatures: Option[String],
             userAction: Option[String]): ContactForm =
-    ContactForm("", "", "", isJavascript = false, referer, csrfToken, service, abFeatures, userAction)
+    ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, abFeatures, userAction)
 }

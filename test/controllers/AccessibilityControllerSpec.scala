@@ -346,12 +346,12 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
         "csrfToken" -> "token",
         "isJavascript" -> isJavascript.toString,
         "csrfToken" -> "a-csrf-token",
-        "referer" -> referrer,
+        "referrer" -> referrer,
         "service" -> "unit-test",
         "userAction" -> "/test/url/action")
 
       FakeRequest()
-        .withHeaders(("referer", referrer))
+        .withHeaders((REFERER, referrer))
         .withFormUrlEncodedBody(fields.toSeq: _*)
     }
   }
