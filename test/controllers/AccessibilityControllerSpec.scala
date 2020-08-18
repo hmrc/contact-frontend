@@ -72,6 +72,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       document.getElementById("accessibility-form") should not be null
       document.getElementById("service").`val`() should be("")
       document.getElementsByAttributeValue("name", "userAction").first().`val`() shouldBe "test?1234=xyz"
+      document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "some.referrer.url"
     }
 
     "display errors when form isn't filled out at all" in new AccessibilityControllerApplication(fakeApplication) {
