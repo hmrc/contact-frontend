@@ -53,7 +53,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
     "show the authenticated form page if logged in" in new AccessibilityControllerApplication(fakeApplication) {
       val request = FakeRequest()
-      val result = controller.unauthenticatedAccessibilityForm(service = None, userAction = Some("test?1234=xyz"))(request)
+      val result = controller.unauthenticatedAccessibilityForm(service = None, userAction = Some("test?1234=xyz"), referrerUrl = Some("some.referrer.url"))(request)
       status(result) should be(200)
       header(LOCATION, result) should be (None)
     }
@@ -64,7 +64,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
     "return 200 and a valid html page for a request" in new AccessibilityControllerApplication(fakeApplication) {
 
       val request = FakeRequest()
-      val result = controller.unauthenticatedAccessibilityForm(service = None, userAction = Some("test?1234=xyz"))(request)
+      val result = controller.unauthenticatedAccessibilityForm(service = None, userAction = Some("test?1234=xyz"), referrerUrl = Some("some.referrer.url"))(request)
 
       status(result) should be(200)
       val document = Jsoup.parse(contentAsString(result))
