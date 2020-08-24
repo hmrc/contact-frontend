@@ -28,6 +28,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.BackUrlValidator
+import play.api.http.HeaderNames.REFERER
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -53,7 +54,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
     "show the authenticated form page if logged in" in new AccessibilityControllerApplication(fakeApplication) {
       val request = FakeRequest()
-      val result = controller.unauthenticatedAccessibilityForm(service = None, userAction = Some("test?1234=xyz"))(request)
+      val result = controller.unauthenticatedAccessibilityForm(service = None, userAction = Some("test?1234=xyz"), referrerUrl = Some("some.referrer.url"))(request)
       status(result) should be(200)
       header(LOCATION, result) should be (None)
     }
@@ -61,10 +62,10 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
   "Reporting an accessibility problem without logging in" should {
 
-    "return 200 and a valid html page for a request" in new AccessibilityControllerApplication(fakeApplication) {
+    "return 200 and a valid html page for a request with optional referrerUrl" in new AccessibilityControllerApplication(fakeApplication) {
 
-      val request = FakeRequest()
-      val result = controller.unauthenticatedAccessibilityForm(service = None, userAction = Some("test?1234=xyz"))(request)
+      val request = FakeRequest().withHeaders((REFERER, "referrer.from.header"))
+      val result = controller.unauthenticatedAccessibilityForm(service = None, userAction = Some("test?1234=xyz"), referrerUrl = Some("some.referrer.url"))(request)
 
       status(result) should be(200)
       val document = Jsoup.parse(contentAsString(result))
@@ -72,6 +73,27 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       document.getElementById("accessibility-form") should not be null
       document.getElementById("service").`val`() should be("")
       document.getElementsByAttributeValue("name", "userAction").first().`val`() shouldBe "test?1234=xyz"
+      document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "some.referrer.url"
+    }
+
+    "return 200 and a valid html page for a request when no referrerUrl and referer in header" in new AccessibilityControllerApplication(fakeApplication) {
+
+      val request = FakeRequest().withHeaders((REFERER, "referrer.from.header"))
+      val result = controller.unauthenticatedAccessibilityForm(service = None, userAction = Some("test?1234=xyz"), referrerUrl = None)(request)
+
+      status(result) should be(200)
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "referrer.from.header"
+    }
+
+    "return 200 and a valid html page for a request when no referrerUrl and no referer in header" in new AccessibilityControllerApplication(fakeApplication) {
+
+      val request = FakeRequest()
+      val result = controller.unauthenticatedAccessibilityForm(service = None, userAction = Some("test?1234=xyz"), referrerUrl = None)(request)
+
+      status(result) should be(200)
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "n/a"
     }
 
     "display errors when form isn't filled out at all" in new AccessibilityControllerApplication(fakeApplication) {

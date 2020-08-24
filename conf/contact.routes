@@ -38,6 +38,6 @@ GET         /accessibility                               @controllers.Accessibil
 POST        /accessibility                               @controllers.AccessibilityController.submitAccessibilityForm()
 GET         /accessibility/thanks                        @controllers.AccessibilityController.thanks()
 
-GET         /accessibility-unauthenticated               @controllers.AccessibilityController.unauthenticatedAccessibilityForm(service: Option[String], userAction: Option[String])
+GET         /accessibility-unauthenticated               @controllers.AccessibilityController.unauthenticatedAccessibilityForm(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
 POST        /accessibility-unauthenticated               @controllers.AccessibilityController.submitUnauthenticatedAccessibilityForm()
 GET         /accessibility-unauthenticated/thanks        @controllers.AccessibilityController.unauthenticatedThanks()

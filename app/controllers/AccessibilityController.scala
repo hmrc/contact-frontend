@@ -89,7 +89,7 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
   def accessibilityForm(service: Option[String], userAction: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     if( request.session.get(SessionKeys.authToken).isEmpty) {
       Future.successful {
-        Redirect(routes.AccessibilityController.unauthenticatedAccessibilityForm(service, userAction))
+        Redirect(routes.AccessibilityController.unauthenticatedAccessibilityForm(service, userAction, None))
       }
     } else {
       loginRedirection(routes.AccessibilityController.accessibilityForm(service, userAction).url)(
@@ -137,9 +137,11 @@ class AccessibilityController @Inject()(val hmrcDeskproConnector: HmrcDeskproCon
 
   /** Unauthenticated routes */
 
-  def unauthenticatedAccessibilityForm(service: Option[String], userAction: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+  def unauthenticatedAccessibilityForm(service: Option[String],
+                                       userAction: Option[String],
+                                       referrerUrl: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     Future.successful {
-      val referrer  = request.headers.get(REFERER)
+      val referrer  = referrerUrl orElse request.headers.get(REFERER)
       val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
       val form      = AccessibilityFormBind.emptyForm(csrfToken, referrer, service, userAction)
       Ok(accessibilityPage(form, routes.AccessibilityController.submitUnauthenticatedAccessibilityForm().url, loggedIn = false))
