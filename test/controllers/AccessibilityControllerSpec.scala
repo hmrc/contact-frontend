@@ -83,7 +83,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       status(result) should be(200)
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "n/a"
+      document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "referrer.from.header"
     }
 
     "return 200 and a valid html page for a request when no referrerUrl and no referer in header" in new AccessibilityControllerApplication(fakeApplication) {
@@ -93,7 +93,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       status(result) should be(200)
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "referrer.from.header"
+      document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "n/a"
     }
 
     "display errors when form isn't filled out at all" in new AccessibilityControllerApplication(fakeApplication) {
