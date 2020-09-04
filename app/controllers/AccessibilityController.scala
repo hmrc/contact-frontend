@@ -19,7 +19,7 @@ import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions}
 import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
 import views.html.{accessibility, accessibility_confirmation}
 

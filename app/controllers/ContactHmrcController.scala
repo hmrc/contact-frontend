@@ -22,7 +22,6 @@ import util.DeskproEmailValidator
 import views.html.helpers.recaptcha
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
 import views.html.{contact_hmrc, contact_hmrc_confirmation, deskpro_error}
-import play.api.http.HeaderNames._
 
 import scala.concurrent.{ExecutionContext, Future}
 
