@@ -13,7 +13,7 @@ import play.api.data.Forms.{mapping, text}
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result, Results}
 import services.CaptchaService
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.deskpro_error
 import views.html.helpers.recaptcha
 

@@ -8,7 +8,7 @@ package config
 import javax.inject.Inject
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.Request
-import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
+import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.error_template
 
 class ContactFrontendErrorHandler @Inject()(val messagesApi: MessagesApi, errorPage: error_template)
