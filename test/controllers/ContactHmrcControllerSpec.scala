@@ -20,7 +20,6 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.GivenWhenThen
 import org.scalatest.concurrent.Eventually
-import org.scalatest.time.{Seconds, Span}
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Application
 import play.api.i18n.MessagesApi
@@ -93,7 +92,6 @@ class ContactHmrcControllerSpec
 
       val contactRequest = FakeRequest()
       val serviceName = "my-fake-service"
-      val referrerUrl = Some("https://www.example.com/some-service")
 
       When("the unauthenticated Contact HMRC page is requested with a service name")
       val contactResult = controller.indexUnauthenticated(serviceName, None, None)(contactRequest)
@@ -165,7 +163,7 @@ class ContactHmrcControllerSpec
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      val submitResult = controller.submitUnauthenticated(contactRequest)
+      controller.submitUnauthenticated(contactRequest)
 
       Then("the message is sent to the Deskpro connector")
       Mockito
@@ -203,7 +201,7 @@ class ContactHmrcControllerSpec
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      val submitResult = controller.submitUnauthenticated(contactRequest)
+      controller.submitUnauthenticated(contactRequest)
 
       Then("the message is sent to the Deskpro connector")
       Mockito

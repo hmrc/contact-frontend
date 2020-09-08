@@ -50,7 +50,7 @@ class FieldTransformerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     }
 
     "transforms userId in the header carrier to n/a if the suppressUserIdInSupportRequests session key is set to true" in new FieldTransformerScope {
-      val requestWithSuppressedUserId = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession(SessionKeys.authProvider -> "IDA", SessionKeys.sensitiveUserId -> "true")
+      val requestWithSuppressedUserId = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession("ap" -> "IDA", SessionKeys.sensitiveUserId -> "true")
       transformer.userIdFrom(requestWithSuppressedUserId, hc) shouldBe "n/a"
     }
 
@@ -128,7 +128,7 @@ class FieldTransformerScope {
   val message: String = "message"
   val referrer: String = "referrer"
   lazy val request = FakeRequest().withHeaders(("User-Agent", userAgent))
-  lazy val requestAuthenticatedByIda = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession((SessionKeys.authProvider, "IDA"))
+  lazy val requestAuthenticatedByIda = FakeRequest().withHeaders(("User-Agent", userAgent)).withSession(("ap", "IDA"))
 
   def expectedUserTaxIdentifiers(nino: Option[String] = None,
                                  ctUtr: Option[String] = None,
