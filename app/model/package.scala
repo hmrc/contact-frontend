@@ -12,7 +12,7 @@ case class AccessibilityForm(
   isJavascript: Boolean,
   referrer: String,
   csrfToken: String,
-  service: Option[String] = Some("unknown"),
+  service: Option[String]    = Some("unknown"),
   userAction: Option[String] = None)
 
 case class ProblemReport(

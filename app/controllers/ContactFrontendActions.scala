@@ -29,4 +29,10 @@ trait ContactFrontendActions extends AuthorisedFunctions {
       Future.successful(None)
     }
 
+  protected def isAuthorised()(implicit hc: HeaderCarrier, request: Request[_]): Future[Boolean] =
+    if (request.session.get(SessionKeys.authToken).isDefined) {
+      authorised()(Future.successful(true)).recover {
+        case _ => false
+      }
+    } else Future.successful(false)
 }

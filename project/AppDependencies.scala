@@ -12,7 +12,7 @@ object AppDependencies {
     "uk.gov.hmrc"               %% "govuk-template"             % "5.55.0-play-27",
     "uk.gov.hmrc"               %% "play-ui"                    % "8.10.0-play-27",
     "uk.gov.hmrc"               %% "url-builder"                % "3.4.0-play-27",
-    "uk.gov.hmrc"               %% "auth-client"                % "3.0.0-play-27",
+    "uk.gov.hmrc"               %% "auth-client"                % "3.2.0-play-27",
     "commons-validator"         %  "commons-validator"          % "1.6",
     "org.apache.httpcomponents" %  "httpclient"                 % "4.4.1"
   )

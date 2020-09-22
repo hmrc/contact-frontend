@@ -15,9 +15,8 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class HmrcDeskproConnector @Inject()(http: HttpClient,
-                                     servicesConfig: ServicesConfig)
-                                    (implicit executionContext: ExecutionContext) {
+class HmrcDeskproConnector @Inject()(http: HttpClient, servicesConfig: ServicesConfig)(
+  implicit executionContext: ExecutionContext) {
 
   def serviceUrl: String = servicesConfig.baseUrl("hmrc-deskpro")
 
@@ -29,15 +28,29 @@ class HmrcDeskproConnector @Inject()(http: HttpClient,
     referrer: String,
     isJavascript: Boolean,
     request: Request[AnyRef],
+    loggedIn: Boolean,
     enrolmentsOption: Option[Enrolments],
     service: Option[String],
     abFeatures: Option[String],
     userAction: Option[String])(implicit hc: HeaderCarrier): Future[TicketId] = {
     val ticket = Ticket
-      .create(name, email, subject, message, referrer, isJavascript, hc, request, enrolmentsOption, service, abFeatures,
+      .create(
+        name,
+        email,
+        subject,
+        message,
+        referrer,
+        isJavascript,
+        hc,
+        request,
+        loggedIn,
+        enrolmentsOption,
+        service,
+        abFeatures,
         userAction)
     http.POST[Ticket, TicketId](requestUrl("/deskpro/get-help-ticket"), ticket) recover {
-      case nf: NotFoundException => throw new Upstream5xxResponse(nf.getMessage, 404, 500)
+      case nf: NotFoundException =>
+        throw new Upstream5xxResponse(nf.getMessage, 404, 500)
     }
   }
 
@@ -50,6 +63,7 @@ class HmrcDeskproConnector @Inject()(http: HttpClient,
     referrer: String,
     isJavascript: Boolean,
     request: Request[AnyRef],
+    loggedIn: Boolean,
     enrolmentsOption: Option[Enrolments],
     service: Option[String],
     abFeatures: Option[String])(implicit hc: HeaderCarrier): Future[TicketId] =
@@ -65,11 +79,13 @@ class HmrcDeskproConnector @Inject()(http: HttpClient,
         isJavascript,
         hc,
         request,
+        loggedIn,
         enrolmentsOption,
         service,
         abFeatures)
     ) recover {
-      case nf: NotFoundException => throw new Upstream5xxResponse(nf.getMessage, 404, 500)
+      case nf: NotFoundException =>
+        throw new Upstream5xxResponse(nf.getMessage, 404, 500)
     }
 
   private def requestUrl[B, A](uri: String): String = s"$serviceUrl$uri"

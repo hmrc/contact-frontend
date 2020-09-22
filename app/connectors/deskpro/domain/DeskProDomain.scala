@@ -9,7 +9,7 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.Enrolments
-import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.http.HeaderCarrier
 
 case class Ticket private (
   name: String,
@@ -44,6 +44,7 @@ object Ticket extends FieldTransformer with Logging {
     isJavascript: Boolean,
     hc: HeaderCarrier,
     request: Request[AnyRef],
+    loggedIn: Boolean,
     enrolments: Option[Enrolments],
     service: Option[String],
     abFeatures: Option[String],
@@ -56,7 +57,7 @@ object Ticket extends FieldTransformer with Logging {
       referrer,
       ynValueOf(isJavascript),
       userAgentOf(request),
-      userIdFrom(request, hc),
+      userIdFrom(loggedIn),
       areaOfTaxOf,
       sessionIdFrom(hc),
       userTaxIdentifiersFromEnrolments(enrolments),
@@ -112,6 +113,7 @@ object Feedback extends FieldTransformer {
     isJavascript: Boolean,
     hc: HeaderCarrier,
     request: Request[AnyRef],
+    loggedIn: Boolean,
     enrolments: Option[Enrolments],
     service: Option[String],
     abFeatures: Option[String]): Feedback =
@@ -124,7 +126,7 @@ object Feedback extends FieldTransformer {
       referrer,
       ynValueOf(isJavascript),
       userAgentOf(request),
-      userIdFrom(request, hc),
+      userIdFrom(loggedIn),
       areaOfTaxOf,
       sessionIdFrom(hc),
       userTaxIdentifiersFromEnrolments(enrolments),
@@ -137,22 +139,24 @@ trait FieldTransformer {
   val NA      = "n/a"
   val UNKNOWN = "unknown"
 
-  def sessionIdFrom(hc: HeaderCarrier) = hc.sessionId.map(_.value).getOrElse("n/a")
+  def sessionIdFrom(hc: HeaderCarrier) =
+    hc.sessionId.map(_.value).getOrElse(NA)
 
   def areaOfTaxOf = UNKNOWN
 
-  def userIdFrom(request: Request[AnyRef], hc: HeaderCarrier): String =
-    request.session.get(SessionKeys.sensitiveUserId) match {
-      case Some("true") => NA
-      case _            => hc.userId.map(_.value).getOrElse(NA)
-    }
+  def userIdFrom(loggedIn: Boolean): String =
+    if (loggedIn) "LoggedInUser" else NA
 
-  def userAgentOf(request: Request[AnyRef]) = request.headers.get("User-Agent").getOrElse("n/a")
+  def userAgentOf(request: Request[AnyRef]) =
+    request.headers.get("User-Agent").getOrElse(NA)
 
   def ynValueOf(javascript: Boolean) = if (javascript) "Y" else "N"
 
   private def extractIdentifier(enrolments: Enrolments, enrolment: String, identifierKey: String): Option[String] =
-    enrolments.getEnrolment(enrolment).flatMap(_.identifiers.find(_.key == identifierKey)).map(_.value)
+    enrolments
+      .getEnrolment(enrolment)
+      .flatMap(_.identifiers.find(_.key == identifierKey))
+      .map(_.value)
 
   def userTaxIdentifiersFromEnrolments(enrolmentsOption: Option[Enrolments]) =
     enrolmentsOption
@@ -163,9 +167,10 @@ trait FieldTransformer {
         val vrn = extractIdentifier(enrolments, "HMCE-VATDEC-ORG", "VATRegNo")
           .orElse(extractIdentifier(enrolments, "HMCE-VATVAR-ORG", "VATRegNo"))
 
-        val empRef = for (taxOfficeNumber <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeNumber");
-                          taxOfficeRef <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeReference"))
-          yield s"$taxOfficeNumber/$taxOfficeRef"
+        val empRef =
+          for (taxOfficeNumber <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeNumber");
+               taxOfficeRef    <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeReference"))
+            yield s"$taxOfficeNumber/$taxOfficeRef"
 
         UserTaxIdentifiers(nino, ctUtr, saUtr, vrn, empRef)
       }

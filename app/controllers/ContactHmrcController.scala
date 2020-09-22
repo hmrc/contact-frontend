@@ -52,19 +52,18 @@ object ContactHmrcForm {
 }
 
 @Singleton
-class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
-                                      val authConnector: AuthConnector,
-                                      val captchaService: CaptchaService,
-                                      val configuration: Configuration,
-                                      mcc: MessagesControllerComponents,
-                                      contactPage: contact_hmrc,
-                                      contactConfirmationPage: contact_hmrc_confirmation,
-                                      contactHmrcForm: contact_hmrc_form,
-                                      contactHmrcFormConfirmation: contact_hmrc_form_confirmation,
-                                      deskproErrorPage: deskpro_error,
-                                      recaptcha: recaptcha)
-                                     (implicit val appConfig: AppConfig,
-                                      val executionContext: ExecutionContext)
+class ContactHmrcController @Inject()(
+  val hmrcDeskproConnector: HmrcDeskproConnector,
+  val authConnector: AuthConnector,
+  val captchaService: CaptchaService,
+  val configuration: Configuration,
+  mcc: MessagesControllerComponents,
+  contactPage: contact_hmrc,
+  contactConfirmationPage: contact_hmrc_confirmation,
+  contactHmrcForm: contact_hmrc_form,
+  contactHmrcFormConfirmation: contact_hmrc_form_confirmation,
+  deskproErrorPage: deskpro_error,
+  recaptcha: recaptcha)(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends WithCaptcha(mcc, deskproErrorPage, recaptcha)
     with DeskproSubmission
     with AuthorisedFunctions
@@ -82,18 +81,20 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
     }))
   }
 
-  def indexUnauthenticated(service: String, userAction: Option[String], referrerUrl: Option[String]) = Action.async { implicit request =>
-    Future.successful {
-      val httpReferrer = request.headers.get(REFERER)
-      val referrer = referrerUrl orElse httpReferrer getOrElse "n/a"
-      val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-      Ok(
-        contactPage(
-          ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, Some(service), None, userAction)),
-          loggedIn = false,
-          reCaptchaComponent = Some(recaptchaFormComponent("contact-hmrc")))
-      )
-    }
+  def indexUnauthenticated(service: String, userAction: Option[String], referrerUrl: Option[String]) = Action.async {
+    implicit request =>
+      Future.successful {
+        val httpReferrer = request.headers.get(REFERER)
+        val referrer     = referrerUrl orElse httpReferrer getOrElse "n/a"
+        val csrfToken    = CSRF.getToken(request).map(_.value).getOrElse("")
+        Ok(
+          contactPage(
+            ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, Some(service), None, userAction)),
+            loggedIn           = false,
+            reCaptchaComponent = Some(recaptchaFormComponent("contact-hmrc"))
+          )
+        )
+      }
   }
 
   def submit = Action.async { implicit request =>
@@ -111,8 +112,6 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
     }
   }
 
-
-
   private def handleSubmit(enrolments: Option[Enrolments], thanksRoute: Call)(implicit request: Request[AnyContent]) =
     ContactHmrcForm.form
       .bindFromRequest()(request)
@@ -121,14 +120,14 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
           Future.successful(BadRequest(contactPage(error, enrolments.isDefined)))
         },
         data =>
-
-          createDeskproTicket(data, enrolments)
-            .map { ticketId =>
-              Redirect(thanksRoute).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
-            }
-            .recover {
-              case _ => InternalServerError(deskproErrorPage())
-            }
+          (for {
+            loggedIn <- isAuthorised()
+            ticketId <- createDeskproTicket(data, enrolments, loggedIn)
+          } yield {
+            Redirect(thanksRoute).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+          }).recover {
+            case _ => InternalServerError(deskproErrorPage())
+        }
       )
 
   def thanks = Action.async { implicit request =>
@@ -142,9 +141,10 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
   }
 
   private def doThanks(implicit request: Request[AnyRef]) = {
-    val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
-      Ok(contactConfirmationPage(ticketId))
-    }
+    val result =
+      request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
+        Ok(contactConfirmationPage(ticketId))
+      }
     Future.successful(result)
   }
 
@@ -168,9 +168,12 @@ class ContactHmrcController @Inject()(val hmrcDeskproConnector: HmrcDeskproConne
           Future.successful(BadRequest(contactHmrcForm(error, resubmitUrl, renderFormOnly)))
         },
         data => {
+          val futureEnrolments = maybeAuthenticatedUserEnrolments()
+          val futureLoggedIn   = isAuthorised()
           (for {
-            enrolments <- maybeAuthenticatedUserEnrolments()
-            ticketId   <- createDeskproTicket(data, enrolments)
+            enrolments <- futureEnrolments
+            loggedIn   <- futureLoggedIn
+            ticketId   <- createDeskproTicket(data, enrolments, loggedIn)
           } yield {
             Ok(ticketId.ticket_id.toString)
           }).recover {
@@ -198,10 +201,11 @@ case class ContactForm(
 )
 
 object ContactForm {
-  def apply(referrer: String,
-            csrfToken: String,
-            service: Option[String],
-            abFeatures: Option[String],
-            userAction: Option[String]): ContactForm =
+  def apply(
+    referrer: String,
+    csrfToken: String,
+    service: Option[String],
+    abFeatures: Option[String],
+    userAction: Option[String]): ContactForm =
     ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, abFeatures, userAction)
 }

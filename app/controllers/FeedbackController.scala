@@ -27,18 +27,19 @@ import views.html.{feedback, feedback_confirmation}
 import play.api.http.HeaderNames._
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton class FeedbackController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
-                                              val authConnector: AuthConnector,
-                                              val accessibleUrlValidator: BackUrlValidator,
-                                              val configuration: Configuration,
-                                              mcc: MessagesControllerComponents,
-                                              feedbackPage: feedback,
-                                              feedbackConfirmationPage: feedback_confirmation,
-                                              feedbackFormPartial: feedback_form,
-                                              feedbackFormConfirmationPartial: feedback_form_confirmation)
-                                             (implicit val appConfig: AppConfig,
-                                              val executionContext: ExecutionContext)
-  extends FrontendController(mcc)
+@Singleton class FeedbackController @Inject()(
+  val hmrcDeskproConnector: HmrcDeskproConnector,
+  val authConnector: AuthConnector,
+  val accessibleUrlValidator: BackUrlValidator,
+  val configuration: Configuration,
+  mcc: MessagesControllerComponents,
+  feedbackPage: feedback,
+  feedbackConfirmationPage: feedback_confirmation,
+  feedbackFormPartial: feedback_form,
+  feedbackFormConfirmationPartial: feedback_form_confirmation)(
+  implicit val appConfig: AppConfig,
+  val executionContext: ExecutionContext)
+    extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport
     with AuthorisedFunctions
@@ -94,9 +95,10 @@ import scala.concurrent.{ExecutionContext, Future}
   }
 
   def submit = Action.async { implicit request =>
-    authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments) { allEnrolments =>
-      doSubmit(Some(allEnrolments))
-    }
+    authorised(AuthProviders(GovernmentGateway))
+      .retrieve(Retrievals.allEnrolments) { allEnrolments =>
+        doSubmit(Some(allEnrolments))
+      }
   }
 
   def submitUnauthenticated = Action.async { implicit request =>
@@ -107,7 +109,9 @@ import scala.concurrent.{ExecutionContext, Future}
     val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
 
     loginRedirection(routes.FeedbackController.thanks(validatedBackUrl).url)(
-      authorised(AuthProviders(GovernmentGateway)) { doThanks(true, request, validatedBackUrl) })
+      authorised(AuthProviders(GovernmentGateway)) {
+        doThanks(true, request, validatedBackUrl)
+      })
   }
 
   def unauthenticatedThanks(backUrl: Option[String] = None) = Action.async { implicit request =>
@@ -121,8 +125,10 @@ import scala.concurrent.{ExecutionContext, Future}
       .fold(
         error => Future.successful(BadRequest(feedbackView(enrolments.isDefined, error))),
         data => {
-          val ticketIdF = createDeskproFeedback(data, enrolments)
-          ticketIdF map { ticketId =>
+          for {
+            loggedIn <- isAuthorised()
+            ticketId <- createDeskproFeedback(data, enrolments, loggedIn)
+          } yield {
             Redirect(
               enrolments
                 .map(_ => routes.FeedbackController.thanks(data.backUrl))
@@ -144,9 +150,10 @@ import scala.concurrent.{ExecutionContext, Future}
     implicit loggedIn: Boolean,
     request: Request[AnyRef],
     backUrl: Option[String]): Future[Result] = {
-    val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
-      Ok(feedbackConfirmationPage(ticketId, loggedIn, backUrl))
-    }
+    val result =
+      request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
+        Ok(feedbackConfirmationPage(ticketId, loggedIn, backUrl))
+      }
     Future.successful(result)
   }
 
@@ -158,7 +165,8 @@ import scala.concurrent.{ExecutionContext, Future}
     canOmitComments: Boolean,
     referrerUrl: Option[String]) = Action.async { implicit request =>
     Future.successful {
-      Ok(feedbackFormPartial(
+      Ok(
+        feedbackFormPartial(
           FeedbackFormBind.emptyForm(csrfToken, referrerUrl orElse referer, None, canOmitComments = canOmitComments),
           submitUrl,
           service,
@@ -170,13 +178,16 @@ import scala.concurrent.{ExecutionContext, Future}
     val form = FeedbackFormBind.form.bindFromRequest()(request)
     form.fold(
       error => {
-        Future.successful(
-          BadRequest(feedbackFormPartial(error, resubmitUrl, canOmitComments = form("canOmitComments").value.exists(_ == "true"))))
+        Future.successful(BadRequest(
+          feedbackFormPartial(error, resubmitUrl, canOmitComments = form("canOmitComments").value.exists(_ == "true"))))
       },
       data => {
+        val retrieveEnrolments = maybeAuthenticatedUserEnrolments()
+        val retrieveLoggedIn   = isAuthorised()
         (for {
-          enrolments <- maybeAuthenticatedUserEnrolments()
-          ticketId   <- createDeskproFeedback(data, enrolments)
+          enrolments <- retrieveEnrolments
+          loggedIn   <- retrieveLoggedIn
+          ticketId   <- createDeskproFeedback(data, enrolments, loggedIn)
         } yield {
           Ok(ticketId.ticket_id.toString)
         }).recover {
@@ -225,14 +236,18 @@ object FeedbackFormBind {
         "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
 
           override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
-            val commentsCanBeOmitted = data.get("canOmitComments").contains("true")
+            val commentsCanBeOmitted =
+              data.get("canOmitComments").contains("true")
             data.get(key) match {
-              case Some(value) if !value.trim.isEmpty || commentsCanBeOmitted => Right(value.trim)
-              case Some(_)                                                    => Left(Seq(FormError(key, "error.common.comments_mandatory", Nil)))
-              case None                                                       => Left(Seq(FormError(key, "error.required", Nil)))
+              case Some(value) if !value.trim.isEmpty || commentsCanBeOmitted =>
+                Right(value.trim)
+              case Some(_) =>
+                Left(Seq(FormError(key, "error.common.comments_mandatory", Nil)))
+              case None => Left(Seq(FormError(key, "error.required", Nil)))
             }
           }
-          override def unbind(key: String, value: String): Map[String, String] = Map(key -> value)
+          override def unbind(key: String, value: String): Map[String, String] =
+            Map(key -> value)
 
         }).verifying("error.common.comments_too_long", comment => {
           val result = comment.size <= 2000
