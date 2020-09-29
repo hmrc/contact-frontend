@@ -56,7 +56,7 @@ object Ticket extends FieldTransformer with Logging {
       referrer,
       ynValueOf(isJavascript),
       userAgentOf(request),
-      userIdFrom(request, hc),
+      userIdFrom(request),
       areaOfTaxOf,
       sessionIdFrom(hc),
       userTaxIdentifiersFromEnrolments(enrolments),
@@ -124,7 +124,7 @@ object Feedback extends FieldTransformer {
       referrer,
       ynValueOf(isJavascript),
       userAgentOf(request),
-      userIdFrom(request, hc),
+      userIdFrom(request),
       areaOfTaxOf,
       sessionIdFrom(hc),
       userTaxIdentifiersFromEnrolments(enrolments),
@@ -141,11 +141,9 @@ trait FieldTransformer {
 
   def areaOfTaxOf = UNKNOWN
 
-  def userIdFrom(request: Request[AnyRef], hc: HeaderCarrier): String =
-    request.session.get(SessionKeys.sensitiveUserId) match {
-      case Some("true") => NA
-      case _            => hc.userId.map(_.value).getOrElse(NA)
-    }
+  def userIdFrom(request: Request[AnyRef]): String =
+    if (request.session.get(SessionKeys.authToken).isDefined) "AuthenticatedUser"
+    else NA
 
   def userAgentOf(request: Request[AnyRef]) = request.headers.get("User-Agent").getOrElse("n/a")
 
