@@ -4,7 +4,9 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.http.HeaderNames.{HOST, ORIGIN}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsNull
 import play.api.mvc.Result
 import play.api.test.{FakeHeaders, FakeRequest}
@@ -15,14 +17,23 @@ import scala.concurrent.duration._
 
 class CorsIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with GivenWhenThen {
 
-  private val fakeRequest = FakeRequest(OPTIONS, "/contact/contact-hmrc",
-    FakeHeaders(Seq(
-      ORIGIN -> "https://ewf.companieshouse.gov.uk",
-      HOST -> "localhost",
-      ACCESS_CONTROL_REQUEST_HEADERS -> USER_AGENT,
-      ACCESS_CONTROL_REQUEST_METHOD -> POST
-    )), JsNull)
+  override lazy val app: Application =
+    new GuiceApplicationBuilder()
+      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "auditing.enabled" -> false)
+      .build()
 
+  private val fakeRequest = FakeRequest(
+    OPTIONS,
+    "/contact/contact-hmrc",
+    FakeHeaders(
+      Seq(
+        ORIGIN                         -> "https://ewf.companieshouse.gov.uk",
+        HOST                           -> "localhost",
+        ACCESS_CONTROL_REQUEST_HEADERS -> USER_AGENT,
+        ACCESS_CONTROL_REQUEST_METHOD  -> POST
+      )),
+    JsNull
+  )
 
   "Play Framework CORS configuration" should {
 
