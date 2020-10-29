@@ -19,20 +19,24 @@ import views.html.helpers.recaptcha
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class WithCaptcha @Inject()(mcc: MessagesControllerComponents,
-                                     deskproErrorPage: deskpro_error,
-                                     recaptcha: recaptcha) extends
-  FrontendController(mcc) with Results with I18nSupport with Logging {
+abstract class WithCaptcha @Inject() (
+  mcc: MessagesControllerComponents,
+  deskproErrorPage: deskpro_error,
+  recaptcha: recaptcha
+) extends FrontendController(mcc)
+    with Results
+    with I18nSupport
+    with Logging {
 
-  implicit val appConfig : AppConfig
+  implicit val appConfig: AppConfig
 
-  implicit val captchaService : CaptchaService
+  implicit val captchaService: CaptchaService
 
   implicit val executionContext: ExecutionContext
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  case class Recaptcha(response : String)
+  case class Recaptcha(response: String)
 
   val recaptchaForm = Form[Recaptcha](
     mapping(
@@ -40,29 +44,28 @@ abstract class WithCaptcha @Inject()(mcc: MessagesControllerComponents,
     )(Recaptcha.apply)(Recaptcha.unapply)
   )
 
-  def recaptchaFormComponent(action : String) = {
+  def recaptchaFormComponent(action: String) =
     recaptcha(appConfig.captchaClientKey, action, appConfig.captchaEnabled)
-  }
 
-  protected def validateCaptcha[R <: Result](request : Request[AnyContent])(action :  => Future[R]) = {
+  protected def validateCaptcha[R <: Result](request: Request[AnyContent])(action: => Future[R]) = {
 
     implicit val implicitRequest = request
 
     if (appConfig.captchaEnabled) {
-      recaptchaForm.bindFromRequest()(request) fold(
+      recaptchaForm.bindFromRequest()(request) fold (
         errors => {
-          logger.warn(s"Part of the POST request responsible for captcha is malformed. Errors ${errors}")
+          logger.warn(s"Part of the POST request responsible for captcha is malformed. Errors $errors")
           Future.successful(BadRequest(deskproErrorPage()))
         },
         form => {
           for {
             isValid <- captchaService.validateCaptcha(form.response)
-            result <- if (isValid) {
-              action
-            } else {
-              logger.warn("There was a failed captcha result")
-              Future.successful(BadRequest(deskproErrorPage()))
-            }
+            result  <- if (isValid) {
+                         action
+                       } else {
+                         logger.warn("There was a failed captcha result")
+                         Future.successful(BadRequest(deskproErrorPage()))
+                       }
           } yield result
         }
       )

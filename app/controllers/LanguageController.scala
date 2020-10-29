@@ -14,7 +14,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.LanguageUtils
 
 @Singleton
-class LanguageController @Inject()(mcc: MessagesControllerComponents)(implicit appConfig: AppConfig)
+class LanguageController @Inject() (mcc: MessagesControllerComponents)(implicit appConfig: AppConfig)
     extends FrontendController(mcc)
     with I18nSupport
     with Logging {
@@ -31,10 +31,9 @@ class LanguageController @Inject()(mcc: MessagesControllerComponents)(implicit a
 
     request.headers.get(REFERER) match {
       case Some(referrer) => Redirect(referrer).withLang(newLang).flashing(LanguageUtils.flashWithSwitchIndicator)
-      case None => {
+      case None           =>
         logger.warn(s"Unable to get the referrer, so sending them to ${appConfig.fallbackURLForLangugeSwitcher}")
         Redirect(appConfig.fallbackURLForLangugeSwitcher).withLang(newLang)
-      }
     }
   }
 

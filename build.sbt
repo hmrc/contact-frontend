@@ -8,8 +8,8 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
   .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    scalaVersion        := "2.12.10",
-    majorVersion        := 3,
+    scalaVersion := "2.12.10",
+    majorVersion := 3,
     libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it"))
   )
   .settings(publishingSettings: _*)
@@ -31,7 +31,7 @@ lazy val microservice = Project(appName, file("."))
   )
 
 lazy val testSettings: Seq[Def.Setting[_]] = Seq(
-  fork        := true,
+  fork := true,
   javaOptions ++= Seq(
     "-Dconfig.resource=test.application.conf",
     "-Dlogger.resource=logback-test.xml"

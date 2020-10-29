@@ -16,9 +16,10 @@ trait ContactFrontendActions extends AuthorisedFunctions {
 
   implicit val executionContext: ExecutionContext
 
-  protected def maybeAuthenticatedUserEnrolments()(
-    implicit hc: HeaderCarrier,
-    request: Request[_]): Future[Option[Enrolments]] =
+  protected def maybeAuthenticatedUserEnrolments()(implicit
+    hc: HeaderCarrier,
+    request: Request[_]
+  ): Future[Option[Enrolments]] =
     if (request.session.get(SessionKeys.authToken).isDefined) {
       authorised()
         .retrieve(Retrievals.allEnrolments) { enrolments =>

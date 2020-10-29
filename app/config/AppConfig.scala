@@ -27,14 +27,14 @@ trait AppConfig {
   def captchaMinScore: BigDecimal
   def captchaClientKey: String
   def captchaServerKey: String
-  def captchaVerifyUrl : String
+  def captchaVerifyUrl: String
 
   def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean
 
   def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature]
 }
 
-class CFConfig @Inject()(configuration: Configuration) extends AppConfig {
+class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
 
   private def loadConfigString(key: String): String =
     configuration
@@ -46,8 +46,7 @@ class CFConfig @Inject()(configuration: Configuration) extends AppConfig {
     .getOrElse("")
 
   private val featureRules: Seq[FeatureEnablingRule] =
-    Try(configuration.underlying.getStringList("features"))
-      .toOption
+    Try(configuration.underlying.getStringList("features")).toOption
       .map(_.asScala.toList)
       .getOrElse(List.empty)
       .map(FeatureEnablingRule.parse)
@@ -63,7 +62,7 @@ class CFConfig @Inject()(configuration: Configuration) extends AppConfig {
 
   override lazy val analyticsToken = loadConfigString("google-analytics.token")
 
-  override lazy val analyticsHost  = loadConfigString("google-analytics.host")
+  override lazy val analyticsHost = loadConfigString("google-analytics.host")
 
   override lazy val backUrlDestinationWhitelist =
     loadConfigString("backUrlDestinationWhitelist").split(',').filter(_.nonEmpty).toSet
@@ -89,7 +88,7 @@ class CFConfig @Inject()(configuration: Configuration) extends AppConfig {
 
   override lazy val captchaServerKey: String = loadConfigString("captcha.v3.keys.server")
 
-  override lazy val captchaVerifyUrl : String = loadConfigString("captcha.v3.verifyUrl")
+  override lazy val captchaVerifyUrl: String = loadConfigString("captcha.v3.verifyUrl")
 
   lazy val featureSelector: FeatureSelector =
     new BucketBasedFeatureSelector(BucketCalculator.deviceIdBucketCalculator, featureRules)

@@ -18,7 +18,7 @@ trait BackUrlValidator {
 }
 
 @Singleton
-class ConfigurationBasedBackUrlValidator @Inject()(appConfig: AppConfig) extends BackUrlValidator with Logging {
+class ConfigurationBasedBackUrlValidator @Inject() (appConfig: AppConfig) extends BackUrlValidator with Logging {
 
   val destinationWhitelist: Set[URL] = appConfig.backUrlDestinationWhitelist.map(new URL(_))
 
@@ -28,7 +28,7 @@ class ConfigurationBasedBackUrlValidator @Inject()(appConfig: AppConfig) extends
     val validationResult = parsedUrl.right.flatMap(checkDomainOnWhitelist)
 
     validationResult match {
-      case Right(_) => true
+      case Right(_)     => true
       case Left(reason) =>
         logger.error(s"Back URL validation failed. URL: $backUrl, reason: $reason.")
         false
