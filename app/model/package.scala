@@ -13,7 +13,8 @@ case class AccessibilityForm(
   referrer: String,
   csrfToken: String,
   service: Option[String] = Some("unknown"),
-  userAction: Option[String] = None)
+  userAction: Option[String] = None
+)
 
 case class ProblemReport(
   reportName: String,
@@ -24,7 +25,8 @@ case class ProblemReport(
   service: Option[String],
   abFeatures: Option[String],
   referrer: Option[String],
-  userAction: Option[String])
+  userAction: Option[String]
+)
 
 case class FeedbackForm(
   experienceRating: String,
@@ -34,10 +36,11 @@ case class FeedbackForm(
   javascriptEnabled: Boolean,
   referrer: String,
   csrfToken: String,
-  service: Option[String]    = Some("unknown"),
+  service: Option[String] = Some("unknown"),
   abFeatures: Option[String] = None,
   backUrl: Option[String],
-  canOmitComments: Boolean)
+  canOmitComments: Boolean
+)
 
 object FeedbackForm {
   def apply(referrer: String, csrfToken: String, backUrl: Option[String], canOmitComments: Boolean): FeedbackForm =
@@ -47,10 +50,11 @@ object FeedbackForm {
       "",
       "",
       javascriptEnabled = false,
-      referrer          = referrer,
-      csrfToken         = csrfToken,
-      backUrl           = backUrl,
-      canOmitComments   = canOmitComments)
+      referrer = referrer,
+      csrfToken = csrfToken,
+      backUrl = backUrl,
+      canOmitComments = canOmitComments
+    )
 
   def apply(
     experienceRating: Option[String],
@@ -76,7 +80,8 @@ object FeedbackForm {
       service,
       abFeatures,
       backUrl,
-      canOmitComments)
+      canOmitComments
+    )
 
 }
 

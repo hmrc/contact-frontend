@@ -18,10 +18,11 @@ trait LoginRedirection extends Results {
 
   def configuration: Configuration
 
-  def loginRedirection[B <: Result](continueUrl: String)(body: Future[B])(
-    implicit ec: ExecutionContext): Future[Result] =
-    body.recoverWith {
-      case _: NoActiveSession => Future.successful(redirectForLogin(continueUrl))
+  def loginRedirection[B <: Result](
+    continueUrl: String
+  )(body: Future[B])(implicit ec: ExecutionContext): Future[Result] =
+    body.recoverWith { case _: NoActiveSession =>
+      Future.successful(redirectForLogin(continueUrl))
     }
 
   private def redirectForLogin(continueUrl: String): Result = {

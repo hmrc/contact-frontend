@@ -27,18 +27,18 @@ import views.html.{feedback, feedback_confirmation}
 import play.api.http.HeaderNames._
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton class FeedbackController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
-                                              val authConnector: AuthConnector,
-                                              val accessibleUrlValidator: BackUrlValidator,
-                                              val configuration: Configuration,
-                                              mcc: MessagesControllerComponents,
-                                              feedbackPage: feedback,
-                                              feedbackConfirmationPage: feedback_confirmation,
-                                              feedbackFormPartial: feedback_form,
-                                              feedbackFormConfirmationPartial: feedback_form_confirmation)
-                                             (implicit val appConfig: AppConfig,
-                                              val executionContext: ExecutionContext)
-  extends FrontendController(mcc)
+@Singleton class FeedbackController @Inject() (
+  val hmrcDeskproConnector: HmrcDeskproConnector,
+  val authConnector: AuthConnector,
+  val accessibleUrlValidator: BackUrlValidator,
+  val configuration: Configuration,
+  mcc: MessagesControllerComponents,
+  feedbackPage: feedback,
+  feedbackConfirmationPage: feedback_confirmation,
+  feedbackFormPartial: feedback_form,
+  feedbackFormConfirmationPartial: feedback_form_confirmation
+)(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
+    extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport
     with AuthorisedFunctions
@@ -63,33 +63,39 @@ import scala.concurrent.{ExecutionContext, Future}
                       _.value
                     }
                     .getOrElse(""),
-                  backUrl         = backUrl,
-                  canOmitComments = canOmitComments),
+                  backUrl = backUrl,
+                  canOmitComments = canOmitComments
+                ),
                 loggedIn = true,
                 service,
                 backUrl,
                 canOmitComments = canOmitComments
-              ))
+              )
+            )
           )
-        })
+        }
+      )
     }
 
   def unauthenticatedFeedbackForm(
     service: Option[String] = None,
     backUrl: Option[String] = None,
-    canOmitComments: Boolean) = Action.async { implicit request =>
+    canOmitComments: Boolean
+  ) = Action.async { implicit request =>
     Future.successful(
       Ok(
         feedbackPage(
           FeedbackFormBind.emptyForm(
-            CSRF.getToken(request).map { _.value }.getOrElse(""),
-            backUrl         = backUrl,
-            canOmitComments = canOmitComments),
+            CSRF.getToken(request).map(_.value).getOrElse(""),
+            backUrl = backUrl,
+            canOmitComments = canOmitComments
+          ),
           loggedIn = false,
           service,
           backUrl,
           canOmitComments = canOmitComments
-        ))
+        )
+      )
     )
   }
 
@@ -107,7 +113,8 @@ import scala.concurrent.{ExecutionContext, Future}
     val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
 
     loginRedirection(routes.FeedbackController.thanks(validatedBackUrl).url)(
-      authorised(AuthProviders(GovernmentGateway)) { doThanks(true, request, validatedBackUrl) })
+      authorised(AuthProviders(GovernmentGateway))(doThanks(true, request, validatedBackUrl))
+    )
   }
 
   def unauthenticatedThanks(backUrl: Option[String] = None) = Action.async { implicit request =>
@@ -126,7 +133,8 @@ import scala.concurrent.{ExecutionContext, Future}
             Redirect(
               enrolments
                 .map(_ => routes.FeedbackController.thanks(data.backUrl))
-                .getOrElse(routes.FeedbackController.unauthenticatedThanks(data.backUrl)))
+                .getOrElse(routes.FeedbackController.unauthenticatedThanks(data.backUrl))
+            )
               .withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
           }
         }
@@ -138,12 +146,14 @@ import scala.concurrent.{ExecutionContext, Future}
       loggedIn,
       form("service").value,
       form("backUrl").value,
-      form("canOmitComments").value.exists(_ == "true"))
+      form("canOmitComments").value.exists(_ == "true")
+    )
 
-  private def doThanks(
-    implicit loggedIn: Boolean,
+  private def doThanks(implicit
+    loggedIn: Boolean,
     request: Request[AnyRef],
-    backUrl: Option[String]): Future[Result] = {
+    backUrl: Option[String]
+  ): Future[Result] = {
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
       Ok(feedbackConfirmationPage(ticketId, loggedIn, backUrl))
     }
@@ -156,33 +166,36 @@ import scala.concurrent.{ExecutionContext, Future}
     service: Option[String],
     referer: Option[String],
     canOmitComments: Boolean,
-    referrerUrl: Option[String]) = Action.async { implicit request =>
+    referrerUrl: Option[String]
+  ) = Action.async { implicit request =>
     Future.successful {
-      Ok(feedbackFormPartial(
+      Ok(
+        feedbackFormPartial(
           FeedbackFormBind.emptyForm(csrfToken, referrerUrl orElse referer, None, canOmitComments = canOmitComments),
           submitUrl,
           service,
-          canOmitComments = canOmitComments))
+          canOmitComments = canOmitComments
+        )
+      )
     }
   }
 
   def submitFeedbackPartialForm(resubmitUrl: String) = Action.async { implicit request =>
     val form = FeedbackFormBind.form.bindFromRequest()(request)
     form.fold(
-      error => {
+      error =>
         Future.successful(
-          BadRequest(feedbackFormPartial(error, resubmitUrl, canOmitComments = form("canOmitComments").value.exists(_ == "true"))))
-      },
-      data => {
+          BadRequest(
+            feedbackFormPartial(error, resubmitUrl, canOmitComments = form("canOmitComments").value.exists(_ == "true"))
+          )
+        ),
+      data =>
         (for {
           enrolments <- maybeAuthenticatedUserEnrolments()
           ticketId   <- createDeskproFeedback(data, enrolments)
-        } yield {
-          Ok(ticketId.ticket_id.toString)
-        }).recover {
-          case _ => InternalServerError
+        } yield Ok(ticketId.ticket_id.toString)).recover { case _ =>
+          InternalServerError
         }
-      }
     )
   }
 
@@ -200,26 +213,30 @@ object FeedbackFormBind {
   private val validateEmail: (String) => Boolean = emailValidator.validate
 
   def emptyForm(csrfToken: String, referrer: Option[String] = None, backUrl: Option[String], canOmitComments: Boolean)(
-    implicit request: Request[AnyRef]) =
+    implicit request: Request[AnyRef]
+  ) =
     FeedbackFormBind.form.fill(
       FeedbackForm(
         referrer.getOrElse(request.headers.get(REFERER).getOrElse("n/a")),
         csrfToken,
         backUrl,
-        canOmitComments))
+        canOmitComments
+      )
+    )
 
   def form =
     Form[FeedbackForm](
       mapping(
-        "feedback-rating" -> optional(text)
+        "feedback-rating"   -> optional(text)
           .verifying("error.common.feedback.rating_mandatory", rating => rating.isDefined && !rating.get.trim.isEmpty)
           .verifying(
             "error.common.feedback.rating_valid",
-            rating => rating.map(validExperiences.contains(_)).getOrElse(true)),
-        "feedback-name" -> text
+            rating => rating.map(validExperiences.contains(_)).getOrElse(true)
+          ),
+        "feedback-name"     -> text
           .verifying("error.common.feedback.name_mandatory", name => !name.trim.isEmpty)
           .verifying("error.common.feedback.name_too_long", name => name.size <= 70),
-        "feedback-email" -> text
+        "feedback-email"    -> text
           .verifying("error.common.problem_report.email_valid", validateEmail)
           .verifying("deskpro.email_too_long", email => email.size <= 255),
         "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
@@ -234,10 +251,13 @@ object FeedbackFormBind {
           }
           override def unbind(key: String, value: String): Map[String, String] = Map(key -> value)
 
-        }).verifying("error.common.comments_too_long", comment => {
-          val result = comment.size <= 2000
-          result
-        }),
+        }).verifying(
+          "error.common.comments_too_long",
+          comment => {
+            val result = comment.size <= 2000
+            result
+          }
+        ),
         "isJavascript"    -> boolean,
         "referrer"        -> text,
         "csrfToken"       -> text,
@@ -245,7 +265,7 @@ object FeedbackFormBind {
         "abFeatures"      -> optional(text),
         "backUrl"         -> optional(text),
         "canOmitComments" -> boolean
-      )(FeedbackForm.apply)((feedbackForm: FeedbackForm) => {
+      )(FeedbackForm.apply) { (feedbackForm: FeedbackForm) =>
         import feedbackForm._
         Some(
           (
@@ -259,6 +279,9 @@ object FeedbackFormBind {
             service,
             abFeatures,
             backUrl,
-            canOmitComments))
-      }))
+            canOmitComments
+          )
+        )
+      }
+    )
 }

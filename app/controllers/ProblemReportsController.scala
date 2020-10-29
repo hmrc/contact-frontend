@@ -34,7 +34,7 @@ object ProblemReportForm {
 
   def resolveServiceFromPost(implicit request: Request[_]): Option[String] = {
     val body = request.body match {
-      case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined => body.asFormUrlEncoded.get
+      case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined    => body.asFormUrlEncoded.get
       case body: play.api.mvc.AnyContent if body.asMultipartFormData.isDefined =>
         body.asMultipartFormData.get.asFormUrlEncoded
     }
@@ -44,51 +44,57 @@ object ProblemReportForm {
 
   def form(implicit request: Request[_], appConfig: AppConfig) = Form[ProblemReport](
     mapping(
-      "report-name" -> text
+      "report-name"   -> text
         .verifying(
           s"error.common.problem_report.name_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
-          name => !name.isEmpty)
+          name => !name.isEmpty
+        )
         .verifying(
           s"error.common.problem_report.name_too_long${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
-          name => name.size <= 70)
+          name => name.size <= 70
+        )
         .verifying(
           s"error.common.problem_report.name_valid${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
-          name => {
+          name =>
             if (appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, resolveServiceFromPost)) {
               name.matches(REPORT_NAME_REGEX)
             } else {
               name.matches(OLD_REPORT_NAME_REGEX)
             } || name.isEmpty
-          }
         ),
-      "report-email" -> text
+      "report-email"  -> text
         .verifying(
           s"error.common.problem_report.email_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
-          email => !email.isEmpty)
+          email => !email.isEmpty
+        )
         .verifying(
           s"error.common.problem_report.email_valid${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
-          email => validateEmail(email) || email.isEmpty)
+          email => validateEmail(email) || email.isEmpty
+        )
         .verifying("deskpro.email_too_long", email => email.length <= 255),
       "report-action" -> text
         .verifying(
           s"error.common.problem_report.action_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
-          action => !action.isEmpty)
+          action => !action.isEmpty
+        )
         .verifying("error.common.comments_too_long", action => action.size <= 1000),
-      "report-error" -> text
+      "report-error"  -> text
         .verifying(
           s"error.common.problem_report.error_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
-          error => !error.isEmpty)
+          error => !error.isEmpty
+        )
         .verifying("error.common.comments_too_long", error => error.size <= 1000),
-      "isJavascript" -> boolean,
-      "service"      -> optional(text),
-      "abFeatures"   -> optional(text),
-      "referrer"     -> optional(text),
-      "userAction"   -> optional(text)
+      "isJavascript"  -> boolean,
+      "service"       -> optional(text),
+      "abFeatures"    -> optional(text),
+      "referrer"      -> optional(text),
+      "userAction"    -> optional(text)
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
   private def improvedFieldValidationFeatureFlag(
-    service: Option[String])(implicit request: Request[_], appConfig: AppConfig): String =
+    service: Option[String]
+  )(implicit request: Request[_], appConfig: AppConfig): String =
     if (appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)) {
       ".b"
     } else {
@@ -98,34 +104,33 @@ object ProblemReportForm {
   def emptyForm(service: Option[String])(implicit request: Request[_], appConfig: AppConfig): Form[ProblemReport] =
     ProblemReportForm.form.fill(
       ProblemReport(
-        reportName   = "",
-        reportEmail  = "",
+        reportName = "",
+        reportEmail = "",
         reportAction = "",
-        reportError  = "",
+        reportError = "",
         isJavascript = false,
-        service      = service,
-        abFeatures   = Some(appConfig.getFeatures(service).mkString(";")),
-        referrer     = request.headers.get(REFERER),
-        userAction   = None
+        service = service,
+        abFeatures = Some(appConfig.getFeatures(service).mkString(";")),
+        referrer = request.headers.get(REFERER),
+        userAction = None
       )
     )
 }
 
 @Singleton
-class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproConnector,
-                                         val authConnector: AuthConnector,
-                                         mcc: MessagesControllerComponents,
-                                         problemReportsPage: problem_reports_nonjavascript,
-                                         problemReportsErrorPage: problem_reports_error_nonjavascript,
-                                         problemReportsConfirmationPage: problem_reports_confirmation_nonjavascript,
-                                         problemReportsConfirmationPage_B: problem_reports_confirmation_nonjavascript_b,
-                                         errorFeedbackForm: error_feedback,
-                                         errorFeedbackFormInner: error_feedback_inner,
-                                         ticketCreatedBody: ticket_created_body,
-                                         ticketCreatedBody_B: ticket_created_body_b
-                                        )
-                                        (implicit appConfig: AppConfig,
-                                         val executionContext: ExecutionContext)
+class ProblemReportsController @Inject() (
+  val hmrcDeskproConnector: HmrcDeskproConnector,
+  val authConnector: AuthConnector,
+  mcc: MessagesControllerComponents,
+  problemReportsPage: problem_reports_nonjavascript,
+  problemReportsErrorPage: problem_reports_error_nonjavascript,
+  problemReportsConfirmationPage: problem_reports_confirmation_nonjavascript,
+  problemReportsConfirmationPage_B: problem_reports_confirmation_nonjavascript_b,
+  errorFeedbackForm: error_feedback,
+  errorFeedbackFormInner: error_feedback_inner,
+  ticketCreatedBody: ticket_created_body,
+  ticketCreatedBody_B: ticket_created_body_b
+)(implicit appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with ContactFrontendActions
     with DeskproSubmission
@@ -153,7 +158,8 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     form: Form[ProblemReport],
     service: Option[String],
     csrfToken: Option[String],
-    referrer: Option[String])(implicit request: Request[_]) =
+    referrer: Option[String]
+  )(implicit request: Request[_]) =
     errorFeedbackFormInner(form, appConfig.externalReportProblemSecureUrl, csrfToken, service, referrer)
 
   def reportFormNonJavaScript(service: Option[String]) = Action { implicit request =>
@@ -163,7 +169,9 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
         ProblemReportForm.emptyForm(service = service),
         appConfig.externalReportProblemSecureUrl,
         service,
-        referrer))
+        referrer
+      )
+    )
   }
 
   def submitSecure: Action[AnyContent] = submit
@@ -181,20 +189,21 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
             val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
             Future.successful(
               Ok(
-                Json.toJson(Map(
-                  "status"  -> "OK",
-                  "message" -> reportFormAjaxView(error, error.data.get("service"), csrfToken, referrer).toString()))))
+                Json.toJson(
+                  Map(
+                    "status"  -> "OK",
+                    "message" -> reportFormAjaxView(error, error.data.get("service"), csrfToken, referrer).toString()
+                  )
+                )
+              )
+            )
           } else {
             Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
           }
         } else {
           Future.successful(
-            Ok(
-              problemReportsPage(
-                error,
-                appConfig.externalReportProblemSecureUrl,
-                error.data.get("service"),
-                referrer)))
+            Ok(problemReportsPage(error, appConfig.externalReportProblemSecureUrl, error.data.get("service"), referrer))
+          )
         }
       },
       problemReport => {
@@ -204,13 +213,12 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
         (for {
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
           ticketId            <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-        } yield {
+        } yield
           if (isAjax) {
             javascriptConfirmationPage(ticketId, problemReport.service)
           } else {
             nonJavascriptConfirmationPage(ticketId, problemReport.service)
-          }
-        }) recover {
+          }) recover {
           case _ if !isAjax => Ok(problemReportsErrorPage())
         }
       }
@@ -226,8 +234,9 @@ class ProblemReportsController @Inject()(val hmrcDeskproConnector: HmrcDeskproCo
     Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
   }
 
-  private def nonJavascriptConfirmationPage(ticketId: TicketId, service: Option[String])(
-    implicit request: Request[_]) = {
+  private def nonJavascriptConfirmationPage(ticketId: TicketId, service: Option[String])(implicit
+    request: Request[_]
+  ) = {
     val view = if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation, service)) {
       problemReportsConfirmationPage_B(ticketId.ticket_id.toString, None)
     } else {

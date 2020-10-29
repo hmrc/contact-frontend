@@ -67,23 +67,26 @@ class FieldTransformerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
 
     "transform paye authorised user to UserTaxIdentifiers containing one identifier i.e. the SH233544B" in new FieldTransformerScope {
       transformer.userTaxIdentifiersFromEnrolments(Some(payeUser)) shouldBe expectedUserTaxIdentifiers(
-        nino = Some("SH233544B"))
+        nino = Some("SH233544B")
+      )
     }
 
     "transform business tax authorised user to UserTaxIdentifiers containing all the Business Tax Identifiers (and HMCE-VATDEC-ORG endorsement)" in new FieldTransformerScope {
       transformer.userTaxIdentifiersFromEnrolments(Some(bizTaxUserWithVatDec)) shouldBe expectedUserTaxIdentifiers(
-        utr    = Some("sa"),
-        ctUtr  = Some("ct"),
-        vrn    = Some("vrn1"),
-        empRef = Some(EmpRef("officeNum", "officeRef").value))
+        utr = Some("sa"),
+        ctUtr = Some("ct"),
+        vrn = Some("vrn1"),
+        empRef = Some(EmpRef("officeNum", "officeRef").value)
+      )
     }
 
     "transform business tax authorised user to UserTaxIdentifiers containing all the Business Tax Identifiers (and HMCE-VATVAR-ORG endorsement)" in new FieldTransformerScope {
       transformer.userTaxIdentifiersFromEnrolments(Some(bizTaxUserWithVatVar)) shouldBe expectedUserTaxIdentifiers(
-        utr    = Some("sa"),
-        ctUtr  = Some("ct"),
-        vrn    = Some("vrn2"),
-        empRef = Some(EmpRef("officeNum", "officeRef").value))
+        utr = Some("sa"),
+        ctUtr = Some("ct"),
+        vrn = Some("vrn2"),
+        empRef = Some(EmpRef("officeNum", "officeRef").value)
+      )
     }
   }
 
@@ -92,12 +95,13 @@ class FieldTransformerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
 class FieldTransformerScope {
   lazy val transformer = new FieldTransformer {}
 
-  lazy val userId = UserId("456")
+  lazy val userId   = UserId("456")
   lazy val payeUser =
     Enrolments(
       Set(
         Enrolment("HMRC-NI").withIdentifier("NINO", "SH233544B")
-      ))
+      )
+    )
 
   lazy val bizTaxUserWithVatDec =
     Enrolments(
@@ -108,7 +112,8 @@ class FieldTransformerScope {
         Enrolment("IR-PAYE")
           .withIdentifier("TaxOfficeNumber", "officeNum")
           .withIdentifier("TaxOfficeReference", "officeRef")
-      ))
+      )
+    )
 
   lazy val bizTaxUserWithVatVar =
     Enrolments(
@@ -119,24 +124,26 @@ class FieldTransformerScope {
         Enrolment("IR-PAYE")
           .withIdentifier("TaxOfficeNumber", "officeNum")
           .withIdentifier("TaxOfficeReference", "officeRef")
-      ))
+      )
+    )
 
-  val sessionId: String = "sessionIdValue"
-  val hc                = HeaderCarrier(userId = Some(userId), sessionId = Some(SessionId(sessionId)))
-  val userAgent: String = "Mozilla"
-  val name: String      = "name"
-  val email: String     = "email"
-  val subject: String   = "subject"
-  val message: String   = "message"
-  val referrer: String  = "referrer"
-  lazy val request      = FakeRequest().withHeaders(("User-Agent", userAgent))
+  val sessionId: String              = "sessionIdValue"
+  val hc                             = HeaderCarrier(userId = Some(userId), sessionId = Some(SessionId(sessionId)))
+  val userAgent: String              = "Mozilla"
+  val name: String                   = "name"
+  val email: String                  = "email"
+  val subject: String                = "subject"
+  val message: String                = "message"
+  val referrer: String               = "referrer"
+  lazy val request                   = FakeRequest().withHeaders(("User-Agent", userAgent))
   lazy val requestAuthenticatedByIda =
     FakeRequest().withHeaders(("User-Agent", userAgent)).withSession(("ap", "IDA"), (SessionKeys.authToken, "12345"))
 
   def expectedUserTaxIdentifiers(
-    nino: Option[String]   = None,
-    ctUtr: Option[String]  = None,
-    utr: Option[String]    = None,
-    vrn: Option[String]    = None,
-    empRef: Option[String] = None) = UserTaxIdentifiers(nino, ctUtr, utr, vrn, empRef)
+    nino: Option[String] = None,
+    ctUtr: Option[String] = None,
+    utr: Option[String] = None,
+    vrn: Option[String] = None,
+    empRef: Option[String] = None
+  ) = UserTaxIdentifiers(nino, ctUtr, utr, vrn, empRef)
 }

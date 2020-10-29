@@ -19,7 +19,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
 
-class CaptchaServiceV3Spec extends AnyWordSpec with Matchers with MockitoSugar with ScalaCheckPropertyChecks with ScalaFutures {
+class CaptchaServiceV3Spec
+    extends AnyWordSpec
+    with Matchers
+    with MockitoSugar
+    with ScalaCheckPropertyChecks
+    with ScalaFutures {
 
   "Verifying user's response" should {
 
@@ -40,12 +45,15 @@ class CaptchaServiceV3Spec extends AnyWordSpec with Matchers with MockitoSugar w
 
     "add the result to metrics" in new Fixtures {
       forAll(scoreGen, scoreGen) { (minScoreRequired, actualScore) =>
-
         metricsStub.defaultRegistry.remove("recaptchaScore")
 
         service(minScoreRequired).checkIfBot(SuccessfulCaptchaApiResponse(actualScore, "action"))
 
-        metricsStub.defaultRegistry.histogram("recaptchaScore").getSnapshot.getValues.shouldBe(Array((actualScore * 100).toLong))
+        metricsStub.defaultRegistry
+          .histogram("recaptchaScore")
+          .getSnapshot
+          .getValues
+          .shouldBe(Array((actualScore * 100).toLong))
       }
     }
 
@@ -61,15 +69,16 @@ class CaptchaServiceV3Spec extends AnyWordSpec with Matchers with MockitoSugar w
     }
 
     val scoreGen: Gen[BigDecimal] =
-          Gen.chooseNum[Double](0,1).map(BigDecimal(_))
+      Gen.chooseNum[Double](0, 1).map(BigDecimal(_))
 
     def service(minScore: BigDecimal = 0.5) = new CaptchaServiceV3(
       mock[CaptchaConnectorV3],
       new TestAppConfig {
         override def captchaMinScore: BigDecimal = minScore
-      }, metricsStub)(ExecutionContext.global)
+      },
+      metricsStub
+    )(ExecutionContext.global)
 
   }
-
 
 }

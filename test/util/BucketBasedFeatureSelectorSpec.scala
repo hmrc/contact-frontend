@@ -11,21 +11,22 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import util.BucketCalculator.BucketCalculator
 
-
 class BucketBasedFeatureSelectorSpec extends AnyWordSpec with Matchers {
 
   val testFeature1 = GetHelpWithThisPageFeatureFieldHints
   val testFeature2 = GetHelpWithThisPageImprovedFieldValidation
   val testFeature3 = GetHelpWithThisPageMoreVerboseConfirmation
 
-  val mockBucketCalculator: BucketCalculator = request =>
-    request.headers.get("bucket").map(_.toInt).getOrElse(0)
+  val mockBucketCalculator: BucketCalculator = request => request.headers.get("bucket").map(_.toInt).getOrElse(0)
 
   val testInstance = new BucketBasedFeatureSelector(
     mockBucketCalculator,
-    Set(FeatureEnablingRule(0, 20, None, testFeature1),
-        FeatureEnablingRule(10, 30, None, testFeature2),
-      FeatureEnablingRule(10, 30, Some(Set("service1", "service2")), testFeature3)))
+    Set(
+      FeatureEnablingRule(0, 20, None, testFeature1),
+      FeatureEnablingRule(10, 30, None, testFeature2),
+      FeatureEnablingRule(10, 30, Some(Set("service1", "service2")), testFeature3)
+    )
+  )
 
   val service = Some("testService")
 
@@ -33,8 +34,7 @@ class BucketBasedFeatureSelectorSpec extends AnyWordSpec with Matchers {
 
     "return features Test1 and Test2 for user in bucket 10" in {
       val request: Request[AnyRef] = FakeRequest().withHeaders(("bucket", "10"))
-      testInstance.computeFeatures(request, service) shouldBe Set(testFeature1,
-                                                         testFeature2)
+      testInstance.computeFeatures(request, service) shouldBe Set(testFeature1, testFeature2)
     }
 
     "return feature Test1 for user in bucket 9" in {

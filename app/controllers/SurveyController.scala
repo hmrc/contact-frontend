@@ -22,11 +22,12 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
-class SurveyController @Inject()(auditConnector: AuditConnector,
-                                 mcc: MessagesControllerComponents,
-                                 surveyPage: survey,
-                                 surveyConfirmationPage: survey_confirmation)
-                                (implicit appConfig: AppConfig, executionContext: ExecutionContext)
+class SurveyController @Inject() (
+  auditConnector: AuditConnector,
+  mcc: MessagesControllerComponents,
+  surveyPage: survey,
+  surveyConfirmationPage: survey_confirmation
+)(implicit appConfig: AppConfig, executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with I18nSupport
     with Logging {
@@ -61,8 +62,9 @@ class SurveyController @Inject()(auditConnector: AuditConnector,
     )
   }
 
-  private[controllers] def getAuditEventOrFormErrors(
-    implicit request: Request[_]): Either[Option[Future[DataEvent]], Seq[FormError]] = {
+  private[controllers] def getAuditEventOrFormErrors(implicit
+    request: Request[_]
+  ): Either[Option[Future[DataEvent]], Seq[FormError]] = {
     val form = surveyForm.bindFromRequest()
     form.errors match {
       case Nil   => Left(Try(form.value.map(buildAuditEvent)).toOption.flatten)
@@ -76,10 +78,11 @@ class SurveyController @Inject()(auditConnector: AuditConnector,
         eventOption foreach { dataEventFuture =>
           dataEventFuture.foreach(auditConnector.sendEvent)
         }
-      case Right(errors) =>
+      case Right(errors)     =>
         errors foreach { error =>
           logger.error(
-            s"Error processing survey form field: '${error.key}' message='${error.message}' args='${error.args.mkString(",")}'")
+            s"Error processing survey form field: '${error.key}' message='${error.message}' args='${error.args.mkString(",")}'"
+          )
         }
     }
     Redirect(routes.SurveyController.confirmation())
@@ -89,20 +92,23 @@ class SurveyController @Inject()(auditConnector: AuditConnector,
     Future.successful(
       DataEvent(
         auditSource = "frontend",
-        auditType   = "DeskproSurvey",
-        tags        = hc.headers.toMap,
-        detail      = formData.toStringMap))
+        auditType = "DeskproSurvey",
+        tags = hc.headers.toMap,
+        detail = formData.toStringMap
+      )
+    )
 
   private val ratingScale = optional(number(min = 1, max = 5, strict = false))
 
   private[controllers] def surveyForm = Form[SurveyFormData](
     mapping(
-      SurveyFormFields.helpful  -> ratingScale,
-      SurveyFormFields.speed    -> ratingScale,
-      SurveyFormFields.improve  -> optional(text(maxLength = 2500)),
-      SurveyFormFields.ticketId -> optional(text).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
+      SurveyFormFields.helpful   -> ratingScale,
+      SurveyFormFields.speed     -> ratingScale,
+      SurveyFormFields.improve   -> optional(text(maxLength = 2500)),
+      SurveyFormFields.ticketId  -> optional(text).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
       SurveyFormFields.serviceId -> optional(text(maxLength = 20)).verifying(serviceId =>
-        serviceId.getOrElse("").length > 0)
+        serviceId.getOrElse("").length > 0
+      )
     )(SurveyFormData.apply)(SurveyFormData.unapply)
   )
 }
@@ -120,7 +126,8 @@ case class SurveyFormData(
   speed: Option[Int],
   improve: Option[String],
   ticketId: Option[String],
-  serviceId: Option[String]) {
+  serviceId: Option[String]
+) {
   def toStringMap: Map[String, String] = collection.immutable.HashMap(
     "helpful"   -> helpful.getOrElse(0).toString,
     "speed"     -> speed.getOrElse(0).toString,

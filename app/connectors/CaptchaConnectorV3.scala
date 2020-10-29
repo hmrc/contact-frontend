@@ -12,7 +12,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaptchaConnectorV3 @Inject()(http: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class CaptchaConnectorV3 @Inject() (http: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def verifyResponse(userResponseToken: String)(implicit hc: HeaderCarrier): Future[CaptchaApiResponseV3] = {
 

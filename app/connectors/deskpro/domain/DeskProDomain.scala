@@ -25,7 +25,8 @@ case class Ticket private (
   userTaxIdentifiers: UserTaxIdentifiers,
   service: Option[String],
   abFeatures: Option[String],
-  userAction: Option[String])
+  userAction: Option[String]
+)
 
 object UserTaxIdentifiers {
   implicit val formats = Json.format[UserTaxIdentifiers]
@@ -47,7 +48,8 @@ object Ticket extends FieldTransformer with Logging {
     enrolments: Option[Enrolments],
     service: Option[String],
     abFeatures: Option[String],
-    userAction: Option[String]): Ticket = {
+    userAction: Option[String]
+  ): Ticket = {
     val ticket = Ticket(
       name.trim,
       email,
@@ -80,7 +82,8 @@ case class UserTaxIdentifiers(
   ctUtr: Option[String],
   utr: Option[String],
   vrn: Option[String],
-  empRef: Option[String])
+  empRef: Option[String]
+)
 
 case class Feedback(
   name: String,
@@ -96,7 +99,8 @@ case class Feedback(
   sessionId: String,
   userTaxIdentifiers: UserTaxIdentifiers,
   service: Option[String],
-  abFeatures: Option[String])
+  abFeatures: Option[String]
+)
 
 object Feedback extends FieldTransformer {
 
@@ -114,7 +118,8 @@ object Feedback extends FieldTransformer {
     request: Request[AnyRef],
     enrolments: Option[Enrolments],
     service: Option[String],
-    abFeatures: Option[String]): Feedback =
+    abFeatures: Option[String]
+  ): Feedback =
     Feedback(
       name.trim,
       email,
@@ -158,12 +163,15 @@ trait FieldTransformer {
         val nino  = extractIdentifier(enrolments, "HMRC-NI", "NINO")
         val saUtr = extractIdentifier(enrolments, "IR-SA", "UTR")
         val ctUtr = extractIdentifier(enrolments, "IR-CT", "UTR")
-        val vrn = extractIdentifier(enrolments, "HMCE-VATDEC-ORG", "VATRegNo")
+        val vrn   = extractIdentifier(enrolments, "HMCE-VATDEC-ORG", "VATRegNo")
           .orElse(extractIdentifier(enrolments, "HMCE-VATVAR-ORG", "VATRegNo"))
 
-        val empRef = for (taxOfficeNumber <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeNumber");
-                          taxOfficeRef <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeReference"))
-          yield s"$taxOfficeNumber/$taxOfficeRef"
+        val empRef =
+          for (
+            taxOfficeNumber <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeNumber");
+            taxOfficeRef    <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeReference")
+          )
+            yield s"$taxOfficeNumber/$taxOfficeRef"
 
         UserTaxIdentifiers(nino, ctUtr, saUtr, vrn, empRef)
       }

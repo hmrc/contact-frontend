@@ -18,9 +18,9 @@ trait FeatureSelector {
 
 case class FeatureEnablingRule(bucketFrom: Int, bucketTo: Int, servicesLimit: Option[Set[String]], feature: Feature) {
   def isApplicable(bucket: Int, maybeService: Option[String]): Boolean = {
-    val bucketCriterion = bucket >= bucketFrom && bucket < bucketTo
+    val bucketCriterion  = bucket >= bucketFrom && bucket < bucketTo
     val serviceCriterion = servicesLimit match {
-      case None => true
+      case None                  => true
       case Some(allowedServices) =>
         maybeService match {
           case Some(service) => allowedServices.contains(service)
@@ -71,7 +71,8 @@ object FeatureEnablingRule {
 }
 
 class BucketBasedFeatureSelector(computeBucket: BucketCalculator, rules: Iterable[FeatureEnablingRule])
-    extends FeatureSelector with Logging {
+    extends FeatureSelector
+    with Logging {
 
   override def computeFeatures(request: Request[_], service: Option[String]): Set[Feature] = {
     val bucket   = computeBucket(request)
@@ -92,8 +93,8 @@ object BucketCalculator {
     val deviceIdMaybe: Option[String] = HeaderCarrierConverter
       .fromHeadersAndSessionAndRequest(request.headers, Some(request.session), Some(request))
       .deviceID
-    val deviceId = deviceIdMaybe.getOrElse("")
-    val bucket   = math.abs(deviceId.hashCode % 100)
+    val deviceId                      = deviceIdMaybe.getOrElse("")
+    val bucket                        = math.abs(deviceId.hashCode % 100)
     bucket
   }
 }
