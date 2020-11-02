@@ -12,16 +12,17 @@ import model.AccessibilityForm
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.i18n.{I18nSupport, Lang, Messages}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
+import play.twirl.api.Html
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions}
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{BackUrlValidator, DeskproEmailValidator}
-import views.html.{accessibility, accessibility_confirmation}
+import util.DeskproEmailValidator
+import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, accessibility, accessibility_confirmation}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -71,11 +72,12 @@ object AccessibilityFormBind {
 class AccessibilityController @Inject() (
   val hmrcDeskproConnector: HmrcDeskproConnector,
   val authConnector: AuthConnector,
-  val accessibleUrlValidator: BackUrlValidator,
   val configuration: Configuration,
   mcc: MessagesControllerComponents,
-  accessibilityPage: accessibility,
-  accessibilityConfirmationPage: accessibility_confirmation
+  assetsFrontendAccessibilityPage: accessibility,
+  assetsFrontendAccessibilityConfirmationPage: accessibility_confirmation,
+  playFrontendAccessibilityProblemPage: AccessibilityProblemPage,
+  playFrontendAccessibilityProblemConfirmationPage: AccessibilityProblemConfirmationPage
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
@@ -102,7 +104,7 @@ class AccessibilityController @Inject() (
               val referrer  = request.headers.get(REFERER)
               val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
               val form      = AccessibilityFormBind.emptyForm(csrfToken, referrer, service, userAction)
-              Ok(accessibilityPage(form, routes.AccessibilityController.submitAccessibilityForm().url, loggedIn = true))
+              Ok(accessibilityPage(form, routes.AccessibilityController.submitAccessibilityForm(), loggedIn = true))
             }
 
           }
@@ -122,7 +124,7 @@ class AccessibilityController @Inject() (
                 BadRequest(
                   accessibilityPage(
                     error,
-                    routes.AccessibilityController.submitAccessibilityForm().url,
+                    routes.AccessibilityController.submitAccessibilityForm(),
                     loggedIn = true
                   )
                 )
@@ -141,7 +143,7 @@ class AccessibilityController @Inject() (
 
   def thanks(): Action[AnyContent] = Action.async { implicit request =>
     loginRedirection(routes.AccessibilityController.thanks().url)(authorised(AuthProviders(GovernmentGateway)) {
-      Future.successful(Ok(accessibilityConfirmationPage("", loggedIn = true)))
+      Future.successful(Ok(accessibilityConfirmationPage(loggedIn = true)))
     })
   }
 
@@ -159,7 +161,7 @@ class AccessibilityController @Inject() (
       Ok(
         accessibilityPage(
           form,
-          routes.AccessibilityController.submitUnauthenticatedAccessibilityForm().url,
+          routes.AccessibilityController.submitUnauthenticatedAccessibilityForm(),
           loggedIn = false
         )
       )
@@ -175,7 +177,7 @@ class AccessibilityController @Inject() (
             BadRequest(
               accessibilityPage(
                 error,
-                routes.AccessibilityController.submitUnauthenticatedAccessibilityForm().url,
+                routes.AccessibilityController.submitUnauthenticatedAccessibilityForm(),
                 loggedIn = false
               )
             )
@@ -189,7 +191,29 @@ class AccessibilityController @Inject() (
   }
 
   def unauthenticatedThanks(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(accessibilityConfirmationPage("")))
+    Future.successful(Ok(accessibilityConfirmationPage(loggedIn = false)))
   }
 
+  private def accessibilityPage(form: Form[AccessibilityForm], action: Call, loggedIn: Boolean)(implicit
+    request: Request[_],
+    lang: Lang
+  ): Html =
+    if (appConfig.enablePlayFrontendAccessibilityForm) {
+      playFrontendAccessibilityProblemPage(
+        form,
+        action
+      )
+    } else {
+      assetsFrontendAccessibilityPage(form, action.url, loggedIn)
+    }
+
+  private def accessibilityConfirmationPage(loggedIn: Boolean)(implicit
+    request: Request[_],
+    lang: Lang
+  ): Html =
+    if (appConfig.enablePlayFrontendAccessibilityForm) {
+      playFrontendAccessibilityProblemConfirmationPage()
+    } else {
+      assetsFrontendAccessibilityConfirmationPage("", loggedIn = false)
+    }
 }

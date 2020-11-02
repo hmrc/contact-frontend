@@ -5,36 +5,29 @@
 
 package controllers
 
-import javax.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import config.AppConfig
-import play.api.Logging
-import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.LanguageUtils
+import javax.inject.Singleton
+import play.api.Configuration
+import play.api.i18n.Lang
+import play.api.mvc._
+import uk.gov.hmrc.play.language.{LanguageController => PlayLanguageController, LanguageUtils}
 
 @Singleton
-class LanguageController @Inject() (mcc: MessagesControllerComponents)(implicit appConfig: AppConfig)
-    extends FrontendController(mcc)
-    with I18nSupport
-    with Logging {
+case class LanguageController @Inject() (
+  configuration: Configuration,
+  languageUtils: LanguageUtils,
+  cc: ControllerComponents,
+  appConfig: AppConfig
+) extends PlayLanguageController(configuration, languageUtils, cc) {
+  import appConfig._
 
-  val english = Lang("en")
-  val welsh   = Lang("cy")
+  def switchToEnglish: Action[AnyContent] = switchToLanguage(en)
 
-  def switchToEnglish: Action[AnyContent] = switchToLang(english)
+  def switchToWelsh: Action[AnyContent] = switchToLanguage(cy)
 
-  def switchToWelsh: Action[AnyContent] = switchToLang(welsh)
+  override def fallbackURL: String = appConfig.fallbackURLForLanguageSwitcher
 
-  private def switchToLang(lang: Lang): Action[AnyContent] = Action { implicit request =>
-    val newLang = if (appConfig.enableLanguageSwitching) lang else english
-
-    request.headers.get(REFERER) match {
-      case Some(referrer) => Redirect(referrer).withLang(newLang).flashing(LanguageUtils.flashWithSwitchIndicator)
-      case None           =>
-        logger.warn(s"Unable to get the referrer, so sending them to ${appConfig.fallbackURLForLangugeSwitcher}")
-        Redirect(appConfig.fallbackURLForLangugeSwitcher).withLang(newLang)
-    }
-  }
-
+  override protected def languageMap: Map[String, Lang] =
+    Map(en -> Lang(en), cy -> Lang(cy))
 }

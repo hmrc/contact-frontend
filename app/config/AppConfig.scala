@@ -7,6 +7,7 @@ package config
 
 import javax.inject.Inject
 import play.api.Configuration
+import play.api.i18n.Lang
 import play.api.mvc.Request
 import util._
 
@@ -21,8 +22,9 @@ trait AppConfig {
   def externalReportProblemSecureUrl: String
   def backUrlDestinationWhitelist: Set[String]
   def loginCallback(continueUrl: String): String
-  def fallbackURLForLangugeSwitcher: String
+  def fallbackURLForLanguageSwitcher: String
   def enableLanguageSwitching: Boolean
+  def enablePlayFrontendAccessibilityForm: Boolean
   def captchaEnabled: Boolean
   def captchaMinScore: BigDecimal
   def captchaClientKey: String
@@ -32,6 +34,9 @@ trait AppConfig {
   def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean
 
   def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature]
+
+  val en: String = "en"
+  val cy: String = "cy"
 }
 
 class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
@@ -69,12 +74,17 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
 
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
 
-  override def fallbackURLForLangugeSwitcher =
+  override def fallbackURLForLanguageSwitcher =
     loadConfigString("platform.frontend.url")
 
   override def enableLanguageSwitching =
     configuration
       .getOptional[Boolean]("enableLanguageSwitching")
+      .getOrElse(false)
+
+  override def enablePlayFrontendAccessibilityForm =
+    configuration
+      .getOptional[Boolean]("enablePlayFrontendAccessibilityForm")
       .getOrElse(false)
 
   override lazy val captchaEnabled: Boolean =

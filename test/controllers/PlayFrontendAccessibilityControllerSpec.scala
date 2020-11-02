@@ -11,10 +11,11 @@ import connectors.deskpro.domain.TicketId
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.http.HeaderNames.REFERER
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -27,15 +28,14 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
-import play.api.http.HeaderNames.REFERER
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
+class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "enablePlayFrontendAccessibilityForm" -> false)
+      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "enablePlayFrontendAccessibilityForm" -> true)
       .build()
 
   implicit val message: Messages = fakeApplication.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
@@ -131,13 +131,13 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      val errors   = document.getElementsByClass("error-message").asScala
+      val errors   = document.select(".govuk-error-message").asScala
       errors.length should be(3)
 
-      document.title()                                                                                 should be("Error: " + Messages("accessibility.heading"))
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.required")))        shouldBe true
-      errors.exists(_.text().equals(Messages("error.common.feedback.name_mandatory")))               shouldBe true
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
+      document.title()                                                                                   should be("Error: " + Messages("accessibility.heading"))
+      errors.exists(_.text().contains(Messages("error.common.accessibility.problem.required")))        shouldBe true
+      errors.exists(_.text().contains(Messages("error.common.feedback.name_mandatory")))               shouldBe true
+      errors.exists(_.text().contains(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
     }
 
     "display error messages when message size exceeds limit" in new AccessibilityControllerApplication(
@@ -160,10 +160,10 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
-      val errors = document.getElementsByClass("error-message").asScala
+      val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.toolong"))) shouldBe true
+      errors.exists(_.text().contains(Messages("error.common.accessibility.problem.toolong"))) shouldBe true
     }
 
     "display error messages when email is invalid" in new AccessibilityControllerApplication(fakeApplication) {
@@ -184,32 +184,10 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
-      val errors = document.getElementsByClass("error-message").asScala
+      val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
-    }
-
-    "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
-      val tooLongEmail = ("x" * 256) + "@email.com"
-
-      val request = generateRequest(
-        desc = "valid form message",
-        formName = "firstname",
-        email = tooLongEmail,
-        isJavascript = false,
-        referrer = "/somepage"
-      )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
-
-      status(result) should be(400)
-
-      import collection.JavaConverters._
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
-      val errors = document.getElementsByClass("error-message").asScala
-      errors.exists(_.text().equals(Messages("deskpro.email_too_long"))) shouldBe true
+      errors.exists(_.text().contains(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
     }
 
     "display error messages when name is too long" in new AccessibilityControllerApplication(fakeApplication) {
@@ -230,8 +208,8 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
-      val errors = document.getElementsByClass("error-message").asScala
-      errors.exists(_.text().equals(Messages("error.common.feedback.name_too_long"))) shouldBe true
+      val errors = document.select(".govuk-error-message").asScala
+      errors.exists(_.text().contains(Messages("error.common.feedback.name_too_long"))) shouldBe true
     }
 
     "redirect to thankyou page when completed" in new AccessibilityControllerApplication(fakeApplication) {
@@ -291,12 +269,12 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
-      val errors = document.getElementsByClass("error-message").asScala
+      val errors = document.select(".govuk-error-message").asScala
       errors.length should be(3)
 
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.required")))        shouldBe true
-      errors.exists(_.text().equals(Messages("error.common.feedback.name_mandatory")))               shouldBe true
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
+      errors.exists(_.text().contains(Messages("error.common.accessibility.problem.required")))        shouldBe true
+      errors.exists(_.text().contains(Messages("error.common.feedback.name_mandatory")))               shouldBe true
+      errors.exists(_.text().contains(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
     }
 
     "display error messages when message size exceeds limit" in new AccessibilityControllerApplication(
@@ -319,10 +297,10 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
-      val errors = document.getElementsByClass("error-message").asScala
+      val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.toolong"))) shouldBe true
+      errors.exists(_.text().contains(Messages("error.common.accessibility.problem.toolong"))) shouldBe true
     }
 
     "display error messages when email is invalid" in new AccessibilityControllerApplication(fakeApplication) {
@@ -343,32 +321,10 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
-      val errors = document.getElementsByClass("error-message").asScala
+      val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
-    }
-
-    "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
-      val tooLongEmail = ("x" * 256) + "@email.com"
-
-      val request = generateRequest(
-        desc = "valid form message",
-        formName = "firstname",
-        email = tooLongEmail,
-        isJavascript = false,
-        referrer = "/somepage"
-      )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
-
-      status(result) should be(400)
-
-      import collection.JavaConverters._
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
-      val errors = document.getElementsByClass("error-message").asScala
-      errors.exists(_.text().equals(Messages("deskpro.email_too_long"))) shouldBe true
+      errors.exists(_.text().contains(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
     }
 
     "display error messages when name is too long" in new AccessibilityControllerApplication(fakeApplication) {
@@ -389,8 +345,8 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
-      val errors = document.getElementsByClass("error-message").asScala
-      errors.exists(_.text().equals(Messages("error.common.feedback.name_too_long"))) shouldBe true
+      val errors = document.select(".govuk-error-message").asScala
+      errors.exists(_.text().contains(Messages("error.common.feedback.name_too_long"))) shouldBe true
     }
 
     "redirect to thankyou page when completed" in new AccessibilityControllerApplication(fakeApplication) {

@@ -1,0 +1,26 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@this(govukCharacterCount: GovukCharacterCount)
+
+@(
+    field: Field,
+    label: String,
+    labelClasses: String = "",
+    maxLength: Option[Int] = None,
+    hint: Option[String] = None,
+    classes: String = ""
+)(implicit messages: Messages)
+@govukCharacterCount(CharacterCount(
+    name = field.id,
+    id = field.id,
+    label = Label(classes = labelClasses, content = Text(label)),
+    value = field.value,
+    maxLength = maxLength,
+    classes = classes,
+    errorMessage = field.error.map(formError =>
+        ErrorMessage(content = Text(messages(formError.message, formError.args: _*)))
+    ),
+))
