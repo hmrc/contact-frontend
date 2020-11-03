@@ -25,9 +25,11 @@ class TestAppConfig extends AppConfig {
 
   override def loginCallback(continueUrl: String): String = ???
 
-  override def fallbackURLForLangugeSwitcher: String = ???
+  override def fallbackURLForLanguageSwitcher: String = ???
 
   override def enableLanguageSwitching: Boolean = true
+
+  override def enablePlayFrontendAccessibilityForm: Boolean = false
 
   override def captchaEnabled: Boolean = ???
 

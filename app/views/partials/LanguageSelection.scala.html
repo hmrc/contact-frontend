@@ -1,0 +1,18 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import controllers.routes.LanguageController._
+@import config.AppConfig
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcLanguageSelect
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language.LanguageSelect
+@this(hmrcLanguageSelect: HmrcLanguageSelect)
+
+@()(implicit messages: Messages, appConfig: AppConfig)
+@import appConfig._
+@hmrcLanguageSelect(LanguageSelect(
+  if (messages.lang.code == cy) Cy else En,
+  (En, switchToLanguage(en).url),
+  (Cy, switchToLanguage(cy).url)
+))

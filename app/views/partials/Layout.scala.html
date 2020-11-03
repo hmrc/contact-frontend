@@ -1,0 +1,47 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.header.Header
+@import views.html.partials.LanguageSelection
+@import views.html.partials.Head
+@import views.html.partials.Scripts
+
+@this(
+        govukLayout: GovukLayout,
+        govukHeader: GovukHeader,
+        hmrcFooter: HmrcFooter,
+        hmrcBanner: HmrcBanner,
+        head: Head,
+        languageSelection: LanguageSelection,
+        scripts: Scripts
+)
+
+@(pageTitle: String)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@import appConfig._
+
+@headerBlock = {
+    @govukHeader(Header(
+        homepageUrl = Some("https://www.gov.uk/"),
+        serviceName = None,
+        serviceUrl = None,
+        containerClasses = None))
+}
+
+@beforeContentBlock = {
+    @hmrcBanner(Banner(language = if(messages.lang.code == cy) Cy else En))
+    @if(appConfig.enableLanguageSwitching) {
+        @languageSelection()
+    }
+}
+
+@govukLayout(
+    pageTitle = Some(pageTitle),
+    headBlock = Some(head()),
+    headerBlock = Some(headerBlock),
+    scriptsBlock = Some(scripts()),
+    beforeContentBlock = Some(beforeContentBlock),
+    footerBlock = Some(hmrcFooter())
+)(contentBlock)

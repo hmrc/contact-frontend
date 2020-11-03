@@ -1,0 +1,16 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import views.html.partials.{Layout, Heading2, Paragraph}
+
+@this(govukPanel: GovukPanel, mainLayout: Layout, h2: Heading2, p: Paragraph)
+@()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@mainLayout(pageTitle = Messages("accessibility.heading")) {
+    @govukPanel(Panel(title = Text(Messages("accessibility.confirmation.title"))))
+    @h2(content = Text(messages("what.happens.next")))
+    @p(content = Text(messages("accessibility.thanks.text")))
+    @p(content = Text(messages("accessibility.close.window")))
+}

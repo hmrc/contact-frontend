@@ -63,9 +63,8 @@ class MessagesSpec extends AnyWordSpec with Matchers {
   private def assertCorrectUseOfQuotes(label: String, messages: Map[String, String]) = messages.foreach {
     case (key: String, value: String) =>
       withClue(s"In $label, there is an unescaped or invalid quote:[$key][$value]") {
-        MatchSingleQuoteOnly.findFirstIn(value).isDefined      shouldBe false
-        MatchBacktickQuoteOnly.findFirstIn(value).isDefined    shouldBe false
-        MatchForwardTickQuoteOnly.findFirstIn(value).isDefined shouldBe false
+        MatchSingleQuoteOnly.findFirstIn(value).isDefined   shouldBe false
+        MatchBacktickQuoteOnly.findFirstIn(value).isDefined shouldBe false
       }
   }
 

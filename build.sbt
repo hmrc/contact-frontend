@@ -17,9 +17,17 @@ lazy val microservice = Project(appName, file("."))
   .settings(integrationTestSettings(): _*)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(
-    PlayKeys.playDefaultPort := 9250
+    PlayKeys.playDefaultPort := 9250,
+    PlayKeys.devSettings ++= Seq("metrics.enabled" -> "false", "auditing.enabled" -> "false"),
+    pipelineStages in Assets := Seq(gzip)
   )
   .settings(
+    TwirlKeys.templateImports ++= Seq(
+      "config.AppConfig",
+      "uk.gov.hmrc.govukfrontend.views.html.components._",
+      "uk.gov.hmrc.govukfrontend.views.html.helpers._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.components._"
+    ),
     // ***************
     // Use the silencer plugin to suppress warnings from unused imports in compiled twirl templates
     scalacOptions += "-P:silencer:pathFilters=views;routes",

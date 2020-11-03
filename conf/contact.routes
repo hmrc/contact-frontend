@@ -1,3 +1,6 @@
+->          /govuk-frontend                              govuk.Routes
+->          /hmrc-frontend                               hmrcfrontend.Routes
+
 GET         /beta-feedback                               @controllers.FeedbackController.feedbackForm(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false)
 GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.unauthenticatedFeedbackForm(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false)
 POST        /beta-feedback/submit                        @controllers.FeedbackController.submit
@@ -33,6 +36,7 @@ GET			/survey/confirmation 	                     @controllers.SurveyController.c
 
 GET         /switch-to-welsh                             @controllers.LanguageController.switchToWelsh()
 GET         /switch-to-english                           @controllers.LanguageController.switchToEnglish()
+GET         /language/:lang                              @controllers.LanguageController.switchToLanguage(lang: String)
 
 GET         /accessibility                               @controllers.AccessibilityController.accessibilityForm(service: Option[String], userAction: Option[String])
 POST        /accessibility                               @controllers.AccessibilityController.submitAccessibilityForm()
@@ -41,3 +45,5 @@ GET         /accessibility/thanks                        @controllers.Accessibil
 GET         /accessibility-unauthenticated               @controllers.AccessibilityController.unauthenticatedAccessibilityForm(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
 POST        /accessibility-unauthenticated               @controllers.AccessibilityController.submitUnauthenticatedAccessibilityForm()
 GET         /accessibility-unauthenticated/thanks        @controllers.AccessibilityController.unauthenticatedThanks()
+
+GET         /assets/*file                                @controllers.Assets.versioned(path = "/public", file: Asset)

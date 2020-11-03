@@ -1,0 +1,26 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@this(govukInput: GovukInput)
+
+@(
+    field: Field,
+    label: String,
+    labelClasses: String = "",
+    hint: Option[String] = None,
+    classes: String = ""
+)(implicit messages: Messages)
+@govukInput(Input(
+    id = field.id,
+    name = field.name,
+    inputType = "text",
+    label = Label(classes = labelClasses, content = Text(label)),
+    hint = hint.map(h => Hint(content = Text(h))),
+    value = field.value,
+    errorMessage = field.error.map(formError =>
+        ErrorMessage(content = Text(messages(formError.message, formError.args: _*)))
+    ),
+    classes = classes
+))
