@@ -31,7 +31,7 @@ import play.api.http.HeaderNames.REFERER
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
+class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()

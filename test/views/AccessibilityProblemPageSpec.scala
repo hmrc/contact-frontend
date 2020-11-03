@@ -6,7 +6,7 @@
 package views
 
 import config.AppConfig
-import _root_.helpers.{AppHelpers, JsoupHelpers}
+import _root_.helpers.{JsoupHelpers, MessagesSupport}
 import model.AccessibilityForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -24,7 +24,7 @@ class AccessibilityProblemPageSpec
     extends AnyWordSpec
     with Matchers
     with GuiceOneAppPerSuite
-    with AppHelpers
+    with MessagesSupport
     with JsoupHelpers {
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
@@ -44,7 +44,8 @@ class AccessibilityProblemPageSpec
       "userAction"         -> optional(text)
     )(AccessibilityForm.apply)(AccessibilityForm.unapply)
   )
-  val formValues: AccessibilityForm              = AccessibilityForm(
+
+  val formValues: AccessibilityForm = AccessibilityForm(
     problemDescription = "",
     name = "",
     email = "",
@@ -54,7 +55,8 @@ class AccessibilityProblemPageSpec
     service = None,
     userAction = None
   )
-  val action: Call                               = Call(method = "POST", url = "/contact/the-submit-url")
+
+  val action: Call = Call(method = "POST", url = "/contact/the-submit-url")
 
   "the report an accessibility problem page" should {
     val accessibilityProblemPage = app.injector.instanceOf[AccessibilityProblemPage]

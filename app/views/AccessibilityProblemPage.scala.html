@@ -6,13 +6,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import model.AccessibilityForm
-@import views.html.partials.Layout
-@import views.html.partials.InputText
-@import views.html.partials.InputHidden
-@import views.html.partials.InputCharacterCount
-@import views.html.partials.H1
-@import views.html.partials.H2
-@import views.html.partials.P
+@import views.html.partials.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
 
 @this(
     inputCharacterCount: InputCharacterCount,
@@ -24,9 +18,9 @@
     govukErrorSummary: GovukErrorSummary,
     formWithCSRF: PlayFrontendFormWithCSRF,
     mainLayout: Layout,
-    h1: H1,
-    h2: H2,
-    p: P
+    h1: Heading1,
+    h2: Heading2,
+    p: Paragraph
 )
 @(accessibilityForm: Form[AccessibilityForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 

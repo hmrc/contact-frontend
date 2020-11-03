@@ -3,9 +3,9 @@
  *
  *@
 
-@import views.html.partials.{Layout, H2, P}
+@import views.html.partials.{Layout, Heading2, Paragraph}
 
-@this(govukPanel: GovukPanel, mainLayout: Layout, h2: H2, p: P)
+@this(govukPanel: GovukPanel, mainLayout: Layout, h2: Heading2, p: Paragraph)
 @()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @mainLayout(pageTitle = Messages("accessibility.heading")) {

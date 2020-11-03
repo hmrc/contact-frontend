@@ -9,7 +9,7 @@ import play.api.Application
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.RequestHeader
 
-trait AppHelpers {
+trait MessagesSupport {
   def getMessages(implicit app: Application, request: RequestHeader) = {
     val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
     messagesApi.preferred(request)
