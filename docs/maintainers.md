@@ -7,6 +7,9 @@ See our [architectural decision log](adr/index.md) (ADL) for a list of past deci
 
 ## How to create a new ADR
 
+1. Install [Node](https://nodejs.org/en/download/) if you do not have this already. Node includes
+npm.
+
 1. Install `adr-log` if you do not have this already
 
     ```shell script
