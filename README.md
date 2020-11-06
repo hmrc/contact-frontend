@@ -292,6 +292,9 @@ When making changes in the asset-frontend service, be aware that it may take lon
 
 [[Back to the top]](#top)
 
+## Maintenance documentation
+Maintenance documentation for the owning team, including architectural decision records (ADRs) can be found [here](docs/maintainers.md).
+
 ## Related projects, useful links: <a name="appendix__linx"></a>
 
 * [hmrc-deskpro](https://github.com/hmrc/hmrc-deskpro/) - Backend service responsible for forwarding requests from contact-frontend to Deskpro
