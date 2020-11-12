@@ -86,21 +86,29 @@ form.name=Enw
 problem_report.email=E-bost
 problem_report.email.b=Cyfeiriad e-bost
 
-accessibility.close.window=Gallwch nawr cau''r ffenestr neu''r tab hwn.
-accessibility.confirmation.title=Mae''ch problem wedi ei nodi
-accessibility.describe.the.problem=Disgrifiwch y broblem hygyrchedd rydych wedi dod o hyd iddi
 accessibility.heading=Rhoi gwybod am broblem hygyrchedd
-accessibility.hint.contact=Byddwn ond yn defnyddio hwn i ateb eich neges.
-accessibility.message.contact=Os hoffech gael ymateb i''r broblem rydych yn rhoi gwybod amdani, rhowch eich enw a''ch cyfeiriad e-bost i ni.
 accessibility.message.para1=Dylech dim ond defnyddio''r ffurflen hon i roi gwybod am unrhyw broblemau hygyrchedd rydych wedi dod o hyd iddynt wrth ddefnyddio''r gwasanaeth hwn. Peidiwch â chynnwys gwybodaeth bersonol nac ariannol, er enghraifft eich rhif Yswiriant Gwladol neu fanylion eich cerdyn credyd.
 accessibility.message.para2=Rydym yn adolygu ac yn ceisio mynd i''r afael ag unrhyw broblem hygyrchedd rydym y cael gwybod amdani.
+accessibility.problem.label=Disgrifiwch y broblem hygyrchedd rydych wedi dod o hyd iddi
+accessibility.problem.error.required=Rhowch eich sylwadau
+accessibility.problem.error.length=Ni all y sylwadau fod yn hirach na 2000 o gymeriadau
+
+# FIXME: to remove once play-frontend version is enabled permanently
 accessibility.subheading.contact=Eich manylion cyswllt
-accessibility.subheading.problem=Disgrifiwch y broblem hygyrchedd rydych wedi dod o hyd iddi
-accessibility.thanks.text=Rydym yn adolygu ac yn ceisio mynd i''r afael ag unrhyw broblem hygyrchedd y rhoddir gwybod amdani. Os ydych wedi rhoi''ch manylion cyswllt i ni, rhown wybod i chi am hynt eich gwybodaeth.
-error.common.accessibility.problem.required=Rhowch eich sylwadau.
-error.common.accessibility.problem.toolong=Ni all y sylwadau fod yn hirach na 2000 o gymeriadau
-error.common.accessibility.problem.email_mandatory=Nodwch gyfeiriad e-bost.
-form.report.problem=Anfon
-what.happens.next=Yr hyn sy''n digwydd nesaf
 
+accessibility.name.label=Enw
+accessibility.name.error.required=Rhowch eich enw
+accessibility.name.error.length=Ni all eich enw fod yn hirach na 70 o gymeriadau
+accessibility.email.label=Cyfeiriad e-bost
+accessibility.email.error.required=Nodwch eich cyfeiriad e-bost
+accessibility.email.error.invalid=Nodwch gyfeiriad e-bost yn y fformat cywir, megis enw@enghraifft.com
+accessibility.email.error.length=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
+accessibility.email.hint=Byddwn ond yn defnyddio hwn i ateb eich neges.
+accessibility.button=Anfon
 
+accessibility.confirmation.title=Mae''ch problem wedi ei nodi
+accessibility.confirmation.subheading=Yr hyn sy''n digwydd nesaf
+accessibility.confirmation.paragraph=Rydym yn adolygu ac yn ceisio mynd i''r afael ag unrhyw broblem hygyrchedd y rhoddir gwybod amdani. Os ydych wedi rhoi''ch manylion cyswllt i ni, rhown wybod i chi am hynt eich gwybodaeth.
+
+# FIXME: to remove once play-frontend version is enabled permanently
+accessibility.close.window=Gallwch nawr cau''r ffenestr neu''r tab hwn.

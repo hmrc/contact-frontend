@@ -34,10 +34,10 @@ object ContactHmrcForm {
     mapping(
       "contact-name"     -> text
         .verifying("error.common.problem_report.name_mandatory", name => !name.trim.isEmpty)
-        .verifying("error.common.problem_report.name_too_long", name => name.size <= 70),
+        .verifying("error.common.problem_report.name_length", name => name.size <= 70),
       "contact-email"    -> text
         .verifying("error.common.problem_report.email_valid", validateEmail)
-        .verifying("deskpro.email_too_long", email => email.size <= 255),
+        .verifying("deskpro.email_length", email => email.size <= 255),
       "contact-comments" -> text
         .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)
         .verifying("error.common.comments_too_long", comment => comment.size <= 2000),

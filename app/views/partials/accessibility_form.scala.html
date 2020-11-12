@@ -44,7 +44,7 @@
     <input type="hidden" name="service" id="service" value="@accessibilityForm("service").value"/>
     @input_textarea(
         field = accessibilityForm("problemDescription"),
-        label = Messages("accessibility.subheading.problem"),
+        label = Messages("accessibility.problem.label"),
         labelClass = Some("heading-large"),
         charLimit = Some(2000)
     )
@@ -59,9 +59,9 @@
 
     @input_text(
         accessibilityForm("email"),
-        label =  Messages("form.email.address"),
+        label =  Messages("accessibility.email.label"),
         inputClass = Some("form-control-3-4"),
-        hint = Some(Messages("accessibility.hint.contact")),
+        hint = Some(Messages("accessibility.email.hint")),
         inputType = Some("email")
     )
 
@@ -70,6 +70,6 @@
     <input type="hidden" name="userAction" id="userAction" value="@accessibilityForm("userAction").value">
 
     <div class="form-field">
-        <button class="button" type="submit">@Messages("form.report.problem")</button>
+        <button class="button" type="submit">@Messages("accessibility.button")</button>
     </div>
 </form>

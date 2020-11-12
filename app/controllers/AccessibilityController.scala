@@ -12,7 +12,7 @@ import model.AccessibilityForm
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.{I18nSupport, Lang, Messages}
+import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
@@ -52,14 +52,15 @@ object AccessibilityFormBind {
   def form: Form[AccessibilityForm] = Form[AccessibilityForm](
     mapping(
       "problemDescription" -> text
-        .verifying("error.common.accessibility.problem.toolong", msg => msg.length <= 2000)
-        .verifying("error.common.accessibility.problem.required", msg => !msg.trim.isEmpty),
+        .verifying("accessibility.problem.error.required", msg => !msg.trim.isEmpty)
+        .verifying("accessibility.problem.error.length", msg => msg.length <= 2000),
       "name"               -> text
-        .verifying("error.common.feedback.name_mandatory", name => !name.trim.isEmpty)
-        .verifying("error.common.feedback.name_too_long", name => name.length <= 70),
+        .verifying("accessibility.name.error.required", name => !name.trim.isEmpty)
+        .verifying("accessibility.name.error.length", name => name.length <= 70),
       "email"              -> text
-        .verifying("error.common.accessibility.problem.email_mandatory", validateEmail)
-        .verifying("deskpro.email_too_long", email => email.length <= 255),
+        .verifying("accessibility.email.error.required", name => !name.trim.isEmpty)
+        .verifying("accessibility.email.error.invalid", validateEmail)
+        .verifying("accessibility.email.error.length", email => email.length <= 255),
       "isJavascript"       -> boolean,
       "referrer"           -> text,
       "csrfToken"          -> text,
