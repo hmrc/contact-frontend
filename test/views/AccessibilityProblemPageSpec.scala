@@ -34,9 +34,9 @@ class AccessibilityProblemPageSpec
 
   val accessibilityForm: Form[AccessibilityForm] = Form[AccessibilityForm](
     mapping(
-      "problemDescription" -> text.verifying("error.common.accessibility.problem.required", msg => !msg.isEmpty),
-      "name"               -> text.verifying("error.common.feedback.name_mandatory", msg => !msg.isEmpty),
-      "email"              -> text.verifying("error.common.accessibility.problem.email_mandatory", msg => !msg.isEmpty),
+      "problemDescription" -> text.verifying("accessibility.problem.error.required", msg => !msg.isEmpty),
+      "name"               -> text.verifying("accessibility.name.error.required", msg => !msg.isEmpty),
+      "email"              -> text.verifying("accessibility.email.error.invalid", msg => !msg.isEmpty),
       "isJavascript"       -> boolean,
       "referrer"           -> text,
       "csrfToken"          -> text,
@@ -213,7 +213,7 @@ class AccessibilityProblemPageSpec
       )
       val errors             = contentWithService.select("#problemDescription-error")
       errors            should have size 1
-      errors.first.text should include("Enter details of the accessibility problem.")
+      errors.first.text should include("Enter details of the accessibility problem")
     }
 
     "include the submitted problem input value" in {
@@ -240,10 +240,22 @@ class AccessibilityProblemPageSpec
       content.select("input[name=name]") should have size 1
     }
 
+    "include a name input with spellcheck turned off" in {
+      val inputs = content.select("input[name=name]")
+
+      inputs.first.attr("spellcheck") should be("false")
+    }
+
+    "include a name input with autocomplete" in {
+      val inputs = content.select("input[name=name]")
+
+      inputs.first.attr("autocomplete") should be("name")
+    }
+
     "include a label for the name input" in {
       val label = content.select("label[for=name]")
       label              should have size 1
-      label.first.text shouldBe "Name"
+      label.first.text shouldBe "Your name"
     }
 
     "not initially include an error message for the name input" in {
@@ -260,7 +272,7 @@ class AccessibilityProblemPageSpec
       )
       val errors             = contentWithService.select("#name-error")
       errors            should have size 1
-      errors.first.text should include("Enter your name.")
+      errors.first.text should include("Enter your name")
     }
 
     "include the submitted name input value" in {
@@ -279,16 +291,34 @@ class AccessibilityProblemPageSpec
       content.select("input[name=email]") should have size 1
     }
 
+    "include an email input with spellcheck turned off" in {
+      val inputs = content.select("input[name=email]")
+
+      inputs.first.attr("spellcheck") should be("false")
+    }
+
+    "include a email input with autocomplete" in {
+      val inputs = content.select("input[name=email]")
+
+      inputs.first.attr("autocomplete") should be("email")
+    }
+
+    "include a email input with the correct type" in {
+      val inputs = content.select("input[name=email]")
+
+      inputs.first.attr("type") should be("email")
+    }
+
     "include a label for the email input" in {
       val label = content.select("label[for=email]")
       label              should have size 1
-      label.first.text shouldBe "Email address"
+      label.first.text shouldBe "Your email address"
     }
 
     "include a hint for the email input" in {
       val label = content.select("#email-hint")
       label            should have size 1
-      label.first.text should include("We'll only use this to reply to your message.")
+      label.first.text should include("We will only use this to reply to your message.")
     }
 
     "not initially include an error message for the email input" in {
@@ -305,7 +335,7 @@ class AccessibilityProblemPageSpec
       )
       val errors             = contentWithService.select("#email-error")
       errors            should have size 1
-      errors.first.text should include("Enter an email address.")
+      errors.first.text should include("Enter an email address in the correct format, like name@example.com")
     }
 
     "include the submitted email input value" in {

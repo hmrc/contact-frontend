@@ -41,25 +41,30 @@
         @inputHidden(accessibilityForm("userAction"))
         @inputCharacterCount(
             accessibilityForm("problemDescription"),
-            label = messages("accessibility.describe.the.problem"),
-            labelClasses = "govuk-label--l",
-            maxLength = Some(2000),
-            classes = "govuk-!-width-two-thirds"
+            label = messages("accessibility.problem.label"),
+            labelClasses = "govuk-label--s",
+            maxLength = Some(2000)
         )
-        @h2(content = Text(messages("accessibility.subheading.contact")))
         @inputText(
             accessibilityForm("name"),
-            label = messages("form.name"),
-            classes = "govuk-!-width-two-thirds"
+            label = messages("accessibility.name.label"),
+            labelClasses = "govuk-label--s",
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false),
+            autocomplete = Some("name")
         )
         @inputText(
             accessibilityForm("email"),
-            label = messages("problem_report.email.b"),
-            hint = Some(messages("accessibility.hint.contact")),
-            classes = "govuk-!-width-two-thirds"
+            inputType = "email",
+            label = messages("accessibility.email.label"),
+            labelClasses = "govuk-label--s",
+            hint = Some(messages("accessibility.email.hint")),
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false),
+            autocomplete = Some("email")
         )
         @govukButton(Button(
-            content = Text(messages("form.report.problem")),
+            content = Text(messages("accessibility.button")),
             inputType = Some("submit"),
             preventDoubleClick = true
         ))

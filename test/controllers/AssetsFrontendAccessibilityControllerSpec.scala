@@ -132,12 +132,13 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
 
       val document = Jsoup.parse(contentAsString(result))
       val errors   = document.getElementsByClass("error-message").asScala
-      errors.length should be(3)
+      errors.length should be(4)
 
-      document.title()                                                                                 should be("Error: " + Messages("accessibility.heading"))
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.required")))        shouldBe true
-      errors.exists(_.text().equals(Messages("error.common.feedback.name_mandatory")))               shouldBe true
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
+      document.title()                                                                   should be("Error: " + Messages("accessibility.heading"))
+      errors.exists(_.text().equals(Messages("accessibility.problem.error.required"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.name.error.required")))    shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.email.error.required")))   shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.email.error.invalid")))    shouldBe true
     }
 
     "display error messages when message size exceeds limit" in new AccessibilityControllerApplication(
@@ -163,7 +164,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.toolong"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.problem.error.length"))) shouldBe true
     }
 
     "display error messages when email is invalid" in new AccessibilityControllerApplication(fakeApplication) {
@@ -187,7 +188,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.email.error.invalid"))) shouldBe true
     }
 
     "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
@@ -209,7 +210,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
       val errors = document.getElementsByClass("error-message").asScala
-      errors.exists(_.text().equals(Messages("deskpro.email_too_long"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.email.error.length"))) shouldBe true
     }
 
     "display error messages when name is too long" in new AccessibilityControllerApplication(fakeApplication) {
@@ -231,7 +232,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
       val errors = document.getElementsByClass("error-message").asScala
-      errors.exists(_.text().equals(Messages("error.common.feedback.name_too_long"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.name.error.length"))) shouldBe true
     }
 
     "redirect to thankyou page when completed" in new AccessibilityControllerApplication(fakeApplication) {
@@ -292,11 +293,12 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
       val errors = document.getElementsByClass("error-message").asScala
-      errors.length should be(3)
+      errors.length should be(4)
 
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.required")))        shouldBe true
-      errors.exists(_.text().equals(Messages("error.common.feedback.name_mandatory")))               shouldBe true
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.problem.error.required"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.name.error.required")))    shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.email.error.required")))   shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.email.error.invalid")))    shouldBe true
     }
 
     "display error messages when message size exceeds limit" in new AccessibilityControllerApplication(
@@ -322,7 +324,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.toolong"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.problem.error.length"))) shouldBe true
     }
 
     "display error messages when email is invalid" in new AccessibilityControllerApplication(fakeApplication) {
@@ -346,7 +348,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       val errors = document.getElementsByClass("error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().equals(Messages("error.common.accessibility.problem.email_mandatory"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.email.error.invalid"))) shouldBe true
     }
 
     "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
@@ -368,7 +370,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
       val errors = document.getElementsByClass("error-message").asScala
-      errors.exists(_.text().equals(Messages("deskpro.email_too_long"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.email.error.length"))) shouldBe true
     }
 
     "display error messages when name is too long" in new AccessibilityControllerApplication(fakeApplication) {
@@ -390,7 +392,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
       val errors = document.getElementsByClass("error-message").asScala
-      errors.exists(_.text().equals(Messages("error.common.feedback.name_too_long"))) shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.name.error.length"))) shouldBe true
     }
 
     "redirect to thankyou page when completed" in new AccessibilityControllerApplication(fakeApplication) {

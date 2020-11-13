@@ -7,20 +7,25 @@
 
 @(
     field: Field,
+    inputType: String = "text",
     label: String,
     labelClasses: String = "",
     hint: Option[String] = None,
-    classes: String = ""
+    classes: String = "",
+    spellcheck: Option[Boolean] = None,
+    autocomplete: Option[String] = None
 )(implicit messages: Messages)
 @govukInput(Input(
     id = field.id,
     name = field.name,
-    inputType = "text",
+    inputType = inputType,
     label = Label(classes = labelClasses, content = Text(label)),
     hint = hint.map(h => Hint(content = Text(h))),
     value = field.value,
     errorMessage = field.error.map(formError =>
         ErrorMessage(content = Text(messages(formError.message, formError.args: _*)))
     ),
-    classes = classes
+    classes = classes,
+    spellcheck = spellcheck,
+    autocomplete = autocomplete
 ))
