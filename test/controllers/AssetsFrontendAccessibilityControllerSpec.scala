@@ -137,6 +137,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       document.title()                                                                   should be("Error: " + Messages("accessibility.heading"))
       errors.exists(_.text().equals(Messages("accessibility.problem.error.required"))) shouldBe true
       errors.exists(_.text().equals(Messages("accessibility.name.error.required")))    shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.email.error.required")))   shouldBe true
       errors.exists(_.text().equals(Messages("accessibility.email.error.invalid")))    shouldBe true
     }
 
@@ -296,6 +297,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
 
       errors.exists(_.text().equals(Messages("accessibility.problem.error.required"))) shouldBe true
       errors.exists(_.text().equals(Messages("accessibility.name.error.required")))    shouldBe true
+      errors.exists(_.text().equals(Messages("accessibility.email.error.required")))   shouldBe true
       errors.exists(_.text().equals(Messages("accessibility.email.error.invalid")))    shouldBe true
     }
 
