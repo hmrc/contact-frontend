@@ -15,6 +15,7 @@ import org.mockito.Matchers.any
 import org.mockito.Matchers.{eq => mockitoEq}
 import org.mockito.Mockito
 import org.mockito.Mockito.when
+import org.mockito.verification.VerificationWithTimeout
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -49,6 +50,9 @@ class ContactHmrcControllerSpec
 
   implicit val actorSystem: ActorSystem        = ActorSystem()
   implicit val materializer: ActorMaterializer = ActorMaterializer()
+
+  val hmrcDeskproConnectorTimeout: VerificationWithTimeout =
+    Mockito.timeout(5000)
 
   "ContactHmrcController" should {
 
@@ -129,7 +133,7 @@ class ContactHmrcControllerSpec
 
       Then("the message is sent to the Deskpro connector")
       Mockito
-        .verify(hmrcDeskproConnector)
+        .verify(hmrcDeskproConnector, hmrcDeskproConnectorTimeout)
         .createDeskProTicket(
           any[String],
           any[String],
@@ -169,7 +173,7 @@ class ContactHmrcControllerSpec
 
       Then("the message is sent to the Deskpro connector")
       Mockito
-        .verify(hmrcDeskproConnector)
+        .verify(hmrcDeskproConnector, hmrcDeskproConnectorTimeout)
         .createDeskProTicket(
           any[String],
           any[String],
@@ -209,7 +213,7 @@ class ContactHmrcControllerSpec
 
       Then("the message is sent to the Deskpro connector")
       Mockito
-        .verify(hmrcDeskproConnector)
+        .verify(hmrcDeskproConnector, hmrcDeskproConnectorTimeout)
         .createDeskProTicket(
           any[String],
           any[String],
@@ -293,7 +297,7 @@ class ContactHmrcControllerSpec
 
       Then("ticket is sent to deskpro")
       Mockito
-        .verify(hmrcDeskproConnector)
+        .verify(hmrcDeskproConnector, hmrcDeskproConnectorTimeout)
         .createDeskProTicket(
           any[String],
           any[String],
@@ -391,7 +395,7 @@ class ContactHmrcControllerSpec
 
       Then("ticket is sent to deskpro")
       Mockito
-        .verify(hmrcDeskproConnector, Mockito.timeout(5000))
+        .verify(hmrcDeskproConnector, hmrcDeskproConnectorTimeout)
         .createDeskProTicket(
           any[String],
           any[String],
