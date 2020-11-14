@@ -27,8 +27,7 @@ import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPag
 import scala.concurrent.{ExecutionContext, Future}
 
 object AccessibilityFormBind {
-  private val emailValidator                   = DeskproEmailValidator()
-  private val validateEmail: String => Boolean = emailValidator.validate
+  private val emailValidator = DeskproEmailValidator()
 
   def emptyForm(
     csrfToken: String,
@@ -52,15 +51,20 @@ object AccessibilityFormBind {
   def form: Form[AccessibilityForm] = Form[AccessibilityForm](
     mapping(
       "problemDescription" -> text
-        .verifying("accessibility.problem.error.required", msg => !msg.trim.isEmpty)
+        .verifying("accessibility.problem.error.required", msg => msg.trim.nonEmpty)
         .verifying("accessibility.problem.error.length", msg => msg.length <= 2000),
       "name"               -> text
-        .verifying("accessibility.name.error.required", name => !name.trim.isEmpty)
+        .verifying("accessibility.name.error.required", name => name.trim.nonEmpty)
         .verifying("accessibility.name.error.length", name => name.length <= 70),
       "email"              -> text
-        .verifying("accessibility.email.error.required", name => !name.trim.isEmpty)
-        .verifying("accessibility.email.error.invalid", validateEmail)
-        .verifying("accessibility.email.error.length", email => email.length <= 255),
+        .verifying("accessibility.email.error.required", name => name.trim.nonEmpty)
+        // the logic below ensures that two or more errors will not fire at the same time. This prevents
+        // multiple error messages appearing in the error summary for the same field
+        .verifying("accessibility.email.error.invalid", email => email.trim.isEmpty || emailValidator.validate(email))
+        .verifying(
+          "accessibility.email.error.length",
+          email => !(email.trim.isEmpty || emailValidator.validate(email)) || email.length <= 255
+        ),
       "isJavascript"       -> boolean,
       "referrer"           -> text,
       "csrfToken"          -> text,
