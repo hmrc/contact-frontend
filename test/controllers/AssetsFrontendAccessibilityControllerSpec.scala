@@ -40,6 +40,10 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
 
   implicit val message: Messages = fakeApplication.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
+  // RFC 5321: https://tools.ietf.org/html/rfc5321
+  // Maximum domain name length: https://www.nic.ad.jp/timeline/en/20th/appendix1.html#:~:text=Each%20element%20of%20a%20domain,a%20maximum%20of%20253%20characters.
+  val tooLongEmail = ("x" * 64) + "@" + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 57) + ".com"
+
   "Accessibility form endpoint" should {
 
     "redirect to unauthenticated page when user isnt logged in" in new AccessibilityControllerApplication(
@@ -132,13 +136,12 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
 
       val document = Jsoup.parse(contentAsString(result))
       val errors   = document.getElementsByClass("error-message").asScala
-      errors.length should be(4)
+      errors.length should be(3)
 
       document.title()                                                                   should be("Error: " + Messages("accessibility.heading"))
       errors.exists(_.text().equals(Messages("accessibility.problem.error.required"))) shouldBe true
       errors.exists(_.text().equals(Messages("accessibility.name.error.required")))    shouldBe true
       errors.exists(_.text().equals(Messages("accessibility.email.error.required")))   shouldBe true
-      errors.exists(_.text().equals(Messages("accessibility.email.error.invalid")))    shouldBe true
     }
 
     "display error messages when message size exceeds limit" in new AccessibilityControllerApplication(
@@ -192,8 +195,6 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
     }
 
     "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
-      val tooLongEmail = ("x" * 256) + "@email.com"
-
       val request = generateRequest(
         desc = "valid form message",
         formName = "firstname",
@@ -293,12 +294,11 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.heading"))
       val errors = document.getElementsByClass("error-message").asScala
-      errors.length should be(4)
+      errors.length should be(3)
 
       errors.exists(_.text().equals(Messages("accessibility.problem.error.required"))) shouldBe true
       errors.exists(_.text().equals(Messages("accessibility.name.error.required")))    shouldBe true
       errors.exists(_.text().equals(Messages("accessibility.email.error.required")))   shouldBe true
-      errors.exists(_.text().equals(Messages("accessibility.email.error.invalid")))    shouldBe true
     }
 
     "display error messages when message size exceeds limit" in new AccessibilityControllerApplication(
@@ -352,8 +352,6 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
     }
 
     "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
-      val tooLongEmail = ("x" * 256) + "@email.com"
-
       val request = generateRequest(
         desc = "valid form message",
         formName = "firstname",

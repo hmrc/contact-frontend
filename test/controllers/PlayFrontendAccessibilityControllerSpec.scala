@@ -40,6 +40,10 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
 
   implicit val message: Messages = fakeApplication.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
+  // RFC 5321: https://tools.ietf.org/html/rfc5321
+  // Maximum domain name length: https://www.nic.ad.jp/timeline/en/20th/appendix1.html#:~:text=Each%20element%20of%20a%20domain,a%20maximum%20of%20253%20characters.
+  val tooLongEmail = ("x" * 64) + "@" + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 57) + ".com"
+
   "Accessibility form endpoint" should {
 
     "redirect to unauthenticated page when user isnt logged in" in new AccessibilityControllerApplication(
@@ -190,6 +194,26 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.email.error.invalid"))) shouldBe true
     }
 
+    "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
+      val request = generateRequest(
+        desc = "valid form message",
+        formName = "firstname",
+        email = tooLongEmail,
+        isJavascript = false,
+        referrer = "/somepage"
+      )
+      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+
+      status(result) should be(400)
+
+      import collection.JavaConverters._
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.title() should be("Error: " + Messages("accessibility.heading"))
+      val errors = document.select(".govuk-error-message").asScala
+      errors.exists(_.text().contains(Messages("accessibility.email.error.length"))) shouldBe true
+    }
+
     "display error messages when name is too long" in new AccessibilityControllerApplication(fakeApplication) {
       val longName = "x" * 256
 
@@ -325,6 +349,26 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.length should be(1)
 
       errors.exists(_.text().contains(Messages("accessibility.email.error.invalid"))) shouldBe true
+    }
+
+    "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
+      val request = generateRequest(
+        desc = "valid form message",
+        formName = "firstname",
+        email = tooLongEmail,
+        isJavascript = false,
+        referrer = "/somepage"
+      )
+      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+
+      status(result) should be(400)
+
+      import collection.JavaConverters._
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.title() should be("Error: " + Messages("accessibility.heading"))
+      val errors = document.select(".govuk-error-message").asScala
+      errors.exists(_.text().contains(Messages("accessibility.email.error.length"))) shouldBe true
     }
 
     "display error messages when name is too long" in new AccessibilityControllerApplication(fakeApplication) {
