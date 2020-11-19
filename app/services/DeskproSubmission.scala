@@ -83,7 +83,7 @@ trait DeskproSubmission {
       request = request,
       enrolmentsOption = enrolmentsOption,
       service = problemReport.service,
-      abFeatures = problemReport.abFeatures,
+      abFeatures = None,
       userAction = problemReport.userAction
     )
   }

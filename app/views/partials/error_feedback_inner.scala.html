@@ -17,9 +17,6 @@
 
 @(problemReportForm : Form[model.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
-@improvedNameFieldValidation = @{appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)}
-@clientSideValidation = @{ !appConfig.hasFeature(GetHelpWithThisPageOnlyServerSideValidation, service) }
-
 <h2>@messages("common.feedback.title")</h2>
 <p>@messages("common.feedback.only_use_form")</p>
 <p>@messages("common.feedback.information.warning")</p>
@@ -41,26 +38,7 @@
             _divClass = Some("form-field"),
             _inputClass = Some("input--medium"),
             _id = Some("report-name-new"),
-            _maxlength = Some(70),
-            _dataProperties = Map(
-                "data-rule-pattern"-> {
-                    if (improvedNameFieldValidation) {
-                        controllers.ProblemReportForm.REPORT_NAME_REGEX
-                    } else {
-                        controllers.ProblemReportForm.OLD_REPORT_NAME_REGEX
-                    }
-                },
-                "data-msg-pattern" -> {
-                    if (improvedNameFieldValidation) {
-                        messages("error.common.problem_report.name_valid.b")
-                    } else {
-                        messages("error.common.problem_report.name_valid")
-                    }
-                },
-                "data-rule-required" -> "true",
-                "data-msg-required" -> messages("error.common.problem_report.name_mandatory.b")
-            ),
-            _clientSideValidation = clientSideValidation
+            _maxlength = Some(70)
             )
 
             @error_feedback_input(
@@ -69,14 +47,7 @@
             _divClass = Some("form-field"),
             _inputClass = Some("input--medium"),
             _id = Some("report-email-new"),
-            _maxlength = Some(255),
-            _dataProperties = Map(
-                "data-rule-email" -> "true",
-                "data-msg-email" -> messages("error.common.problem_report.email_valid"),
-                "data-rule-required" -> "true",
-                "data-msg-required" -> messages("error.common.problem_report.email_mandatory.b")
-            ),
-            _clientSideValidation = clientSideValidation
+            _maxlength = Some(255)
             )
 
             @error_feedback_textarea(
@@ -87,17 +58,13 @@
             _id = Some("report-action-new"),
             _rows = Some(5),
             _maxlength = Some(255),
-            _dataProperties = Map(
-                "data-rule-required" -> "true",
-                "data-msg-required" -> messages("error.common.problem_report.action_mandatory.b")
-            ),
+
             _hint = if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints, service)) {
                 Some(messages("problem_report.action.hint.b"))
             } else {
                 None
             },
-            _bottomHint = Some(messages("problem_report.common.size_limit", 1000)),
-            _clientSideValidation = clientSideValidation
+            _bottomHint = Some(messages("problem_report.common.size_limit", 1000))
             )
 
             @error_feedback_textarea(
@@ -108,24 +75,14 @@
             _id = Some("report-error-new"),
             _rows = Some(5),
             _maxlength = Some(255),
-            _dataProperties = Map(
-                "data-rule-required" -> "true",
-                "data-msg-required" -> messages("error.common.problem_report.error_mandatory.b")
-            ),
-            _hint = if(appConfig.hasFeature(GetHelpWithThisPageFeatureFieldHints, service)) {
-                Some(messages("problem_report.error.hint.b"))
-            } else {
-                None
-            },
-            _bottomHint = Some(messages("problem_report.common.size_limit", 1000)),
-            _clientSideValidation = clientSideValidation
+            _hint = None,
+            _bottomHint = Some(messages("problem_report.common.size_limit", 1000))
             )
 
             <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
             @if(referrer.isDefined) {
             <input type="hidden" name="referrer" id="referrer" value="@referrer">
             }
-            <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
 
             <div class="form-field">
                 <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@messages("form.send")</button>
@@ -142,26 +99,7 @@
             _divClass = Some("form-group-compound"),
             _inputClass = Some("input--fullwidth form-control"),
             _id = Some("report-name"),
-            _maxlength = Some(70),
-            _dataProperties = Map(
-                "data-rule-pattern" -> {
-                    if(improvedNameFieldValidation) {
-                        controllers.ProblemReportForm.REPORT_NAME_REGEX
-                    } else {
-                        controllers.ProblemReportForm.OLD_REPORT_NAME_REGEX
-                    }
-                },
-                "data-msg-pattern" -> {
-                    if (improvedNameFieldValidation) {
-                        messages("error.common.problem_report.name_valid.b")
-                    } else {
-                        messages("error.common.problem_report.name_valid")
-                    }
-                },
-                "data-rule-required" -> "true",
-                "data-msg-required" -> messages("error.common.problem_report.name_mandatory")
-            ),
-            _clientSideValidation = clientSideValidation
+            _maxlength = Some(70)
             )
 
             @error_feedback_input(
@@ -170,14 +108,7 @@
             _divClass = Some("form-group-compound"),
             _inputClass = Some("input--fullwidth form-control"),
             _id = Some("report-email"),
-            _maxlength = Some(255),
-            _dataProperties = Map(
-                "data-rule-email" -> "true",
-                "data-msg-email" -> messages("error.common.problem_report.email_valid"),
-                "data-rule-required" -> "true",
-                "data-msg-required" -> messages("error.common.problem_report.email_mandatory")
-            ),
-            _clientSideValidation = clientSideValidation
+            _maxlength = Some(255)
             )
 
             @error_feedback_input(
@@ -187,11 +118,6 @@
             _inputClass = Some("input--fullwidth form-control"),
             _id = Some("report-action"),
             _maxlength = Some(1000),
-            _dataProperties = Map(
-                "data-rule-required" -> "true",
-                "data-msg-required" -> messages("error.common.problem_report.action_mandatory")
-            ),
-            _clientSideValidation = clientSideValidation
             )
 
             @error_feedback_input(
@@ -200,19 +126,13 @@
             _divClass = Some("form-group-compound"),
             _inputClass = Some("input--cleared form-control"),
             _id = Some("report-error"),
-            _maxlength = Some(1000),
-            _dataProperties = Map(
-                "data-rule-required" -> "true",
-                "data-msg-required" -> messages("error.common.problem_report.error_mandatory")
-            ),
-            _clientSideValidation = clientSideValidation
+            _maxlength = Some(1000)
             )
 
             <input type="hidden" name="isJavascript" id="isJavascript" value="@problemReportForm.data.get("isJavascript")">
             @if(referrer.isDefined) {
                 <input type="hidden" name="referrer" id="referrer" value="@referrer">
             }
-            <input type="hidden" name="abFeatures" value="@{appConfig.getFeatures(service).map(_.name).mkString(";")}"/>
 
             <div class="form-field">
                 <button id="report-submit" class="button" type="submit" data-journey-click="page:Click:Get help with this page Submit">@messages("form.send")</button>
