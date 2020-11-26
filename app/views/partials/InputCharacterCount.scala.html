@@ -17,6 +17,7 @@
     name = field.id,
     id = field.id,
     label = Label(classes = labelClasses, content = Text(label)),
+    hint = hint.map(h => Hint(content = Text(h))),
     value = field.value,
     maxLength = maxLength,
     classes = classes,

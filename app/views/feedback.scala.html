@@ -15,7 +15,7 @@
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@mainContent(title = Messages("common.feedback.heading"), userLoggedIn = loggedIn) {
+@mainContent(title = Messages("feedback.heading"), userLoggedIn = loggedIn) {
 
     @if(loggedIn) {
         @feedbackPartialForm(feedbackForm, routes.FeedbackController.submit.url, service, backUrl, canOmitComments)

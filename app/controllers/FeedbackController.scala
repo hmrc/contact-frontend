@@ -23,8 +23,10 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions,
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
 import views.html.partials.{feedback_form, feedback_form_confirmation}
-import views.html.{feedback, feedback_confirmation}
+import views.html.{FeedbackConfirmationPage, FeedbackPage, feedback, feedback_confirmation}
 import play.api.http.HeaderNames._
+import play.twirl.api.Html
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton class FeedbackController @Inject() (
@@ -33,10 +35,12 @@ import scala.concurrent.{ExecutionContext, Future}
   val accessibleUrlValidator: BackUrlValidator,
   val configuration: Configuration,
   mcc: MessagesControllerComponents,
-  feedbackPage: feedback,
-  feedbackConfirmationPage: feedback_confirmation,
+  assetsFrontendFeedbackPage: feedback,
+  assetsFrontendFeedbackConfirmationPage: feedback_confirmation,
+  playFrontendFeedbackConfirmationPage: FeedbackConfirmationPage,
   feedbackFormPartial: feedback_form,
-  feedbackFormConfirmationPartial: feedback_form_confirmation
+  feedbackFormConfirmationPartial: feedback_form_confirmation,
+  playFrontendFeedbackPage: FeedbackPage
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
@@ -203,6 +207,39 @@ import scala.concurrent.{ExecutionContext, Future}
     Ok(feedbackFormConfirmationPartial(ticketId, None))
   }
 
+  private def feedbackConfirmationPage(ticketId: String, loggedIn: Boolean, backUrl: Option[String])(implicit
+    request: Request[_],
+    lang: Lang
+  ) =
+    if (appConfig.enablePlayFrontendFeedbackForm) {
+      playFrontendFeedbackConfirmationPage(
+        backUrl = backUrl
+      )
+    } else {
+      assetsFrontendFeedbackConfirmationPage(ticketId, loggedIn, backUrl)
+    }
+
+  private def feedbackPage(
+    form: Form[FeedbackForm],
+    loggedIn: Boolean,
+    service: Option[String] = None,
+    backUrl: Option[String] = None,
+    canOmitComments: Boolean
+  )(implicit
+    request: Request[_],
+    lang: Lang
+  ): Html = {
+    val action =
+      if (loggedIn) routes.FeedbackController.submit else routes.FeedbackController.submitUnauthenticated
+    if (appConfig.enablePlayFrontendFeedbackForm) {
+      playFrontendFeedbackPage(
+        form,
+        action
+      )
+    } else {
+      assetsFrontendFeedbackPage(form, loggedIn, service, backUrl, canOmitComments = canOmitComments)
+    }
+  }
 }
 
 object FeedbackFormBind {
@@ -228,16 +265,16 @@ object FeedbackFormBind {
     Form[FeedbackForm](
       mapping(
         "feedback-rating"   -> optional(text)
-          .verifying("error.common.feedback.rating_mandatory", rating => rating.isDefined && !rating.get.trim.isEmpty)
+          .verifying("feedback.rating.error.required", rating => rating.isDefined && !rating.get.trim.isEmpty)
           .verifying(
-            "error.common.feedback.rating_valid",
+            "feedback.rating.error.invalid",
             rating => rating.map(validExperiences.contains(_)).getOrElse(true)
           ),
         "feedback-name"     -> text
-          .verifying("error.common.feedback.name_mandatory", name => !name.trim.isEmpty)
-          .verifying("error.common.feedback.name_too_long", name => name.size <= 70),
+          .verifying("feedback.name.error.required", name => !name.trim.isEmpty)
+          .verifying("feedback.name.error.length", name => name.size <= 70),
         "feedback-email"    -> text
-          .verifying("error.common.problem_report.email_valid", validateEmail)
+          .verifying("feedback.email.error.invalid", validateEmail)
           .verifying("deskpro.email_too_long", email => email.size <= 255),
         "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
 
@@ -245,7 +282,7 @@ object FeedbackFormBind {
             val commentsCanBeOmitted = data.get("canOmitComments").contains("true")
             data.get(key) match {
               case Some(value) if !value.trim.isEmpty || commentsCanBeOmitted => Right(value.trim)
-              case Some(_)                                                    => Left(Seq(FormError(key, "error.common.comments_mandatory", Nil)))
+              case Some(_)                                                    => Left(Seq(FormError(key, "feedback.comments.error.required", Nil)))
               case None                                                       => Left(Seq(FormError(key, "error.required", Nil)))
             }
           }

@@ -25,6 +25,7 @@ trait AppConfig {
   def fallbackURLForLanguageSwitcher: String
   def enableLanguageSwitching: Boolean
   def enablePlayFrontendAccessibilityForm: Boolean
+  def enablePlayFrontendFeedbackForm: Boolean
   def enablePlayFrontendProblemReportNonjsForm: Boolean
   def captchaEnabled: Boolean
   def captchaMinScore: BigDecimal
@@ -89,6 +90,11 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
   override def enablePlayFrontendAccessibilityForm =
     configuration
       .getOptional[Boolean]("enablePlayFrontendAccessibilityForm")
+      .getOrElse(false)
+
+  override def enablePlayFrontendFeedbackForm =
+    configuration
+      .getOptional[Boolean]("enablePlayFrontendFeedbackForm")
       .getOrElse(false)
 
   override def enablePlayFrontendProblemReportNonjsForm: Boolean =
