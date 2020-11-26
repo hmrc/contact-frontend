@@ -207,15 +207,17 @@ class ProblemReportsControllerApplication(app: Application) extends MockitoSugar
       Future.successful(Json.parse("{ \"allEnrolments\" : []}").as[A](retrieval.reads))
   }
 
-  val problemReportPage             = app.injector.instanceOf[views.html.problem_reports_nonjavascript]
-  val problemReportErrorPage        = app.injector.instanceOf[views.html.problem_reports_error_nonjavascript]
-  val problemReportConfirmationPage = app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript]
-  val playFrontendProblemReportPage = app.injector.instanceOf[views.html.ProblemReportsNonjsPage]
-  val playFrontendConfirmationPage  = app.injector.instanceOf[views.html.ProblemReportsNonjsConfirmationPage]
-  val playFrontendErrorFeedbackPage = app.injector.instanceOf[views.html.ProblemReportsNonjsErrorPage]
-  val errorFeedbackForm             = app.injector.instanceOf[views.html.partials.error_feedback]
-  val errorFeedbackFormInner        = app.injector.instanceOf[views.html.partials.error_feedback_inner]
-  val ticketCreatedBody             = app.injector.instanceOf[views.html.ticket_created_body]
+  val problemReportPage              = app.injector.instanceOf[views.html.problem_reports_nonjavascript]
+  val problemReportErrorPage         = app.injector.instanceOf[views.html.problem_reports_error_nonjavascript]
+  val problemReportConfirmationPage  = app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript]
+  val problemReportConfirmationPageB = app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript_b]
+  val playFrontendProblemReportPage  = app.injector.instanceOf[views.html.ProblemReportsNonjsPage]
+  val playFrontendConfirmationPage   = app.injector.instanceOf[views.html.ProblemReportsNonjsConfirmationPage]
+  val playFrontendErrorFeedbackPage  = app.injector.instanceOf[views.html.ProblemReportsNonjsErrorPage]
+  val errorFeedbackForm              = app.injector.instanceOf[views.html.partials.error_feedback]
+  val errorFeedbackFormInner         = app.injector.instanceOf[views.html.partials.error_feedback_inner]
+  val ticketCreatedBody              = app.injector.instanceOf[views.html.ticket_created_body]
+  val ticketCreatedBody_B            = app.injector.instanceOf[views.html.ticket_created_body_b]
 
   val controller = new ProblemReportsController(
     mock[HmrcDeskproConnector],
@@ -227,9 +229,11 @@ class ProblemReportsControllerApplication(app: Application) extends MockitoSugar
     playFrontendErrorFeedbackPage,
     problemReportConfirmationPage,
     playFrontendConfirmationPage,
+    problemReportConfirmationPageB,
     errorFeedbackForm,
     errorFeedbackFormInner,
-    ticketCreatedBody
+    ticketCreatedBody,
+    ticketCreatedBody_B
   )(new CFConfig(app.configuration), ExecutionContext.Implicits.global)
 
   val deskproName: String           = "John Densmore"

@@ -57,12 +57,17 @@ problem_report.error.error.length=Ni all y sylwadau fod yn hirach na 2000 o gyme
 problem_report.button=Anfon
 
 problem_report.action=Beth oeddech yn ei wneud?
+problem_report.action.b=Beth oeddech yn ceisio''i wneud?
+problem_report.action.hint.b=Er enghraifft, mewngofnodi, argraffu rhywbeth, dod o hyd i wybodaeth, deall neu ddefnyddio''r gwasanaeth.
 problem_report.error=Gyda beth ydych angen help?
+problem_report.error.b=Pa broblem ydych eisiau rhoi gwybod i ni amdani?
+problem_report.error.hint.b=Os cawsoch neges yn dweud bod rhywbeth o''i le, rhowch wybod i ni beth mae''n ei ddweud.
 problem_report.common.size_limit=Gallwch nodi hyd at {0} o gymeriadau
 common.problem_report.error_nojavascript_title=Cafwyd problem wrth anfon eich ymholiad
 deskpro.email_too_long=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
 contact.heading=Cymorth a chysylltiadau
 contact.confirmation.message=Bydd rhywun yn cysylltu â chi cyn pen 2 ddiwrnod gwaith.
+contact.confirmation.message.b=Byddwn yn ateb neu''n rhoi gwybod i chi sut y byddwn yn delio â''ch neges cyn pen 2 ddiwrnod gwaith.
 survey.title=Arolwg
 survey.confirmation.title=Diolch, mae eich adborth wedi dod i law.
 survey.was.answer.helpful.question=Pa mor fodlon ydych gyda''r ateb a gawsoch gennym?
@@ -98,6 +103,7 @@ form.online.services.very_bad=Gwael iawn
 form.comments=Sylwadau
 form.name=Enw
 problem_report.email=E-bost
+problem_report.email.b=Cyfeiriad e-bost
 
 accessibility.heading=Rhoi gwybod am broblem hygyrchedd
 accessibility.message.para1=Dylech dim ond defnyddio''r ffurflen hon i roi gwybod am unrhyw broblemau hygyrchedd rydych wedi dod o hyd iddynt wrth ddefnyddio''r gwasanaeth hwn. Peidiwch â chynnwys gwybodaeth bersonol nac ariannol, er enghraifft eich rhif Yswiriant Gwladol neu fanylion eich cerdyn credyd.

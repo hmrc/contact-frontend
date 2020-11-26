@@ -9,9 +9,11 @@ _label : Option[String] = None,
 _maxlength : Option[Int] = None,
 _divClass : Option[String] = None,
 _inputClass : Option[String] = None,
+_dataProperties: Map[String, String] = Map.empty,
 _hint : Option[String] = None,
 _bottomHint: Option[String] = None,
-_rows: Option[Int] = None)(implicit lang : Lang, messages : Messages)
+_rows: Option[Int] = None,
+_clientSideValidation: Boolean = false)(implicit lang : Lang, messages : Messages)
 
 @id = @{ _id.getOrElse(field.name) }
 <div class="@for(divClass <- _divClass){ @divClass } @if(field.hasErrors){form-field--error}">

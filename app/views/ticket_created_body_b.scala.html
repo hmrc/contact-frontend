@@ -1,0 +1,13 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@this()
+
+@(ticketId: String, thankYouMessage: Option[String])(implicit lang : Lang, messages : Messages, appConfig: config.AppConfig)
+
+<h2 id="feedback-thank-you-header">@Messages("common.acknowledgment")</h2>
+
+<input id="ticketId" type="hidden" value="@ticketId"/>
+<p>@Html(Messages(thankYouMessage.getOrElse("contact.confirmation.message.b")))</p>
