@@ -115,7 +115,7 @@ class ProblemReportsNonjsPageSpec
       val welshContent                = problemReportsNonjsPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
-      paragraphs.first.text should include("efnyddio'r ffurflen hon i roi gwybod am broblemau technegol yn unig.")
+      paragraphs.first.text should include("Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.")
     }
 
     "include the correct form tag" in {

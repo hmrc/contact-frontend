@@ -37,6 +37,13 @@ language-switcher.welsh=Cymraeg
 language-switcher.welsh.hover=Defnyddio''r cyfrif hwn yn Cymraeg
 button.back=Yn ôl
 
+problem_report.title=Cael help gyda phroblem dechnegol
+problem_report.paragraph.1=Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.
+problem_report.paragraph.2=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
+problem_report.name.label=Enw
+problem_report.email.label=E-bost
+problem_report.action.label=Beth oeddech yn ei wneud?
+problem_report.error.label=Gyda beth ydych angen help?
 problem_report.name.error.required=Rhowch eich enw
 problem_report.name.error.length=Ni all eich enw fod yn hirach na 70 o gymeriadau
 problem_report.name.error.valid=Rhowch lythrennau neu atalnodi’n unig
@@ -47,6 +54,7 @@ problem_report.action.error.required=Rhowch fanylion yr hyn yr oeddech yn ei wne
 problem_report.action.error.length=Ni all y sylwadau fod yn hirach na 2000 o gymeriadau
 problem_report.error.error.required=Rhowch fanylion yr hyn a aeth o’i le
 problem_report.error.error.length=Ni all y sylwadau fod yn hirach na 2000 o gymeriadau
+problem_report.button=Anfon
 
 problem_report.action=Beth oeddech yn ei wneud?
 problem_report.error=Gyda beth ydych angen help?

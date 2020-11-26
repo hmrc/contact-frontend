@@ -37,6 +37,13 @@ language-switcher.welsh=Cymraeg
 language-switcher.welsh.hover=Defnyddio''r cyfrif hwn yn Cymraeg
 button.back=Back
 
+problem_report.title=Get help with a technical problem
+problem_report.paragraph.1=Only use this form to report technical problems.
+problem_report.paragraph.2=Don’t include any personal or financial information. For example, your National Insurance or credit card numbers.
+problem_report.name.label=Name
+problem_report.email.label=Email
+problem_report.action.label=What were you doing?
+problem_report.error.label=What do you need help with?
 problem_report.name.error.required=Please provide your name.
 problem_report.name.error.length=Your name can’t be longer than 70 characters
 problem_report.name.error.valid=Letters or punctuation only please
@@ -47,6 +54,7 @@ problem_report.action.error.required=Please enter details of what you were doing
 problem_report.action.error.length=The comment cannot be longer than 1000 characters
 problem_report.error.error.required=Please enter details of what went wrong.
 problem_report.error.error.length=The comment cannot be longer than 1000 characters
+problem_report.button=Send
 
 problem_report.action=What were you doing?
 problem_report.error=What do you need help with?
