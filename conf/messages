@@ -31,25 +31,38 @@ error.common.comments_mandatory=Enter your comments.
 error.common.comments_too_long=The comment cannot be longer than 2000 characters
 error.summary.title=There is a problem
 
-
 language-switcher.english=English
 language-switcher.english.hover=Use this account in English
 language-switcher.welsh=Cymraeg
 language-switcher.welsh.hover=Defnyddio''r cyfrif hwn yn Cymraeg
 button.back=Back
 
+problem_report.title=Get help with a technical problem
+problem_report.paragraph.1=Only use this form to report technical problems.
+problem_report.paragraph.2=Don’t include any personal or financial information. For example, your National Insurance or credit card numbers.
+problem_report.name.label=Name
+problem_report.email.label=Email
+problem_report.action.label=What were you doing?
+problem_report.error.label=What do you need help with?
+problem_report.name.error.required=Please provide your name.
+problem_report.name.error.length=Your name can’t be longer than 70 characters
+problem_report.name.error.valid=Letters or punctuation only please
+problem_report.email.error.required=Please provide your email address.
+problem_report.email.error.valid=Please enter a valid email address.
+problem_report.email.error.length=Your email can’t be longer than 255 characters
+problem_report.action.error.required=Please enter details of what you were doing.
+problem_report.action.error.length=The comment cannot be longer than 1000 characters
+problem_report.error.error.required=Please enter details of what went wrong.
+problem_report.error.error.length=The comment cannot be longer than 1000 characters
+problem_report.button=Send
+
 problem_report.action=What were you doing?
-problem_report.action.b=What were you trying to do?
-problem_report.action.hint.b=For example, sign in, print something, find information, understand or use the service.
 problem_report.error=What do you need help with?
-problem_report.error.b=What problem do you want to tell us about?
-problem_report.error.hint.b=If you got a message telling you something was wrong, tell us what it says.
 problem_report.common.size_limit=You can enter up to {0} characters
 common.problem_report.error_nojavascript_title=There was a problem sending your query
 deskpro.email_too_long=Your email can''t be longer than 255 characters
 contact.heading=Help and contact
 contact.confirmation.message=Someone will get back to you within 2 working days.
-contact.confirmation.message.b=We will reply or let you know how we are dealing with your message within 2 working days.
 survey.title=Survey
 survey.confirmation.title=Thank you, your feedback has been received
 survey.was.answer.helpful.question=How satisfied are you with the answer we gave you?
@@ -85,7 +98,6 @@ form.online.services.very_bad=Very bad
 form.comments=Comments
 form.name=Name
 problem_report.email=Email
-problem_report.email.b=Email address
 
 accessibility.heading=Report an accessibility problem
 accessibility.message.para1=Please only use this form to report any accessibility problems you have found when using this service. Do not include personal or financial information, for example your National Insurance number or credit card details.

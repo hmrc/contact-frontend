@@ -31,6 +31,8 @@ class TestAppConfig extends AppConfig {
 
   override def enablePlayFrontendAccessibilityForm: Boolean = false
 
+  override def enablePlayFrontendProblemReportNonjsForm: Boolean = false
+
   override def captchaEnabled: Boolean = ???
 
   override def captchaMinScore: BigDecimal = ???
@@ -44,4 +46,5 @@ class TestAppConfig extends AppConfig {
   override def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean = ???
 
   override def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] = ???
+
 }

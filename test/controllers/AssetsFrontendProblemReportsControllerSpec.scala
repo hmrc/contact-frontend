@@ -30,11 +30,15 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerTest with Matchers {
+class AssetsFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerTest with Matchers {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false)
+      .configure(
+        "metrics.jvm"                          -> false,
+        "metrics.enabled"                      -> false,
+        "enablePlayFrontendProblemReportsForm" -> false
+      )
       .build()
 
   implicit val messages: Messages =
@@ -108,8 +112,9 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerTest w
 
       val message = contentAsJson(result).\("message").as[String]
       contentAsJson(result).\("status").as[String] shouldBe "OK"
-      message                                        should include("<h2 id=\"feedback-thank-you-header\">Thank you</h2>")
-      message                                        should include("Someone will get back to you within 2 working days.")
+
+      message should include("<h2 id=\"feedback-thank-you-header\">Thank you</h2>")
+      message should include("Someone will get back to you within 2 working days.")
     }
 
     "return 200 and a valid html page with validation error for invalid input and js is not enabled" in new ProblemReportsControllerApplication(
@@ -202,27 +207,29 @@ class ProblemReportsControllerApplication(app: Application) extends MockitoSugar
       Future.successful(Json.parse("{ \"allEnrolments\" : []}").as[A](retrieval.reads))
   }
 
-  val problemReportPage               = app.injector.instanceOf[views.html.problem_reports_nonjavascript]
-  val problemReportErrorPage          = app.injector.instanceOf[views.html.problem_reports_error_nonjavascript]
-  val problemReportConfirmationPage   = app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript]
-  val problemReportConfirmationPage_B = app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript_b]
-  val errorFeedbackForm               = app.injector.instanceOf[views.html.partials.error_feedback]
-  val errorFeedbackFormInner          = app.injector.instanceOf[views.html.partials.error_feedback_inner]
-  val ticketCreatedBody               = app.injector.instanceOf[views.html.ticket_created_body]
-  val ticketCreatedBody_B             = app.injector.instanceOf[views.html.ticket_created_body_b]
+  val problemReportPage             = app.injector.instanceOf[views.html.problem_reports_nonjavascript]
+  val problemReportErrorPage        = app.injector.instanceOf[views.html.problem_reports_error_nonjavascript]
+  val problemReportConfirmationPage = app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript]
+  val playFrontendProblemReportPage = app.injector.instanceOf[views.html.ProblemReportsNonjsPage]
+  val playFrontendConfirmationPage  = app.injector.instanceOf[views.html.ProblemReportsNonjsConfirmationPage]
+  val playFrontendErrorFeedbackPage = app.injector.instanceOf[views.html.ProblemReportsNonjsErrorPage]
+  val errorFeedbackForm             = app.injector.instanceOf[views.html.partials.error_feedback]
+  val errorFeedbackFormInner        = app.injector.instanceOf[views.html.partials.error_feedback_inner]
+  val ticketCreatedBody             = app.injector.instanceOf[views.html.ticket_created_body]
 
   val controller = new ProblemReportsController(
     mock[HmrcDeskproConnector],
     authConnector,
     Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
     problemReportPage,
+    playFrontendProblemReportPage,
     problemReportErrorPage,
+    playFrontendErrorFeedbackPage,
     problemReportConfirmationPage,
-    problemReportConfirmationPage_B,
+    playFrontendConfirmationPage,
     errorFeedbackForm,
     errorFeedbackFormInner,
-    ticketCreatedBody,
-    ticketCreatedBody_B
+    ticketCreatedBody
   )(new CFConfig(app.configuration), ExecutionContext.Implicits.global)
 
   val deskproName: String           = "John Densmore"

@@ -35,7 +35,11 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "enablePlayFrontendAccessibilityForm" -> false)
+      .configure(
+        "metrics.jvm"                         -> false,
+        "metrics.enabled"                     -> false,
+        "enablePlayFrontendAccessibilityForm" -> false
+      )
       .build()
 
   implicit val message: Messages = fakeApplication.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))

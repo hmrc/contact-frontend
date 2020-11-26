@@ -7,7 +7,6 @@ package config
 
 import javax.inject.Inject
 import play.api.Configuration
-import play.api.i18n.Lang
 import play.api.mvc.Request
 import util._
 
@@ -15,6 +14,7 @@ import scala.collection.JavaConverters._
 import scala.util.Try
 
 trait AppConfig {
+
   def assetsPrefix: String
   def analyticsToken: String
   def analyticsHost: String
@@ -25,6 +25,7 @@ trait AppConfig {
   def fallbackURLForLanguageSwitcher: String
   def enableLanguageSwitching: Boolean
   def enablePlayFrontendAccessibilityForm: Boolean
+  def enablePlayFrontendProblemReportNonjsForm: Boolean
   def captchaEnabled: Boolean
   def captchaMinScore: BigDecimal
   def captchaClientKey: String
@@ -70,7 +71,10 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
   override lazy val analyticsHost = loadConfigString("google-analytics.host")
 
   override lazy val backUrlDestinationWhitelist =
-    loadConfigString("backUrlDestinationWhitelist").split(',').filter(_.nonEmpty).toSet
+    loadConfigString("backUrlDestinationWhitelist")
+      .split(',')
+      .filter(_.nonEmpty)
+      .toSet
 
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
 
@@ -85,6 +89,11 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
   override def enablePlayFrontendAccessibilityForm =
     configuration
       .getOptional[Boolean]("enablePlayFrontendAccessibilityForm")
+      .getOrElse(false)
+
+  override def enablePlayFrontendProblemReportNonjsForm: Boolean =
+    configuration
+      .getOptional[Boolean]("enablePlayFrontendProblemReportsForm")
       .getOrElse(false)
 
   override lazy val captchaEnabled: Boolean =
@@ -111,4 +120,5 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
 
   private def configNotFoundError(key: String) =
     throw new RuntimeException(s"Could not find config key '$key'")
+
 }
