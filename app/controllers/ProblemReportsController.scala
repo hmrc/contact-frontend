@@ -14,14 +14,15 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, GetHelpWithThisPageOnlyServerSideValidation}
+import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation, GetHelpWithThisPageOnlyServerSideValidation}
 import views.html.partials.{error_feedback, error_feedback_inner}
-import views.html.{ProblemReportsNonjsConfirmationPage, ProblemReportsNonjsErrorPage, ProblemReportsNonjsPage, problem_reports_confirmation_nonjavascript, problem_reports_error_nonjavascript, problem_reports_nonjavascript, ticket_created_body}
+import views.html.{ProblemReportsNonjsConfirmationPage, ProblemReportsNonjsErrorPage, ProblemReportsNonjsPage, problem_reports_confirmation_nonjavascript, problem_reports_confirmation_nonjavascript_b, problem_reports_error_nonjavascript, problem_reports_nonjavascript, ticket_created_body, ticket_created_body_b}
 import play.api.http.HeaderNames._
+
 import scala.concurrent.{ExecutionContext, Future}
 
 object ProblemReportForm {
@@ -42,59 +43,66 @@ object ProblemReportForm {
     body.get("service").flatMap(_.headOption)
   }
 
-  def form(implicit request: Request[_]) = Form[ProblemReport](
+  def form(implicit request: Request[_], appConfig: AppConfig) = Form[ProblemReport](
     mapping(
       "report-name"   -> text
         .verifying(
-          "problem_report.name.error.required",
+          s"error.common.problem_report.name_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
           name => !name.isEmpty
         )
         .verifying(
-          "problem_report.name.error.length",
+          s"error.common.problem_report.name_too_long${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
           name => name.size <= 70
         )
         .verifying(
-          "problem_report.name.error.valid",
-          name => name.matches(OLD_REPORT_NAME_REGEX) || name.isEmpty
+          s"error.common.problem_report.name_valid${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
+          name =>
+            if (appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, resolveServiceFromPost)) {
+              name.matches(REPORT_NAME_REGEX)
+            } else {
+              name.matches(OLD_REPORT_NAME_REGEX)
+            } || name.isEmpty
         ),
       "report-email"  -> text
         .verifying(
-          "problem_report.email.error.required",
+          s"error.common.problem_report.email_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
           email => !email.isEmpty
         )
         .verifying(
-          "problem_report.email.error.valid",
+          s"error.common.problem_report.email_valid${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
           email => validateEmail(email) || email.isEmpty
         )
-        .verifying("problem_report.email.error.length", email => email.length <= 255),
+        .verifying("deskpro.email_too_long", email => email.length <= 255),
       "report-action" -> text
         .verifying(
-          s"problem_report.action.error.required",
+          s"error.common.problem_report.action_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
           action => !action.isEmpty
         )
-        .verifying(
-          "problem_report.action.error.length",
-          action => action.size <= 1000
-        ),
+        .verifying("error.common.comments_too_long", action => action.size <= 1000),
       "report-error"  -> text
         .verifying(
-          s"problem_report.error.error.required",
+          s"error.common.problem_report.error_mandatory${improvedFieldValidationFeatureFlag(resolveServiceFromPost)}",
           error => !error.isEmpty
         )
-        .verifying(
-          "problem_report.error.error.length",
-          error => error.size <= 1000
-        ),
+        .verifying("error.common.comments_too_long", error => error.size <= 1000),
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
+      "abFeatures"    -> optional(text),
       "referrer"      -> optional(text),
       "userAction"    -> optional(text)
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
-  def emptyForm(
+  private def improvedFieldValidationFeatureFlag(
     service: Option[String]
-  )(implicit request: Request[_], appConfig: AppConfig): Form[ProblemReport] =
+  )(implicit request: Request[_], appConfig: AppConfig): String =
+    if (appConfig.hasFeature(GetHelpWithThisPageImprovedFieldValidation, service)) {
+      ".b"
+    } else {
+      ""
+    }
+
+  def emptyForm(service: Option[String])(implicit request: Request[_], appConfig: AppConfig): Form[ProblemReport] =
     ProblemReportForm.form.fill(
       ProblemReport(
         reportName = "",
@@ -103,6 +111,7 @@ object ProblemReportForm {
         reportError = "",
         isJavascript = false,
         service = service,
+        abFeatures = Some(appConfig.getFeatures(service).mkString(";")),
         referrer = request.headers.get(REFERER),
         userAction = None
       )
@@ -120,9 +129,11 @@ class ProblemReportsController @Inject() (
   playFrontendProblemReportsErrorPage: ProblemReportsNonjsErrorPage,
   assetsFrontendProblemReportsConfirmationPage: problem_reports_confirmation_nonjavascript,
   playFrontendProblemReportsConfirmationPage: ProblemReportsNonjsConfirmationPage,
+  assetsFrontendProblemReportsConfirmationPage_B: problem_reports_confirmation_nonjavascript_b,
   errorFeedbackForm: error_feedback,
   errorFeedbackFormInner: error_feedback_inner,
-  ticketCreatedBody: ticket_created_body
+  ticketCreatedBody: ticket_created_body,
+  ticketCreatedBody_B: ticket_created_body_b
 )(implicit appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with ContactFrontendActions
@@ -166,19 +177,19 @@ class ProblemReportsController @Inject() (
     val isAjax = request.headers.get("X-Requested-With").contains("XMLHttpRequest")
 
     ProblemReportForm.form.bindFromRequest.fold(
-      (formWithErrors: Form[ProblemReport]) => {
+      (error: Form[ProblemReport]) => {
 
-        val referrer = formWithErrors.data.get("referrer").filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
+        val referrer = error.data.get("referrer").filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
 
         if (isAjax) {
-          if (appConfig.hasFeature(GetHelpWithThisPageOnlyServerSideValidation, formWithErrors.data.get("service"))) {
+          if (appConfig.hasFeature(GetHelpWithThisPageOnlyServerSideValidation, error.data.get("service"))) {
             val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
             Future.successful(
               Ok(
                 Json.toJson(
                   Map(
                     "status"  -> "OK",
-                    "message" -> reportFormAjaxView(formWithErrors, formWithErrors.data.get("service"), csrfToken, referrer).toString()
+                    "message" -> reportFormAjaxView(error, error.data.get("service"), csrfToken, referrer).toString()
                   )
                 )
               )
@@ -187,9 +198,7 @@ class ProblemReportsController @Inject() (
             Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
           }
         } else {
-          Future.successful(
-            problemReportsPage(formWithErrors, formWithErrors.data.get("service"), referrer)(request)
-          )
+          Future.successful(problemReportsPage(error, error.data.get("service"), referrer))
         }
       },
       problemReport => {
@@ -203,56 +212,63 @@ class ProblemReportsController @Inject() (
           if (isAjax) {
             javascriptConfirmationPage(ticketId, problemReport.service)
           } else {
-            reportFormNonjsConfirmationPage(ticketId)
+            nonJavascriptConfirmationPage(ticketId, problemReport.service)
           }) recover {
           case _ if !isAjax =>
-            val view =
-              if (appConfig.enablePlayFrontendProblemReportNonjsForm)
-                playFrontendProblemReportsErrorPage()
-              else
-                assetsFrontendProblemReportsErrorPage()
-            Ok(view)
+            if (appConfig.enablePlayFrontendProblemReportNonjsForm) {
+              Ok(playFrontendProblemReportsErrorPage())
+            } else {
+              Ok(assetsFrontendProblemReportsErrorPage())
+            }
         }
       }
     )
   }
 
   private def javascriptConfirmationPage(ticketId: TicketId, service: Option[String])(implicit request: Request[_]) = {
-    val view = ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
+    val view = if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation, service)) {
+      ticketCreatedBody_B(ticketId.ticket_id.toString, None).toString()
+    } else {
+      ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
+    }
     Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
+  }
+
+  private def nonJavascriptConfirmationPage(ticketId: TicketId, service: Option[String])(implicit
+    request: Request[_]
+  ) = {
+    val view =
+      if (appConfig.enablePlayFrontendProblemReportNonjsForm) {
+        playFrontendProblemReportsConfirmationPage()
+      } else {
+        if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation, service)) {
+          assetsFrontendProblemReportsConfirmationPage_B(ticketId.ticket_id.toString, None)
+        } else {
+          assetsFrontendProblemReportsConfirmationPage(ticketId.ticket_id.toString, None)
+        }
+      }
+    Ok(view)
   }
 
   private def problemReportsPage(form: Form[ProblemReport], service: Option[String], referrer: Option[String])(implicit
     request: Request[_]
-  ): Result = {
-    val view = if (appConfig.enablePlayFrontendProblemReportNonjsForm) {
-      playFrontendProblemReportsPage(
-        form,
-        routes.ProblemReportsController.submit()
+  ) =
+    if (appConfig.enablePlayFrontendProblemReportNonjsForm) {
+      Ok(
+        playFrontendProblemReportsPage(
+          form,
+          routes.ProblemReportsController.submit()
+        )
       )
     } else {
-      assetsFrontendProblemReportsPage(
-        form,
-        appConfig.externalReportProblemSecureUrl,
-        service,
-        referrer
+      Ok(
+        assetsFrontendProblemReportsPage(
+          form,
+          appConfig.externalReportProblemSecureUrl,
+          service,
+          referrer
+        )
       )
     }
-    Ok(view)
-  }
-
-  private def reportFormNonjsConfirmationPage(ticketId: TicketId)(implicit
-    request: Request[_]
-  ) = {
-    val view = if (appConfig.enablePlayFrontendProblemReportNonjsForm) {
-      playFrontendProblemReportsConfirmationPage()
-    } else {
-      assetsFrontendProblemReportsConfirmationPage(
-        ticketId.ticket_id.toString,
-        None
-      )
-    }
-    Ok(view)
-  }
 
 }

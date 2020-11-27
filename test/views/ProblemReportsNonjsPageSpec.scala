@@ -51,6 +51,7 @@ class ProblemReportsNonjsPageSpec
       "report-error"  -> text.verifying("error.common.problem_report.error_mandatory", msg => !msg.isEmpty),
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
+      "abFeatures"    -> optional(text),
       "referrer"      -> optional(text),
       "userAction"    -> optional(text)
     )(ProblemReport.apply)(ProblemReport.unapply)
@@ -62,6 +63,7 @@ class ProblemReportsNonjsPageSpec
     reportAction = "Testing action",
     reportError = "Testing error",
     isJavascript = false,
+    abFeatures = None,
     referrer = None,
     service = None,
     userAction = None
