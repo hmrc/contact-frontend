@@ -173,6 +173,8 @@ class ProblemReportsController @Inject() (
 
   def submitSecure: Action[AnyContent] = submit
 
+  def submitNonJavaScript: Action[AnyContent] = submit
+
   def submit = Action.async { implicit request =>
     val isAjax = request.headers.get("X-Requested-With").contains("XMLHttpRequest")
 
@@ -257,7 +259,7 @@ class ProblemReportsController @Inject() (
       Ok(
         playFrontendProblemReportsPage(
           form,
-          routes.ProblemReportsController.submit()
+          routes.ProblemReportsController.submitNonJavaScript()
         )
       )
     } else {
