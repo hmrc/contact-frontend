@@ -76,6 +76,23 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
       }
 
     "return 200 and a valid html page for a valid request with " +
+      "JavaScript disabled for an unauthenticated user on standalone page" in new TestScope(fakeApplication()) {
+
+      hrmcConnectorWillReturnTheTicketId
+
+      val request = generateRequest(javascriptEnabled = false)
+      val result  = controller.submitNonJavaScript()(request)
+
+      status(result) should be(200)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementsByClass("govuk-error-summary").size() should be(0)
+      document.getElementsByClass("govuk-body").text()          should be(
+        "Someone will get back to you within 2 working days."
+      )
+    }
+
+    "return 200 and a valid html page for a valid request with " +
       "JavaScript disabled for an authenticated user" in new TestScope(fakeApplication()) {
         when(
           hmrcDeskproConnector.createDeskProTicket(

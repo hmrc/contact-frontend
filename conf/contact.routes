@@ -28,6 +28,7 @@ GET         /problem_reports                             @controllers.ProblemRep
 GET         /problem_reports_ajax                        @controllers.ProblemReportsController.reportFormAjax(service: Option[String])
 GET         /problem_reports_nonjs                       @controllers.ProblemReportsController.reportFormNonJavaScript(service: Option[String])
 POST        /problem_reports                             @controllers.ProblemReportsController.submit
+POST        /problem_reports_nonjs                       @controllers.ProblemReportsController.submitNonJavaScript
 POST        /problem_reports_secure                      @controllers.ProblemReportsController.submitSecure
 
 GET			/survey				 	                     @controllers.SurveyController.survey(ticketId: String, serviceId: String)
