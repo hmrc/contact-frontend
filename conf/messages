@@ -6,6 +6,7 @@ feedback.name.error.length=Your name cannot be longer than 70 characters
 feedback.rating.error.required=Tell us what you think of the service
 feedback.rating.error.invalid=Please select a valid experience rating
 feedback.email.error.invalid=Enter an email address in the correct format, like name@example.com
+feedback.email.error.length=Email must be 255 characters or fewer
 feedback.comments.error.required=Enter your comments
 feedback.heading=Send your feedback
 feedback.send=Send

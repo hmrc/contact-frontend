@@ -275,7 +275,7 @@ object FeedbackFormBind {
           .verifying("feedback.name.error.length", name => name.size <= 70),
         "feedback-email"    -> text
           .verifying("feedback.email.error.invalid", validateEmail)
-          .verifying("deskpro.email_too_long", email => email.size <= 255),
+          .verifying("feedback.email.error.length", email => email.size <= 255),
         "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
 
           override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {

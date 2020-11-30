@@ -5,6 +5,7 @@ feedback.name.error.length=Ni all eich enw fod yn hirach na 70 o gymeriadau
 feedback.rating.error.required=Rhowch wybod i ni beth yw eich barn am y gwasanaeth
 feedback.rating.error.invalid=Dewiswch opsiwn dilys i fesur eich profiad
 feedback.email.error.invalid=Rhowch gyfeiriad e-bost dilys
+feedback.email.error.length=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
 feedback.comments.error.required=Rhowch eich sylwadau
 feedback.heading=Anfon eich adborth
 feedback.send=Anfon
