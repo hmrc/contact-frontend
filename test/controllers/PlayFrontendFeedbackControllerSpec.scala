@@ -13,9 +13,9 @@ import connectors.deskpro.domain.TicketId
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -32,11 +32,11 @@ import util.BackUrlValidator
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
+class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false)
+      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "enablePlayFrontendFeedbackForm" -> true)
       .build()
 
   "feedbackPartialForm" should {
@@ -89,7 +89,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-message") shouldNot be(empty)
+      page.body().getElementsByClass("govuk-error-message") shouldNot be(empty)
 
       verifyZeroInteractions(hmrcDeskproConnector)
     }
@@ -124,12 +124,12 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-message") shouldNot be(empty)
+      page.body().getElementsByClass("govuk-error-message") shouldNot be(empty)
 
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
-    "include 'server', 'backUrl' and 'canOmitComments' fields in the returned page if form not filled in correctly" in new FeedbackControllerApplication(
+    "include 'service', 'backUrl' and 'canOmitComments' fields in the returned page if form not filled in correctly" in new FeedbackControllerApplication(
       fakeApplication
     ) {
 
@@ -139,10 +139,11 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-message") shouldNot be(empty)
-      page.body().getElementById("feedbackService").attr("value") shouldBe "someService"
-      page.body().getElementById("feedbackBackUrl").attr("value") shouldBe "http://www.back.url"
-      page.body().getElementById("canOmitComments").attr("value") shouldBe "true"
+      page.body().select(".govuk-error-message").size should be > 0
+
+      page.body().select("input[name=service]").first.attr("value")   shouldBe "someService"
+      page.body().select("input[name=backUrl]").first.attr("value")   shouldBe "http://www.back.url"
+      page.body().select("input[name=canOmitComments]").attr("value") shouldBe "true"
 
     }
 
@@ -209,7 +210,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val submit = controller.thanks()(request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
       val page   = Jsoup.parse(contentAsString(submit))
 
-      page.body().getElementById("feedback-back") shouldBe null
+      page.body().select(".govuk-back-link").first shouldBe null
 
     }
 
@@ -220,11 +221,11 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       )
       val page   = Jsoup.parse(contentAsString(submit))
 
-      page.body().getElementById("feedback-back").attr("href") shouldBe "http://www.valid.url"
+      page.body().select(".govuk-back-link").first.attr("href") shouldBe "http://www.valid.url"
 
     }
 
-    "not contain back button if requested and the back url is invalid" in new FeedbackControllerApplication(
+    "not contain back link if requested and the back url is invalid" in new FeedbackControllerApplication(
       fakeApplication
     ) {
 
@@ -233,7 +234,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       )
       val page   = Jsoup.parse(contentAsString(submit))
 
-      page.body().getElementById("feedback-back") shouldBe null
+      page.body().select(".govuk-back-link").first shouldBe null
 
     }
 
@@ -245,7 +246,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         )
         val page   = Jsoup.parse(contentAsString(submit))
 
-        page.body().getElementById("feedback-back") shouldBe null
+        page.body().select(".govuk-back-link").first shouldBe null
 
       }
 
@@ -258,7 +259,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         )
         val page   = Jsoup.parse(contentAsString(submit))
 
-        page.body().getElementById("feedback-back").attr("href") shouldBe "http://www.valid.url"
+        page.body().select(".govuk-back-link").first.attr("href") shouldBe "http://www.valid.url"
 
       }
 
@@ -271,7 +272,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         )
         val page   = Jsoup.parse(contentAsString(submit))
 
-        page.body().getElementById("feedback-back") shouldBe null
+        page.body().select(".govuk-back-link").first shouldBe null
 
       }
     }
@@ -384,10 +385,13 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       override def validate(backUrl: String) = backUrl == "http://www.valid.url"
     }
 
-    val feedbackPage             = fakeApplication().injector.instanceOf[views.html.feedback]
-    val feedbackConfirmationPage = fakeApplication().injector.instanceOf[views.html.feedback_confirmation]
-    val feedbackPartialForm      = fakeApplication().injector.instanceOf[views.html.partials.feedback_form]
-    val feedbackFormConfirmation = fakeApplication().injector.instanceOf[views.html.partials.feedback_form_confirmation]
+    val feedbackPage                         = fakeApplication().injector.instanceOf[views.html.feedback]
+    val feedbackConfirmationPage             = fakeApplication().injector.instanceOf[views.html.feedback_confirmation]
+    val feedbackPartialForm                  = fakeApplication().injector.instanceOf[views.html.partials.feedback_form]
+    val feedbackFormConfirmation             = fakeApplication().injector.instanceOf[views.html.partials.feedback_form_confirmation]
+    val playFrontendFeedbackPage             = fakeApplication().injector.instanceOf[views.html.FeedbackPage]
+    val playFrontendFeedbackConfirmationPage =
+      fakeApplication().injector.instanceOf[views.html.FeedbackConfirmationPage]
 
     val controller = new FeedbackController(
       hmrcDeskproConnector,
@@ -397,8 +401,10 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       Stubs.stubMessagesControllerComponents(),
       feedbackPage,
       feedbackConfirmationPage,
+      playFrontendFeedbackConfirmationPage,
       feedbackPartialForm,
-      feedbackFormConfirmation
+      feedbackFormConfirmation,
+      playFrontendFeedbackPage
     )(new CFConfig(app.configuration), ExecutionContext.Implicits.global)
 
     val enrolments = Some(Enrolments(Set()))

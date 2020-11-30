@@ -5,6 +5,7 @@
 
 @import config.AppConfig
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.header.Header
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardFooter
 @import views.html.partials.LanguageSelection
 @import views.html.partials.Head
 @import views.html.partials.Scripts
@@ -12,14 +13,14 @@
 @this(
         govukLayout: GovukLayout,
         govukHeader: GovukHeader,
-        hmrcFooter: HmrcFooter,
+        hmrcStandardFooter: HmrcStandardFooter,
         hmrcBanner: HmrcBanner,
         head: Head,
         languageSelection: LanguageSelection,
         scripts: Scripts
 )
 
-@(pageTitle: String)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(pageTitle: String, beforeContent: Option[Html] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 @import appConfig._
 
 @headerBlock = {
@@ -35,6 +36,7 @@
     @if(appConfig.enableLanguageSwitching) {
         @languageSelection()
     }
+    @beforeContent
 }
 
 @govukLayout(
@@ -43,5 +45,5 @@
     headerBlock = Some(headerBlock),
     scriptsBlock = Some(scripts()),
     beforeContentBlock = Some(beforeContentBlock),
-    footerBlock = Some(hmrcFooter())
+    footerBlock = Some(hmrcStandardFooter())
 )(contentBlock)

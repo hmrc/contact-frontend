@@ -1,0 +1,22 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import views.html.partials.Layout
+
+@this(govukPanel: GovukPanel, govukBackLink: GovukBackLink, mainLayout: Layout)
+@(backUrl: Option[String] = None)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@backLink = {
+  @backUrl.map { url =>
+    @govukBackLink(BackLink(
+      href = url,
+      content = Text(messages("feedback.confirmation.back"))
+    ))
+  }
+}
+
+@mainLayout(pageTitle = messages("feedback.confirmation.heading"), beforeContent = Some(backLink)) {
+  @govukPanel(Panel(title = Text(messages("feedback.confirmation.message"))))
+}

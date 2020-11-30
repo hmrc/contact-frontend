@@ -1,17 +1,25 @@
 common.thank.you=Thank you
 common.acknowledgment=Message received
-error.common.feedback.name_mandatory=Enter your name.
-error.common.feedback.name_too_long=Your name can''t be longer than 70 characters
-error.common.feedback.rating_mandatory=Tell us what you think of the service.
-error.common.feedback.rating_valid=Please select a valid experience rating
-common.feedback.heading=Send your feedback
-common.feedback.confirmation.heading=Your feedback
-common.feedback.confirmation.message=Your feedback has been received.
-common.feedback.information.warning=Don''t include any personal or financial information. For example, your National Insurance or credit card numbers.
+
+feedback.name.error.required=Enter your name
+feedback.name.error.length=Your name cannot be longer than 70 characters
+feedback.rating.error.required=Tell us what you think of the service
+feedback.rating.error.invalid=Please select a valid experience rating
+feedback.email.error.invalid=Enter an email address in the correct format, like name@example.com
+feedback.email.error.length=Email must be 255 characters or fewer
+feedback.comments.error.required=Enter your comments
+feedback.heading=Send your feedback
+feedback.send=Send
+feedback.confirmation.heading=Your feedback
+feedback.confirmation.message=Your feedback has been received.
+feedback.confirmation.back=Back
+
+common.feedback.information.warning=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
 common.feedback.get.help=Is this page not working properly?
 common.feedback.title=Get help with a technical problem
 common.feedback.htmltitle=Get help with a technical problem – HM Revenue & Customs – GOV.UK
 common.feedback.only_use_form=Only use this form to report technical problems.
+
 error.browser.title.prefix=Error:
 error.common.problem_report.name_mandatory=Please provide your name.
 error.common.problem_report.name_mandatory.b=Enter a name

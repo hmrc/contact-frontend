@@ -31,6 +31,8 @@ class TestAppConfig extends AppConfig {
 
   override def enablePlayFrontendAccessibilityForm: Boolean = false
 
+  override def enablePlayFrontendFeedbackForm: Boolean = false
+
   override def enablePlayFrontendProblemReportNonjsForm: Boolean = false
 
   override def captchaEnabled: Boolean = ???

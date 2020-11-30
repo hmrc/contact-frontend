@@ -9,6 +9,6 @@
 
 @(ticketId:String, loggedIn: Boolean, backUrl: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
-@mainContent(title = Messages("common.feedback.heading"), userLoggedIn = loggedIn) {
+@mainContent(title = Messages("feedback.heading"), userLoggedIn = loggedIn) {
     @feedbackFormConfirmation(ticketId, backUrl)
 }

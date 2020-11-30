@@ -1,12 +1,18 @@
 common.thank.you=Diolch
 common.acknowledgment=Mae''ch neges wedi dod i law
-error.common.feedback.name_mandatory=Rhowch eich enw.
-error.common.feedback.name_too_long=Ni all eich enw fod yn hirach na 70 o gymeriadau
-error.common.feedback.rating_mandatory=Rhowch wybod i ni beth yw eich barn am y gwasanaeth.
-error.common.feedback.rating_valid=Dewiswch opsiwn dilys i fesur eich profiad
-common.feedback.heading=Anfon eich adborth
-common.feedback.confirmation.heading=Eich adborth
-common.feedback.confirmation.message=Mae eich adborth wedi dod i law.
+feedback.name.error.required=Rhowch eich enw
+feedback.name.error.length=Ni all eich enw fod yn hirach na 70 o gymeriadau
+feedback.rating.error.required=Rhowch wybod i ni beth yw eich barn am y gwasanaeth
+feedback.rating.error.invalid=Dewiswch opsiwn dilys i fesur eich profiad
+feedback.email.error.invalid=Rhowch gyfeiriad e-bost dilys
+feedback.email.error.length=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
+feedback.comments.error.required=Rhowch eich sylwadau
+feedback.heading=Anfon eich adborth
+feedback.send=Anfon
+feedback.confirmation.heading=Eich adborth
+feedback.confirmation.message=Mae eich adborth wedi dod i law.
+feedback.confirmation.back=Yn ôl
+
 common.feedback.information.warning=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
 common.feedback.get.help=A yw''r dudalen hon yn gweithio''n iawn?
 common.feedback.title=Cael help gyda phroblem dechnegol
@@ -94,7 +100,7 @@ form.email.address=Cyfeiriad e-bost
 form.your.comments=Eich sylwadau
 
 form.online.services=Beth yw eich barn am y gwasanaeth ar-lein hwn?
-form.online.services.data=Rydym yn defnyddio''ch adborth i wella ein gwasanaethau.
+form.online.services.data=Rydym yn defnyddio’ch adborth i wella ein gwasanaethau.
 form.online.services.very_good=Da iawn
 form.online.services.good=Da
 form.online.services.neutral=Niwtral

@@ -1,0 +1,82 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import model.FeedbackForm
+@import views.html.partials.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Paragraph}
+
+@this(
+    inputCharacterCount: InputCharacterCount,
+    inputHidden: InputHidden,
+    inputText: InputText,
+    inputRadios: InputRadios,
+    govukButton: GovukButton,
+    govukErrorSummary: GovukErrorSummary,
+    formWithCSRF: PlayFrontendFormWithCSRF,
+    mainLayout: Layout,
+    h1: Heading1,
+    p: Paragraph
+)
+@(feedbackForm: Form[FeedbackForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@pageTitle = @{
+    if(feedbackForm.hasErrors){Messages("error.browser.title.prefix")+" "+Messages("feedback.heading")} else Messages("feedback.heading")
+}
+
+@mainLayout(pageTitle) {
+    @if(feedbackForm.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary(errorList = feedbackForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+    }
+    @h1(content = Text(messages("feedback.heading")))
+    @p(content = Text(messages("form.online.services.data")))
+    @formWithCSRF(action, 'id -> "feedback-form") {
+      @inputHidden(feedbackForm("service"))
+      @inputHidden(feedbackForm("referrer"))
+      @inputHidden(feedbackForm("canOmitComments"))
+      @defining(feedbackForm("backUrl")) { backUrlField =>
+        @if(backUrlField.value.isDefined) {
+          @inputHidden(backUrlField)
+        }
+      }
+      @inputRadios(
+        feedbackForm("feedback-rating"),
+        legend = Messages("form.online.services"),
+        items = Seq(
+          ("5", Messages("form.online.services.very_good")),
+          ("4", Messages("form.online.services.good")),
+          ("3", Messages("form.online.services.neutral")),
+          ("2", Messages("form.online.services.bad")),
+          ("1", Messages("form.online.services.very_bad"))
+        )
+      )
+      @inputText(
+        feedbackForm("feedback-name"),
+        label = messages("form.name"),
+        classes = "govuk-!-width-two-thirds",
+        spellcheck = Some(false),
+        autocomplete = Some("name")
+      )
+      @inputText(
+        feedbackForm("feedback-email"),
+        inputType = "email",
+        label = messages("form.email.address"),
+        classes = "govuk-!-width-two-thirds",
+        spellcheck = Some(false),
+        autocomplete = Some("email")
+      )
+      @inputCharacterCount(
+        feedbackForm("feedback-comments"),
+        hint = Some(messages("common.feedback.information.warning")),
+        label = messages("form.comments"),
+        maxLength = Some(2000)
+      )
+      @govukButton(Button(
+        content = Text(messages("feedback.send")),
+        inputType = Some("submit"),
+        preventDoubleClick = true
+      ))
+    }
+}

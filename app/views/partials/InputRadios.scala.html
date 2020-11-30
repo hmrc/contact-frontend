@@ -1,0 +1,31 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@this(govukRadios: GovukRadios)
+
+@(
+    field: Field,
+    legend: String,
+    items: Seq[(String, String)]
+)(implicit messages: Messages)
+@govukRadios(Radios(
+  fieldset = Some(Fieldset(
+    legend = Some(Legend(
+      content = Text(legend)
+    ))
+  )),
+  idPrefix = Some(field.name),
+  name = field.name,
+  errorMessage = field.error.map(formError =>
+    ErrorMessage(content = Text(messages(formError.message, formError.args: _*)))
+  ),
+  items = items map { case (value: String, label: String) =>
+    RadioItem(
+      content = Text(label),
+      checked = field.value.contains(value),
+      value = Some(value)
+    )
+  }
+))
