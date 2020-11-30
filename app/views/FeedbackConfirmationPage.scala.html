@@ -3,16 +3,16 @@
  *
  *@
 
-@import views.html.partials.{Layout, Heading2, Paragraph}
+@import views.html.partials.Layout
 
-@this(govukPanel: GovukPanel, govukBackLink: GovukBackLink, mainLayout: Layout, h2: Heading2, p: Paragraph)
+@this(govukPanel: GovukPanel, govukBackLink: GovukBackLink, mainLayout: Layout)
 @(backUrl: Option[String] = None)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @backLink = {
   @backUrl.map { url =>
     @govukBackLink(BackLink(
       href = url,
-      content = Text(messages("button.back"))
+      content = Text(messages("feedback.confirmation.back"))
     ))
   }
 }

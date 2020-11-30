@@ -8,8 +8,10 @@ feedback.rating.error.invalid=Please select a valid experience rating
 feedback.email.error.invalid=Enter an email address in the correct format, like name@example.com
 feedback.comments.error.required=Enter your comments
 feedback.heading=Send your feedback
+feedback.send=Send
 feedback.confirmation.heading=Your feedback
 feedback.confirmation.message=Your feedback has been received.
+feedback.confirmation.back=Back
 
 common.feedback.information.warning=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
 common.feedback.get.help=Is this page not working properly?

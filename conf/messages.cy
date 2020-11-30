@@ -7,8 +7,11 @@ feedback.rating.error.invalid=Dewiswch opsiwn dilys i fesur eich profiad
 feedback.email.error.invalid=Rhowch gyfeiriad e-bost dilys
 feedback.comments.error.required=Rhowch eich sylwadau
 feedback.heading=Anfon eich adborth
+feedback.send=Anfon
 feedback.confirmation.heading=Eich adborth
 feedback.confirmation.message=Mae eich adborth wedi dod i law.
+feedback.confirmation.back=Yn ôl
+
 common.feedback.information.warning=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
 common.feedback.get.help=A yw''r dudalen hon yn gweithio''n iawn?
 common.feedback.title=Cael help gyda phroblem dechnegol
