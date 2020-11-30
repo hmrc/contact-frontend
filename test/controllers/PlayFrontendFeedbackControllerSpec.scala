@@ -39,6 +39,40 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "enablePlayFrontendFeedbackForm" -> true)
       .build()
 
+  "feedbackForm" should {
+    "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in new FeedbackControllerApplication(
+      fakeApplication
+    ) {
+      val result = controller.feedbackForm(
+        service = Some("any-service"),
+        backUrl = Some("/any-service"),
+        canOmitComments = true
+      )(FakeRequest("GET", "/foo"))
+
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().select("input[name=service]").first.attr("value")   shouldBe "any-service"
+      page.body().select("input[name=backUrl]").first.attr("value")   shouldBe "/any-service"
+      page.body().select("input[name=canOmitComments]").attr("value") shouldBe "true"
+    }
+  }
+
+  "unauthenticatedFeedbackForm" should {
+    "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in new FeedbackControllerApplication(
+      fakeApplication
+    ) {
+      val result = controller.unauthenticatedFeedbackForm(
+        service = Some("any-service"),
+        backUrl = Some("/any-service"),
+        canOmitComments = true
+      )(FakeRequest("GET", "/foo"))
+
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().select("input[name=service]").first.attr("value")   shouldBe "any-service"
+      page.body().select("input[name=backUrl]").first.attr("value")   shouldBe "/any-service"
+      page.body().select("input[name=canOmitComments]").attr("value") shouldBe "true"
+    }
+  }
+
   "feedbackPartialForm" should {
     val submitUrl       = "https:/abcdefg.com"
     val csrfToken       = "CSRF"
@@ -63,6 +97,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementById("referrer").attr("value") shouldBe "https://www.other-example.com/some-service"
     }
+
   }
 
   "Submitting the feedback for unauthenticated user" should {

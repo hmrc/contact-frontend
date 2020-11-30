@@ -34,8 +34,8 @@ class FeedbackPageSpec
 
   val form: Form[FeedbackForm] = Form[FeedbackForm](
     mapping(
-      "feedback-rating"   -> text
-        .verifying("feedback.rating.error.required", rating => rating.nonEmpty),
+      "feedback-rating"   -> optional(text)
+        .verifying("feedback.rating.error.required", rating => rating.isDefined && rating.get.nonEmpty),
       "feedback-name"     -> text
         .verifying("feedback.name.error.required", name => name.nonEmpty),
       "feedback-email"    -> text
@@ -53,8 +53,15 @@ class FeedbackPageSpec
   )
 
   val formValues: FeedbackForm = FeedbackForm(
+    experienceRating = Some(""),
+    name = "",
+    email = "",
+    comments = "",
+    javascriptEnabled = false,
     referrer = "n/a",
     csrfToken = "",
+    service = Some("unknown"),
+    abFeatures = None,
     backUrl = None,
     canOmitComments = false
   )
@@ -261,7 +268,7 @@ class FeedbackPageSpec
     "include an error message for the feedback rating" in {
       val contentWithService = feedbackPage(
         form.fillAndValidate(
-          formValues.copy(experienceRating = "")
+          formValues.copy(experienceRating = Some(""))
         ),
         action
       )
@@ -273,7 +280,7 @@ class FeedbackPageSpec
     "include the submitted feedback rating" in {
       val contentWithService = feedbackPage(
         form.fill(
-          formValues.copy(experienceRating = "4")
+          formValues.copy(experienceRating = Some("4"))
         ),
         action
       )

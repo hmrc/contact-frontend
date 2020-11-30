@@ -52,7 +52,7 @@ trait DeskproSubmission {
     hmrcDeskproConnector.createFeedback(
       name = data.name,
       email = data.email,
-      rating = data.experienceRating,
+      rating = data.experienceRating.getOrElse(""),
       subject = "Beta feedback submission",
       message = data.comments match {
         case ""      => "No comment given"
