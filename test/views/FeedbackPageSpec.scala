@@ -461,5 +461,22 @@ class FeedbackPageSpec
       val buttons = content.select("button[type=submit]")
       buttons.first.attr("data-prevent-double-click") shouldBe "true"
     }
+
+    "not include a link to the problem reports nonjs form if not specified" in {
+      content.body should not include "Get help with this page"
+    }
+
+    "include a link to the problem reports nonjs form with service filled from the form" in {
+      val contentWithService = feedbackPage(
+        form.fill(
+          formValues.copy(service = Some("foo"))
+        ),
+        action
+      )
+
+      val links = contentWithService.select("a[href=/contact/problem_reports_nonjs?newTab=true&service=foo]")
+      links              should have size 1
+      links.first.text shouldBe "Get help with this page (opens in new tab)"
+    }
   }
 }
