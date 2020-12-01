@@ -140,3 +140,5 @@ accessibility.confirmation.paragraph=We have received your message and will repl
 
 # FIXME: to remove once play-frontend version is enabled permanently
 accessibility.close.window=You can now close this window or tab.
+
+testPage.title = Service test page
