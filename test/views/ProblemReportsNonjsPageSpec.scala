@@ -226,7 +226,7 @@ class ProblemReportsNonjsPageSpec
       )
       val errors             = contentWithService.select("#report-action-error")
       errors            should have size 1
-      errors.first.text should include("Please enter details of what you were doing")
+      errors.first.text should include("Enter details of what you were doing")
     }
 
     "include the submitted problem input value" in {
@@ -269,7 +269,7 @@ class ProblemReportsNonjsPageSpec
       )
       val errors             = contentWithService.select("#report-error-error")
       errors            should have size 1
-      errors.first.text should include("Please enter details of what went wrong")
+      errors.first.text should include("Enter details of what went wrong")
     }
 
     "include the submitted report an error input value" in {
