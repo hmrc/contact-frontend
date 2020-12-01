@@ -1,0 +1,14 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@this(hmrcReportTechnicalIssue: HmrcReportTechnicalIssue)
+
+@(serviceId: Option[String])(implicit appConfig: AppConfig, messages: Messages)
+@serviceId.map { s =>
+ @hmrcReportTechnicalIssue(ReportTechnicalIssue(
+  serviceCode = s,
+  if (messages.lang.code == "cy") Cy else En
+ ))
+}

@@ -68,7 +68,8 @@ import scala.concurrent.{ExecutionContext, Future}
                     }
                     .getOrElse(""),
                   backUrl = backUrl,
-                  canOmitComments = canOmitComments
+                  canOmitComments = canOmitComments,
+                  service = service
                 ),
                 loggedIn = true,
                 service,
@@ -92,7 +93,8 @@ import scala.concurrent.{ExecutionContext, Future}
           FeedbackFormBind.emptyForm(
             CSRF.getToken(request).map(_.value).getOrElse(""),
             backUrl = backUrl,
-            canOmitComments = canOmitComments
+            canOmitComments = canOmitComments,
+            service = service
           ),
           loggedIn = false,
           service,
@@ -175,7 +177,13 @@ import scala.concurrent.{ExecutionContext, Future}
     Future.successful {
       Ok(
         feedbackFormPartial(
-          FeedbackFormBind.emptyForm(csrfToken, referrerUrl orElse referer, None, canOmitComments = canOmitComments),
+          FeedbackFormBind.emptyForm(
+            csrfToken,
+            referrerUrl orElse referer,
+            None,
+            canOmitComments = canOmitComments,
+            service = service
+          ),
           submitUrl,
           service,
           canOmitComments = canOmitComments
@@ -249,13 +257,27 @@ object FeedbackFormBind {
   private val emailValidator                     = new DeskproEmailValidator()
   private val validateEmail: (String) => Boolean = emailValidator.validate
 
-  def emptyForm(csrfToken: String, referrer: Option[String] = None, backUrl: Option[String], canOmitComments: Boolean)(
-    implicit request: Request[AnyRef]
+  def emptyForm(
+    csrfToken: String,
+    referrer: Option[String] = None,
+    backUrl: Option[String],
+    canOmitComments: Boolean,
+    service: Option[String],
+    abFeatures: Option[String] = None
+  )(implicit
+    request: Request[AnyRef]
   ) =
     FeedbackFormBind.form.fill(
       FeedbackForm(
+        experienceRating = None,
+        name = "",
+        email = "",
+        comments = "",
+        javascriptEnabled = false,
         referrer.getOrElse(request.headers.get(REFERER).getOrElse("n/a")),
         csrfToken,
+        Some(service.getOrElse("unknown")),
+        abFeatures,
         backUrl,
         canOmitComments
       )
@@ -302,23 +324,6 @@ object FeedbackFormBind {
         "abFeatures"      -> optional(text),
         "backUrl"         -> optional(text),
         "canOmitComments" -> boolean
-      )(FeedbackForm.apply) { (feedbackForm: FeedbackForm) =>
-        import feedbackForm._
-        Some(
-          (
-            Some(experienceRating),
-            name,
-            email,
-            comments,
-            javascriptEnabled,
-            referrer,
-            csrfToken,
-            service,
-            abFeatures,
-            backUrl,
-            canOmitComments
-          )
-        )
-      }
+      )(FeedbackForm.apply)(FeedbackForm.unapply)
     )
 }

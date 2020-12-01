@@ -34,8 +34,8 @@ class FeedbackPageSpec
 
   val form: Form[FeedbackForm] = Form[FeedbackForm](
     mapping(
-      "feedback-rating"   -> text
-        .verifying("feedback.rating.error.required", rating => rating.nonEmpty),
+      "feedback-rating"   -> optional(text)
+        .verifying("feedback.rating.error.required", rating => rating.isDefined && rating.get.nonEmpty),
       "feedback-name"     -> text
         .verifying("feedback.name.error.required", name => name.nonEmpty),
       "feedback-email"    -> text
@@ -53,8 +53,15 @@ class FeedbackPageSpec
   )
 
   val formValues: FeedbackForm = FeedbackForm(
+    experienceRating = Some(""),
+    name = "",
+    email = "",
+    comments = "",
+    javascriptEnabled = false,
     referrer = "n/a",
     csrfToken = "",
+    service = Some("unknown"),
+    abFeatures = None,
     backUrl = None,
     canOmitComments = false
   )
@@ -261,7 +268,7 @@ class FeedbackPageSpec
     "include an error message for the feedback rating" in {
       val contentWithService = feedbackPage(
         form.fillAndValidate(
-          formValues.copy(experienceRating = "")
+          formValues.copy(experienceRating = Some(""))
         ),
         action
       )
@@ -273,7 +280,7 @@ class FeedbackPageSpec
     "include the submitted feedback rating" in {
       val contentWithService = feedbackPage(
         form.fill(
-          formValues.copy(experienceRating = "4")
+          formValues.copy(experienceRating = Some("4"))
         ),
         action
       )
@@ -453,6 +460,23 @@ class FeedbackPageSpec
     "have double click prevention turned on" in {
       val buttons = content.select("button[type=submit]")
       buttons.first.attr("data-prevent-double-click") shouldBe "true"
+    }
+
+    "not include a link to the problem reports nonjs form if not specified" in {
+      content.body should not include "Get help with this page"
+    }
+
+    "include a link to the problem reports nonjs form with service filled from the form" in {
+      val contentWithService = feedbackPage(
+        form.fill(
+          formValues.copy(service = Some("foo"))
+        ),
+        action
+      )
+
+      val links = contentWithService.select("a[href=/contact/problem_reports_nonjs?newTab=true&service=foo]")
+      links              should have size 1
+      links.first.text shouldBe "Get help with this page (opens in new tab)"
     }
   }
 }

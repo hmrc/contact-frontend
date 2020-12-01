@@ -6,7 +6,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import model.FeedbackForm
-@import views.html.partials.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Paragraph}
+@import views.html.partials.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Paragraph, ReportTechnicalIssue}
 
 @this(
     inputCharacterCount: InputCharacterCount,
@@ -18,7 +18,8 @@
     formWithCSRF: PlayFrontendFormWithCSRF,
     mainLayout: Layout,
     h1: Heading1,
-    p: Paragraph
+    p: Paragraph,
+    reportTechnicalIssue: ReportTechnicalIssue
 )
 @(feedbackForm: Form[FeedbackForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
@@ -79,4 +80,5 @@
         preventDoubleClick = true
       ))
     }
+    @reportTechnicalIssue(feedbackForm("service").value)
 }
