@@ -1,0 +1,13 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import config.AppConfig
+
+@this(mainContent: views.html.main)
+
+@()(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@mainContent(title = messages("testPage.title")) {
+<h1>@messages("testPage.title")</h1>
+}

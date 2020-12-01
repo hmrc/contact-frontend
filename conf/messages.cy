@@ -137,3 +137,5 @@ accessibility.confirmation.paragraph=Rydym yn adolygu ac yn ceisio mynd i''r afa
 
 # FIXME: to remove once play-frontend version is enabled permanently
 accessibility.close.window=Gallwch nawr cau''r ffenestr neu''r tab hwn.
+
+testPage.title = Service test page
