@@ -463,7 +463,7 @@ class FeedbackPageSpec
     }
 
     "not include a link to the problem reports nonjs form if not specified" in {
-      content.body should not include "Get help with this page"
+      content.body should not include "Is this page not working properly?"
     }
 
     "include a link to the problem reports nonjs form with service filled from the form" in {
@@ -476,7 +476,7 @@ class FeedbackPageSpec
 
       val links = contentWithService.select("a[href=/contact/problem_reports_nonjs?newTab=true&service=foo]")
       links              should have size 1
-      links.first.text shouldBe "Get help with this page (opens in new tab)"
+      links.first.text shouldBe "Is this page not working properly? (opens in new tab)"
     }
   }
 }
