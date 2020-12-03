@@ -35,7 +35,7 @@ class CSPIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
 
       headers(
         CONTENT_SECURITY_POLICY
-      ) shouldBe "default-src 'self' 'unsafe-inline' 'unsafe-eval' www.google-analytics.com cdnjs.cloudflare.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com data:"
+      ) shouldBe "default-src 'self' 'unsafe-inline' 'unsafe-eval' www.googletagmanager.com www.google-analytics.com cdnjs.cloudflare.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com data:"
     }
   }
 }
