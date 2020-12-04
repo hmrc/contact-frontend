@@ -4,15 +4,16 @@
  *@
 
 @import config.AppConfig
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.header.Header
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.header.Header
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardFooter
 @import views.html.partials.LanguageSelection
 @import views.html.partials.Head
 @import views.html.partials.Scripts
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.footer.FooterItem
 
 @this(
         govukLayout: GovukLayout,
-        govukHeader: GovukHeader,
+        hmrcHeader: HmrcHeader,
         hmrcStandardFooter: HmrcStandardFooter,
         hmrcBanner: HmrcBanner,
         head: Head,
@@ -24,15 +25,14 @@
 @import appConfig._
 
 @headerBlock = {
-    @govukHeader(Header(
-        homepageUrl = Some("https://www.gov.uk/"),
-        serviceName = None,
-        serviceUrl = None,
-        containerClasses = None))
+    @hmrcHeader(Header(
+        homepageUrl = "https://www.gov.uk/",
+        language = if(messages.lang.code == cy) Cy else En,
+        displayHmrcBanner = true
+    ))
 }
 
 @beforeContentBlock = {
-    @hmrcBanner(Banner(language = if(messages.lang.code == cy) Cy else En))
     @if(appConfig.enableLanguageSwitching) {
         @languageSelection()
     }
