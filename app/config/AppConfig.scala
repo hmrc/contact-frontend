@@ -27,6 +27,7 @@ trait AppConfig {
   def enablePlayFrontendAccessibilityForm: Boolean
   def enablePlayFrontendFeedbackForm: Boolean
   def enablePlayFrontendProblemReportNonjsForm: Boolean
+  def enablePlayFrontendSurveyForm: Boolean
   def captchaEnabled: Boolean
   def captchaMinScore: BigDecimal
   def captchaClientKey: String
@@ -58,70 +59,75 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .getOrElse(List.empty)
       .map(FeatureEnablingRule.parse)
 
-  override lazy val externalReportProblemUrl =
+  lazy val externalReportProblemUrl =
     s"$contactHost/contact/problem_reports"
 
-  override lazy val externalReportProblemSecureUrl =
+  lazy val externalReportProblemSecureUrl =
     s"$contactHost/contact/problem_reports_secure"
 
-  override lazy val assetsPrefix =
+  lazy val assetsPrefix =
     loadConfigString("frontend.assets.url") + loadConfigString(s"frontend.assets.version")
 
-  override lazy val analyticsToken = loadConfigString("google-analytics.token")
+  lazy val analyticsToken = loadConfigString("google-analytics.token")
 
-  override lazy val analyticsHost = loadConfigString("google-analytics.host")
+  lazy val analyticsHost = loadConfigString("google-analytics.host")
 
-  override lazy val backUrlDestinationWhitelist =
+  lazy val backUrlDestinationWhitelist =
     loadConfigString("backUrlDestinationWhitelist")
       .split(',')
       .filter(_.nonEmpty)
       .toSet
 
-  override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
+  def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
 
-  override def fallbackURLForLanguageSwitcher =
+  def fallbackURLForLanguageSwitcher =
     loadConfigString("platform.frontend.url")
 
-  override def enableLanguageSwitching =
+  def enableLanguageSwitching: Boolean =
     configuration
       .getOptional[Boolean]("enableLanguageSwitching")
       .getOrElse(false)
 
-  override def enablePlayFrontendAccessibilityForm =
+  def enablePlayFrontendAccessibilityForm: Boolean =
     configuration
       .getOptional[Boolean]("enablePlayFrontendAccessibilityForm")
       .getOrElse(false)
 
-  override def enablePlayFrontendFeedbackForm =
+  def enablePlayFrontendFeedbackForm: Boolean =
     configuration
       .getOptional[Boolean]("enablePlayFrontendFeedbackForm")
       .getOrElse(false)
 
-  override def enablePlayFrontendProblemReportNonjsForm: Boolean =
+  def enablePlayFrontendProblemReportNonjsForm: Boolean =
     configuration
       .getOptional[Boolean]("enablePlayFrontendProblemReportsForm")
       .getOrElse(false)
 
-  override lazy val captchaEnabled: Boolean =
+  def enablePlayFrontendSurveyForm: Boolean =
+    configuration
+      .getOptional[Boolean]("enablePlayFrontendSurveyForm")
+      .getOrElse(false)
+
+  lazy val captchaEnabled: Boolean =
     configuration
       .getOptional[Boolean]("captcha.v3.enabled")
       .getOrElse(configNotFoundError("captcha.v3.enabled"))
 
-  override lazy val captchaMinScore: BigDecimal = BigDecimal(loadConfigString("captcha.v3.minScore"))
+  lazy val captchaMinScore: BigDecimal = BigDecimal(loadConfigString("captcha.v3.minScore"))
 
-  override lazy val captchaClientKey: String = loadConfigString("captcha.v3.keys.client")
+  lazy val captchaClientKey: String = loadConfigString("captcha.v3.keys.client")
 
-  override lazy val captchaServerKey: String = loadConfigString("captcha.v3.keys.server")
+  lazy val captchaServerKey: String = loadConfigString("captcha.v3.keys.server")
 
-  override lazy val captchaVerifyUrl: String = loadConfigString("captcha.v3.verifyUrl")
+  lazy val captchaVerifyUrl: String = loadConfigString("captcha.v3.verifyUrl")
 
   lazy val featureSelector: FeatureSelector =
     new BucketBasedFeatureSelector(BucketCalculator.deviceIdBucketCalculator, featureRules)
 
-  override def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean =
+  def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean =
     featureSelector.computeFeatures(request, service).contains(f)
 
-  override def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] =
+  def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] =
     featureSelector.computeFeatures(request, service)
 
   private def configNotFoundError(key: String) =

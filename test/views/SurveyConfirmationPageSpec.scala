@@ -13,9 +13,9 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
-import views.html.FeedbackConfirmationPage
+import views.html.SurveyConfirmationPage
 
-class FeedbackConfirmationPageSpec
+class SurveyConfirmationPageSpec
     extends AnyWordSpec
     with Matchers
     with GuiceOneAppPerSuite
@@ -26,20 +26,13 @@ class FeedbackConfirmationPageSpec
   implicit lazy val appConfig: AppConfig       = app.injector.instanceOf[AppConfig]
 
   "the feedback confirmation page" should {
-    val feedbackConfirmationPage = app.injector.instanceOf[FeedbackConfirmationPage]
+    val feedbackConfirmationPage = app.injector.instanceOf[SurveyConfirmationPage]
     val content                  = feedbackConfirmationPage()
 
     "include the confirmation panel" in {
       val panels = content.select("h1")
       panels            should have size 1
-      panels.first.text should be("Your feedback has been received.")
-    }
-
-    "include a back link" in {
-      val contentWithBackLink = feedbackConfirmationPage(backUrl = Some("/foo"))
-      val backlinks           = contentWithBackLink.select("a.govuk-link")
-      backlinks                     should have size 2
-      backlinks.get(1).attr("href") should be("/foo")
+      panels.first.text should be("Thank you, your feedback has been received.")
     }
 
     "translate the title into Welsh if requested" in {
@@ -47,7 +40,7 @@ class FeedbackConfirmationPageSpec
       val welshContent                = feedbackConfirmationPage()
 
       val titles = welshContent.select("h1")
-      titles.first.text should be("Mae eich adborth wedi dod i law.")
+      titles.first.text should be("Diolch, mae eich adborth wedi dod i law.")
     }
   }
 }

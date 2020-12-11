@@ -45,3 +45,27 @@ case class FeedbackForm(
 object FeedbackFormConfig {
   val validExperiences = (5 to 1 by -1) map (_.toString)
 }
+
+case class SurveyForm(
+  helpful: Option[Int],
+  speed: Option[Int],
+  improve: Option[String],
+  ticketId: Option[String],
+  serviceId: Option[String]
+) {
+  def toStringMap: Map[String, String] = collection.immutable.HashMap(
+    "helpful"   -> helpful.getOrElse(0).toString,
+    "speed"     -> speed.getOrElse(0).toString,
+    "improve"   -> improve.getOrElse(""),
+    "ticketId"  -> ticketId.getOrElse(""),
+    "serviceId" -> serviceId.getOrElse("")
+  )
+}
+
+object SurveyFormFields {
+  val helpful   = "helpful"
+  val speed     = "speed"
+  val improve   = "improve"
+  val ticketId  = "ticket-id"
+  val serviceId = "service-id"
+}

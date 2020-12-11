@@ -7,16 +7,18 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 import config.AppConfig
+import model.{SurveyForm, SurveyFormFields}
 import play.api.Logging
 import play.api.data.Forms._
 import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.{MessagesControllerComponents, Request, Result}
+import play.api.mvc.{Call, MessagesControllerComponents, Request, Result}
+import play.twirl.api.Html
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.{survey, survey_confirmation}
+import views.html.{SurveyConfirmationPage, SurveyPage, survey, survey_confirmation}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -25,8 +27,10 @@ import scala.util.Try
 class SurveyController @Inject() (
   auditConnector: AuditConnector,
   mcc: MessagesControllerComponents,
-  surveyPage: survey,
-  surveyConfirmationPage: survey_confirmation
+  assetsFrontendSurveyPage: survey,
+  playFrontendSurveyPage: SurveyPage,
+  assetsFrontendSurveyConfirmationPage: survey_confirmation,
+  playFrontendSurveyConfirmationPage: SurveyConfirmationPage
 )(implicit appConfig: AppConfig, executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with I18nSupport
@@ -44,7 +48,9 @@ class SurveyController @Inject() (
   def survey(ticketId: String, serviceId: String) = Action.async { implicit request =>
     Future.successful(
       if (validateTicketId(ticketId)) {
-        Ok(surveyPage(ticketId, serviceId))
+        val form   = emptyForm(serviceId = Some(serviceId), ticketId = Some(ticketId))
+        val action = routes.SurveyController.submit
+        Ok(surveyPage(form, action))
       } else {
         logger.error(s"Invalid ticket id $ticketId when requesting survey form")
         BadRequest("Invalid ticket id")
@@ -53,12 +59,27 @@ class SurveyController @Inject() (
   }
 
   def submit() = Action.async { implicit request =>
-    Future.successful(submitSurveyAction)
+    Future.successful {
+      if (appConfig.enablePlayFrontendSurveyForm) {
+        playFrontendSurveyForm.bindFromRequest.fold(
+          formWithErrors =>
+            BadRequest(
+              playFrontendSurveyPage(
+                formWithErrors,
+                routes.SurveyController.submit
+              )
+            ),
+          _ => submitSurveyAction
+        )
+      } else {
+        submitSurveyAction
+      }
+    }
   }
 
   def confirmation() = Action.async { implicit request =>
     Future.successful(
-      Ok(surveyConfirmationPage())
+      Ok(surveyConfirmationPage)
     )
   }
 
@@ -88,7 +109,7 @@ class SurveyController @Inject() (
     Redirect(routes.SurveyController.confirmation())
   }
 
-  private[controllers] def buildAuditEvent(formData: SurveyFormData)(implicit hc: HeaderCarrier): Future[DataEvent] =
+  private[controllers] def buildAuditEvent(formData: SurveyForm)(implicit hc: HeaderCarrier): Future[DataEvent] =
     Future.successful(
       DataEvent(
         auditSource = "frontend",
@@ -100,7 +121,7 @@ class SurveyController @Inject() (
 
   private val ratingScale = optional(number(min = 1, max = 5, strict = false))
 
-  private[controllers] def surveyForm = Form[SurveyFormData](
+  private[controllers] def surveyForm = Form[SurveyForm](
     mapping(
       SurveyFormFields.helpful   -> ratingScale,
       SurveyFormFields.speed     -> ratingScale,
@@ -109,30 +130,56 @@ class SurveyController @Inject() (
       SurveyFormFields.serviceId -> optional(text(maxLength = 20)).verifying(serviceId =>
         serviceId.getOrElse("").length > 0
       )
-    )(SurveyFormData.apply)(SurveyFormData.unapply)
+    )(SurveyForm.apply)(SurveyForm.unapply)
   )
-}
 
-object SurveyFormFields {
-  val helpful   = "helpful"
-  val speed     = "speed"
-  val improve   = "improve"
-  val ticketId  = "ticket-id"
-  val serviceId = "service-id"
-}
-
-case class SurveyFormData(
-  helpful: Option[Int],
-  speed: Option[Int],
-  improve: Option[String],
-  ticketId: Option[String],
-  serviceId: Option[String]
-) {
-  def toStringMap: Map[String, String] = collection.immutable.HashMap(
-    "helpful"   -> helpful.getOrElse(0).toString,
-    "speed"     -> speed.getOrElse(0).toString,
-    "improve"   -> improve.getOrElse(""),
-    "ticketId"  -> ticketId.getOrElse(""),
-    "serviceId" -> serviceId.getOrElse("")
+  private[controllers] def playFrontendSurveyForm = Form[SurveyForm](
+    mapping(
+      SurveyFormFields.helpful   -> ratingScale
+        .verifying("survey.helpful.error.required", helpful => helpful.isDefined),
+      SurveyFormFields.speed     -> ratingScale
+        .verifying("survey.speed.error.required", speed => speed.isDefined),
+      SurveyFormFields.improve   -> optional(text)
+        .verifying("survey.improve.error.length", improve => improve.getOrElse("").length <= 2500),
+      SurveyFormFields.ticketId  -> optional(text),
+      SurveyFormFields.serviceId -> optional(text)
+    )(SurveyForm.apply)(SurveyForm.unapply)
   )
+
+  private[controllers] def emptyForm(
+    serviceId: Option[String] = None,
+    ticketId: Option[String] = None
+  ): Form[SurveyForm] =
+    surveyForm.fill(
+      SurveyForm(
+        helpful = None,
+        speed = None,
+        improve = None,
+        ticketId = ticketId,
+        serviceId = serviceId
+      )
+    )
+
+  private def surveyPage(form: Form[SurveyForm], action: Call)(implicit
+    request: Request[_],
+    lang: Lang
+  ): Html =
+    if (appConfig.enablePlayFrontendSurveyForm) {
+      playFrontendSurveyPage(
+        form,
+        action
+      )
+    } else {
+      assetsFrontendSurveyPage(ticketId = form("ticket-id").value.get, serviceId = form("service-id").value.get)
+    }
+
+  private def surveyConfirmationPage(implicit
+    request: Request[_],
+    lang: Lang
+  ): Html =
+    if (appConfig.enablePlayFrontendSurveyForm) {
+      playFrontendSurveyConfirmationPage()
+    } else {
+      assetsFrontendSurveyConfirmationPage()
+    }
 }

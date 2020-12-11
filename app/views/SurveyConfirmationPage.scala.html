@@ -1,0 +1,12 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import views.html.partials.Layout
+
+@this(govukPanel: GovukPanel, govukBackLink: GovukBackLink, mainLayout: Layout)
+@()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@mainLayout(pageTitle = messages("survey.title")) {
+  @govukPanel(Panel(title = Text(messages("survey.confirmation.title"))))
+}
