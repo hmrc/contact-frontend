@@ -1,5 +1,7 @@
 common.thank.you=Diolch
 common.acknowledgment=Mae''ch neges wedi dod i law
+common.fullstop=.
+
 feedback.name.error.required=Rhowch eich enw
 feedback.name.error.length=Ni all eich enw fod yn hirach na 70 o gymeriadau
 feedback.rating.error.required=Rhowch wybod i ni beth yw eich barn am y gwasanaeth
@@ -71,9 +73,7 @@ problem_report.error.hint.b=Os cawsoch neges yn dweud bod rhywbeth o''i le, rhow
 problem_report.common.size_limit=Gallwch nodi hyd at {0} o gymeriadau
 common.problem_report.error_nojavascript_title=Cafwyd problem wrth anfon eich ymholiad
 deskpro.email_too_long=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
-contact.heading=Cymorth a chysylltiadau
-contact.confirmation.message=Bydd rhywun yn cysylltu â chi cyn pen 2 ddiwrnod gwaith.
-contact.confirmation.message.b=Byddwn yn ateb neu''n rhoi gwybod i chi sut y byddwn yn delio â''ch neges cyn pen 2 ddiwrnod gwaith.
+
 survey.title=Arolwg
 survey.helpful.error.required=Tell us how satisfied you are with the answer we gave you
 survey.speed.error.required=Tell us how satisfied you are with the speed of our reply
@@ -93,10 +93,29 @@ survey.submit=Cyflwyno
 deskpro.error.problem.sending=Cododd problem wrth anfon eich ymholiad.
 please.try.later=Rhowch gynnig arall arni yn nes ymlaen.
 
+contact.heading=Cymorth a chysylltiadau
+contact.confirmation.message=Bydd rhywun yn cysylltu â chi cyn pen 2 ddiwrnod gwaith.
+contact.confirmation.message.b=Byddwn yn ateb neu''n rhoi gwybod i chi sut y byddwn yn delio â''ch neges cyn pen 2 ddiwrnod gwaith.
 contact.form.specific.query=Os oes gennych ymholiad penodol ynghylch treth {0}.
 contact.form.please.fill=Os oes angen cymorth arnoch i ddefnyddio''ch cyfrif treth, llenwch y ffurflen hon.
 contact.form.how.help=Sut allwn eich helpu?
 form.send=Anfon
+contact.button=Anfon
+contact.comments.label=Eich sylwadau
+contact.comments.error.required=Rhowch eich sylwadau
+contact.comments.error.length=Ni all eich sylwadau fod yn hirach na 2000 o gymeriadau
+contact.name.label=Enw
+contact.name.error.required=Rhowch eich enw
+contact.name.error.length=Ni all eich enw fod yn hirach na 70 o gymeriadau
+contact.email.label=Cyfeiriad e-bost
+contact.email.error.required=Nodwch eich cyfeiriad e-bost
+contact.email.error.invalid=Nodwch gyfeiriad e-bost yn y fformat cywir, megis enw@enghraifft.com
+contact.email.error.length=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
+contact.form.heading2=Sut allwn eich helpu?
+contact.form.para1=Os oes gennych ymholiad penodol ynghylch treth
+contact.form.para2=Os oes angen cymorth arnoch i ddefnyddio''ch cyfrif treth, llenwch y ffurflen hon.
+contact.form.para3=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
+contact.hmrc.link=Contact HMRC
 
 form.your.name=Eich enw
 form.email.address=Cyfeiriad e-bost

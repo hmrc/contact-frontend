@@ -17,6 +17,8 @@ class TestAppConfig extends AppConfig {
 
   def analyticsHost: String = "localhost"
 
+  def contactHmrcAboutTaxUrl: String = "some.contact.url"
+
   def externalReportProblemUrl: String = ???
 
   def externalReportProblemSecureUrl: String = ???
@@ -36,6 +38,8 @@ class TestAppConfig extends AppConfig {
   def enablePlayFrontendProblemReportNonjsForm: Boolean = false
 
   def enablePlayFrontendSurveyForm: Boolean = false
+
+  def enablePlayFrontendContactHmrcForm: Boolean = false
 
   def captchaEnabled: Boolean = ???
 

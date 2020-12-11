@@ -78,19 +78,19 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
     "return 200 and a valid html page for a valid request with " +
       "JavaScript disabled for an unauthenticated user on standalone page" in new TestScope(fakeApplication()) {
 
-      hrmcConnectorWillReturnTheTicketId
+        hrmcConnectorWillReturnTheTicketId
 
-      val request = generateRequest(javascriptEnabled = false)
-      val result  = controller.submitNonJavaScript()(request)
+        val request = generateRequest(javascriptEnabled = false)
+        val result  = controller.submitNonJavaScript()(request)
 
-      status(result) should be(200)
+        status(result) should be(200)
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByClass("govuk-error-summary").size() should be(0)
-      document.getElementsByClass("govuk-body").text()          should be(
-        "Someone will get back to you within 2 working days."
-      )
-    }
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementsByClass("govuk-error-summary").size() should be(0)
+        document.getElementsByClass("govuk-body").text()          should be(
+          "Someone will get back to you within 2 working days."
+        )
+      }
 
     "return 200 and a valid html page for a valid request with " +
       "JavaScript disabled for an authenticated user" in new TestScope(fakeApplication()) {
@@ -253,7 +253,8 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
     val problemReportPage              = app.injector.instanceOf[views.html.problem_reports_nonjavascript]
     val problemReportErrorPage         = app.injector.instanceOf[views.html.problem_reports_error_nonjavascript]
     val problemReportConfirmationPage  = app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript]
-    val problemReportConfirmationPageB = app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript_b]
+    val problemReportConfirmationPageB =
+      app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript_b]
     val playFrontendProblemReportPage  = app.injector.instanceOf[views.html.ProblemReportsNonjsPage]
     val playFrontendConfirmationPage   = app.injector.instanceOf[views.html.ProblemReportsNonjsConfirmationPage]
     val playFrontendErrorFeedbackPage  = app.injector.instanceOf[views.html.ProblemReportsNonjsErrorPage]

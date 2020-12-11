@@ -18,6 +18,7 @@ trait AppConfig {
   def assetsPrefix: String
   def analyticsToken: String
   def analyticsHost: String
+  def contactHmrcAboutTaxUrl: String
   def externalReportProblemUrl: String
   def externalReportProblemSecureUrl: String
   def backUrlDestinationWhitelist: Set[String]
@@ -28,6 +29,7 @@ trait AppConfig {
   def enablePlayFrontendFeedbackForm: Boolean
   def enablePlayFrontendProblemReportNonjsForm: Boolean
   def enablePlayFrontendSurveyForm: Boolean
+  def enablePlayFrontendContactHmrcForm: Boolean
   def captchaEnabled: Boolean
   def captchaMinScore: BigDecimal
   def captchaClientKey: String
@@ -58,6 +60,9 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .map(_.asScala.toList)
       .getOrElse(List.empty)
       .map(FeatureEnablingRule.parse)
+
+  override def contactHmrcAboutTaxUrl: String =
+    loadConfigString("contactHmrcAboutTax.url")
 
   override lazy val externalReportProblemUrl =
     s"$contactHost/contact/problem_reports"
@@ -108,7 +113,12 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .getOptional[Boolean]("enablePlayFrontendSurveyForm")
       .getOrElse(false)
 
-  lazy val captchaEnabled: Boolean =
+  override def enablePlayFrontendContactHmrcForm: Boolean =
+    configuration
+      .getOptional[Boolean]("enablePlayFrontendContactHmrcForm")
+      .getOrElse(false)
+
+  override lazy val captchaEnabled: Boolean =
     configuration
       .getOptional[Boolean]("captcha.v3.enabled")
       .getOrElse(configNotFoundError("captcha.v3.enabled"))
