@@ -1,0 +1,17 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import views.html.partials.{Layout, Heading1, Paragraph}
+
+@this(
+    mainLayout: Layout,
+    h1: Heading1,
+    p: Paragraph
+)
+@(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@mainLayout(pageTitle, isWelshTranslationAvailable = false) {
+    @h1(content = Text(heading))
+    @p(content = Text(message))
+}

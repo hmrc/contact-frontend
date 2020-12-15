@@ -73,7 +73,7 @@ class WithCaptchaSpec extends AnyWordSpec with MockitoSugar with Results with Ma
     class TestController(enabled: Boolean = true)
         extends WithCaptcha(
           Stubs.stubMessagesControllerComponents(messagesApi = Helpers.stubMessagesApi()),
-          app.injector.instanceOf[views.html.deskpro_error],
+          app.injector.instanceOf[views.html.DeskproErrorPage],
           app.injector.instanceOf[views.html.helpers.recaptcha]
         ) {
       override implicit val appConfig: AppConfig = new TestAppConfig {

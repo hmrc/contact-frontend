@@ -1,0 +1,20 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import views.html.partials.{Layout, Heading1, Paragraph}
+
+@this(
+    mainLayout: Layout,
+    h1: Heading1,
+    p: Paragraph
+)
+@()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@defining(messages("global.error.InternalServerError500.heading")) { pageTitle =>
+  @mainLayout(pageTitle, isWelshTranslationAvailable = true) {
+    @h1(content = Text(pageTitle))
+    @p(content = Text(messages("deskpro.error.problem.sending")))
+    @p(content = Text(messages("please.try.later")))
+  }
+}

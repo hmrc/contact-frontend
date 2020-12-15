@@ -9,14 +9,11 @@ import javax.inject.Inject
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
-import views.html.error_template
+import views.html.ErrorPage
 
-class ContactFrontendErrorHandler @Inject() (val messagesApi: MessagesApi, errorPage: error_template)(implicit
+class ContactFrontendErrorHandler @Inject() (val messagesApi: MessagesApi, errorPage: ErrorPage)(implicit
   appConfig: AppConfig
 ) extends FrontendErrorHandler {
-
-  implicit def lang(implicit request: Request[_]): Lang = request.lang(messagesApi)
-
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
     request: Request[_]
   ) =
