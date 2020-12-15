@@ -3,7 +3,6 @@
  *
  *@
 
-@import model.SurveyFormFields
 @import uk.gov.hmrc.play.views.html.helpers.FormWithCSRF
 
 @this(mainContent: views.html.main, helpersForm: uk.gov.hmrc.play.views.html.helpers.FormWithCSRF)
@@ -26,23 +25,23 @@
 		<fieldset class="form-field-group">
 		    <legend class="float--none">@Messages("survey.was.answer.helpful.question")</legend>
 		    <label class="block-label--stacked" for="helpful-strongly-agree">
-		        <input type="radio" id="helpful-strongly-agree" name="@{SurveyFormFields.helpful}" value="5">
+		        <input type="radio" id="helpful-strongly-agree" name="helpful" value="5">
 				@Messages("survey.strongly.agree.response")
 		    </label>
 		    <label class="block-label--stacked" for="helpful-agree">
-		        <input type="radio" id="helpful-agree" name="@{SurveyFormFields.helpful}" value="4">
+		        <input type="radio" id="helpful-agree" name="helpful" value="4">
 				@Messages("survey.agree.response")
 		    </label>
 		    <label class="block-label--stacked" for="helpful-neutral">
-		        <input type="radio" id="helpful-neutral" name="@{SurveyFormFields.helpful}" value="3">
+		        <input type="radio" id="helpful-neutral" name="helpful" value="3">
 				@Messages("survey.neutral.response")
 		    </label>
 		    <label class="block-label--stacked" for="helpful-disagree">
-		        <input type="radio" id="helpful-disagree" name="@{SurveyFormFields.helpful}" value="2">
+		        <input type="radio" id="helpful-disagree" name="helpful" value="2">
 				@Messages("survey.disagree.response")
 		    </label>
 		    <label class="block-label--stacked" for="helpful-strongly-disagree">
-		        <input type="radio" id="helpful-strongly-disagree" name="@{SurveyFormFields.helpful}" value="1">
+		        <input type="radio" id="helpful-strongly-disagree" name="helpful" value="1">
 				@Messages("survey.strongly.disagree.response")
 		    </label>
 		</fieldset>
@@ -50,30 +49,30 @@
 		<fieldset class="form-field-group">
 		    <legend class="float--none">@Messages("survey.satisfied.with.speed.question")</legend>
 		    <label class="block-label--stacked" for="speed-strongly-agree">
-		        <input type="radio" id="speed-strongly-agree" name="@{SurveyFormFields.speed}" value="5">
+		        <input type="radio" id="speed-strongly-agree" name="speed" value="5">
 				@Messages("survey.strongly.agree.response")
 		    </label>
 		    <label class="block-label--stacked" for="speed-agree">
-		        <input type="radio" id="speed-agree" name="@{SurveyFormFields.speed}" value="4">
+		        <input type="radio" id="speed-agree" name="speed" value="4">
 				@Messages("survey.agree.response")
 		    </label>
 		    <label class="block-label--stacked" for="speed-neutral">
-		        <input type="radio" id="speed-neutral" name="@{SurveyFormFields.speed}" value="3">
+		        <input type="radio" id="speed-neutral" name="speed" value="3">
 				@Messages("survey.neutral.response")
 		    </label>
 		    <label class="block-label--stacked" for="speed-disagree">
-		        <input type="radio" id="speed-disagree" name="@{SurveyFormFields.speed}" value="2">
+		        <input type="radio" id="speed-disagree" name="speed" value="2">
 				@Messages("survey.disagree.response")
 		    </label>
 		    <label class="block-label--stacked" for="speed-strongly-disagree">
-		        <input type="radio" id="speed-strongly-disagree" name="@{SurveyFormFields.speed}" value="1">
+		        <input type="radio" id="speed-strongly-disagree" name="speed" value="1">
 				@Messages("survey.strongly.disagree.response")
 		    </label>
 		</fieldset>
 
 		<div class="form-field-group">
 			<legend class="float--none" for="improve">@Messages("survey.tell.us.how.we.can.improve")</legend>
-		    <textarea maxlength="2500" id="improve" name="@{SurveyFormFields.improve}" cols="40" rows="6"></textarea>
+		    <textarea maxlength="2500" id="improve" name="improve" cols="40" rows="6"></textarea>
 		    <p class="push--top"><small>@Messages("survey.2500.characters.or.less")</small></p>
 		</div>
 

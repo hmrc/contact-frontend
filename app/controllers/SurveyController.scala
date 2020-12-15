@@ -7,7 +7,7 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 import config.AppConfig
-import model.{SurveyForm, SurveyFormFields}
+import model.SurveyForm
 import play.api.Logging
 import play.api.data.Forms._
 import play.api.data.{Form, FormError}
@@ -115,7 +115,13 @@ class SurveyController @Inject() (
         auditSource = "frontend",
         auditType = "DeskproSurvey",
         tags = hc.headers.toMap,
-        detail = formData.toStringMap
+        detail = collection.immutable.HashMap(
+          "helpful"   -> formData.helpful.getOrElse(0).toString,
+          "speed"     -> formData.speed.getOrElse(0).toString,
+          "improve"   -> formData.improve.getOrElse(""),
+          "ticketId"  -> formData.ticketId.getOrElse(""),
+          "serviceId" -> formData.serviceId.getOrElse("")
+        )
       )
     )
 
@@ -123,26 +129,24 @@ class SurveyController @Inject() (
 
   private[controllers] def surveyForm = Form[SurveyForm](
     mapping(
-      SurveyFormFields.helpful   -> ratingScale,
-      SurveyFormFields.speed     -> ratingScale,
-      SurveyFormFields.improve   -> optional(text(maxLength = 2500)),
-      SurveyFormFields.ticketId  -> optional(text).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
-      SurveyFormFields.serviceId -> optional(text(maxLength = 20)).verifying(serviceId =>
-        serviceId.getOrElse("").length > 0
-      )
+      "helpful"    -> ratingScale,
+      "speed"      -> ratingScale,
+      "improve"    -> optional(text(maxLength = 2500)),
+      "ticket-id"  -> optional(text).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
+      "service-id" -> optional(text(maxLength = 20)).verifying(serviceId => serviceId.getOrElse("").length > 0)
     )(SurveyForm.apply)(SurveyForm.unapply)
   )
 
   private[controllers] def playFrontendSurveyForm = Form[SurveyForm](
     mapping(
-      SurveyFormFields.helpful   -> ratingScale
+      "helpful"    -> ratingScale
         .verifying("survey.helpful.error.required", helpful => helpful.isDefined),
-      SurveyFormFields.speed     -> ratingScale
+      "speed"      -> ratingScale
         .verifying("survey.speed.error.required", speed => speed.isDefined),
-      SurveyFormFields.improve   -> optional(text)
+      "improve"    -> optional(text)
         .verifying("survey.improve.error.length", improve => improve.getOrElse("").length <= 2500),
-      SurveyFormFields.ticketId  -> optional(text),
-      SurveyFormFields.serviceId -> optional(text)
+      "ticket-id"  -> optional(text),
+      "service-id" -> optional(text)
     )(SurveyForm.apply)(SurveyForm.unapply)
   )
 

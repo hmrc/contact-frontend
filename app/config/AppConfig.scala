@@ -59,51 +59,51 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .getOrElse(List.empty)
       .map(FeatureEnablingRule.parse)
 
-  lazy val externalReportProblemUrl =
+  override lazy val externalReportProblemUrl =
     s"$contactHost/contact/problem_reports"
 
-  lazy val externalReportProblemSecureUrl =
+  override lazy val externalReportProblemSecureUrl =
     s"$contactHost/contact/problem_reports_secure"
 
-  lazy val assetsPrefix =
+  override lazy val assetsPrefix =
     loadConfigString("frontend.assets.url") + loadConfigString(s"frontend.assets.version")
 
-  lazy val analyticsToken = loadConfigString("google-analytics.token")
+  override lazy val analyticsToken = loadConfigString("google-analytics.token")
 
-  lazy val analyticsHost = loadConfigString("google-analytics.host")
+  override lazy val analyticsHost = loadConfigString("google-analytics.host")
 
-  lazy val backUrlDestinationWhitelist =
+  override lazy val backUrlDestinationWhitelist =
     loadConfigString("backUrlDestinationWhitelist")
       .split(',')
       .filter(_.nonEmpty)
       .toSet
 
-  def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
+  override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
 
-  def fallbackURLForLanguageSwitcher =
+  override def fallbackURLForLanguageSwitcher =
     loadConfigString("platform.frontend.url")
 
-  def enableLanguageSwitching: Boolean =
+  override def enableLanguageSwitching =
     configuration
       .getOptional[Boolean]("enableLanguageSwitching")
       .getOrElse(false)
 
-  def enablePlayFrontendAccessibilityForm: Boolean =
+  override def enablePlayFrontendAccessibilityForm =
     configuration
       .getOptional[Boolean]("enablePlayFrontendAccessibilityForm")
       .getOrElse(false)
 
-  def enablePlayFrontendFeedbackForm: Boolean =
+  override def enablePlayFrontendFeedbackForm =
     configuration
       .getOptional[Boolean]("enablePlayFrontendFeedbackForm")
       .getOrElse(false)
 
-  def enablePlayFrontendProblemReportNonjsForm: Boolean =
+  override def enablePlayFrontendProblemReportNonjsForm: Boolean =
     configuration
       .getOptional[Boolean]("enablePlayFrontendProblemReportsForm")
       .getOrElse(false)
 
-  def enablePlayFrontendSurveyForm: Boolean =
+  override def enablePlayFrontendSurveyForm: Boolean =
     configuration
       .getOptional[Boolean]("enablePlayFrontendSurveyForm")
       .getOrElse(false)
@@ -113,21 +113,21 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .getOptional[Boolean]("captcha.v3.enabled")
       .getOrElse(configNotFoundError("captcha.v3.enabled"))
 
-  lazy val captchaMinScore: BigDecimal = BigDecimal(loadConfigString("captcha.v3.minScore"))
+  override lazy val captchaMinScore: BigDecimal = BigDecimal(loadConfigString("captcha.v3.minScore"))
 
-  lazy val captchaClientKey: String = loadConfigString("captcha.v3.keys.client")
+  override lazy val captchaClientKey: String = loadConfigString("captcha.v3.keys.client")
 
-  lazy val captchaServerKey: String = loadConfigString("captcha.v3.keys.server")
+  override lazy val captchaServerKey: String = loadConfigString("captcha.v3.keys.server")
 
-  lazy val captchaVerifyUrl: String = loadConfigString("captcha.v3.verifyUrl")
+  override lazy val captchaVerifyUrl: String = loadConfigString("captcha.v3.verifyUrl")
 
   lazy val featureSelector: FeatureSelector =
     new BucketBasedFeatureSelector(BucketCalculator.deviceIdBucketCalculator, featureRules)
 
-  def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean =
+  override def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean =
     featureSelector.computeFeatures(request, service).contains(f)
 
-  def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] =
+  override def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] =
     featureSelector.computeFeatures(request, service)
 
   private def configNotFoundError(key: String) =

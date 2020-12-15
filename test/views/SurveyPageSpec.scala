@@ -7,7 +7,7 @@ package views
 
 import _root_.helpers.{JsoupHelpers, MessagesSupport}
 import config.AppConfig
-import model.{SurveyForm, SurveyFormFields}
+import model.SurveyForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -28,14 +28,14 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite 
 
   val form: Form[SurveyForm] = Form[SurveyForm](
     mapping(
-      SurveyFormFields.helpful   -> optional(number(min = 1, max = 5, strict = false))
+      "helpful"    -> optional(number(min = 1, max = 5, strict = false))
         .verifying("survey.helpful.error.required", helpful => helpful.isDefined),
-      SurveyFormFields.speed     -> optional(number(min = 1, max = 5, strict = false))
+      "speed"      -> optional(number(min = 1, max = 5, strict = false))
         .verifying("survey.speed.error.required", speed => speed.isDefined),
-      SurveyFormFields.improve   -> optional(text)
+      "improve"    -> optional(text)
         .verifying("survey.improve.error.length", improve => improve.getOrElse("").length <= 10),
-      SurveyFormFields.ticketId  -> optional(text),
-      SurveyFormFields.serviceId -> optional(text)
+      "ticket-id"  -> optional(text),
+      "service-id" -> optional(text)
     )(SurveyForm.apply)(SurveyForm.unapply)
   )
 
@@ -49,7 +49,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite 
 
   val action: Call = Call(method = "POST", url = "/contact/the-submit-url")
 
-  "the survey page" should {
+  "The survey page" should {
     val surveyPage = app.injector.instanceOf[SurveyPage]
     val content    = surveyPage(form, action)
 
