@@ -245,8 +245,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       val submit = controller.thanks()(request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
       val page   = Jsoup.parse(contentAsString(submit))
 
-      page.body().select(".govuk-back-link").first shouldBe null
-
+      page.body().select(".govuk-link") should have size 1
     }
 
     "contain back button if requested and the back url is valid" in new FeedbackControllerApplication(fakeApplication) {
@@ -256,8 +255,9 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       )
       val page   = Jsoup.parse(contentAsString(submit))
 
-      page.body().select(".govuk-back-link").first.attr("href") shouldBe "http://www.valid.url"
+      page.body().select(".govuk-link") should have size 2
 
+      page.body().select(".govuk-link").get(1).attr("href") shouldBe "http://www.valid.url"
     }
 
     "not contain back link if requested and the back url is invalid" in new FeedbackControllerApplication(
@@ -269,7 +269,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       )
       val page   = Jsoup.parse(contentAsString(submit))
 
-      page.body().select(".govuk-back-link").first shouldBe null
+      page.body().select(".govuk-link") should have size 1
 
     }
 
@@ -294,8 +294,8 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
         )
         val page   = Jsoup.parse(contentAsString(submit))
 
-        page.body().select(".govuk-back-link").first.attr("href") shouldBe "http://www.valid.url"
-
+        page.body().select(".govuk-link")                       should have size 2
+        page.body().select(".govuk-link").get(1).attr("href") shouldBe "http://www.valid.url"
       }
 
       "not contain back button if requested and the back url is invalid" in new FeedbackControllerApplication(

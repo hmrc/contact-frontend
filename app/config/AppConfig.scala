@@ -27,6 +27,7 @@ trait AppConfig {
   def enablePlayFrontendAccessibilityForm: Boolean
   def enablePlayFrontendFeedbackForm: Boolean
   def enablePlayFrontendProblemReportNonjsForm: Boolean
+  def enablePlayFrontendSurveyForm: Boolean
   def captchaEnabled: Boolean
   def captchaMinScore: BigDecimal
   def captchaClientKey: String
@@ -102,7 +103,12 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .getOptional[Boolean]("enablePlayFrontendProblemReportsForm")
       .getOrElse(false)
 
-  override lazy val captchaEnabled: Boolean =
+  override def enablePlayFrontendSurveyForm: Boolean =
+    configuration
+      .getOptional[Boolean]("enablePlayFrontendSurveyForm")
+      .getOrElse(false)
+
+  lazy val captchaEnabled: Boolean =
     configuration
       .getOptional[Boolean]("captcha.v3.enabled")
       .getOrElse(configNotFoundError("captcha.v3.enabled"))

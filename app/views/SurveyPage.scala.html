@@ -1,0 +1,64 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import model.SurveyForm
+@import views.html.partials.{Layout, InputRadios, InputHidden, InputCharacterCount, Heading1}
+
+@this(
+    inputCharacterCount: InputCharacterCount,
+    inputHidden: InputHidden,
+    inputRadios: InputRadios,
+    govukButton: GovukButton,
+    govukErrorSummary: GovukErrorSummary,
+    formWithCSRF: PlayFrontendFormWithCSRF,
+    mainLayout: Layout,
+    h1: Heading1
+)
+@(surveyForm: Form[SurveyForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@pageTitle = @{
+    if(surveyForm.hasErrors){messages("error.browser.title.prefix")+" "+messages("survey.title")} else messages("survey.title")
+}
+
+@mainLayout(pageTitle) {
+    @if(surveyForm.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary(errorList = surveyForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+    }
+    @h1(content = Text(messages("survey.title")))
+    @formWithCSRF(action) {
+      @inputHidden(surveyForm("service-id"))
+      @inputHidden(surveyForm("ticket-id"))
+      @defining(Seq(
+        ("5", messages("survey.strongly.agree.response")),
+        ("4", messages("survey.agree.response")),
+        ("3", messages("survey.neutral.response")),
+        ("2", messages("survey.disagree.response")),
+        ("1", messages("survey.strongly.disagree.response"))
+      )) { items =>
+        @inputRadios(
+          surveyForm("helpful"),
+          legend = messages("survey.was.answer.helpful.question"),
+          items = items
+        )
+        @inputRadios(
+          surveyForm("speed"),
+          legend = messages("survey.satisfied.with.speed.question"),
+          items = items
+        )
+      }
+      @inputCharacterCount(
+        surveyForm("improve"),
+        label = messages("survey.tell.us.how.we.can.improve"),
+        maxLength = Some(2500)
+      )
+      @govukButton(Button(
+        content = Text(messages("survey.submit")),
+        inputType = Some("submit"),
+        preventDoubleClick = true
+      ))
+    }
+}

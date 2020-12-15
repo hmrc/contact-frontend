@@ -9,8 +9,10 @@ import config.CFConfig
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.Configuration
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.{Application, Configuration}
 import play.api.data.FormError
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{FakeHeaders, FakeRequest}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
@@ -19,21 +21,29 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class SurveyControllerSpec extends AnyWordSpec with Matchers {
+class AssetsFrontendSurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
+  override def fakeApplication(): Application =
+    new GuiceApplicationBuilder()
+      .configure(
+        "metrics.jvm"                  -> false,
+        "metrics.enabled"              -> false,
+        "enablePlayFrontendSurveyForm" -> false
+      )
+      .build()
 
   "ticketId regex" should {
-    "validates correct ticket refs" in new SurveyControllerApplication {
+    "validates correct ticket refs" in new TestScope {
       controller.validateTicketId("GFBN-8051-KLNY") shouldBe true
     }
 
-    "rejects invalid ticket refs" in new SurveyControllerApplication {
+    "rejects invalid ticket refs" in new TestScope {
       controller.validateTicketId("GFBN-8051-") shouldBe false
       controller.validateTicketId("")           shouldBe false
     }
   }
 
   "SurveyController" should {
-    "produce an audit result for a valid form" in new SurveyControllerApplication {
+    "produce an audit result for a valid form" in new TestScope {
       implicit val request = FakeRequest(
         "GET",
         "/blah",
@@ -63,7 +73,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers {
       )
     }
 
-    "product errors for an invalid form" in new SurveyControllerApplication {
+    "product errors for an invalid form" in new TestScope {
       implicit val request = FakeRequest(
         "GET",
         "/blah",
@@ -83,14 +93,14 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers {
     }
   }
 
-}
-
-class SurveyControllerApplication extends MockitoSugar {
-
-  val controller = new SurveyController(
-    mock[AuditConnector],
-    Stubs.stubMessagesControllerComponents(),
-    mock[views.html.survey],
-    mock[views.html.survey_confirmation]
-  )(new CFConfig(Configuration()), ExecutionContext.Implicits.global)
+  class TestScope extends MockitoSugar {
+    val controller = new SurveyController(
+      mock[AuditConnector],
+      Stubs.stubMessagesControllerComponents(),
+      mock[views.html.survey],
+      mock[views.html.SurveyPage],
+      mock[views.html.survey_confirmation],
+      mock[views.html.SurveyConfirmationPage]
+    )(new CFConfig(Configuration()), ExecutionContext.Implicits.global)
+  }
 }

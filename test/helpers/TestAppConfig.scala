@@ -11,42 +11,44 @@ import util.Feature
 
 class TestAppConfig extends AppConfig {
 
-  override def assetsPrefix: String = ???
+  def assetsPrefix: String = ???
 
-  override def analyticsToken: String = "token"
+  def analyticsToken: String = "token"
 
-  override def analyticsHost: String = "localhost"
+  def analyticsHost: String = "localhost"
 
-  override def externalReportProblemUrl: String = ???
+  def externalReportProblemUrl: String = ???
 
-  override def externalReportProblemSecureUrl: String = ???
+  def externalReportProblemSecureUrl: String = ???
 
-  override def backUrlDestinationWhitelist: Set[String] = ???
+  def backUrlDestinationWhitelist: Set[String] = ???
 
-  override def loginCallback(continueUrl: String): String = ???
+  def loginCallback(continueUrl: String): String = ???
 
-  override def fallbackURLForLanguageSwitcher: String = ???
+  def fallbackURLForLanguageSwitcher: String = ???
 
-  override def enableLanguageSwitching: Boolean = true
+  def enableLanguageSwitching: Boolean = true
 
-  override def enablePlayFrontendAccessibilityForm: Boolean = false
+  def enablePlayFrontendAccessibilityForm: Boolean = false
 
-  override def enablePlayFrontendFeedbackForm: Boolean = false
+  def enablePlayFrontendFeedbackForm: Boolean = false
 
-  override def enablePlayFrontendProblemReportNonjsForm: Boolean = false
+  def enablePlayFrontendProblemReportNonjsForm: Boolean = false
 
-  override def captchaEnabled: Boolean = ???
+  def enablePlayFrontendSurveyForm: Boolean = false
 
-  override def captchaMinScore: BigDecimal = ???
+  def captchaEnabled: Boolean = ???
 
-  override def captchaClientKey: String = ???
+  def captchaMinScore: BigDecimal = ???
 
-  override def captchaServerKey: String = ???
+  def captchaClientKey: String = ???
 
-  override def captchaVerifyUrl: String = ???
+  def captchaServerKey: String = ???
 
-  override def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean = ???
+  def captchaVerifyUrl: String = ???
 
-  override def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] = ???
+  def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean = ???
+
+  def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] = ???
 
 }
