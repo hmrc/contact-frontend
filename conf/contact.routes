@@ -20,7 +20,7 @@ GET         /contact-hmrc/form                           @controllers.ContactHmr
 POST        /contact-hmrc/form                           @controllers.ContactHmrcController.submitContactHmrcPartialForm(resubmitUrl: String, renderFormOnly: Boolean ?= false)
 GET         /contact-hmrc/form/confirmation              @controllers.ContactHmrcController.contactHmrcPartialFormConfirmation(ticketId: String)
 
-GET         /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.indexUnauthenticated(service: String, userAction: Option[String], referrerUrl: Option[String])
+GET         /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.indexUnauthenticated(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
 POST        /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.submitUnauthenticated
 GET         /contact-hmrc/thanks-unauthenticated         @controllers.ContactHmrcController.thanksUnauthenticated
 

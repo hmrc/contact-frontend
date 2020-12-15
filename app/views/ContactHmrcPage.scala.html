@@ -1,0 +1,75 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import views.html.partials.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
+
+@this(
+    inputCharacterCount: InputCharacterCount,
+    govukInput: GovukInput,
+    inputHidden: InputHidden,
+    inputText: InputText,
+    govukButton: GovukButton,
+    govukFieldset: GovukFieldset,
+    govukErrorSummary: GovukErrorSummary,
+    formWithCSRF: PlayFrontendFormWithCSRF,
+    mainLayout: Layout,
+    h1: Heading1,
+    h2: Heading2,
+    p: Paragraph
+)
+@(contactForm: Form[ContactForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@pageTitle = @{
+    if(contactForm.hasErrors){Messages("error.browser.title.prefix") + " " + Messages("contact.heading")}
+    else Messages("contact.heading")
+}
+
+@contactHmrcLink = @{
+    <a href={appConfig.contactHmrcAboutTaxUrl} class="govuk-link" rel="noreferrer noopener" target="_blank">{messages("contact.hmrc.link")}</a>
+}
+
+@mainLayout(pageTitle) {
+    @if(contactForm.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary(errorList = contactForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+    }
+    @h1(content = Text(messages("contact.heading")))
+    @p(content = HtmlContent(messages("contact.form.para1") + " " + contactHmrcLink + messages("common.fullstop")))
+    @p(content = Text(messages("contact.form.para2")))
+    @h2(content = Text(messages("contact.form.heading2")))
+    @p(content = Text(messages("contact.form.para3")))
+
+    @formWithCSRF(action, 'id -> "contact-hmrc-form") {
+        @inputHidden(contactForm("service"))
+        @inputHidden(contactForm("referrer"))
+        @inputHidden(contactForm("userAction"))
+        @inputText(
+            contactForm("contact-name"),
+            label = messages("contact.name.label"),
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false),
+            autocomplete = Some("name")
+        )
+        @inputText(
+            contactForm("contact-email"),
+            inputType = "email",
+            label = messages("contact.email.label"),
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false),
+            autocomplete = Some("email")
+        )
+        @inputCharacterCount(
+            contactForm("contact-comments"),
+            label = messages("contact.comments.label"),
+            maxLength = Some(2000)
+        )
+        @govukButton(Button(
+            content = Text(messages("contact.button")),
+            inputType = Some("submit"),
+            preventDoubleClick = true
+        ))
+    }
+}

@@ -35,7 +35,7 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ContactHmrcControllerSpec
+class AssetsFrontendContactHmrcControllerSpec
     extends AnyWordSpec
     with GivenWhenThen
     with Matchers
@@ -45,7 +45,7 @@ class ContactHmrcControllerSpec
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false)
+      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "enablePlayFrontendContactHmrcForm" -> false)
       .build()
 
   implicit val actorSystem: ActorSystem        = ActorSystem()
@@ -61,7 +61,7 @@ class ContactHmrcControllerSpec
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
       val contactRequest = FakeRequest().withHeaders((REFERER, "/some-service-page"))
-      val serviceName    = "my-fake-service"
+      val serviceName    = Some("my-fake-service")
 
       When("the unauthenticated Contact HMRC page is requested with a service name")
       val contactResult = controller.indexUnauthenticated(serviceName, None, None)(contactRequest)
@@ -79,7 +79,7 @@ class ContactHmrcControllerSpec
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
       val contactRequest = FakeRequest().withHeaders((REFERER, "/some-service-page"))
-      val serviceName    = "my-fake-service"
+      val serviceName    = Some("my-fake-service")
       val referrerUrl    = Some("https://www.example.com/some-service")
 
       When("the unauthenticated Contact HMRC page is requested with a service name and a referrer url")
@@ -95,7 +95,7 @@ class ContactHmrcControllerSpec
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
       val contactRequest = FakeRequest()
-      val serviceName    = "my-fake-service"
+      val serviceName    = Some("my-fake-service")
 
       When("the unauthenticated Contact HMRC page is requested with a service name")
       val contactResult = controller.indexUnauthenticated(serviceName, None, None)(contactRequest)
@@ -429,24 +429,19 @@ class ContactHmrcControllerSpec
 
     val hmrcDeskproConnector = mock[HmrcDeskproConnector]
 
-    val captchaService = new CaptchaService {
-      override def validateCaptcha(response: String)(implicit headerCarrier: HeaderCarrier): Future[Boolean] =
-        Future.successful(true)
-    }
-
     val contactPage             = fakeApplication.injector.instanceOf[views.html.contact_hmrc]
     val contactConfirmationPage = fakeApplication.injector.instanceOf[views.html.contact_hmrc_confirmation]
     val contactForm             = fakeApplication.injector.instanceOf[views.html.partials.contact_hmrc_form]
     val contactFormConfirmation =
       fakeApplication.injector.instanceOf[views.html.partials.contact_hmrc_form_confirmation]
     val deskproErrorPage        = fakeApplication.injector.instanceOf[views.html.DeskproErrorPage]
-    val recaptcha               = fakeApplication.injector.instanceOf[views.html.helpers.recaptcha]
+    val pfContactPage           = fakeApplication.injector.instanceOf[views.html.ContactHmrcPage]
+    val pfConfirmationPage      = fakeApplication.injector.instanceOf[views.html.ContactHmrcConfirmationPage]
 
     val controller =
       new ContactHmrcController(
         hmrcDeskproConnector,
         authConnector,
-        captchaService,
         configuration,
         Stubs.stubMessagesControllerComponents(messagesApi = messages),
         contactPage,
@@ -454,7 +449,8 @@ class ContactHmrcControllerSpec
         contactForm,
         contactFormConfirmation,
         deskproErrorPage,
-        recaptcha
+        pfContactPage,
+        pfConfirmationPage
       )
 
     def mockDeskproConnector(result: Future[TicketId]): Unit =

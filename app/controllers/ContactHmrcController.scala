@@ -11,17 +11,17 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc._
 import play.filters.csrf.CSRF
-import services.{CaptchaService, DeskproSubmission}
+import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.DeskproEmailValidator
-import views.html.helpers.recaptcha
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
-import views.html.{DeskproErrorPage, contact_hmrc, contact_hmrc_confirmation}
+import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, DeskproErrorPage, contact_hmrc, contact_hmrc_confirmation}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,14 +33,15 @@ object ContactHmrcForm {
   val form = Form[ContactForm](
     mapping(
       "contact-name"     -> text
-        .verifying("error.common.problem_report.name_mandatory", name => !name.trim.isEmpty)
-        .verifying("error.common.problem_report.name_too_long", name => name.size <= 70),
+        .verifying("contact.name.error.required", name => !name.trim.isEmpty)
+        .verifying("contact.name.error.length", name => name.size <= 70),
       "contact-email"    -> text
-        .verifying("error.common.problem_report.email_valid", validateEmail)
-        .verifying("deskpro.email_too_long", email => email.size <= 255),
+        .verifying("contact.email.error.required", email => !email.trim.isEmpty)
+        .verifying("contact.email.error.invalid", validateEmail)
+        .verifying("contact.email.error.length", email => email.size <= 255),
       "contact-comments" -> text
-        .verifying("error.common.comments_mandatory", comment => !comment.trim.isEmpty)
-        .verifying("error.common.comments_too_long", comment => comment.size <= 2000),
+        .verifying("contact.comments.error.required", comment => !comment.trim.isEmpty)
+        .verifying("contact.comments.error.length", comment => comment.size <= 2000),
       "isJavascript"     -> boolean,
       "referrer"         -> text,
       "csrfToken"        -> text,
@@ -55,70 +56,78 @@ object ContactHmrcForm {
 class ContactHmrcController @Inject() (
   val hmrcDeskproConnector: HmrcDeskproConnector,
   val authConnector: AuthConnector,
-  val captchaService: CaptchaService,
   val configuration: Configuration,
   mcc: MessagesControllerComponents,
-  contactPage: contact_hmrc,
-  contactConfirmationPage: contact_hmrc_confirmation,
+  assetsFrontendContactPage: contact_hmrc,
+  assetsFrontendContactConfirmationPage: contact_hmrc_confirmation,
   contactHmrcForm: contact_hmrc_form,
   contactHmrcFormConfirmation: contact_hmrc_form_confirmation,
   deskproErrorPage: DeskproErrorPage,
-  recaptcha: recaptcha
+  playFrontendContactPage: ContactHmrcPage,
+  playFrontendContactConfirmationPage: ContactHmrcConfirmationPage
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
-    extends WithCaptcha(mcc, deskproErrorPage, recaptcha)
+    extends FrontendController(mcc)
     with DeskproSubmission
     with AuthorisedFunctions
     with LoginRedirection
     with I18nSupport
     with ContactFrontendActions {
 
+  implicit def lang(implicit request: Request[_]): Lang = request.lang
+
   def index = Action.async { implicit request =>
     loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway)) {
       Future.successful {
         val referrer  = request.headers.get(REFERER).getOrElse("n/a")
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-        Ok(contactPage(ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, None, None, None)), loggedIn = true))
+        val form      = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, None, None, None))
+        val view      = contactPage(form, true, routes.ContactHmrcController.submit())
+        Ok(view)
       }
     })
   }
 
-  def indexUnauthenticated(service: String, userAction: Option[String], referrerUrl: Option[String]) = Action.async {
-    implicit request =>
+  def indexUnauthenticated(service: Option[String], userAction: Option[String], referrerUrl: Option[String]) =
+    Action.async { implicit request =>
       Future.successful {
         val httpReferrer = request.headers.get(REFERER)
         val referrer     = referrerUrl orElse httpReferrer getOrElse "n/a"
         val csrfToken    = CSRF.getToken(request).map(_.value).getOrElse("")
-        Ok(
-          contactPage(
-            ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, Some(service), None, userAction)),
-            loggedIn = false,
-            reCaptchaComponent = Some(recaptchaFormComponent("contact-hmrc"))
-          )
-        )
+        val form         = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, None, userAction))
+        val view         = contactPage(form, false, routes.ContactHmrcController.submitUnauthenticated())
+        Ok(view)
       }
-  }
+    }
+
+  private def contactPage(form: Form[ContactForm], isLoggedIn: Boolean, submit: Call)(implicit
+    request: Request[Any]
+  ) =
+    if (appConfig.enablePlayFrontendContactHmrcForm) playFrontendContactPage(form, submit)
+    else assetsFrontendContactPage(form, loggedIn = isLoggedIn)
 
   def submit = Action.async { implicit request =>
     loginRedirection(routes.ContactHmrcController.index().url)(
       authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments) { allEnrolments =>
-        validateCaptcha(request) {
-          handleSubmit(Some(allEnrolments), routes.ContactHmrcController.thanks())
-        }
+        handleSubmit(Some(allEnrolments), routes.ContactHmrcController.thanks())
       }
     )
   }
 
   def submitUnauthenticated = Action.async { implicit request =>
-    validateCaptcha(request) {
-      handleSubmit(None, routes.ContactHmrcController.thanksUnauthenticated())
-    }
+    handleSubmit(None, routes.ContactHmrcController.thanksUnauthenticated())
   }
 
   private def handleSubmit(enrolments: Option[Enrolments], thanksRoute: Call)(implicit request: Request[AnyContent]) =
     ContactHmrcForm.form
       .bindFromRequest()(request)
       .fold(
-        error => Future.successful(BadRequest(contactPage(error, enrolments.isDefined))),
+        error => {
+          val submitUrl = {
+            if (enrolments.isDefined) routes.ContactHmrcController.submit()
+            else routes.ContactHmrcController.submitUnauthenticated()
+          }
+          Future.successful(BadRequest(contactPage(error, isLoggedIn = enrolments.isDefined, submitUrl)))
+        },
         data =>
           createDeskproTicket(data, enrolments)
             .map { ticketId =>
@@ -141,7 +150,10 @@ class ContactHmrcController @Inject() (
 
   private def doThanks(implicit request: Request[AnyRef]) = {
     val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
-      Ok(contactConfirmationPage(ticketId))
+      val view =
+        if (appConfig.enablePlayFrontendContactHmrcForm) playFrontendContactConfirmationPage()
+        else assetsFrontendContactConfirmationPage(ticketId)
+      Ok(view)
     }
     Future.successful(result)
   }
