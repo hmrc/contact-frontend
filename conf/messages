@@ -43,12 +43,12 @@ error.summary.title=There is a problem
 language-switcher.english=English
 language-switcher.english.hover=Use this account in English
 language-switcher.welsh=Cymraeg
-language-switcher.welsh.hover=Defnyddio''r cyfrif hwn yn Cymraeg
+language-switcher.welsh.hover=Defnyddio’r cyfrif hwn yn Cymraeg
 button.back=Back
 
 problem_report.title=Get help with a technical problem
 problem_report.paragraph.1=Only use this form to report technical problems.
-problem_report.paragraph.2=Don’t include any personal or financial information. For example, your National Insurance or credit card numbers.
+problem_report.paragraph.2=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
 problem_report.name.label=Name
 problem_report.email.label=Email
 problem_report.action.label=What were you doing?
