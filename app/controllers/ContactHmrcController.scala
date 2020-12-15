@@ -21,7 +21,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import util.DeskproEmailValidator
 import views.html.helpers.recaptcha
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
-import views.html.{contact_hmrc, contact_hmrc_confirmation, deskpro_error}
+import views.html.{DeskproErrorPage, contact_hmrc, contact_hmrc_confirmation}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -62,7 +62,7 @@ class ContactHmrcController @Inject() (
   contactConfirmationPage: contact_hmrc_confirmation,
   contactHmrcForm: contact_hmrc_form,
   contactHmrcFormConfirmation: contact_hmrc_form_confirmation,
-  deskproErrorPage: deskpro_error,
+  deskproErrorPage: DeskproErrorPage,
   recaptcha: recaptcha
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends WithCaptcha(mcc, deskproErrorPage, recaptcha)

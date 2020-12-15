@@ -9,7 +9,6 @@
 @import views.html.partials.LanguageSelection
 @import views.html.partials.Head
 @import views.html.partials.Scripts
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.footer.FooterItem
 
 @this(
         govukLayout: GovukLayout,
@@ -21,7 +20,7 @@
         scripts: Scripts
 )
 
-@(pageTitle: String, beforeContent: Option[Html] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(pageTitle: String, beforeContent: Option[Html] = None, isWelshTranslationAvailable: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 @import appConfig._
 
 @headerBlock = {
@@ -33,7 +32,7 @@
 }
 
 @beforeContentBlock = {
-    @if(appConfig.enableLanguageSwitching) {
+    @if(isWelshTranslationAvailable && appConfig.enableLanguageSwitching) {
         @languageSelection()
     }
     @beforeContent

@@ -413,7 +413,7 @@ class ContactHmrcControllerSpec
       And("an error message is returned to the user")
       status(result) shouldBe 500
       val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("page-header").text() shouldBe "Sorry, we’re experiencing technical difficulties"
+      page.body().select("h1").first.text() shouldBe "Sorry, we’re experiencing technical difficulties"
     }
   }
 
@@ -439,7 +439,7 @@ class ContactHmrcControllerSpec
     val contactForm             = fakeApplication.injector.instanceOf[views.html.partials.contact_hmrc_form]
     val contactFormConfirmation =
       fakeApplication.injector.instanceOf[views.html.partials.contact_hmrc_form_confirmation]
-    val deskproErrorPage        = fakeApplication.injector.instanceOf[views.html.deskpro_error]
+    val deskproErrorPage        = fakeApplication.injector.instanceOf[views.html.DeskproErrorPage]
     val recaptcha               = fakeApplication.injector.instanceOf[views.html.helpers.recaptcha]
 
     val controller =

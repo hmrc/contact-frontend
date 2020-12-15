@@ -14,14 +14,14 @@ import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result, Results}
 import services.CaptchaService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.deskpro_error
+import views.html.{DeskproErrorPage}
 import views.html.helpers.recaptcha
 
 import scala.concurrent.{ExecutionContext, Future}
 
 abstract class WithCaptcha @Inject() (
   mcc: MessagesControllerComponents,
-  deskproErrorPage: deskpro_error,
+  deskproErrorPage: DeskproErrorPage,
   recaptcha: recaptcha
 ) extends FrontendController(mcc)
     with Results
