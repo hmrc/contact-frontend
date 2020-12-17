@@ -16,7 +16,7 @@ import org.mockito.Mockito._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -32,7 +32,7 @@ import util.BackUrlValidator
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
+class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
@@ -129,7 +129,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
-    "succed with comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
+    "succeed with comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
       hmrcConnectorWillReturnTheTicketId()
 
       val result =
@@ -141,7 +141,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       verifyRequestMade(comment = "Some comment")
     }
 
-    "succed without comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
+    "succeed without comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
       hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submitUnauthenticated()(generateRequest(comments = "", canOmitComments = true))
@@ -272,46 +272,45 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       page.body().select(".govuk-link") should have size 1
 
     }
+  }
 
-    "Feedback confirmation page for anonymous user " should {
-      "not contain back button if not requested" in new FeedbackControllerApplication(fakeApplication) {
+  "Feedback confirmation page for anonymous user " should {
+    "not contain back button if not requested" in new FeedbackControllerApplication(fakeApplication) {
 
-        val submit = controller.unauthenticatedThanks()(
-          request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
-        )
-        val page   = Jsoup.parse(contentAsString(submit))
+      val submit = controller.unauthenticatedThanks()(
+        request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
+      )
+      val page   = Jsoup.parse(contentAsString(submit))
 
-        page.body().select(".govuk-back-link").first shouldBe null
+      page.body().select(".govuk-back-link").first shouldBe null
 
-      }
-
-      "contain back button if requested and the back url is valid" in new FeedbackControllerApplication(
-        fakeApplication
-      ) {
-
-        val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.valid.url"))(
-          request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
-        )
-        val page   = Jsoup.parse(contentAsString(submit))
-
-        page.body().select(".govuk-link")                       should have size 2
-        page.body().select(".govuk-link").get(1).attr("href") shouldBe "http://www.valid.url"
-      }
-
-      "not contain back button if requested and the back url is invalid" in new FeedbackControllerApplication(
-        fakeApplication
-      ) {
-
-        val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.invalid.url"))(
-          request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
-        )
-        val page   = Jsoup.parse(contentAsString(submit))
-
-        page.body().select(".govuk-back-link").first shouldBe null
-
-      }
     }
 
+    "contain back button if requested and the back url is valid" in new FeedbackControllerApplication(
+      fakeApplication
+    ) {
+
+      val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.valid.url"))(
+        request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
+      )
+      val page   = Jsoup.parse(contentAsString(submit))
+
+      page.body().select(".govuk-link")                       should have size 2
+      page.body().select(".govuk-link").get(1).attr("href") shouldBe "http://www.valid.url"
+    }
+
+    "not contain back button if requested and the back url is invalid" in new FeedbackControllerApplication(
+      fakeApplication
+    ) {
+
+      val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.invalid.url"))(
+        request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
+      )
+      val page   = Jsoup.parse(contentAsString(submit))
+
+      page.body().select(".govuk-back-link").first shouldBe null
+
+    }
   }
 
   "Submitting the partial feedback form" should {

@@ -21,7 +21,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.GivenWhenThen
 import org.scalatest.concurrent.Eventually
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.MessagesApi
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -41,7 +41,7 @@ class AssetsFrontendContactHmrcControllerSpec
     with Matchers
     with MockitoSugar
     with Eventually
-    with GuiceOneAppPerTest {
+    with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
