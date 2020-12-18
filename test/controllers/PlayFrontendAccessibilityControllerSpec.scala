@@ -38,7 +38,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "enablePlayFrontendAccessibilityForm" -> true)
       .build()
 
-  implicit val message: Messages = fakeApplication.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+  implicit val message: Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
   // RFC 5321: https://tools.ietf.org/html/rfc5321
   // Maximum domain name length: https://www.nic.ad.jp/timeline/en/20th/appendix1.html#:~:text=Each%20element%20of%20a%20domain,a%20maximum%20of%20253%20characters.
@@ -46,9 +46,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
 
   "Accessibility form endpoint" should {
 
-    "redirect to unauthenticated page when user isnt logged in" in new AccessibilityControllerApplication(
-      fakeApplication
-    ) {
+    "redirect to unauthenticated page when user isnt logged in" in new TestScope {
       val request    = FakeRequest()
       val userAction = "/page/test?1234=xyz"
       val result     = controller.accessibilityForm(service = None, userAction = Some(userAction))(request)
@@ -59,7 +57,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       )
     }
 
-    "show the authenticated form page if logged in" in new AccessibilityControllerApplication(fakeApplication) {
+    "show the authenticated form page if logged in" in new TestScope {
       val request = FakeRequest()
       val result  = controller.unauthenticatedAccessibilityForm(
         service = None,
@@ -73,9 +71,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
 
   "Reporting an accessibility problem without logging in" should {
 
-    "return 200 and a valid html page for a request with optional referrerUrl" in new AccessibilityControllerApplication(
-      fakeApplication
-    ) {
+    "return 200 and a valid html page for a request with optional referrerUrl" in new TestScope {
 
       val request = FakeRequest().withHeaders((REFERER, "referrer.from.header"))
       val result  = controller.unauthenticatedAccessibilityForm(
@@ -93,9 +89,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       document.getElementsByAttributeValue("name", "referrer").first().`val`()   shouldBe "some.referrer.url"
     }
 
-    "return 200 and a valid html page for a request when no referrerUrl and referer in header" in new AccessibilityControllerApplication(
-      fakeApplication
-    ) {
+    "return 200 and a valid html page for a request when no referrerUrl and referer in header" in new TestScope {
 
       val request = FakeRequest().withHeaders((REFERER, "referrer.from.header"))
       val result  = controller.unauthenticatedAccessibilityForm(
@@ -109,9 +103,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "referrer.from.header"
     }
 
-    "return 200 and a valid html page for a request when no referrerUrl and no referer in header" in new AccessibilityControllerApplication(
-      fakeApplication
-    ) {
+    "return 200 and a valid html page for a request when no referrerUrl and no referer in header" in new TestScope {
 
       val request = FakeRequest()
       val result  = controller.unauthenticatedAccessibilityForm(
@@ -125,7 +117,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "n/a"
     }
 
-    "display errors when form isn't filled out at all" in new AccessibilityControllerApplication(fakeApplication) {
+    "display errors when form isn't filled out at all" in new TestScope {
 
       val request = generateRequest(desc = "", formName = "", email = "", isJavascript = false, referrer = "/somepage")
       val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
@@ -144,9 +136,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.email.error.required")))   shouldBe true
     }
 
-    "display error messages when message size exceeds limit" in new AccessibilityControllerApplication(
-      fakeApplication
-    ) {
+    "display error messages when message size exceeds limit" in new TestScope {
       val msg2500 = "x" * 2500
 
       val request = generateRequest(
@@ -170,7 +160,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.problem.error.length"))) shouldBe true
     }
 
-    "display error messages when email is invalid" in new AccessibilityControllerApplication(fakeApplication) {
+    "display error messages when email is invalid" in new TestScope {
       val badEmail = "firstname'email.gov."
 
       val request = generateRequest(
@@ -194,7 +184,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.email.error.invalid"))) shouldBe true
     }
 
-    "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
+    "display error messages when email is too long" in new TestScope {
       val request = generateRequest(
         desc = "valid form message",
         formName = "firstname",
@@ -214,7 +204,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.email.error.length"))) shouldBe true
     }
 
-    "display error messages when name is too long" in new AccessibilityControllerApplication(fakeApplication) {
+    "display error messages when name is too long" in new TestScope {
       val longName = "x" * 256
 
       val request = generateRequest(
@@ -236,7 +226,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.name.error.length"))) shouldBe true
     }
 
-    "redirect to thankyou page when completed" in new AccessibilityControllerApplication(fakeApplication) {
+    "redirect to thankyou page when completed" in new TestScope {
       when(
         hmrcDeskproConnector.createDeskProTicket(
           name = any[String],
@@ -269,7 +259,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
 
   "Reporting an accessibility problem when logging in" should {
 
-    "return 200 and a valid html page for a request" in new AccessibilityControllerApplication(fakeApplication) {
+    "return 200 and a valid html page for a request" in new TestScope {
 
       val request = FakeRequest().withSession(SessionKeys.authToken -> "authToken")
       val result  = controller.accessibilityForm(service = None, userAction = Some("test?1234=xyz"))(request)
@@ -282,7 +272,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       document.getElementsByAttributeValue("name", "userAction").first().`val`() shouldBe "test?1234=xyz"
     }
 
-    "display errors when form isn't filled out at all" in new AccessibilityControllerApplication(fakeApplication) {
+    "display errors when form isn't filled out at all" in new TestScope {
 
       val request = generateRequest(desc = "", formName = "", email = "", isJavascript = false, referrer = "/somepage")
       val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
@@ -301,9 +291,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.email.error.required")))   shouldBe true
     }
 
-    "display error messages when message size exceeds limit" in new AccessibilityControllerApplication(
-      fakeApplication
-    ) {
+    "display error messages when message size exceeds limit" in new TestScope {
       val msg2500 = "x" * 2500
 
       val request = generateRequest(
@@ -327,7 +315,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.problem.error.length"))) shouldBe true
     }
 
-    "display error messages when email is invalid" in new AccessibilityControllerApplication(fakeApplication) {
+    "display error messages when email is invalid" in new TestScope {
       val badEmail = "firstname'email.gov."
 
       val request = generateRequest(
@@ -351,7 +339,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.email.error.invalid"))) shouldBe true
     }
 
-    "display error messages when email is too long" in new AccessibilityControllerApplication(fakeApplication) {
+    "display error messages when email is too long" in new TestScope {
       val request = generateRequest(
         desc = "valid form message",
         formName = "firstname",
@@ -371,7 +359,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.email.error.length"))) shouldBe true
     }
 
-    "display error messages when name is too long" in new AccessibilityControllerApplication(fakeApplication) {
+    "display error messages when name is too long" in new TestScope {
       val longName = "x" * 256
 
       val request = generateRequest(
@@ -393,7 +381,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       errors.exists(_.text().contains(Messages("accessibility.name.error.length"))) shouldBe true
     }
 
-    "redirect to thankyou page when completed" in new AccessibilityControllerApplication(fakeApplication) {
+    "redirect to thankyou page when completed" in new TestScope {
       when(
         hmrcDeskproConnector.createDeskProTicket(
           name = any[String],
@@ -424,7 +412,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
     }
   }
 
-  class AccessibilityControllerApplication(app: Application) extends MockitoSugar {
+  class TestScope extends MockitoSugar {
 
     val hmrcDeskproConnector: HmrcDeskproConnector = mock[HmrcDeskproConnector]
 
