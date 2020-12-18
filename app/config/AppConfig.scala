@@ -135,10 +135,10 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
     new BucketBasedFeatureSelector(BucketCalculator.deviceIdBucketCalculator, featureRules)
 
   override def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean =
-    featureSelector.computeFeatures(request, service).contains(f)
+    false
 
   override def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] =
-    featureSelector.computeFeatures(request, service)
+    Set.empty
 
   private def configNotFoundError(key: String) =
     throw new RuntimeException(s"Could not find config key '$key'")

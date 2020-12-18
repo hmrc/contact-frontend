@@ -11,7 +11,7 @@ import org.jsoup.Jsoup
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import org.scalatestplus.play.guice.{GuiceOneAppPerSuite, GuiceOneAppPerTest}
 import play.api.Application
 import play.api.data.FormError
 import play.api.i18n.MessagesApi
@@ -25,7 +25,7 @@ import play.api.test.Helpers._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class PlayFrontendSurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest with JsoupHelpers {
+class PlayFrontendSurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with JsoupHelpers {
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(

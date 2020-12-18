@@ -14,7 +14,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -31,7 +31,7 @@ import play.api.http.HeaderNames.REFERER
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
+class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()

@@ -9,7 +9,7 @@ import config.CFConfig
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.{Application, Configuration}
 import play.api.data.FormError
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -21,7 +21,7 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class AssetsFrontendSurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
+class AssetsFrontendSurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
