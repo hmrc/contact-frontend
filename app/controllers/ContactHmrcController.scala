@@ -27,21 +27,23 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object ContactHmrcForm {
 
-  private val emailValidator                     = new DeskproEmailValidator()
-  private val validateEmail: (String) => Boolean = emailValidator.validate
+  private val emailValidator = new DeskproEmailValidator()
 
   val form = Form[ContactForm](
     mapping(
       "contact-name"     -> text
-        .verifying("contact.name.error.required", name => !name.trim.isEmpty)
-        .verifying("contact.name.error.length", name => name.size <= 70),
+        .verifying("contact.name.error.required", name => name.trim.nonEmpty)
+        .verifying("contact.name.error.length", name => name.length <= 70),
       "contact-email"    -> text
         .verifying("contact.email.error.required", email => !email.trim.isEmpty)
-        .verifying("contact.email.error.invalid", validateEmail)
-        .verifying("contact.email.error.length", email => email.size <= 255),
+        .verifying("contact.email.error.invalid", email => email.trim.isEmpty || emailValidator.validate(email))
+        .verifying(
+          "contact.email.error.length",
+          email => !(email.trim.isEmpty || emailValidator.validate(email)) || email.length <= 255
+        ),
       "contact-comments" -> text
         .verifying("contact.comments.error.required", comment => !comment.trim.isEmpty)
-        .verifying("contact.comments.error.length", comment => comment.size <= 2000),
+        .verifying("contact.comments.error.length", comment => comment.length <= 2000),
       "isJavascript"     -> boolean,
       "referrer"         -> text,
       "csrfToken"        -> text,

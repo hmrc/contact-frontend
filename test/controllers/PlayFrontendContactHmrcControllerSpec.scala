@@ -22,7 +22,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Application
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.FakeRequest
@@ -31,6 +31,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
+import collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
 class PlayFrontendContactHmrcControllerSpec
@@ -48,6 +49,8 @@ class PlayFrontendContactHmrcControllerSpec
 
   implicit val actorSystem: ActorSystem        = ActorSystem()
   implicit val materializer: ActorMaterializer = ActorMaterializer()
+
+  implicit val message: Messages = fakeApplication.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
   val hmrcDeskproConnectorTimeout: VerificationWithTimeout =
     Mockito.timeout(5000)
@@ -225,6 +228,150 @@ class PlayFrontendContactHmrcControllerSpec
           any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])
+    }
+
+    "display errors when form isn't filled out at all" in new ContactHmrcControllerApplication {
+
+      val fields = Map(
+        "contact-name"          -> "",
+        "contact-email"         -> "",
+        "contact-comments"      -> "",
+        "isJavascript"          -> "false",
+        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"             -> "n/a",
+        "service"               -> "scp",
+        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
+        "recaptcha-v3-response" -> "xx",
+        "userAction"            -> "/overridden/path"
+      )
+
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val result         = controller.submitUnauthenticated()(contactRequest)
+
+      status(result) should be(400)
+
+      val document = Jsoup.parse(contentAsString(result))
+      val errors   = document.select(".govuk-error-message").asScala
+      errors.length should be(3)
+
+      document.title() should be("Error: " + Messages("contact.heading"))
+
+      errors.exists(_.text().contains(Messages("contact.comments.error.required"))) shouldBe true
+      errors.exists(_.text().contains(Messages("contact.name.error.required")))    shouldBe true
+      errors.exists(_.text().contains(Messages("contact.email.error.required")))   shouldBe true
+    }
+
+    "display error messages when comments size exceeds limit" in new ContactHmrcControllerApplication {
+      val msg2500 = "x" * 2500
+
+      val fields = Map(
+        "contact-name"          -> "Bob The Builder",
+        "contact-email"         -> "bob@build-it.com",
+        "contact-comments"      -> msg2500,
+        "isJavascript"          -> "false",
+        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"             -> "n/a",
+        "service"               -> "scp",
+        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
+        "recaptcha-v3-response" -> "xx",
+        "userAction"            -> "/overridden/path"
+      )
+
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val result         = controller.submitUnauthenticated()(contactRequest)
+
+      status(result) should be(400)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.title() should be("Error: " + Messages("contact.heading"))
+      val errors = document.select(".govuk-error-message").asScala
+      errors.length should be(1)
+
+      errors.exists(_.text().contains(Messages("contact.comments.error.length"))) shouldBe true
+    }
+
+    "display error messages when email is invalid" in new ContactHmrcControllerApplication {
+      val badEmail = "firstname'email.gov."
+
+      val fields = Map(
+        "contact-name"          -> "Bob The Builder",
+        "contact-email"         -> badEmail,
+        "contact-comments"      -> "Can We Fix It?",
+        "isJavascript"          -> "false",
+        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"             -> "n/a",
+        "service"               -> "scp",
+        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
+        "recaptcha-v3-response" -> "xx",
+        "userAction"            -> "/overridden/path"
+      )
+
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val result         = controller.submitUnauthenticated()(contactRequest)
+
+      status(result) should be(400)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.title() should be("Error: " + Messages("contact.heading"))
+      val errors = document.select(".govuk-error-message").asScala
+      errors.length should be(1)
+
+      errors.exists(_.text().contains(Messages("contact.email.error.invalid"))) shouldBe true
+    }
+
+    "display error messages when email is too long" in new ContactHmrcControllerApplication {
+      val tooLongEmail = ("x" * 64) + "@" + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 57) + ".com"
+
+      val fields = Map(
+        "contact-name"          -> "Bob The Builder",
+        "contact-email"         -> tooLongEmail,
+        "contact-comments"      -> "Can We Fix It?",
+        "isJavascript"          -> "false",
+        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"             -> "n/a",
+        "service"               -> "scp",
+        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
+        "recaptcha-v3-response" -> "xx",
+        "userAction"            -> "/overridden/path"
+      )
+
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val result         = controller.submitUnauthenticated()(contactRequest)
+
+      status(result) should be(400)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.title() should be("Error: " + Messages("contact.heading"))
+      val errors = document.select(".govuk-error-message").asScala
+      errors.exists(_.text().contains(Messages("contact.email.error.length"))) shouldBe true
+    }
+
+    "display error messages when name is too long" in new ContactHmrcControllerApplication {
+      val longName = "x" * 256
+
+      val fields         = Map(
+        "contact-name"          -> longName,
+        "contact-email"         -> "bob@build-it.com",
+        "contact-comments"      -> "Can We Fix It?",
+        "isJavascript"          -> "false",
+        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"             -> "n/a",
+        "service"               -> "scp",
+        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
+        "recaptcha-v3-response" -> "xx",
+        "userAction"            -> "/overridden/path"
+      )
+      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val result         = controller.submitUnauthenticated()(contactRequest)
+
+      status(result) should be(400)
+
+      import collection.JavaConverters._
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.title() should be("Error: " + Messages("contact.heading"))
+      val errors = document.select(".govuk-error-message").asScala
+      errors.exists(_.text().contains(Messages("contact.name.error.length"))) shouldBe true
     }
 
     "return expected Internal Error when hmrc-deskpro errors for non-authenticated submit page" in new ContactHmrcControllerApplication {
