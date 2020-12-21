@@ -40,9 +40,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       .build()
 
   "feedbackForm" should {
-    "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in new TestScope {
       val result = controller.feedbackForm(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
@@ -57,9 +55,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
   }
 
   "unauthenticatedFeedbackForm" should {
-    "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in new TestScope {
       val result = controller.unauthenticatedFeedbackForm(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
@@ -80,7 +76,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
     val referer         = Some("https://www.example.com/some-service")
     val canOmitComments = false
 
-    "use the (deprecated) referer parameter if supplied" in new FeedbackControllerApplication(fakeApplication) {
+    "use the (deprecated) referer parameter if supplied" in new TestScope {
       val result =
         controller.feedbackPartialForm(submitUrl, csrfToken, service, referer, canOmitComments, None)(request)
 
@@ -88,7 +84,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       page.body().getElementById("referrer").attr("value") shouldBe "https://www.example.com/some-service"
     }
 
-    "use the referrerUrl parameter if supplied" in new FeedbackControllerApplication(fakeApplication) {
+    "use the referrerUrl parameter if supplied" in new TestScope {
       val referrerUrl = Some("https://www.other-example.com/some-service")
 
       val result =
@@ -102,9 +98,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
 
   "Submitting the feedback for unauthenticated user" should {
 
-    "redirect to confirmation page without 'back' button if 'back' link not provided" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "redirect to confirmation page without 'back' button if 'back' link not provided" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
@@ -116,7 +110,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       verifyRequestMade()
     }
 
-    "show errors if some form not filled in correctly" in new FeedbackControllerApplication(fakeApplication) {
+    "show errors if some form not filled in correctly" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
@@ -129,7 +123,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
-    "succeed with comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
+    "succeed with comment if 'canOmitComments' flag is true" in new TestScope {
       hmrcConnectorWillReturnTheTicketId()
 
       val result =
@@ -141,7 +135,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       verifyRequestMade(comment = "Some comment")
     }
 
-    "succeed without comment if 'canOmitComments' flag is true" in new FeedbackControllerApplication(fakeApplication) {
+    "succeed without comment if 'canOmitComments' flag is true" in new TestScope {
       hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submitUnauthenticated()(generateRequest(comments = "", canOmitComments = true))
@@ -152,7 +146,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       verifyRequestMade(comment = "No comment given")
     }
 
-    "fail without comment if 'canOmitComments' flag is false" in new FeedbackControllerApplication(fakeApplication) {
+    "fail without comment if 'canOmitComments' flag is false" in new TestScope {
       hmrcConnectorWillReturnTheTicketId()
 
       val result = controller.submitUnauthenticated()(generateRequest(comments = "", canOmitComments = false))
@@ -164,9 +158,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
-    "include 'service', 'backUrl' and 'canOmitComments' fields in the returned page if form not filled in correctly" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "include 'service', 'backUrl' and 'canOmitComments' fields in the returned page if form not filled in correctly" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
@@ -182,7 +174,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
 
     }
 
-    "show errors if call to hmrc-deskpro failed" in new FeedbackControllerApplication(fakeApplication) {
+    "show errors if call to hmrc-deskpro failed" in new TestScope {
 
       hmrcConnectorWillFail()
 
@@ -190,9 +182,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
 
     }
 
-    "redirect to confirmation page with 'back' button if 'back' link provided" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "redirect to confirmation page with 'back' button if 'back' link provided" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
@@ -208,9 +198,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
   }
 
   "Submitting feedback for authenticated user" should {
-    "redirect to confirmation page without 'back' button if 'back' link not provided" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "redirect to confirmation page without 'back' button if 'back' link not provided" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
@@ -222,9 +210,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       verifyRequestMade()
     }
 
-    "redirect to confirmation page with 'back' button if 'back' link provided" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "redirect to confirmation page with 'back' button if 'back' link provided" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
@@ -240,7 +226,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
   }
 
   "Feedback confirmation page for authenticated user " should {
-    "not contain back button if not requested" in new FeedbackControllerApplication(fakeApplication) {
+    "not contain back button if not requested" in new TestScope {
 
       val submit = controller.thanks()(request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
       val page   = Jsoup.parse(contentAsString(submit))
@@ -248,7 +234,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       page.body().select(".govuk-link") should have size 1
     }
 
-    "contain back button if requested and the back url is valid" in new FeedbackControllerApplication(fakeApplication) {
+    "contain back button if requested and the back url is valid" in new TestScope {
 
       val submit = controller.thanks(backUrl = Some("http://www.valid.url"))(
         request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
@@ -260,9 +246,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       page.body().select(".govuk-link").get(1).attr("href") shouldBe "http://www.valid.url"
     }
 
-    "not contain back link if requested and the back url is invalid" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "not contain back link if requested and the back url is invalid" in new TestScope {
 
       val submit = controller.thanks(backUrl = Some("http://www.invalid.url"))(
         request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
@@ -275,7 +259,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
   }
 
   "Feedback confirmation page for anonymous user " should {
-    "not contain back button if not requested" in new FeedbackControllerApplication(fakeApplication) {
+    "not contain back button if not requested" in new TestScope {
 
       val submit = controller.unauthenticatedThanks()(
         request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
@@ -286,9 +270,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
 
     }
 
-    "contain back button if requested and the back url is valid" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "contain back button if requested and the back url is valid" in new TestScope {
 
       val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.valid.url"))(
         request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
@@ -299,9 +281,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       page.body().select(".govuk-link").get(1).attr("href") shouldBe "http://www.valid.url"
     }
 
-    "not contain back button if requested and the back url is invalid" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "not contain back button if requested and the back url is invalid" in new TestScope {
 
       val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.invalid.url"))(
         request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
@@ -315,7 +295,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
 
   "Submitting the partial feedback form" should {
 
-    "show errors if the form is not filled in correctly" in new FeedbackControllerApplication(fakeApplication) {
+    "show errors if the form is not filled in correctly" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
@@ -328,9 +308,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
-    "allow comments to be empty if the canOmitComments flag is set to true" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "allow comments to be empty if the canOmitComments flag is set to true" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
@@ -344,9 +322,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       verifyRequestMade("No comment given")
     }
 
-    "show errors if no comments are provided and the canOmitComments flag is set to false" in new FeedbackControllerApplication(
-      fakeApplication
-    ) {
+    "show errors if no comments are provided and the canOmitComments flag is set to false" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
@@ -361,7 +337,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
     }
   }
 
-  class FeedbackControllerApplication(app: Application) extends MockitoSugar {
+  class TestScope extends MockitoSugar {
 
     val hmrcDeskproConnector = mock[HmrcDeskproConnector]
 
@@ -419,13 +395,13 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       override def validate(backUrl: String) = backUrl == "http://www.valid.url"
     }
 
-    val feedbackPage                         = fakeApplication().injector.instanceOf[views.html.feedback]
-    val feedbackConfirmationPage             = fakeApplication().injector.instanceOf[views.html.feedback_confirmation]
-    val feedbackPartialForm                  = fakeApplication().injector.instanceOf[views.html.partials.feedback_form]
-    val feedbackFormConfirmation             = fakeApplication().injector.instanceOf[views.html.partials.feedback_form_confirmation]
-    val playFrontendFeedbackPage             = fakeApplication().injector.instanceOf[views.html.FeedbackPage]
+    val feedbackPage                         = app.injector.instanceOf[views.html.feedback]
+    val feedbackConfirmationPage             = app.injector.instanceOf[views.html.feedback_confirmation]
+    val feedbackPartialForm                  = app.injector.instanceOf[views.html.partials.feedback_form]
+    val feedbackFormConfirmation             = app.injector.instanceOf[views.html.partials.feedback_form_confirmation]
+    val playFrontendFeedbackPage             = app.injector.instanceOf[views.html.FeedbackPage]
     val playFrontendFeedbackConfirmationPage =
-      fakeApplication().injector.instanceOf[views.html.FeedbackConfirmationPage]
+      app.injector.instanceOf[views.html.FeedbackConfirmationPage]
 
     val controller = new FeedbackController(
       hmrcDeskproConnector,

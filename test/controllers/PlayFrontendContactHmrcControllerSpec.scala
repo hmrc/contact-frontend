@@ -20,7 +20,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -40,7 +40,7 @@ class PlayFrontendContactHmrcControllerSpec
     with Matchers
     with MockitoSugar
     with Eventually
-    with GuiceOneAppPerTest {
+    with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
@@ -50,14 +50,14 @@ class PlayFrontendContactHmrcControllerSpec
   implicit val actorSystem: ActorSystem        = ActorSystem()
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-  implicit val message: Messages = fakeApplication.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+  implicit val message: Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
   val hmrcDeskproConnectorTimeout: VerificationWithTimeout =
     Mockito.timeout(5000)
 
   "ContactHmrcController" should {
 
-    "return expected OK for non-authenticated index page" in new ContactHmrcControllerApplication {
+    "return expected OK for non-authenticated index page" in new TestScope {
       Given("a GET request")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -75,7 +75,7 @@ class PlayFrontendContactHmrcControllerSpec
       page.body().getElementById("service").attr("value")  shouldBe "my-fake-service"
     }
 
-    "use the referrerUrl parameter if supplied" in new ContactHmrcControllerApplication {
+    "use the referrerUrl parameter if supplied" in new TestScope {
       Given("a GET request")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -91,7 +91,7 @@ class PlayFrontendContactHmrcControllerSpec
       page.body().getElementById("referrer").attr("value") shouldBe "https://www.example.com/some-service"
     }
 
-    "fallback to n/a if no referrer information is available" in new ContactHmrcControllerApplication {
+    "fallback to n/a if no referrer information is available" in new TestScope {
       Given("a GET request")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -106,7 +106,7 @@ class PlayFrontendContactHmrcControllerSpec
       page.body().getElementById("referrer").attr("value") shouldBe "n/a"
     }
 
-    "return expected OK for non-authenticated submit page" in new ContactHmrcControllerApplication {
+    "return expected OK for non-authenticated submit page" in new TestScope {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -150,7 +150,7 @@ class PlayFrontendContactHmrcControllerSpec
         )(any[HeaderCarrier])
     }
 
-    "send the referrer URL to DeskPro" in new ContactHmrcControllerApplication {
+    "send the referrer URL to DeskPro" in new TestScope {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -190,7 +190,7 @@ class PlayFrontendContactHmrcControllerSpec
         )(any[HeaderCarrier])
     }
 
-    "send the referrer information to DeskPro with userAction replacing the path if non-empty" in new ContactHmrcControllerApplication {
+    "send the referrer information to DeskPro with userAction replacing the path if non-empty" in new TestScope {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -230,7 +230,7 @@ class PlayFrontendContactHmrcControllerSpec
         )(any[HeaderCarrier])
     }
 
-    "display errors when form isn't filled out at all" in new ContactHmrcControllerApplication {
+    "display errors when form isn't filled out at all" in new TestScope {
 
       val fields = Map(
         "contact-name"          -> "",
@@ -257,11 +257,11 @@ class PlayFrontendContactHmrcControllerSpec
       document.title() should be("Error: " + Messages("contact.heading"))
 
       errors.exists(_.text().contains(Messages("contact.comments.error.required"))) shouldBe true
-      errors.exists(_.text().contains(Messages("contact.name.error.required")))    shouldBe true
-      errors.exists(_.text().contains(Messages("contact.email.error.required")))   shouldBe true
+      errors.exists(_.text().contains(Messages("contact.name.error.required")))     shouldBe true
+      errors.exists(_.text().contains(Messages("contact.email.error.required")))    shouldBe true
     }
 
-    "display error messages when comments size exceeds limit" in new ContactHmrcControllerApplication {
+    "display error messages when comments size exceeds limit" in new TestScope {
       val msg2500 = "x" * 2500
 
       val fields = Map(
@@ -290,7 +290,7 @@ class PlayFrontendContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.comments.error.length"))) shouldBe true
     }
 
-    "display error messages when email is invalid" in new ContactHmrcControllerApplication {
+    "display error messages when email is invalid" in new TestScope {
       val badEmail = "firstname'email.gov."
 
       val fields = Map(
@@ -319,7 +319,7 @@ class PlayFrontendContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.email.error.invalid"))) shouldBe true
     }
 
-    "display error messages when email is too long" in new ContactHmrcControllerApplication {
+    "display error messages when email is too long" in new TestScope {
       val tooLongEmail = ("x" * 64) + "@" + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 57) + ".com"
 
       val fields = Map(
@@ -346,7 +346,7 @@ class PlayFrontendContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.email.error.length"))) shouldBe true
     }
 
-    "display error messages when name is too long" in new ContactHmrcControllerApplication {
+    "display error messages when name is too long" in new TestScope {
       val longName = "x" * 256
 
       val fields         = Map(
@@ -374,7 +374,7 @@ class PlayFrontendContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.name.error.length"))) shouldBe true
     }
 
-    "return expected Internal Error when hmrc-deskpro errors for non-authenticated submit page" in new ContactHmrcControllerApplication {
+    "return expected Internal Error when hmrc-deskpro errors for non-authenticated submit page" in new TestScope {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.failed(new Exception("This is an expected test error")))
 
@@ -400,7 +400,7 @@ class PlayFrontendContactHmrcControllerSpec
       status(submitResult) shouldBe 500
     }
 
-    "return expected OK for non-authenticated thanks page" in new ContactHmrcControllerApplication {
+    "return expected OK for non-authenticated thanks page" in new TestScope {
       Given("a GET request")
 
       val contactRequest = FakeRequest().withSession(("ticketId", "12345"))
@@ -414,7 +414,7 @@ class PlayFrontendContactHmrcControllerSpec
   }
 
   "Submitting contact hrmc form" should {
-    "return JSON with ticket id for sucessful form submission" in new ContactHmrcControllerApplication {
+    "return JSON with ticket id for sucessful form submission" in new TestScope {
       Given("we have a valid reqest")
 
       val ticketId = TicketId(12345)
@@ -463,7 +463,7 @@ class PlayFrontendContactHmrcControllerSpec
       resultAsJson.as[Int] shouldBe ticketId.ticket_id
     }
 
-    "redisplay form in case of validation errors - rendering only form without header" in new ContactHmrcControllerApplication {
+    "redisplay form in case of validation errors - rendering only form without header" in new TestScope {
       Given("we have an invalid request")
 
       val fields = Map.empty
@@ -488,7 +488,7 @@ class PlayFrontendContactHmrcControllerSpec
       page.body().getElementsByClass("page-header") should be(empty)
     }
 
-    "redisplay form in case of validation errors - rendering with header" in new ContactHmrcControllerApplication {
+    "redisplay form in case of validation errors - rendering with header" in new TestScope {
       Given("we have an invalid request")
 
       val fields = Map.empty
@@ -513,7 +513,7 @@ class PlayFrontendContactHmrcControllerSpec
       page.body().getElementsByClass("page-header") shouldNot be(empty)
     }
 
-    "show an error page with bad request HTTP code if sending the data to deskpro failed" in new ContactHmrcControllerApplication {
+    "show an error page with bad request HTTP code if sending the data to deskpro failed" in new TestScope {
       Given("we have a valid reqest")
 
       val fields = Map(
@@ -562,26 +562,26 @@ class PlayFrontendContactHmrcControllerSpec
     }
   }
 
-  class ContactHmrcControllerApplication extends MockitoSugar {
+  class TestScope extends MockitoSugar {
 
     val authConnector = mock[AuthConnector]
 
-    val configuration = fakeApplication.configuration
+    val configuration = app.configuration
 
     implicit val appConfig        = new CFConfig(configuration)
     implicit val executionContext = ExecutionContext.Implicits.global
-    implicit val messages         = fakeApplication.injector.instanceOf[MessagesApi]
+    implicit val messages         = app.injector.instanceOf[MessagesApi]
 
     val hmrcDeskproConnector = mock[HmrcDeskproConnector]
 
-    val contactPage             = fakeApplication.injector.instanceOf[views.html.contact_hmrc]
-    val contactConfirmationPage = fakeApplication.injector.instanceOf[views.html.contact_hmrc_confirmation]
-    val contactForm             = fakeApplication.injector.instanceOf[views.html.partials.contact_hmrc_form]
+    val contactPage             = app.injector.instanceOf[views.html.contact_hmrc]
+    val contactConfirmationPage = app.injector.instanceOf[views.html.contact_hmrc_confirmation]
+    val contactForm             = app.injector.instanceOf[views.html.partials.contact_hmrc_form]
     val contactFormConfirmation =
-      fakeApplication.injector.instanceOf[views.html.partials.contact_hmrc_form_confirmation]
-    val deskproErrorPage        = fakeApplication.injector.instanceOf[views.html.DeskproErrorPage]
-    val pfContactPage           = fakeApplication.injector.instanceOf[views.html.ContactHmrcPage]
-    val pfConfirmationPage      = fakeApplication.injector.instanceOf[views.html.ContactHmrcConfirmationPage]
+      app.injector.instanceOf[views.html.partials.contact_hmrc_form_confirmation]
+    val deskproErrorPage        = app.injector.instanceOf[views.html.DeskproErrorPage]
+    val pfContactPage           = app.injector.instanceOf[views.html.ContactHmrcPage]
+    val pfConfirmationPage      = app.injector.instanceOf[views.html.ContactHmrcConfirmationPage]
 
     val controller =
       new ContactHmrcController(

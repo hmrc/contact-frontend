@@ -42,10 +42,10 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
       .build()
 
   implicit val messages: Messages =
-    fakeApplication().injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+    app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
   "Requesting the standalone non-JavaScript page" should {
-    "return 200 and valid HTML" in new TestScope(fakeApplication()) {
+    "return 200 and valid HTML" in new TestScope {
       val result = controller.reportFormNonJavaScript(Some("my-test-service"))(FakeRequest())
 
       status(result) should be(200)
@@ -59,7 +59,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
   "Reporting a problem" should {
 
     "return 200 and a valid html page for a valid request with " +
-      "JavaScript disabled for an unauthenticated user" in new TestScope(fakeApplication()) {
+      "JavaScript disabled for an unauthenticated user" in new TestScope {
 
         hrmcConnectorWillReturnTheTicketId
 
@@ -76,7 +76,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
       }
 
     "return 200 and a valid html page for a valid request with " +
-      "JavaScript disabled for an unauthenticated user on standalone page" in new TestScope(fakeApplication()) {
+      "JavaScript disabled for an unauthenticated user on standalone page" in new TestScope {
 
         hrmcConnectorWillReturnTheTicketId
 
@@ -93,7 +93,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
       }
 
     "return 200 and a valid html page for a valid request with " +
-      "JavaScript disabled for an authenticated user" in new TestScope(fakeApplication()) {
+      "JavaScript disabled for an authenticated user" in new TestScope {
         when(
           hmrcDeskproConnector.createDeskProTicket(
             meq("John Densmore"),
@@ -127,7 +127,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
       }
 
     "return 200 and a valid json for a valid request with " +
-      "JavaScript enabled" in new TestScope(fakeApplication()) {
+      "JavaScript enabled" in new TestScope {
         when(
           hmrcDeskproConnector.createDeskProTicket(
             meq("John Densmore"),
@@ -160,7 +160,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
       }
 
     "return 200 and a valid html page with validation error for invalid input with " +
-      "JavaScript disabled" in new TestScope(fakeApplication()) {
+      "JavaScript disabled" in new TestScope {
         val result =
           controller.submit()(generateInvalidRequest(javascriptEnabled = false))
 
@@ -172,7 +172,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
       }
 
     "return 400 and a valid json containing validation errors for invalid input with " +
-      "JavaScript enabled" in new TestScope(fakeApplication()) {
+      "JavaScript enabled" in new TestScope {
 
         val result = controller.submit()(generateInvalidRequest())
 
@@ -182,7 +182,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
         contentAsJson(result).\("status").as[String] shouldBe "ERROR"
       }
 
-    "fail if the email has invalid syntax (for DeskPRO)" in new TestScope(fakeApplication()) {
+    "fail if the email has invalid syntax (for DeskPRO)" in new TestScope {
       val request = generateRequest(javascriptEnabled = false, email = "a@a")
       val submit  = controller.submit()(request)
       val page    = Jsoup.parse(contentAsString(submit))
@@ -194,7 +194,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
     }
 
     "fail if the name has invalid characters with " +
-      "Javascript disabled" in new TestScope(fakeApplication()) {
+      "Javascript disabled" in new TestScope {
         val request = generateRequest(
           javascriptEnabled = false,
           name = """<a href="blah.com">something</a>"""
@@ -211,7 +211,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
       }
 
     "return error page if the Deskpro ticket creation fails with " +
-      "Javascript disabled" in new TestScope(fakeApplication()) {
+      "Javascript disabled" in new TestScope {
         when(
           hmrcDeskproConnector.createDeskProTicket(
             meq("John Densmore"),
@@ -238,7 +238,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
 
   }
 
-  class TestScope(app: Application) extends MockitoSugar {
+  class TestScope extends MockitoSugar {
 
     val authConnector = new AuthConnector {
       override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
