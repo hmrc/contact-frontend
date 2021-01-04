@@ -46,7 +46,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
 
   "Accessibility form endpoint" should {
 
-    "redirect to unauthenticated page when user isnt logged in" in new TestScope {
+    "redirect to unauthenticated page when user is not logged in" in new TestScope {
       val request    = FakeRequest()
       val userAction = "/page/test?1234=xyz"
       val result     = controller.accessibilityForm(service = None, userAction = Some(userAction))(request)
@@ -120,7 +120,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
     "display errors when form isn't filled out at all" in new TestScope {
 
       val request = generateRequest(desc = "", formName = "", email = "", isJavascript = false, referrer = "/somepage")
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(400)
 
@@ -146,7 +146,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(400)
 
@@ -170,7 +170,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(400)
 
@@ -192,7 +192,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(400)
 
@@ -214,7 +214,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(400)
 
@@ -250,7 +250,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result)           should be(303)
       header(LOCATION, result) should be(Some("/contact/accessibility-unauthenticated/thanks"))
@@ -262,27 +262,41 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
     "return 200 and a valid html page for a request" in new TestScope {
 
       val request = FakeRequest().withSession(SessionKeys.authToken -> "authToken")
-      val result  = controller.accessibilityForm(service = None, userAction = Some("test?1234=xyz"))(request)
+      val result  =
+        controller.accessibilityForm(service = Some("my-service"), userAction = Some("test?1234=xyz"))(request)
 
       status(result) should be(200)
       val document = Jsoup.parse(contentAsString(result))
       document.title()                                                             should be(Messages("accessibility.heading"))
+      document
+        .body()
+        .select("form[id=accessibility-form]")
+        .first
+        .attr("action")                                                          shouldBe s"/contact/accessibility?service=my-service&userAction=test%3F1234%3Dxyz"
       document.getElementById("accessibility-form")                                should not be null
-      document.getElementById("service").`val`()                                   should be("")
+      document.getElementById("service").`val`()                                   should be("my-service")
       document.getElementsByAttributeValue("name", "userAction").first().`val`() shouldBe "test?1234=xyz"
     }
 
     "display errors when form isn't filled out at all" in new TestScope {
 
       val request = generateRequest(desc = "", formName = "", email = "", isJavascript = false, referrer = "/somepage")
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(service = Some("my-service"), Some("my-action"))(
+          request.withSession(SessionKeys.authToken -> "authToken")
+        )
 
       status(result) should be(400)
 
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
+      document.title()    should be("Error: " + Messages("accessibility.heading"))
+      document
+        .body()
+        .select("form[id=accessibility-form]")
+        .first
+        .attr("action") shouldBe s"/contact/accessibility?service=my-service&userAction=my-action"
       val errors = document.select(".govuk-error-message").asScala
       errors.length should be(3)
 
@@ -301,7 +315,8 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result) should be(400)
 
@@ -325,7 +340,8 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result) should be(400)
 
@@ -347,7 +363,8 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result) should be(400)
 
@@ -369,7 +386,8 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result) should be(400)
 
@@ -405,9 +423,10 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
-      status(result)           should be(303)
+      status(result) should be(303)
       header(LOCATION, result) should be(Some("/contact/accessibility/thanks"))
     }
   }

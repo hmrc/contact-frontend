@@ -124,7 +124,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
     "display errors when form isn't filled out at all" in new TestScope {
 
       val request = generateRequest(desc = "", formName = "", email = "", isJavascript = false, referrer = "/somepage")
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(400)
 
@@ -150,7 +150,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(400)
 
@@ -174,7 +174,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(400)
 
@@ -196,7 +196,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(400)
 
@@ -218,7 +218,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(400)
 
@@ -254,7 +254,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitUnauthenticatedAccessibilityForm()(request)
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result)           should be(303)
       header(LOCATION, result) should be(Some("/contact/accessibility-unauthenticated/thanks"))
@@ -279,7 +279,8 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
     "display errors when form isn't filled out at all" in new TestScope {
 
       val request = generateRequest(desc = "", formName = "", email = "", isJavascript = false, referrer = "/somepage")
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result) should be(400)
 
@@ -305,7 +306,8 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result) should be(400)
 
@@ -329,7 +331,8 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result) should be(400)
 
@@ -351,7 +354,8 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result) should be(400)
 
@@ -373,7 +377,8 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result) should be(400)
 
@@ -409,9 +414,10 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
         isJavascript = false,
         referrer = "/somepage"
       )
-      val result  = controller.submitAccessibilityForm()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
-      status(result)           should be(303)
+      status(result) should be(303)
       header(LOCATION, result) should be(Some("/contact/accessibility/thanks"))
     }
   }

@@ -96,7 +96,8 @@ class ContactHmrcController @Inject() (
         val referrer     = referrerUrl orElse httpReferrer getOrElse "n/a"
         val csrfToken    = CSRF.getToken(request).map(_.value).getOrElse("")
         val form         = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, None, userAction))
-        val view         = contactPage(form, false, routes.ContactHmrcController.submitUnauthenticated())
+        val action       = routes.ContactHmrcController.submitUnauthenticated(service, userAction, referrerUrl)
+        val view         = contactPage(form, false, action)
         Ok(view)
       }
     }
@@ -110,23 +111,34 @@ class ContactHmrcController @Inject() (
   def submit = Action.async { implicit request =>
     loginRedirection(routes.ContactHmrcController.index().url)(
       authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments) { allEnrolments =>
-        handleSubmit(Some(allEnrolments), routes.ContactHmrcController.thanks())
+        handleSubmit(Some(allEnrolments), routes.ContactHmrcController.thanks(), None, None, None)
       }
     )
   }
 
-  def submitUnauthenticated = Action.async { implicit request =>
-    handleSubmit(None, routes.ContactHmrcController.thanksUnauthenticated())
-  }
+  def submitUnauthenticated(
+    service: Option[String],
+    userAction: Option[String],
+    referrerUrl: Option[String]
+  ): Action[AnyContent] =
+    Action.async { implicit request =>
+      handleSubmit(None, routes.ContactHmrcController.thanksUnauthenticated(), service, userAction, referrerUrl)
+    }
 
-  private def handleSubmit(enrolments: Option[Enrolments], thanksRoute: Call)(implicit request: Request[AnyContent]) =
+  private def handleSubmit(
+    enrolments: Option[Enrolments],
+    thanksRoute: Call,
+    service: Option[String],
+    userAction: Option[String],
+    referrerUrl: Option[String]
+  )(implicit request: Request[AnyContent]) =
     ContactHmrcForm.form
       .bindFromRequest()(request)
       .fold(
         error => {
           val submitUrl = {
             if (enrolments.isDefined) routes.ContactHmrcController.submit()
-            else routes.ContactHmrcController.submitUnauthenticated()
+            else routes.ContactHmrcController.submitUnauthenticated(service, userAction, referrerUrl)
           }
           Future.successful(BadRequest(contactPage(error, isLoggedIn = enrolments.isDefined, submitUrl)))
         },

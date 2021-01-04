@@ -128,7 +128,7 @@ class AssetsFrontendContactHmrcControllerSpec
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      val submitResult = controller.submitUnauthenticated(contactRequest)
+      val submitResult = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       Then("the user is redirected to the thanks page")
       status(submitResult)               shouldBe 303
@@ -172,7 +172,7 @@ class AssetsFrontendContactHmrcControllerSpec
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      controller.submitUnauthenticated(contactRequest)
+      controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       Then("the message is sent to the Deskpro connector")
       Mockito
@@ -212,7 +212,7 @@ class AssetsFrontendContactHmrcControllerSpec
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      controller.submitUnauthenticated(contactRequest)
+      controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       Then("the message is sent to the Deskpro connector")
       Mockito
@@ -248,7 +248,7 @@ class AssetsFrontendContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated()(contactRequest)
+      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -280,7 +280,7 @@ class AssetsFrontendContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated()(contactRequest)
+      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -309,7 +309,7 @@ class AssetsFrontendContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated()(contactRequest)
+      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -338,7 +338,7 @@ class AssetsFrontendContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated()(contactRequest)
+      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -364,7 +364,7 @@ class AssetsFrontendContactHmrcControllerSpec
         "userAction"            -> "/overridden/path"
       )
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated()(contactRequest)
+      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -394,7 +394,7 @@ class AssetsFrontendContactHmrcControllerSpec
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      val submitResult = controller.submitUnauthenticated(contactRequest)
+      val submitResult = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       And("the Deskpro connector fails")
 

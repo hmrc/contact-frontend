@@ -101,7 +101,7 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(request)
+      val result = controller.submitUnauthenticatedDeprecated()(request)
 
       status(result)             should be(303)
       redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks-unauthenticated")
@@ -113,7 +113,7 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(generateInvalidRequest())
+      val result = controller.submitUnauthenticatedDeprecated()(generateInvalidRequest())
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
@@ -122,11 +122,11 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
-    "succed with comment if 'canOmitComments' flag is true" in new TestScope {
+    "succeed with comment if 'canOmitComments' flag is true" in new TestScope {
       hmrcConnectorWillReturnTheTicketId()
 
       val result =
-        controller.submitUnauthenticated()(generateRequest(comments = "Some comment", canOmitComments = true))
+        controller.submitUnauthenticatedDeprecated()(generateRequest(comments = "Some comment", canOmitComments = true))
 
       status(result)             should be(303)
       redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks-unauthenticated")
@@ -134,10 +134,10 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
       verifyRequestMade(comment = "Some comment")
     }
 
-    "succed without comment if 'canOmitComments' flag is true" in new TestScope {
+    "succeed without comment if 'canOmitComments' flag is true" in new TestScope {
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(generateRequest(comments = "", canOmitComments = true))
+      val result = controller.submitUnauthenticatedDeprecated()(generateRequest(comments = "", canOmitComments = true))
 
       status(result)             should be(303)
       redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks-unauthenticated")
@@ -148,7 +148,7 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
     "fail without comment if 'canOmitComments' flag is false" in new TestScope {
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(generateRequest(comments = "", canOmitComments = false))
+      val result = controller.submitUnauthenticatedDeprecated()(generateRequest(comments = "", canOmitComments = false))
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
@@ -161,7 +161,7 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(generateInvalidRequestWithBackUrlAndService())
+      val result = controller.submitUnauthenticatedDeprecated()(generateInvalidRequestWithBackUrlAndService())
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
@@ -176,7 +176,7 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
 
       hmrcConnectorWillFail()
 
-      an[Exception] shouldBe thrownBy(await(controller.submitUnauthenticated()(request)))
+      an[Exception] shouldBe thrownBy(await(controller.submitUnauthenticatedDeprecated()(request)))
 
     }
 
@@ -184,11 +184,12 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(requestWithBackLink)
+      val result = controller.submitUnauthenticatedDeprecated()(requestWithBackLink)
 
-      status(result)             should be(303)
+      status(result) should be(303)
+      val encodedBackUrl: String = URLEncoder.encode("http://www.back.url", "UTF-8")
       redirectLocation(result) shouldBe Some(
-        s"/contact/beta-feedback/thanks-unauthenticated?backUrl=${URLEncoder.encode("http://www.back.url", "UTF-8")}"
+        s"/contact/beta-feedback/thanks-unauthenticated?backUrl=$encodedBackUrl"
       )
 
       verifyRequestMade()
@@ -200,7 +201,7 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submit()(request.withSession(SessionKeys.authToken -> "authToken"))
+      val result = controller.submitDeprecated()(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result)             should be(303)
       redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks")
@@ -212,11 +213,12 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submit()(requestWithBackLink.withSession(SessionKeys.authToken -> "authToken"))
+      val result = controller.submitDeprecated()(requestWithBackLink.withSession(SessionKeys.authToken -> "authToken"))
 
-      status(result)             should be(303)
+      status(result) should be(303)
+      val encodedBackUrl = URLEncoder.encode("http://www.back.url", "UTF-8")
       redirectLocation(result) shouldBe Some(
-        s"/contact/beta-feedback/thanks?backUrl=${URLEncoder.encode("http://www.back.url", "UTF-8")}"
+        s"/contact/beta-feedback/thanks?backUrl=$encodedBackUrl"
       )
 
       verifyRequestMade()
@@ -254,42 +256,41 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
       page.body().select("#feedback-back").first shouldBe null
 
     }
+  }
 
-    "Feedback confirmation page for anonymous user " should {
-      "not contain back button if not requested" in new TestScope {
+  "Feedback confirmation page for anonymous user" should {
+    "not contain back button if not requested" in new TestScope {
 
-        val submit = controller.unauthenticatedThanks()(
-          request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
-        )
-        val page   = Jsoup.parse(contentAsString(submit))
+      val submit = controller.unauthenticatedThanks()(
+        request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
+      )
+      val page   = Jsoup.parse(contentAsString(submit))
 
-        page.body().select("#feedback-back").first shouldBe null
+      page.body().select("#feedback-back").first shouldBe null
 
-      }
-
-      "contain back button if requested and the back url is valid" in new TestScope {
-
-        val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.valid.url"))(
-          request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
-        )
-        val page   = Jsoup.parse(contentAsString(submit))
-
-        page.body().select("#feedback-back").first.attr("href") shouldBe "http://www.valid.url"
-
-      }
-
-      "not contain back button if requested and the back url is invalid" in new TestScope {
-
-        val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.invalid.url"))(
-          request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
-        )
-        val page   = Jsoup.parse(contentAsString(submit))
-
-        page.body().select("#feedback-back").first shouldBe null
-
-      }
     }
 
+    "contain back button if requested and the back url is valid" in new TestScope {
+
+      val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.valid.url"))(
+        request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
+      )
+      val page   = Jsoup.parse(contentAsString(submit))
+
+      page.body().select("#feedback-back").first.attr("href") shouldBe "http://www.valid.url"
+
+    }
+
+    "not contain back button if requested and the back url is invalid" in new TestScope {
+
+      val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.invalid.url"))(
+        request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
+      )
+      val page   = Jsoup.parse(contentAsString(submit))
+
+      page.body().select("#feedback-back").first shouldBe null
+
+    }
   }
 
   "Submitting the partial feedback form" should {

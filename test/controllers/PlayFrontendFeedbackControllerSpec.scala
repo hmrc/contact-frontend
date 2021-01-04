@@ -55,7 +55,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
   }
 
   "unauthenticatedFeedbackForm" should {
-    "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in new TestScope {
+    "include 'service', 'backUrl' and 'canOmitComments' hidden fields and bind to submit URL" in new TestScope {
       val result = controller.unauthenticatedFeedbackForm(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
@@ -63,6 +63,15 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       )(FakeRequest("GET", "/foo"))
 
       val page = Jsoup.parse(contentAsString(result))
+
+      val encodedBackUrl = URLEncoder.encode("/any-service", "UTF-8")
+      val queryString    = s"service=any-service&backUrl=$encodedBackUrl&canOmitComments=true"
+      page
+        .body()
+        .select("form[id=feedback-form]")
+        .first
+        .attr("action") shouldBe s"/contact/beta-feedback-unauthenticated?$queryString"
+
       page.body().select("input[name=service]").first.attr("value")   shouldBe "any-service"
       page.body().select("input[name=backUrl]").first.attr("value")   shouldBe "/any-service"
       page.body().select("input[name=canOmitComments]").attr("value") shouldBe "true"
@@ -168,6 +177,14 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       val page = Jsoup.parse(contentAsString(result))
       page.body().select(".govuk-error-message").size should be > 0
 
+      val encodedBackUrl = URLEncoder.encode("http://www.back.url", "UTF-8")
+      val queryString    = s"service=someService&backUrl=$encodedBackUrl&canOmitComments=true"
+      page
+        .body()
+        .select("form[id=feedback-form]")
+        .first
+        .attr("action") shouldBe s"/contact/beta-feedback-unauthenticated?$queryString"
+
       page.body().select("input[name=service]").first.attr("value")   shouldBe "someService"
       page.body().select("input[name=backUrl]").first.attr("value")   shouldBe "http://www.back.url"
       page.body().select("input[name=canOmitComments]").attr("value") shouldBe "true"
@@ -188,9 +205,10 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
 
       val result = controller.submitUnauthenticated()(requestWithBackLink)
 
-      status(result)             should be(303)
+      status(result) should be(303)
+      val encodedBackUrl: String = URLEncoder.encode("http://www.back.url", "UTF-8")
       redirectLocation(result) shouldBe Some(
-        s"/contact/beta-feedback/thanks-unauthenticated?backUrl=${URLEncoder.encode("http://www.back.url", "UTF-8")}"
+        s"/contact/beta-feedback/thanks-unauthenticated?backUrl=$encodedBackUrl"
       )
 
       verifyRequestMade()
@@ -216,9 +234,10 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
 
       val result = controller.submit()(requestWithBackLink.withSession(SessionKeys.authToken -> "authToken"))
 
-      status(result)             should be(303)
+      status(result) should be(303)
+      val encodedBackUrl: String = URLEncoder.encode("http://www.back.url", "UTF-8")
       redirectLocation(result) shouldBe Some(
-        s"/contact/beta-feedback/thanks?backUrl=${URLEncoder.encode("http://www.back.url", "UTF-8")}"
+        s"/contact/beta-feedback/thanks?backUrl=$encodedBackUrl"
       )
 
       verifyRequestMade()

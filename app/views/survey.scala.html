@@ -16,7 +16,7 @@
 		<h1>@Messages("survey.title")</h1>
 	</header>
 
-	@helpersForm(action=controllers.routes.SurveyController.submit, 'class -> "form") {
+	@helpersForm(action=controllers.routes.SurveyController.submitDeprecated, 'class -> "form") {
 
         <input type="hidden" value="@ticketId" id="ticket-id" name="ticket-id">
         <input type="hidden" value="@serviceId" id="service-id" name="service-id">

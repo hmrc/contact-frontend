@@ -49,7 +49,7 @@ class SurveyController @Inject() (
     Future.successful(
       if (validateTicketId(ticketId)) {
         val form   = emptyForm(serviceId = Some(serviceId), ticketId = Some(ticketId))
-        val action = routes.SurveyController.submit
+        val action = routes.SurveyController.submit(ticketId, serviceId)
         Ok(surveyPage(form, action))
       } else {
         logger.error(s"Invalid ticket id $ticketId when requesting survey form")
@@ -58,22 +58,24 @@ class SurveyController @Inject() (
     )
   }
 
-  def submit() = Action.async { implicit request =>
+  def submitDeprecated() = Action.async { implicit request =>
     Future.successful {
-      if (appConfig.enablePlayFrontendSurveyForm) {
-        playFrontendSurveyForm.bindFromRequest.fold(
-          formWithErrors =>
-            BadRequest(
-              playFrontendSurveyPage(
-                formWithErrors,
-                routes.SurveyController.submit
-              )
-            ),
-          _ => submitSurveyAction
-        )
-      } else {
-        submitSurveyAction
-      }
+      submitSurveyAction
+    }
+  }
+
+  def submit(ticketId: String, serviceId: String) = Action.async { implicit request =>
+    Future.successful {
+      playFrontendSurveyForm.bindFromRequest.fold(
+        formWithErrors =>
+          BadRequest(
+            playFrontendSurveyPage(
+              formWithErrors,
+              routes.SurveyController.submit(ticketId, serviceId)
+            )
+          ),
+        _ => submitSurveyAction
+      )
     }
   }
 
