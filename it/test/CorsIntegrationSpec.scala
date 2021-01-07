@@ -1,6 +1,5 @@
 package test
 
-import org.scalatest.GivenWhenThen
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -15,7 +14,7 @@ import play.api.test.Helpers._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class CorsIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with GivenWhenThen {
+class CorsIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   override lazy val app: Application =
     new GuiceApplicationBuilder()
@@ -31,7 +30,8 @@ class CorsIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerS
         HOST                           -> "localhost",
         ACCESS_CONTROL_REQUEST_HEADERS -> USER_AGENT,
         ACCESS_CONTROL_REQUEST_METHOD  -> POST
-      )),
+      )
+    ),
     JsNull
   )
 
