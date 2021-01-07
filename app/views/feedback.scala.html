@@ -18,8 +18,8 @@
 @mainContent(title = Messages("feedback.heading"), userLoggedIn = loggedIn) {
 
     @if(loggedIn) {
-        @feedbackPartialForm(feedbackForm, routes.FeedbackController.submit.url, service, backUrl, canOmitComments)
+        @feedbackPartialForm(feedbackForm, routes.FeedbackController.submitDeprecated.url, service, backUrl, canOmitComments)
     } else {
-        @feedbackPartialForm(feedbackForm, routes.FeedbackController.submitUnauthenticated.url, service, backUrl, canOmitComments)
+        @feedbackPartialForm(feedbackForm, routes.FeedbackController.submitUnauthenticatedDeprecated.url, service, backUrl, canOmitComments)
     }
 }

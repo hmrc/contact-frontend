@@ -29,7 +29,7 @@
         @govukErrorSummary(ErrorSummary(errorList = surveyForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
     }
     @h1(content = Text(messages("survey.title")))
-    @formWithCSRF(action) {
+    @formWithCSRF(action, 'id -> "survey-form") {
       @inputHidden(surveyForm("service-id"))
       @inputHidden(surveyForm("ticket-id"))
       @defining(Seq(

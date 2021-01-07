@@ -17,7 +17,7 @@
     } else {
         @contactHmrcForm(
             contactForm            = contactForm,
-            externalContactHmrcUrl = routes.ContactHmrcController.submitUnauthenticated.url,
+            externalContactHmrcUrl = routes.ContactHmrcController.submitUnauthenticated(None, None, None).url,
             renderFormOnly         = false,
             reCaptchaComponent     = reCaptchaComponent
         )

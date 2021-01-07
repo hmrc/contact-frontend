@@ -65,13 +65,20 @@ class PlayFrontendContactHmrcControllerSpec
       val serviceName    = Some("my-fake-service")
 
       When("the unauthenticated Contact HMRC page is requested with a service name")
-      val contactResult = controller.indexUnauthenticated(serviceName, None, None)(contactRequest)
+      val contactResult =
+        controller.indexUnauthenticated(serviceName, Some("my-action"), Some("/url-from-query"))(contactRequest)
 
       Then("the expected page should be returned")
       status(contactResult) shouldBe 200
 
-      val page = Jsoup.parse(contentAsString(contactResult))
-      page.body().getElementById("referrer").attr("value") shouldBe "/some-service-page"
+      val page        = Jsoup.parse(contentAsString(contactResult))
+      val queryString = s"service=my-fake-service&userAction=my-action&referrerUrl=%2Furl-from-query"
+      page
+        .body()
+        .select("form[id=contact-hmrc-form]")
+        .first
+        .attr("action")                                    shouldBe s"/contact/contact-hmrc-unauthenticated?$queryString"
+      page.body().getElementById("referrer").attr("value") shouldBe "/url-from-query"
       page.body().getElementById("service").attr("value")  shouldBe "my-fake-service"
     }
 
@@ -126,7 +133,7 @@ class PlayFrontendContactHmrcControllerSpec
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      val submitResult = controller.submitUnauthenticated(contactRequest)
+      val submitResult = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       Then("the user is redirected to the thanks page")
       status(submitResult)               shouldBe 303
@@ -170,7 +177,7 @@ class PlayFrontendContactHmrcControllerSpec
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      controller.submitUnauthenticated(contactRequest)
+      controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       Then("the message is sent to the Deskpro connector")
       Mockito
@@ -210,7 +217,7 @@ class PlayFrontendContactHmrcControllerSpec
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      controller.submitUnauthenticated(contactRequest)
+      controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       Then("the message is sent to the Deskpro connector")
       Mockito
@@ -246,7 +253,7 @@ class PlayFrontendContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated()(contactRequest)
+      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -278,7 +285,7 @@ class PlayFrontendContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated()(contactRequest)
+      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -307,7 +314,7 @@ class PlayFrontendContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated()(contactRequest)
+      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -336,7 +343,7 @@ class PlayFrontendContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated()(contactRequest)
+      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -362,7 +369,7 @@ class PlayFrontendContactHmrcControllerSpec
         "userAction"            -> "/overridden/path"
       )
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated()(contactRequest)
+      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -392,7 +399,7 @@ class PlayFrontendContactHmrcControllerSpec
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to unauthenticated submit contact page")
-      val submitResult = controller.submitUnauthenticated(contactRequest)
+      val submitResult = controller.submitUnauthenticated(None, None, None)(contactRequest)
 
       And("the Deskpro connector fails")
 
@@ -414,8 +421,8 @@ class PlayFrontendContactHmrcControllerSpec
   }
 
   "Submitting contact hrmc form" should {
-    "return JSON with ticket id for sucessful form submission" in new TestScope {
-      Given("we have a valid reqest")
+    "return JSON with ticket id for successful form submission" in new TestScope {
+      Given("we have a valid request")
 
       val ticketId = TicketId(12345)
 

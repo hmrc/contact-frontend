@@ -105,13 +105,28 @@ import scala.concurrent.{ExecutionContext, Future}
     )
   }
 
-  def submit = Action.async { implicit request =>
+  def submitDeprecated = Action.async { implicit request =>
     authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments) { allEnrolments =>
       doSubmit(Some(allEnrolments))
     }
   }
 
-  def submitUnauthenticated = Action.async { implicit request =>
+  def submitUnauthenticatedDeprecated = Action.async { implicit request =>
+    doSubmit(None)
+  }
+
+  def submit(service: Option[String] = None, backUrl: Option[String] = None, canOmitComments: Boolean = false) =
+    Action.async { implicit request =>
+      authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments) { allEnrolments =>
+        doSubmit(Some(allEnrolments))
+      }
+    }
+
+  def submitUnauthenticated(
+    service: Option[String] = None,
+    backUrl: Option[String] = None,
+    canOmitComments: Boolean = false
+  ) = Action.async { implicit request =>
     doSubmit(None)
   }
 
@@ -236,10 +251,11 @@ import scala.concurrent.{ExecutionContext, Future}
   )(implicit
     request: Request[_],
     lang: Lang
-  ): Html = {
-    val action =
-      if (loggedIn) routes.FeedbackController.submit else routes.FeedbackController.submitUnauthenticated
+  ): Html =
     if (appConfig.enablePlayFrontendFeedbackForm) {
+      val action =
+        if (loggedIn) routes.FeedbackController.submit(service, backUrl, canOmitComments)
+        else routes.FeedbackController.submitUnauthenticated(service, backUrl, canOmitComments)
       playFrontendFeedbackPage(
         form,
         action
@@ -247,7 +263,6 @@ import scala.concurrent.{ExecutionContext, Future}
     } else {
       assetsFrontendFeedbackPage(form, loggedIn, service, backUrl, canOmitComments = canOmitComments)
     }
-  }
 }
 
 object FeedbackFormBind {
@@ -308,6 +323,7 @@ object FeedbackFormBind {
               case None                                                       => Left(Seq(FormError(key, "error.required", Nil)))
             }
           }
+
           override def unbind(key: String, value: String): Map[String, String] = Map(key -> value)
 
         }).verifying(

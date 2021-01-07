@@ -47,6 +47,20 @@ class PlayFrontendSurveyControllerSpec extends AnyWordSpec with Matchers with Gu
   }
 
   "SurveyController" should {
+    "bind query string parameters to the form as expected" in new TestScope {
+      val ticketId  = "GFBN-8051-KLNY"
+      val serviceId = "abcdefg"
+
+      val result   = controller.survey(ticketId, serviceId)(FakeRequest())
+      val document = Jsoup.parse(contentAsString(result))
+
+      val queryString = s"ticketId=$ticketId&serviceId=$serviceId"
+      document.body().select("form[id=survey-form]").first.attr("action") shouldBe s"/contact/survey?$queryString"
+
+      document.body().select("input[name=service-id]").first.attr("value") shouldBe serviceId
+      document.body().select("input[name=ticket-id]").first.attr("value")  shouldBe ticketId
+    }
+
     "produce an audit result for a valid form" in new TestScope {
       implicit val request = FakeRequest(
         "GET",
@@ -98,19 +112,21 @@ class PlayFrontendSurveyControllerSpec extends AnyWordSpec with Matchers with Gu
   }
 
   "display errors when form isn't filled out at all" in new TestScope {
-    val fields  = Map(
-      "ticket-id"  -> "GFBN-8051-KLNY",
-      "service-id" -> "abcdefg"
-    )
-    val request = FakeRequest("POST", "/blah")
+    val ticketId  = "GFBN-8051-KLNY"
+    val serviceId = "abcdefg"
+    val request   = FakeRequest("POST", "/blah")
 
     implicit val messages = messagesApi.preferred(request)
-    val result            = controller.submit()(request)
+    val result            = controller.submit(ticketId, serviceId)(request)
 
     status(result) should be(400)
 
     val document = Jsoup.parse(contentAsString(result))
-    val errors   = document.select(".govuk-error-message")
+
+    val queryString = s"ticketId=$ticketId&serviceId=$serviceId"
+    document.body().select("form[id=survey-form]").first.attr("action") shouldBe s"/contact/survey?$queryString"
+
+    val errors = document.select(".govuk-error-message")
 
     errors               should have size 2
     errors.get(0).text() should include(messages("survey.helpful.error.required"))
@@ -118,22 +134,28 @@ class PlayFrontendSurveyControllerSpec extends AnyWordSpec with Matchers with Gu
   }
 
   "display errors when comment is too long" in new TestScope {
-    val fields  = Map(
+    val ticketId  = "GFBN-8051-KLNY"
+    val serviceId = "abcdefg"
+    val fields    = Map(
       "helpful"    -> "1",
       "speed"      -> "1",
       "improve"    -> "x" * 3000,
-      "ticket-id"  -> "GFBN-8051-KLNY",
-      "service-id" -> "abcdefg"
+      "ticket-id"  -> ticketId,
+      "service-id" -> serviceId
     )
-    val request = FakeRequest("POST", "/blah").withFormUrlEncodedBody(fields.toSeq: _*)
+    val request   = FakeRequest("POST", "/blah").withFormUrlEncodedBody(fields.toSeq: _*)
 
     implicit val messages = messagesApi.preferred(request)
-    val result            = controller.submit()(request)
+    val result            = controller.submit(ticketId, serviceId)(request)
 
     status(result) should be(400)
 
     val document = Jsoup.parse(contentAsString(result))
-    val errors   = document.select(".govuk-error-message")
+
+    val queryString = s"ticketId=$ticketId&serviceId=$serviceId"
+    document.body().select("form[id=survey-form]").first.attr("action") shouldBe s"/contact/survey?$queryString"
+
+    val errors = document.select(".govuk-error-message")
 
     errors               should have size 1
     errors.get(0).text() should include(messages("survey.improve.error.length"))

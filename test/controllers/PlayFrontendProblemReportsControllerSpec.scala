@@ -50,7 +50,13 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
 
       status(result) should be(200)
 
-      val document = Jsoup.parse(contentAsString(result))
+      val document    = Jsoup.parse(contentAsString(result))
+      val queryString = s"service=my-test-service"
+      document
+        .body()
+        .select("form[id=error-feedback-form]")
+        .first
+        .attr("action")                                       shouldBe s"/contact/problem_reports_nonjs?$queryString"
       document.getElementById("error-feedback-form")            should not be null
       document.getElementsByClass("govuk-error-summary").size() should be(0)
     }
@@ -81,7 +87,7 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
         hrmcConnectorWillReturnTheTicketId
 
         val request = generateRequest(javascriptEnabled = false)
-        val result  = controller.submitNonJavaScript()(request)
+        val result  = controller.submitNonJavaScript(service = None)(request)
 
         status(result) should be(200)
 
