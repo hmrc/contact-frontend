@@ -1,6 +1,5 @@
 package test
 
-import org.scalatest.GivenWhenThen
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -13,7 +12,7 @@ import play.api.test.FakeRequest
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class CSPIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with GivenWhenThen {
+class CSPIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   override lazy val app: Application =
     new GuiceApplicationBuilder()
