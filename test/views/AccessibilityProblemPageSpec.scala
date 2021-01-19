@@ -266,7 +266,7 @@ class AccessibilityProblemPageSpec
     "include a label for the name input" in {
       val label = content.select("label[for=name]")
       label              should have size 1
-      label.first.text shouldBe "Your name"
+      label.first.text shouldBe "Full name"
     }
 
     "not initially include an error message for the name input" in {
@@ -283,7 +283,7 @@ class AccessibilityProblemPageSpec
       )
       val errors             = contentWithService.select("#name-error")
       errors            should have size 1
-      errors.first.text should include("Enter your name")
+      errors.first.text should include("Enter your full name")
     }
 
     "include the submitted name input value" in {
@@ -323,7 +323,7 @@ class AccessibilityProblemPageSpec
     "include a label for the email input" in {
       val label = content.select("label[for=email]")
       label              should have size 1
-      label.first.text shouldBe "Your email address"
+      label.first.text shouldBe "Email address"
     }
 
     "include a hint for the email input" in {

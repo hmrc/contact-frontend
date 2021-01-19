@@ -14,14 +14,14 @@ import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result, Results}
 import services.CaptchaService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.{DeskproErrorPage}
+import views.html.InternalErrorPage
 import views.html.helpers.recaptcha
 
 import scala.concurrent.{ExecutionContext, Future}
 
 abstract class WithCaptcha @Inject() (
   mcc: MessagesControllerComponents,
-  deskproErrorPage: DeskproErrorPage,
+  errorPage: InternalErrorPage,
   recaptcha: recaptcha
 ) extends FrontendController(mcc)
     with Results
@@ -55,7 +55,7 @@ abstract class WithCaptcha @Inject() (
       recaptchaForm.bindFromRequest()(request) fold (
         errors => {
           logger.warn(s"Part of the POST request responsible for captcha is malformed. Errors $errors")
-          Future.successful(BadRequest(deskproErrorPage()))
+          Future.successful(BadRequest(errorPage()))
         },
         form => {
           for {
@@ -64,7 +64,7 @@ abstract class WithCaptcha @Inject() (
                          action
                        } else {
                          logger.warn("There was a failed captcha result")
-                         Future.successful(BadRequest(deskproErrorPage()))
+                         Future.successful(BadRequest(errorPage()))
                        }
           } yield result
         }

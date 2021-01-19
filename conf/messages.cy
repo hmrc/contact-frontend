@@ -90,7 +90,10 @@ survey.tell.us.how.we.can.improve=Rhowch wybod i ni sut y gallwn wella''r cymort
 survey.2500.characters.or.less=2500 o gymeriadau neu lai
 survey.submit=Cyflwyno
 
-deskpro.error.problem.sending=Cododd problem wrth anfon eich ymholiad.
+deskpro.error.page.title=Sorry, there is a problem with the service – Contact HMRC – GOV.UK
+deskpro.error.page.heading=Sorry, there is a problem with the service
+deskpro.error.try.later=Try again later.
+deskpro.error.not.sent=Your message has not been sent.
 please.try.later=Rhowch gynnig arall arni yn nes ymlaen.
 
 contact.heading=Cymorth a chysylltiadau

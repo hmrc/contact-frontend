@@ -442,6 +442,7 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
     val playFrontendAccessibilityPage               = app.injector.instanceOf[views.html.AccessibilityProblemPage]
     val playFrontendAccessibilityConfirmationPage   =
       app.injector.instanceOf[views.html.AccessibilityProblemConfirmationPage]
+    val errorPage                                   = app.injector.instanceOf[views.html.InternalErrorPage]
 
     val controller = new AccessibilityController(
       hmrcDeskproConnector,
@@ -451,7 +452,8 @@ class AssetsFrontendAccessibilityControllerSpec extends AnyWordSpec with Matcher
       assetsFrontendAccessibilityPage,
       assetsFrontendAccessibilityConfirmationPage,
       playFrontendAccessibilityPage,
-      playFrontendAccessibilityConfirmationPage
+      playFrontendAccessibilityConfirmationPage,
+      errorPage
     )(cconfig, ExecutionContext.Implicits.global)
 
     def generateRequest(desc: String, formName: String, email: String, isJavascript: Boolean, referrer: String) = {

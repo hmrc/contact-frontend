@@ -53,7 +53,7 @@ class WithCaptchaSpec extends AnyWordSpec with MockitoSugar with Results with Ma
       val result         = testController.action(contactRequest)
 
       status(result)        shouldBe 400
-      contentAsString(result) should include("deskpro.error.problem.sending")
+      contentAsString(result) should include("deskpro.error.page.heading")
     }
 
     "fail with bad request if detected as a bot" in {
@@ -67,13 +67,13 @@ class WithCaptchaSpec extends AnyWordSpec with MockitoSugar with Results with Ma
       val result         = testController.action(contactRequest)
 
       status(result)        shouldBe 400
-      contentAsString(result) should include("deskpro.error.problem.sending")
+      contentAsString(result) should include("deskpro.error.page.heading")
     }
 
     class TestController(enabled: Boolean = true)
         extends WithCaptcha(
           Stubs.stubMessagesControllerComponents(messagesApi = Helpers.stubMessagesApi()),
-          app.injector.instanceOf[views.html.DeskproErrorPage],
+          app.injector.instanceOf[views.html.InternalErrorPage],
           app.injector.instanceOf[views.html.helpers.recaptcha]
         ) {
       override implicit val appConfig: AppConfig = new TestAppConfig {

@@ -7,6 +7,7 @@ package controllers
 
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
+
 import javax.inject.{Inject, Singleton}
 import model.FeedbackForm
 import play.api.data.Forms._
@@ -23,7 +24,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions,
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
 import views.html.partials.{feedback_form, feedback_form_confirmation}
-import views.html.{FeedbackConfirmationPage, FeedbackPage, feedback, feedback_confirmation}
+import views.html.{InternalErrorPage, FeedbackConfirmationPage, FeedbackPage, feedback, feedback_confirmation}
 import play.api.http.HeaderNames._
 import play.twirl.api.Html
 
@@ -40,7 +41,8 @@ import scala.concurrent.{ExecutionContext, Future}
   playFrontendFeedbackConfirmationPage: FeedbackConfirmationPage,
   feedbackFormPartial: feedback_form,
   feedbackFormConfirmationPartial: feedback_form_confirmation,
-  playFrontendFeedbackPage: FeedbackPage
+  playFrontendFeedbackPage: FeedbackPage,
+  errorPage: InternalErrorPage
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
@@ -158,6 +160,8 @@ import scala.concurrent.{ExecutionContext, Future}
             )
               .withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
           }
+        }.recover { case _ =>
+          InternalServerError(errorPage())
         }
       )
 

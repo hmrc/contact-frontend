@@ -11,10 +11,10 @@
     p: Paragraph
 )
 @()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
-@defining(messages("global.error.InternalServerError500.heading")) { pageTitle =>
+@defining(messages("deskpro.error.page.title")) { pageTitle =>
   @mainLayout(pageTitle, isWelshTranslationAvailable = true) {
-    @h1(content = Text(pageTitle))
-    @p(content = Text(messages("deskpro.error.problem.sending")))
-    @p(content = Text(messages("please.try.later")))
+    @h1(content = Text(messages("deskpro.error.page.heading")))
+    @p(content = Text(messages("deskpro.error.try.later")))
+    @p(content = Text(messages("deskpro.error.not.sent")))
   }
 }

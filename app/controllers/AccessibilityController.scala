@@ -7,6 +7,7 @@ package controllers
 
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
+
 import javax.inject.Inject
 import model.AccessibilityForm
 import play.api.Configuration
@@ -22,7 +23,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions}
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.DeskproEmailValidator
-import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, accessibility, accessibility_confirmation}
+import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, InternalErrorPage, accessibility, accessibility_confirmation}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -82,7 +83,8 @@ class AccessibilityController @Inject() (
   assetsFrontendAccessibilityPage: accessibility,
   assetsFrontendAccessibilityConfirmationPage: accessibility_confirmation,
   playFrontendAccessibilityProblemPage: AccessibilityProblemPage,
-  playFrontendAccessibilityProblemConfirmationPage: AccessibilityProblemConfirmationPage
+  playFrontendAccessibilityProblemConfirmationPage: AccessibilityProblemConfirmationPage,
+  errorPage: InternalErrorPage
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
@@ -129,11 +131,15 @@ class AccessibilityController @Inject() (
                   BadRequest(accessibilityPage(error, action, loggedIn = true))
                 ),
               data =>
-                for {
-                  maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
-                  _                   <- createAccessibilityTicket(data, maybeUserEnrolments)
-                  thanks               = routes.AccessibilityController.thanks()
-                } yield Redirect(thanks)
+                {
+                  for {
+                    maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
+                    _                   <- createAccessibilityTicket(data, maybeUserEnrolments)
+                    thanks               = routes.AccessibilityController.thanks()
+                  } yield Redirect(thanks)
+                }.recover { case _ =>
+                  InternalServerError(errorPage())
+                }
             )
         }
       )
@@ -181,11 +187,14 @@ class AccessibilityController @Inject() (
                 )
               )
             ),
-          data =>
+          data => {
             for {
-              _     <- createAccessibilityTicket(data, None)
+              _ <- createAccessibilityTicket(data, None)
               thanks = routes.AccessibilityController.unauthenticatedThanks()
             } yield Redirect(thanks)
+          }.recover { case _ =>
+            InternalServerError(errorPage())
+          }
         )
     }
 

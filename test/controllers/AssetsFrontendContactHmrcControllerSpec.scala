@@ -560,7 +560,7 @@ class AssetsFrontendContactHmrcControllerSpec
       And("an error message is returned to the user")
       status(result) shouldBe 500
       val page = Jsoup.parse(contentAsString(result))
-      page.body().select("h1").first.text() shouldBe "Sorry, we’re experiencing technical difficulties"
+      page.body().select("h1").first.text() shouldBe "Sorry, there is a problem with the service"
     }
   }
 
@@ -581,7 +581,7 @@ class AssetsFrontendContactHmrcControllerSpec
     val contactForm             = app.injector.instanceOf[views.html.partials.contact_hmrc_form]
     val contactFormConfirmation =
       app.injector.instanceOf[views.html.partials.contact_hmrc_form_confirmation]
-    val deskproErrorPage        = app.injector.instanceOf[views.html.DeskproErrorPage]
+    val errorPage               = app.injector.instanceOf[views.html.InternalErrorPage]
     val pfContactPage           = app.injector.instanceOf[views.html.ContactHmrcPage]
     val pfConfirmationPage      = app.injector.instanceOf[views.html.ContactHmrcConfirmationPage]
 
@@ -595,7 +595,7 @@ class AssetsFrontendContactHmrcControllerSpec
         contactConfirmationPage,
         contactForm,
         contactFormConfirmation,
-        deskproErrorPage,
+        errorPage,
         pfContactPage,
         pfConfirmationPage
       )

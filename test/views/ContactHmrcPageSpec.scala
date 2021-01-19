@@ -262,7 +262,7 @@ class ContactHmrcPageSpec
     "include a label for the name input" in {
       val label = content.select("label[for=contact-name]")
       label              should have size 1
-      label.first.text shouldBe "Your name"
+      label.first.text shouldBe "Full name"
     }
 
     "not initially include an error message for the name input" in {
@@ -279,7 +279,7 @@ class ContactHmrcPageSpec
       )
       val errors             = contentWithService.select("#contact-name-error")
       errors            should have size 1
-      errors.first.text should include("Enter your name")
+      errors.first.text should include("Enter your full name")
     }
 
     "include the submitted name input value" in {
@@ -313,7 +313,7 @@ class ContactHmrcPageSpec
     "include a label for the email input" in {
       val label = content.select("label[for=contact-email]")
       label              should have size 1
-      label.first.text shouldBe "Your email address"
+      label.first.text shouldBe "Email address"
     }
 
     "not initially include an error message for the email input" in {
