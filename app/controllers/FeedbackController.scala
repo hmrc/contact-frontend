@@ -190,9 +190,9 @@ import scala.concurrent.{ExecutionContext, Future}
     request: Request[AnyRef],
     backUrl: Option[String]
   ): Future[Result] = {
-    val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
-      Ok(feedbackConfirmationPage(ticketId, loggedIn, backUrl))
-    }
+    val maybeTicketId = request.session.get("ticketId")
+    val result        =
+      feedbackConfirmationPage(maybeTicketId, loggedIn, backUrl)
     Future.successful(result)
   }
 
@@ -245,16 +245,22 @@ import scala.concurrent.{ExecutionContext, Future}
     Ok(feedbackFormConfirmationPartial(ticketId, None))
   }
 
-  private def feedbackConfirmationPage(ticketId: String, loggedIn: Boolean, backUrl: Option[String])(implicit
+  private def feedbackConfirmationPage(maybeTicketId: Option[String], loggedIn: Boolean, backUrl: Option[String])(
+    implicit
     request: Request[_],
     lang: Lang
-  ) =
+  ): Result =
     if (appConfig.enablePlayFrontendFeedbackForm) {
-      playFrontendFeedbackConfirmationPage(
-        backUrl = backUrl
+      Ok(
+        playFrontendFeedbackConfirmationPage(
+          backUrl = backUrl
+        )
       )
     } else {
-      assetsFrontendFeedbackConfirmationPage(ticketId, loggedIn, backUrl)
+      maybeTicketId match {
+        case Some(ticketId) => Ok(assetsFrontendFeedbackConfirmationPage(ticketId, loggedIn, backUrl))
+        case None           => InternalServerError(errorPage())
+      }
     }
 
   private def feedbackPage(
