@@ -307,7 +307,7 @@ class FeedbackPageSpec
     "include a label for the name input" in {
       val label = content.select("label[for=feedback-name]")
       label              should have size 1
-      label.first.text shouldBe "Name"
+      label.first.text shouldBe "Full name"
     }
 
     "not initially include an error message for the name input" in {
@@ -324,7 +324,7 @@ class FeedbackPageSpec
       )
       val errors             = contentWithService.select("#feedback-name-error")
       errors            should have size 1
-      errors.first.text should include("Enter your name")
+      errors.first.text should include("Enter your full name")
     }
 
     "include the submitted name input value" in {

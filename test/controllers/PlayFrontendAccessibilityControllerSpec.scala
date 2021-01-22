@@ -255,6 +255,40 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       status(result)           should be(303)
       header(LOCATION, result) should be(Some("/contact/accessibility-unauthenticated/thanks"))
     }
+
+    "return error page if the Deskpro ticket creation fails" in new TestScope  {
+      when(
+        hmrcDeskproConnector.createDeskProTicket(
+          name = any[String],
+          email = any[String],
+          subject = any[String],
+          message = any[String],
+          referrer = any[String],
+          isJavascript = any[Boolean],
+          any[Request[AnyRef]](),
+          any[Option[Enrolments]],
+          any[Option[String]],
+          any[Option[String]],
+          any[Option[String]]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new Exception("failed")))
+
+      val request = generateRequest(
+        desc = "valid form message",
+        formName = "valid name",
+        email = "valid@email.com",
+        isJavascript = false,
+        referrer = "/somepage"
+      )
+
+      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
+
+      status(result) should be(500)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.text() should include("Sorry, there is a problem with the service")
+      document.text() should include("Try again later.")
+    }
   }
 
   "Reporting an accessibility problem when logging in" should {
@@ -429,6 +463,41 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       status(result) should be(303)
       header(LOCATION, result) should be(Some("/contact/accessibility/thanks"))
     }
+
+    "return error page if the Deskpro ticket creation fails" in new TestScope  {
+      when(
+        hmrcDeskproConnector.createDeskProTicket(
+          name = any[String],
+          email = any[String],
+          subject = any[String],
+          message = any[String],
+          referrer = any[String],
+          isJavascript = any[Boolean],
+          any[Request[AnyRef]](),
+          any[Option[Enrolments]],
+          any[Option[String]],
+          any[Option[String]],
+          any[Option[String]]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new Exception("failed")))
+
+      val request = generateRequest(
+        desc = "valid form message",
+        formName = "valid name",
+        email = "valid@email.com",
+        isJavascript = false,
+        referrer = "/somepage"
+      )
+
+      val result  =
+        controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
+
+      status(result) should be(500)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.text() should include("Sorry, there is a problem with the service")
+      document.text() should include("Try again later.")
+    }
   }
 
   class TestScope extends MockitoSugar {
@@ -451,6 +520,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
     val playFrontendAccessibilityPage               = app.injector.instanceOf[views.html.AccessibilityProblemPage]
     val playFrontendAccessibilityConfirmationPage   =
       app.injector.instanceOf[views.html.AccessibilityProblemConfirmationPage]
+    val errorPage                                   = app.injector.instanceOf[views.html.InternalErrorPage]
 
     val controller = new AccessibilityController(
       hmrcDeskproConnector,
@@ -460,7 +530,8 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       assetsFrontendAccessibilityPage,
       assetsFrontendAccessibilityConfirmationPage,
       playFrontendAccessibilityPage,
-      playFrontendAccessibilityConfirmationPage
+      playFrontendAccessibilityConfirmationPage,
+      errorPage
     )(cconfig, ExecutionContext.Implicits.global)
 
     def generateRequest(desc: String, formName: String, email: String, isJavascript: Boolean, referrer: String) = {

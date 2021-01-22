@@ -8,6 +8,7 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
+
 import javax.inject.{Inject, Singleton}
 import model.ProblemReport
 import play.api.data.Forms._
@@ -20,7 +21,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation, GetHelpWithThisPageOnlyServerSideValidation}
 import views.html.partials.{error_feedback, error_feedback_inner}
-import views.html.{ProblemReportsNonjsConfirmationPage, ProblemReportsNonjsErrorPage, ProblemReportsNonjsPage, problem_reports_confirmation_nonjavascript, problem_reports_confirmation_nonjavascript_b, problem_reports_error_nonjavascript, problem_reports_nonjavascript, ticket_created_body, ticket_created_body_b}
+import views.html.{InternalErrorPage, ProblemReportsNonjsConfirmationPage, ProblemReportsNonjsPage, problem_reports_confirmation_nonjavascript, problem_reports_confirmation_nonjavascript_b, problem_reports_nonjavascript, ticket_created_body, ticket_created_body_b}
 import play.api.http.HeaderNames._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -125,15 +126,14 @@ class ProblemReportsController @Inject() (
   mcc: MessagesControllerComponents,
   assetsFrontendProblemReportsPage: problem_reports_nonjavascript,
   playFrontendProblemReportsPage: ProblemReportsNonjsPage,
-  assetsFrontendProblemReportsErrorPage: problem_reports_error_nonjavascript,
-  playFrontendProblemReportsErrorPage: ProblemReportsNonjsErrorPage,
   assetsFrontendProblemReportsConfirmationPage: problem_reports_confirmation_nonjavascript,
   playFrontendProblemReportsConfirmationPage: ProblemReportsNonjsConfirmationPage,
   assetsFrontendProblemReportsConfirmationPage_B: problem_reports_confirmation_nonjavascript_b,
   errorFeedbackForm: error_feedback,
   errorFeedbackFormInner: error_feedback_inner,
   ticketCreatedBody: ticket_created_body,
-  ticketCreatedBody_B: ticket_created_body_b
+  ticketCreatedBody_B: ticket_created_body_b,
+  errorPage: InternalErrorPage
 )(implicit appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with ContactFrontendActions
@@ -217,11 +217,7 @@ class ProblemReportsController @Inject() (
             nonJavascriptConfirmationPage(ticketId, problemReport.service)
           }) recover {
           case _ if !isAjax =>
-            if (appConfig.enablePlayFrontendProblemReportNonjsForm) {
-              Ok(playFrontendProblemReportsErrorPage())
-            } else {
-              Ok(assetsFrontendProblemReportsErrorPage())
-            }
+            InternalServerError(errorPage())
         }
       }
     )

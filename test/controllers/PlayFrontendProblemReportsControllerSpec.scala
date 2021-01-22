@@ -236,10 +236,10 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
 
         val request = generateRequest(javascriptEnabled = false)
         val result  = controller.submit()(request)
-        status(result) should be(200)
+        status(result) should be(500)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.text() should include("Please try again later.")
+        document.text() should include("Try again later.")
       }
 
   }
@@ -257,13 +257,12 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
     }
 
     val problemReportPage              = app.injector.instanceOf[views.html.problem_reports_nonjavascript]
-    val problemReportErrorPage         = app.injector.instanceOf[views.html.problem_reports_error_nonjavascript]
     val problemReportConfirmationPage  = app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript]
     val problemReportConfirmationPageB =
       app.injector.instanceOf[views.html.problem_reports_confirmation_nonjavascript_b]
     val playFrontendProblemReportPage  = app.injector.instanceOf[views.html.ProblemReportsNonjsPage]
     val playFrontendConfirmationPage   = app.injector.instanceOf[views.html.ProblemReportsNonjsConfirmationPage]
-    val playFrontendErrorFeedbackPage  = app.injector.instanceOf[views.html.ProblemReportsNonjsErrorPage]
+    val playFrontendErrorFeedbackPage  = app.injector.instanceOf[views.html.InternalErrorPage]
     val errorFeedbackForm              = app.injector.instanceOf[views.html.partials.error_feedback]
     val errorFeedbackFormInner         = app.injector.instanceOf[views.html.partials.error_feedback_inner]
     val ticketCreatedBody              = app.injector.instanceOf[views.html.ticket_created_body]
@@ -275,15 +274,14 @@ class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOne
       Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
       problemReportPage,
       playFrontendProblemReportPage,
-      problemReportErrorPage,
-      playFrontendErrorFeedbackPage,
       problemReportConfirmationPage,
       playFrontendConfirmationPage,
       problemReportConfirmationPageB,
       errorFeedbackForm,
       errorFeedbackFormInner,
       ticketCreatedBody,
-      ticketCreatedBody_B
+      ticketCreatedBody_B,
+      playFrontendErrorFeedbackPage
     )(new CFConfig(app.configuration), ExecutionContext.Implicits.global)
 
     val deskproName: String           = "John Densmore"

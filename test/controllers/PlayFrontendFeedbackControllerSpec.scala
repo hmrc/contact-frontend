@@ -191,12 +191,14 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
 
     }
 
-    "show errors if call to hmrc-deskpro failed" in new TestScope {
+    "return service error page if call to hmrc-deskpro failed" in new TestScope {
 
       hmrcConnectorWillFail()
 
-      an[Exception] shouldBe thrownBy(await(controller.submitUnauthenticated()(request)))
-
+      val result = controller.submitUnauthenticated()(request)
+      status(result) shouldBe 500
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().select("h1").first.text() shouldBe "deskpro.error.page.heading"
     }
 
     "redirect to confirmation page with 'back' button if 'back' link provided" in new TestScope {
@@ -421,6 +423,7 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
     val playFrontendFeedbackPage             = app.injector.instanceOf[views.html.FeedbackPage]
     val playFrontendFeedbackConfirmationPage =
       app.injector.instanceOf[views.html.FeedbackConfirmationPage]
+    val errorPage                            = app.injector.instanceOf[views.html.InternalErrorPage]
 
     val controller = new FeedbackController(
       hmrcDeskproConnector,
@@ -433,7 +436,8 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       playFrontendFeedbackConfirmationPage,
       feedbackPartialForm,
       feedbackFormConfirmation,
-      playFrontendFeedbackPage
+      playFrontendFeedbackPage,
+      errorPage
     )(new CFConfig(app.configuration), ExecutionContext.Implicits.global)
 
     val enrolments = Some(Enrolments(Set()))

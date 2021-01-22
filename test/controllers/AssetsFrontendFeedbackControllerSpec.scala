@@ -176,8 +176,10 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
 
       hmrcConnectorWillFail()
 
-      an[Exception] shouldBe thrownBy(await(controller.submitUnauthenticatedDeprecated()(request)))
-
+      val result = controller.submitUnauthenticatedDeprecated()(request)
+      status(result) shouldBe 500
+      val page = Jsoup.parse(contentAsString(result))
+      page.body().select("h1").first.text() shouldBe "deskpro.error.page.heading"
     }
 
     "redirect to confirmation page with 'back' button if 'back' link provided" in new TestScope {
@@ -402,6 +404,8 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
     val playFrontendFeedbackPage             = app.injector.instanceOf[views.html.FeedbackPage]
     val playFrontendFeedbackConfirmationPage =
       app.injector.instanceOf[views.html.FeedbackConfirmationPage]
+    val errorPage                            = app.injector.instanceOf[views.html.InternalErrorPage]
+
 
     val controller = new FeedbackController(
       hmrcDeskproConnector,
@@ -414,7 +418,8 @@ class AssetsFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers wit
       playFrontendFeedbackConfirmationPage,
       feedbackPartialForm,
       feedbackFormConfirmation,
-      playFrontendFeedbackPage
+      playFrontendFeedbackPage,
+      errorPage
     )(new CFConfig(app.configuration), ExecutionContext.Implicits.global)
 
     val enrolments = Some(Enrolments(Set()))

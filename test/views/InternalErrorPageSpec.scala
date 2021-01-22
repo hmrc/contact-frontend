@@ -15,9 +15,9 @@ import play.api.mvc.RequestHeader
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.DeskproErrorPage
+import views.html.InternalErrorPage
 
-class DeskproErrorPageSpec
+class InternalErrorPageSpec
     extends AnyWordSpec
     with Matchers
     with GuiceOneAppPerSuite
@@ -30,7 +30,7 @@ class DeskproErrorPageSpec
   implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   "the error template" should {
-    val errorTemplate = app.injector.instanceOf[DeskproErrorPage]
+    val errorTemplate = app.injector.instanceOf[InternalErrorPage]
     val content       =
       errorTemplate()
 
@@ -47,24 +47,24 @@ class DeskproErrorPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").text shouldBe "Sorry, we’re experiencing technical difficulties"
+      content.select("title").text shouldBe "Sorry, there is a problem with the service – Contact HMRC – GOV.UK"
     }
 
     "display the correct page heading" in {
       val headers = content.select("h1")
       headers.size       shouldBe 1
-      headers.first.text shouldBe "Sorry, we’re experiencing technical difficulties"
+      headers.first.text shouldBe "Sorry, there is a problem with the service"
     }
 
     "return the deskpro specific content" in {
       contentAsString(content) should include(
-        "There was a problem sending your query."
+        "Your message has not been sent."
       )
     }
 
     "return the generic content" in {
       contentAsString(content) should include(
-        "Please try again later."
+        "Try again later."
       )
     }
   }

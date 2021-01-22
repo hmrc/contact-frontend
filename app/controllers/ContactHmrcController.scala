@@ -21,7 +21,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.DeskproEmailValidator
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
-import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, DeskproErrorPage, contact_hmrc, contact_hmrc_confirmation}
+import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage, contact_hmrc, contact_hmrc_confirmation}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -64,7 +64,7 @@ class ContactHmrcController @Inject() (
   assetsFrontendContactConfirmationPage: contact_hmrc_confirmation,
   contactHmrcForm: contact_hmrc_form,
   contactHmrcFormConfirmation: contact_hmrc_form_confirmation,
-  deskproErrorPage: DeskproErrorPage,
+  errorPage: InternalErrorPage,
   playFrontendContactPage: ContactHmrcPage,
   playFrontendContactConfirmationPage: ContactHmrcConfirmationPage
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
@@ -148,7 +148,7 @@ class ContactHmrcController @Inject() (
               Redirect(thanksRoute).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
             }
             .recover { case _ =>
-              InternalServerError(deskproErrorPage())
+              InternalServerError(errorPage())
             }
       )
 
@@ -197,7 +197,7 @@ class ContactHmrcController @Inject() (
             enrolments <- maybeAuthenticatedUserEnrolments()
             ticketId   <- createDeskproTicket(data, enrolments)
           } yield Ok(ticketId.ticket_id.toString)).recover { case _ =>
-            InternalServerError(deskproErrorPage())
+            InternalServerError(errorPage())
           }
       )
   }
