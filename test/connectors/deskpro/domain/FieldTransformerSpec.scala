@@ -25,7 +25,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import uk.gov.hmrc.domain._
 import uk.gov.hmrc.http.logging.SessionId
-import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys, UserId}
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 class FieldTransformerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
 
@@ -106,7 +106,6 @@ class FieldTransformerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
 class FieldTransformerScope {
   lazy val transformer = new FieldTransformer {}
 
-  lazy val userId   = UserId("456")
   lazy val payeUser =
     Enrolments(
       Set(
@@ -139,7 +138,7 @@ class FieldTransformerScope {
     )
 
   val sessionId: String              = "sessionIdValue"
-  val hc                             = HeaderCarrier(userId = Some(userId), sessionId = Some(SessionId(sessionId)))
+  val hc                             = HeaderCarrier(sessionId = Some(SessionId(sessionId)))
   val userAgent: String              = "Mozilla"
   val name: String                   = "name"
   val email: String                  = "email"
