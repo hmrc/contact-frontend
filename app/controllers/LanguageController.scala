@@ -30,7 +30,7 @@ case class LanguageController @Inject() (
   languageUtils: LanguageUtils,
   cc: ControllerComponents,
   appConfig: AppConfig
-) extends PlayLanguageController(configuration, languageUtils, cc) {
+) extends PlayLanguageController(languageUtils, cc) {
   import appConfig._
 
   def switchToEnglish: Action[AnyContent] = switchToLanguage(en)
