@@ -259,7 +259,7 @@ import scala.concurrent.{ExecutionContext, Future}
     } else {
       maybeTicketId match {
         case Some(ticketId) => Ok(assetsFrontendFeedbackConfirmationPage(ticketId, loggedIn, backUrl))
-        case None           => InternalServerError(errorPage())
+        case None           => BadRequest(errorPage())
       }
     }
 
