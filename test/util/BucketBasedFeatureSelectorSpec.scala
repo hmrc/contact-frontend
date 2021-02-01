@@ -66,12 +66,12 @@ class BucketBasedFeatureSelectorSpec extends AnyWordSpec with Matchers {
   }
 
   "ResquestBasedFeatureSelector with service provided" should {
-    "enable feature if the service is on the whitelist" in {
+    "enable feature if the service is on the allow list" in {
       val request: Request[AnyRef] = FakeRequest().withHeaders(("bucket", "5"))
       testInstance.computeFeatures(request, Some("service1")) shouldBe Set(testFeature1)
     }
 
-    "not enable feature if the service is not on the whitelist" in {
+    "not enable feature if the service is not on the allow list" in {
       val request: Request[AnyRef] = FakeRequest().withHeaders(("bucket", "5"))
       testInstance.computeFeatures(request, Some("other-service")) shouldBe Set(testFeature1)
     }

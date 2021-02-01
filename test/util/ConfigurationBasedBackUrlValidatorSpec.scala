@@ -28,7 +28,7 @@ class ConfigurationBasedBackUrlValidatorSpec extends AnyWordSpec with Matchers w
   val appConfig = mock[AppConfig]
 
   Mockito
-    .when(appConfig.backUrlDestinationWhitelist)
+    .when(appConfig.backUrlDestinationAllowList)
     .thenReturn(Set("http://tax.service.gov.uk", "https://tax2.service.gov.uk", "http://localhost:8080"))
 
   val validator = new ConfigurationBasedBackUrlValidator(appConfig)

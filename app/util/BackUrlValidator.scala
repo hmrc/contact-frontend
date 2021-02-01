@@ -31,12 +31,12 @@ trait BackUrlValidator {
 @Singleton
 class ConfigurationBasedBackUrlValidator @Inject() (appConfig: AppConfig) extends BackUrlValidator with Logging {
 
-  val destinationWhitelist: Set[URL] = appConfig.backUrlDestinationWhitelist.map(new URL(_))
+  val destinationAllowList: Set[URL] = appConfig.backUrlDestinationAllowList.map(new URL(_))
 
   def validate(backUrl: String): Boolean = {
 
     val parsedUrl        = Try(new URL(backUrl)).toOption.toRight(left = "Unparseable URL")
-    val validationResult = parsedUrl.right.flatMap(checkDomainOnWhitelist)
+    val validationResult = parsedUrl.right.flatMap(checkDomainOnAllowList)
 
     validationResult match {
       case Right(_)     => true
@@ -47,12 +47,12 @@ class ConfigurationBasedBackUrlValidator @Inject() (appConfig: AppConfig) extend
 
   }
 
-  private def checkDomainOnWhitelist(url: URL): Either[String, Unit] = {
+  private def checkDomainOnAllowList(url: URL): Either[String, Unit] = {
     val host = url.getHost
-    if (destinationWhitelist.exists(destinationMatches(_, url))) {
+    if (destinationAllowList.exists(destinationMatches(_, url))) {
       Right(())
     } else {
-      Left(s"URL contains domain name not from the whitelist ($host)")
+      Left(s"URL contains domain name not from the allow list ($host)")
     }
   }
 

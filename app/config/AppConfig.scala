@@ -32,7 +32,7 @@ trait AppConfig {
   def contactHmrcAboutTaxUrl: String
   def externalReportProblemUrl: String
   def externalReportProblemSecureUrl: String
-  def backUrlDestinationWhitelist: Set[String]
+  def backUrlDestinationAllowList: Set[String]
   def loginCallback(continueUrl: String): String
   def fallbackURLForLanguageSwitcher: String
   def enableLanguageSwitching: Boolean
@@ -88,8 +88,8 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
 
   override lazy val analyticsHost = loadConfigString("google-analytics.host")
 
-  override lazy val backUrlDestinationWhitelist =
-    loadConfigString("backUrlDestinationWhitelist")
+  override lazy val backUrlDestinationAllowList =
+    loadConfigString("backUrlDestinationAllowList")
       .split(',')
       .filter(_.nonEmpty)
       .toSet
