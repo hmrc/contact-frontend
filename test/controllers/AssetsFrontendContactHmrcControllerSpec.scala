@@ -132,7 +132,6 @@ class AssetsFrontendContactHmrcControllerSpec
         "csrfToken"             -> "n/a",
         "service"               -> "scp",
         "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "recaptcha-v3-response" -> "xx",
         "userAction"            -> "/some-service-page"
       )
 
@@ -176,7 +175,6 @@ class AssetsFrontendContactHmrcControllerSpec
         "csrfToken"             -> "n/a",
         "service"               -> "scp",
         "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "recaptcha-v3-response" -> "xx",
         "userAction"            -> ""
       )
 
@@ -216,7 +214,6 @@ class AssetsFrontendContactHmrcControllerSpec
         "csrfToken"             -> "n/a",
         "service"               -> "scp",
         "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "recaptcha-v3-response" -> "xx",
         "userAction"            -> "/overridden/path"
       )
 
@@ -254,7 +251,6 @@ class AssetsFrontendContactHmrcControllerSpec
         "csrfToken"             -> "n/a",
         "service"               -> "scp",
         "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "recaptcha-v3-response" -> "xx",
         "userAction"            -> "/overridden/path"
       )
 
@@ -286,7 +282,6 @@ class AssetsFrontendContactHmrcControllerSpec
         "csrfToken"             -> "n/a",
         "service"               -> "scp",
         "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "recaptcha-v3-response" -> "xx",
         "userAction"            -> "/overridden/path"
       )
 
@@ -315,7 +310,6 @@ class AssetsFrontendContactHmrcControllerSpec
         "csrfToken"             -> "n/a",
         "service"               -> "scp",
         "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "recaptcha-v3-response" -> "xx",
         "userAction"            -> "/overridden/path"
       )
 
@@ -344,7 +338,6 @@ class AssetsFrontendContactHmrcControllerSpec
         "csrfToken"             -> "n/a",
         "service"               -> "scp",
         "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "recaptcha-v3-response" -> "xx",
         "userAction"            -> "/overridden/path"
       )
 
@@ -371,7 +364,6 @@ class AssetsFrontendContactHmrcControllerSpec
         "csrfToken"             -> "n/a",
         "service"               -> "scp",
         "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "recaptcha-v3-response" -> "xx",
         "userAction"            -> "/overridden/path"
       )
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -398,8 +390,7 @@ class AssetsFrontendContactHmrcControllerSpec
         "isJavascript"          -> "false",
         "referrer"              -> "n/a",
         "csrfToken"             -> "n/a",
-        "service"               -> "scp",
-        "recaptcha-v3-response" -> "xx"
+        "service"               -> "scp"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
