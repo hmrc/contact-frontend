@@ -18,7 +18,7 @@
 
 @this(mainContent: views.html.main, contactHmrcForm: views.html.partials.contact_hmrc_form)
 
-@(contactForm: Form[controllers.ContactForm], loggedIn : Boolean, reCaptchaComponent: Option[Html] = None)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@(contactForm: Form[controllers.ContactForm], loggedIn : Boolean)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @import uk.gov.hmrc.play.views.html.helpers._
 
@@ -29,8 +29,7 @@
         @contactHmrcForm(
             contactForm            = contactForm,
             externalContactHmrcUrl = routes.ContactHmrcController.submitUnauthenticated(None, None, None).url,
-            renderFormOnly         = false,
-            reCaptchaComponent     = reCaptchaComponent
+            renderFormOnly         = false
         )
     }
 }

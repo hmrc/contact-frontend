@@ -20,8 +20,7 @@
 
 @(contactForm: Form[controllers.ContactForm],
   externalContactHmrcUrl: String,
-  renderFormOnly: Boolean = false,
-  reCaptchaComponent: Option[Html] = None)(implicit request: Request[_], lang : Lang, messages : Messages)
+  renderFormOnly: Boolean = false)(implicit request: Request[_], lang : Lang, messages : Messages)
 
 @if(!renderFormOnly) {
     <header class="page-header">
@@ -63,8 +62,6 @@
         <input type="hidden" name="isJavascript" id="isJavascript" value="@contactForm.data.get("isJavascript")">
         <input type="hidden" name="referrer" id="referrer" value="@contactForm.data.get("referrer")">
         <input type="hidden" name="userAction" id="userAction" value="@contactForm("userAction").value" />
-
-        @reCaptchaComponent.map { component => @component }
 
         <div class="form-field">
             <button class="button" type="submit">@Messages("form.send")</button>

@@ -41,11 +41,6 @@ trait AppConfig {
   def enablePlayFrontendProblemReportNonjsForm: Boolean
   def enablePlayFrontendSurveyForm: Boolean
   def enablePlayFrontendContactHmrcForm: Boolean
-  def captchaEnabled: Boolean
-  def captchaMinScore: BigDecimal
-  def captchaClientKey: String
-  def captchaServerKey: String
-  def captchaVerifyUrl: String
 
   def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean
 
@@ -128,19 +123,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
     configuration
       .getOptional[Boolean]("enablePlayFrontendContactHmrcForm")
       .getOrElse(false)
-
-  override lazy val captchaEnabled: Boolean =
-    configuration
-      .getOptional[Boolean]("captcha.v3.enabled")
-      .getOrElse(configNotFoundError("captcha.v3.enabled"))
-
-  override lazy val captchaMinScore: BigDecimal = BigDecimal(loadConfigString("captcha.v3.minScore"))
-
-  override lazy val captchaClientKey: String = loadConfigString("captcha.v3.keys.client")
-
-  override lazy val captchaServerKey: String = loadConfigString("captcha.v3.keys.server")
-
-  override lazy val captchaVerifyUrl: String = loadConfigString("captcha.v3.verifyUrl")
 
   lazy val featureSelector: FeatureSelector =
     new BucketBasedFeatureSelector(BucketCalculator.deviceIdBucketCalculator, featureRules)

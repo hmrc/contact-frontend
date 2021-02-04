@@ -52,16 +52,6 @@ class TestAppConfig extends AppConfig {
 
   def enablePlayFrontendContactHmrcForm: Boolean = false
 
-  def captchaEnabled: Boolean = ???
-
-  def captchaMinScore: BigDecimal = ???
-
-  def captchaClientKey: String = ???
-
-  def captchaServerKey: String = ???
-
-  def captchaVerifyUrl: String = ???
-
   def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean = ???
 
   def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] = ???
