@@ -23,7 +23,7 @@
     inputCharacterCount: InputCharacterCount,
     inputHidden: InputHidden,
     inputText: InputText,
-    govukRadios: GovukRadios,
+    radiosHelper: RadiosHelper,
     govukButton: GovukButton,
     govukErrorSummary: GovukErrorSummary,
     formWithCSRF: PlayFrontendFormWithCSRF,
@@ -53,17 +53,15 @@
           @inputHidden(backUrlField)
         }
       }
-      @govukRadios(
-          Radios.fromField(
-              feedbackForm("feedback-rating"),
-              Messages("form.online.services"),
-              Seq(
-                  (Messages("form.online.services.very_good"), "5"),
-                  (Messages("form.online.services.good"), "4"),
-                  (Messages("form.online.services.neutral"), "3"),
-                  (Messages("form.online.services.bad"), "2"),
-                  (Messages("form.online.services.very_bad"), "1")
-              )
+      @radiosHelper(
+          feedbackForm("feedback-rating"),
+          Messages("form.online.services"),
+          Seq(
+              (Messages("form.online.services.very_good"), "5"),
+              (Messages("form.online.services.good"), "4"),
+              (Messages("form.online.services.neutral"), "3"),
+              (Messages("form.online.services.bad"), "2"),
+              (Messages("form.online.services.very_bad"), "1")
           )
       )
       @inputText(

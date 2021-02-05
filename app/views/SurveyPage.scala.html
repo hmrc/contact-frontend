@@ -22,7 +22,7 @@
 @this(
     inputCharacterCount: InputCharacterCount,
     inputHidden: InputHidden,
-    govukRadios: GovukRadios,
+    radiosHelper: RadiosHelper,
     govukButton: GovukButton,
     govukErrorSummary: GovukErrorSummary,
     formWithCSRF: PlayFrontendFormWithCSRF,
@@ -50,16 +50,16 @@
         (messages("survey.disagree.response"), "2"),
         (messages("survey.strongly.disagree.response"), "1")
       )) { items =>
-        @govukRadios(Radios.fromField(
+        @radiosHelper(
           surveyForm("helpful"),
           legend = messages("survey.was.answer.helpful.question"),
           radioItems = items
-        ))
-        @govukRadios(Radios.fromField(
+        )
+        @radiosHelper(
           surveyForm("speed"),
           legend = messages("survey.satisfied.with.speed.question"),
             radioItems = items
-        ))
+        )
       }
       @inputCharacterCount(
         surveyForm("improve"),
