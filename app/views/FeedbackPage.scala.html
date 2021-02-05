@@ -17,13 +17,13 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import model.FeedbackForm
-@import views.html.partials.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Paragraph, ReportTechnicalIssue}
+@import views.html.partials.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Paragraph, ReportTechnicalIssue}
 
 @this(
     inputCharacterCount: InputCharacterCount,
     inputHidden: InputHidden,
     inputText: InputText,
-    inputRadios: InputRadios,
+    govukRadios: GovukRadios,
     govukButton: GovukButton,
     govukErrorSummary: GovukErrorSummary,
     formWithCSRF: PlayFrontendFormWithCSRF,
@@ -53,16 +53,18 @@
           @inputHidden(backUrlField)
         }
       }
-      @inputRadios(
-        feedbackForm("feedback-rating"),
-        legend = Messages("form.online.services"),
-        items = Seq(
-          ("5", Messages("form.online.services.very_good")),
-          ("4", Messages("form.online.services.good")),
-          ("3", Messages("form.online.services.neutral")),
-          ("2", Messages("form.online.services.bad")),
-          ("1", Messages("form.online.services.very_bad"))
-        )
+      @govukRadios(
+          Radios.fromField(
+              feedbackForm("feedback-rating"),
+              Messages("form.online.services"),
+              Seq(
+                  (Messages("form.online.services.very_good"), "5"),
+                  (Messages("form.online.services.good"), "4"),
+                  (Messages("form.online.services.neutral"), "3"),
+                  (Messages("form.online.services.bad"), "2"),
+                  (Messages("form.online.services.very_bad"), "1")
+              )
+          )
       )
       @inputText(
         feedbackForm("feedback-name"),

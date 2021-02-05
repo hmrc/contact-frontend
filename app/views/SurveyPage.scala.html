@@ -17,12 +17,12 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import model.SurveyForm
-@import views.html.partials.{Layout, InputRadios, InputHidden, InputCharacterCount, Heading1}
+@import views.html.partials.{Layout, InputHidden, InputCharacterCount, Heading1}
 
 @this(
     inputCharacterCount: InputCharacterCount,
     inputHidden: InputHidden,
-    inputRadios: InputRadios,
+    govukRadios: GovukRadios,
     govukButton: GovukButton,
     govukErrorSummary: GovukErrorSummary,
     formWithCSRF: PlayFrontendFormWithCSRF,
@@ -44,22 +44,22 @@
       @inputHidden(surveyForm("service-id"))
       @inputHidden(surveyForm("ticket-id"))
       @defining(Seq(
-        ("5", messages("survey.strongly.agree.response")),
-        ("4", messages("survey.agree.response")),
-        ("3", messages("survey.neutral.response")),
-        ("2", messages("survey.disagree.response")),
-        ("1", messages("survey.strongly.disagree.response"))
+        (messages("survey.strongly.agree.response"), "5"),
+        (messages("survey.agree.response"), "4"),
+        (messages("survey.neutral.response"), "3"),
+        (messages("survey.disagree.response"), "2"),
+        (messages("survey.strongly.disagree.response"), "1")
       )) { items =>
-        @inputRadios(
+        @govukRadios(Radios.fromField(
           surveyForm("helpful"),
           legend = messages("survey.was.answer.helpful.question"),
-          items = items
-        )
-        @inputRadios(
+          radioItems = items
+        ))
+        @govukRadios(Radios.fromField(
           surveyForm("speed"),
           legend = messages("survey.satisfied.with.speed.question"),
-          items = items
-        )
+            radioItems = items
+        ))
       }
       @inputCharacterCount(
         surveyForm("improve"),
