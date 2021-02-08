@@ -7,9 +7,7 @@ This service allows users to contact the HMRC Customer Contact team for 3 major 
 3) provide feedback about how well an issue was resolved by the HMRC Customer Contact team ('Customer Satisfaction')
 
 Contact-frontend is responsible for showing forms pertaining to the purposes listed above, validating the input, and
-passing user requests to downstream services - to [Deskpro](https://confluence.tools.tax.service.gov.uk/x/4oadBg) for 'Get help with this page', 'Help and contact' and 'Providing Beta feedback about services', and Splunk datastore for 'Customer Satisfaction'. Although Splunk is currently used to store such responses, these are intended to be migrated to a more suitable datastore at a later date.
-
-The service is not intended to be used standalone; rather to be integrated with other services.
+passing user requests to downstream services - to Deskpro for 'Get help with this page', 'Help and contact' and 'Providing Beta feedback about services', and an internal datastore for 'Customer Satisfaction' (contact [#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/) if you require more information about this).
 
 # Contents
    * [Forms provided by the Customer Contact Subsystem](#forms-provided-by-the-customer-contact-subsystem)
@@ -109,7 +107,7 @@ standalone page. This parameter should contain the full, absolute, properly enco
 the contact form. For example, a link from the SCP sign in page would look like 
 `https://www.tax.service.gov.uk/contact/contact-hmrc-unauthenticated?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds`
 
-The referrer field is passed to the DeskPro service and lets operators know which page the user was on when they asked to
+The referrer field is passed to the Deskpro service and lets operators know which page the user was on when they asked to
 contact HMRC. If the referrerUrl is not supplied, the application will attempt to use the HTTP Header and userAction parameter (if present). 
 However, this mechanism is not recommended because it relies on browsers correctly forwarding the HTTP Referer header in all situations.
 
@@ -176,31 +174,8 @@ Customization flags:
 * *canOmitComments* - consuming services can decide whether the 'comments' field is optional. To make this the case, the consuming service must add 'canOmitComments=true' field to the request
 * *backURL* - (only for standalone page mode). A 'Back' button redirecting the user back to the consuming service can be embedded into the Beta Feedback form. In order to achieve this, the consuming service has to specify a destination URL.
 
-If you want to embed the feedback form on your page, you have to create endpoints in your frontend service that redirect user requests to contact-frontend and wrap HTML code around the returned in a response in your services layout. Three requests need to be handled:
-
-a) GET endpoint to show the form. This should result in making a backend GET call to the endpoint 
-`https://contact-frontend.public.mdtp/contact/beta-feedback/form?{params}`, where params should consist of:
- * *submitUrl* - url that should be used by the user to make a POST request to submit the form. This should be set to the value of the POST endpoint implemented in b).
- * *service* - consuming services should specify their identifier as the 'service' parameter of requests to contact-frontend. The value of this parameter will later be passed to Splunk and would allow proper analysis of feedback
- * *canOmitComments* - consuming services can decide whether the 'comments' field is optional. To make it optional, the consuming service must add 'canOmitComments=true' field to the request
- * *csrfToken* - CSRF token generated from cookies of the consuming service. This parameter will be added automatically by the [play-partials](https://github.com/hmrc/play-partials) library and the service itself should't add it manually.
- * *referrerUrl* - the full, absolute URL of the page the user is submitting feedback about.
-This endpoint will return a HTML partial than can then be embedded in the page layout.
-
-b) POST endpoint to submit the form. This should result in making a backend POST call to the endpoint
-`https://contact-frontend.public.mdtp/contact/beta-feedback/form?resubmitUrl`, where the *resubmitUrl* is a public facing URL to this endpoint
-
-In the case where form submission succeeds, this endpoint will return a HTTP 200 response containing the identifier of the ticket that has been created. In this case, the consuming service should redirect the user to the endpoint that displays the confirmation page (described below).
-
-In the case where form submission fails, this endpoint will return a HTTP 400 response with a body of a HTML snippet containing the form with errors higlighted.
-This snippet must be displayed again back to the user.
-
-c) GET endpoint to display confirmation of the successful submission. This should result in making a GET call to the endpoint `https://contact-frontend.public.mdtp/contact/beta-feedback-confirmation`, which will then return HTML partial
-with a confirmation message decorated with the layout of the consuming service.
-
-Handling of partials can be simplified by using [play-partials](https://github.com/hmrc/play-partials) library.
-
-A good example of how to integrate the feedback form with the service can be found in this repository: [business-rates-valuation-frontend](https://github.com/hmrc/business-rates-valuation-frontend)
+`Send your feedback` historically also supported displaying the *Send your feedback* page as a partial; however, this
+functionality is *deprecated* and should not be used.
 
 [[Back to the top]](#top)
 
@@ -231,15 +206,6 @@ The form is intended to be displayed in a new tab or window. When the form is co
 
 [[Back to the top]](#top)
 
-# Integration guide <a name="integration-guide"></a>
-
-Below, you can find a brief description of how to use forms provided by contact-frontend in your service.
-
-A detailed integration guide can be found on [Confluence](https://confluence.tools.tax.service.gov.uk/display/PlatDev/Customer+Contact+Services%3A+Integration+Guide).
-
-[[Back to the top]](#top)
-
-
 ## Cross-Origin Resource Sharing (CORS) <a name="cross-origin-resource-sharing-cors"></a>
 
 When contact forms are embedded on a service's pages, the client's browser communicates with contact-frontend using AJAX requests.
@@ -247,19 +213,19 @@ This may cause problems when the service runs on a different domain from the one
 
 If you want to use contact-frontend in a service that runs on another domain, this can be done by explicitly specifying that other domain in the configuration of contact-frontend. Contact-frontend service will then use [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) (Cross-Origin Resource Sharing) to allow the browser to accept such cross-domain requests.
 
-To achieve that, the service uses the standard  [CORS Filter](https://www.playframework.com/documentation/2.5.x/CorsFilter) provided by Play Framework.
+To achieve that, the service uses the standard  [CORS Filter](https://www.playframework.com/documentation/2.6.x/CorsFilter) provided by Play Framework.
 Configuration is defined in `contact-frontend.yaml` within the environment specific `app-config`. Here is example configuration:
 ```
 play.filters.cors.allowedOrigins.0: "https://ewf.companieshouse.gov.uk"
-play.filters.cors.allowedOrigins.1: "https://www.qa.tax.service.gov.uk"
+play.filters.cors.allowedOrigins.1: "https://www.{environment}.tax.service.gov.uk"
 ```
 
 [[Back to the top]](#top)
 
 ## Creating customized customer contact forms <a name="creating-own-customer-contact-forms"></a>
 
-Currently it's not possible to customize forms in ways other than described above. If you have business
-requirements to customize customer contact form, please get in touch with PlatOps team ([#team-platops](https://hmrcdigital.slack.com/messages/C0GS60DK2))
+Currently it is not possible to customize forms in ways other than described above. If you have business
+requirements to customize customer contact form, please get in touch with PlatUI team ([#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/))
 
 [[Back to the top]](#top)
 
@@ -295,15 +261,8 @@ When making changes in the asset-frontend service, be aware that it may take lon
 ## Maintenance documentation
 Maintenance documentation for the owning team, including architectural decision records (ADRs) can be found [here](docs/maintainers.md).
 
-## Related projects, useful links: <a name="appendix__linx"></a>
-
-* [hmrc-deskpro](https://github.com/hmrc/hmrc-deskpro/) - Backend service responsible for forwarding requests from contact-frontend to Deskpro
-* [contact-acceptance-tests](https://github.com/hmrc/contact-acceptance-tests/) - Acceptance tests of the CCS subsystem
-* [deskpro-performance-tests](https://github.com/hmrc/deskPro-performance-tests) - Performance tests of the CCS subsystem combined with performance tests of the DeskPro agent journey
-* [deskpro-mods](https://github.com/hmrc/deskpro-mods) - Modifications of Deskpro that add a button allowing the Support Team to lookup for tax identifier of a request sender 
-
 ## Slack <a name="appendix__links__slack"></a>
-* [#team-platops](https://hmrcdigital.slack.com/messages/C0GS60DK2) - PlatOps is responsible for contact-frontend
-* [#team-ddcops](https://hmrcdigital.slack.com/messages/C0HUAN03S) - DDCOps is responsible for Deskpro maintenance
+* [#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/) - PlatUI is responsible for contact-frontend
+* [#team-ddcops](https://hmrcdigital.slack.com/messages/team-ddcops) - DDCOps is responsible for Deskpro maintenance
 
 [[Back to the top]](#top)
