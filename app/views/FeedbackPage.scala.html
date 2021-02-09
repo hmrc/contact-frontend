@@ -17,13 +17,13 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import model.FeedbackForm
-@import views.html.partials.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Paragraph, ReportTechnicalIssue}
+@import views.html.partials.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Paragraph, ReportTechnicalIssue}
 
 @this(
     inputCharacterCount: InputCharacterCount,
     inputHidden: InputHidden,
     inputText: InputText,
-    inputRadios: InputRadios,
+    radiosWithField: RadiosWithField,
     govukButton: GovukButton,
     govukErrorSummary: GovukErrorSummary,
     formWithCSRF: PlayFrontendFormWithCSRF,
@@ -53,16 +53,20 @@
           @inputHidden(backUrlField)
         }
       }
-      @inputRadios(
-        feedbackForm("feedback-rating"),
-        legend = Messages("form.online.services"),
+      @radiosWithField(Radios(
+        fieldset = Some(Fieldset(
+            legend = Some(Legend(
+                content = Text(Messages("form.online.services"))
+            ))
+        )),
         items = Seq(
-          ("5", Messages("form.online.services.very_good")),
-          ("4", Messages("form.online.services.good")),
-          ("3", Messages("form.online.services.neutral")),
-          ("2", Messages("form.online.services.bad")),
-          ("1", Messages("form.online.services.very_bad"))
-        )
+          RadioItem(content = Text(Messages("form.online.services.very_good")), value = Some("5")),
+          RadioItem(content = Text(Messages("form.online.services.good")), value = Some("4")),
+          RadioItem(content = Text(Messages("form.online.services.neutral")), value = Some("3")),
+          RadioItem(content = Text(Messages("form.online.services.bad")), value = Some("2")),
+          RadioItem(content = Text(Messages("form.online.services.very_bad")), value = Some("1"))
+        )),
+       Some(feedbackForm("feedback-rating"))
       )
       @inputText(
         feedbackForm("feedback-name"),

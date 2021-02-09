@@ -17,12 +17,12 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import model.SurveyForm
-@import views.html.partials.{Layout, InputRadios, InputHidden, InputCharacterCount, Heading1}
+@import views.html.partials.{Layout, InputHidden, InputCharacterCount, Heading1}
 
 @this(
     inputCharacterCount: InputCharacterCount,
     inputHidden: InputHidden,
-    inputRadios: InputRadios,
+    radiosWithField: RadiosWithField,
     govukButton: GovukButton,
     govukErrorSummary: GovukErrorSummary,
     formWithCSRF: PlayFrontendFormWithCSRF,
@@ -44,21 +44,29 @@
       @inputHidden(surveyForm("service-id"))
       @inputHidden(surveyForm("ticket-id"))
       @defining(Seq(
-        ("5", messages("survey.strongly.agree.response")),
-        ("4", messages("survey.agree.response")),
-        ("3", messages("survey.neutral.response")),
-        ("2", messages("survey.disagree.response")),
-        ("1", messages("survey.strongly.disagree.response"))
+          RadioItem(content = Text(Messages("survey.strongly.agree.response")), value = Some("5")),
+          RadioItem(content = Text(Messages("survey.agree.response")), value = Some("4")),
+          RadioItem(content = Text(Messages("urvey.neutral.response")), value = Some("3")),
+          RadioItem(content = Text(Messages("survey.disagree.response")), value = Some("2")),
+          RadioItem(content = Text(Messages("survey.strongly.disagree.response")), value = Some("1"))
       )) { items =>
-        @inputRadios(
-          surveyForm("helpful"),
-          legend = messages("survey.was.answer.helpful.question"),
-          items = items
+        @radiosWithField(Radios(
+          fieldset = Some(Fieldset(
+            legend = Some(Legend(
+              content = Text(Messages("survey.was.answer.helpful.question"))
+              ))
+            )),
+            items = items),
+            Some(surveyForm("helpful"))
         )
-        @inputRadios(
-          surveyForm("speed"),
-          legend = messages("survey.satisfied.with.speed.question"),
-          items = items
+        @radiosWithField(Radios(
+          fieldset = Some(Fieldset(
+            legend = Some(Legend(
+              content = Text(Messages("survey.satisfied.with.speed.question"))
+            ))
+          )),
+          items = items),
+          Some(surveyForm("speed"))
         )
       }
       @inputCharacterCount(
