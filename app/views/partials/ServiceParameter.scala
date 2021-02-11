@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import config.AppConfig
+package views.partials
 
-@this(mainContent: views.html.main, feedbackFormConfirmation: views.html.partials.feedback_form_confirmation)
+import play.api.data.Form
 
-@(ticketId:String, loggedIn: Boolean, backUrl: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+object ServiceParameter {
 
-@mainContent(title = Messages("feedback.heading"), userLoggedIn = loggedIn) {
-    @feedbackFormConfirmation(ticketId, backUrl)
+  def extractServiceParameter[T](feedbackForm: Form[T], service: Option[String]) =
+    feedbackForm("service").value match {
+      case Some("unknown") => service.getOrElse("unknown")
+      case Some(service)   => service
+      case None            => "unknown"
+    }
+
 }

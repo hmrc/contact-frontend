@@ -24,6 +24,6 @@ class ContactFrontendModule extends Module {
   override def bindings(environment: Environment, configuration: Configuration) =
     Seq(
       bind[AppConfig].to[CFConfig],
-      bind[BackUrlValidator].to[ConfigurationBasedBackUrlValidator],
+      bind[BackUrlValidator].to[ConfigurationBasedBackUrlValidator]
     )
 }

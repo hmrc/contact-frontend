@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.{SurveyConfirmationPage, SurveyPage, survey, survey_confirmation}
+import views.html.{SurveyConfirmationPage, SurveyPage}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -38,9 +38,7 @@ import scala.util.Try
 class SurveyController @Inject() (
   auditConnector: AuditConnector,
   mcc: MessagesControllerComponents,
-  assetsFrontendSurveyPage: survey,
   playFrontendSurveyPage: SurveyPage,
-  assetsFrontendSurveyConfirmationPage: survey_confirmation,
   playFrontendSurveyConfirmationPage: SurveyConfirmationPage
 )(implicit appConfig: AppConfig, executionContext: ExecutionContext)
     extends FrontendController(mcc)
@@ -181,22 +179,14 @@ class SurveyController @Inject() (
     request: Request[_],
     lang: Lang
   ): Html =
-    if (appConfig.enablePlayFrontendSurveyForm) {
-      playFrontendSurveyPage(
-        form,
-        action
-      )
-    } else {
-      assetsFrontendSurveyPage(ticketId = form("ticket-id").value.get, serviceId = form("service-id").value.get)
-    }
+    playFrontendSurveyPage(
+      form,
+      action
+    )
 
   private def surveyConfirmationPage(implicit
     request: Request[_],
     lang: Lang
   ): Html =
-    if (appConfig.enablePlayFrontendSurveyForm) {
-      playFrontendSurveyConfirmationPage()
-    } else {
-      assetsFrontendSurveyConfirmationPage()
-    }
+    playFrontendSurveyConfirmationPage()
 }

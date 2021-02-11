@@ -427,8 +427,6 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       override def validate(backUrl: String) = backUrl == "http://www.valid.url"
     }
 
-    val feedbackPage                         = app.injector.instanceOf[views.html.feedback]
-    val feedbackConfirmationPage             = app.injector.instanceOf[views.html.feedback_confirmation]
     val feedbackPartialForm                  = app.injector.instanceOf[views.html.partials.feedback_form]
     val feedbackFormConfirmation             = app.injector.instanceOf[views.html.partials.feedback_form_confirmation]
     val playFrontendFeedbackPage             = app.injector.instanceOf[views.html.FeedbackPage]
@@ -442,8 +440,6 @@ class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with 
       backUrlValidator,
       app.configuration,
       Stubs.stubMessagesControllerComponents(),
-      feedbackPage,
-      feedbackConfirmationPage,
       playFrontendFeedbackConfirmationPage,
       feedbackPartialForm,
       feedbackFormConfirmation,

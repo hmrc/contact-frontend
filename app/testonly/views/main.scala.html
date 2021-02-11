@@ -15,11 +15,24 @@
  *@
 
 @import config.AppConfig
+@import testonly.views.html.govuk_wrapper
+@import play.twirl.api.HtmlFormat
 
-@this(mainContent: views.html.main, contactHmrcFormConfirmation: views.html.partials.contact_hmrc_form_confirmation)
+@this(govUkWrapper: govuk_wrapper)
+@(
+  title: String,
+  userLoggedIn: Boolean = true,
+  getHelpForm: Html = HtmlFormat.empty,
+)(mainContent: Html)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
-@(ticketId: String)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
-
-@mainContent(title = Messages("contact.heading"), supportLinkEnabled = false) {
-  @contactHmrcFormConfirmation(ticketId)
+@mainContentBlock = {
+  <article class="content__body">@mainContent</article>
 }
+
+@govUkWrapper(
+  title = title,
+  mainContent = mainContentBlock,
+  userLoggedIn = userLoggedIn,
+  getHelpForm = getHelpForm,
+  enableLanguageSwitching = true
+)

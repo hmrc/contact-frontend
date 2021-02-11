@@ -267,7 +267,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       header(LOCATION, result) should be(Some("/contact/accessibility-unauthenticated/thanks"))
     }
 
-    "return error page if the Deskpro ticket creation fails" in new TestScope  {
+    "return error page if the Deskpro ticket creation fails" in new TestScope {
       when(
         hmrcDeskproConnector.createDeskProTicket(
           name = any[String],
@@ -292,7 +292,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         referrer = "/somepage"
       )
 
-      val result  = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
+      val result = controller.submitUnauthenticatedAccessibilityForm(None, None)(request)
 
       status(result) should be(500)
 
@@ -475,7 +475,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
       header(LOCATION, result) should be(Some("/contact/accessibility/thanks"))
     }
 
-    "return error page if the Deskpro ticket creation fails" in new TestScope  {
+    "return error page if the Deskpro ticket creation fails" in new TestScope {
       when(
         hmrcDeskproConnector.createDeskProTicket(
           name = any[String],
@@ -500,7 +500,7 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
         referrer = "/somepage"
       )
 
-      val result  =
+      val result =
         controller.submitAccessibilityForm(None, None)(request.withSession(SessionKeys.authToken -> "authToken"))
 
       status(result) should be(500)
@@ -525,21 +525,17 @@ class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers 
 
     implicit val cconfig: CFConfig = new CFConfig(app.configuration)
 
-    val messages                                    = app.injector.instanceOf[MessagesApi]
-    val assetsFrontendAccessibilityPage             = app.injector.instanceOf[views.html.accessibility]
-    val assetsFrontendAccessibilityConfirmationPage = app.injector.instanceOf[views.html.accessibility_confirmation]
-    val playFrontendAccessibilityPage               = app.injector.instanceOf[views.html.AccessibilityProblemPage]
-    val playFrontendAccessibilityConfirmationPage   =
+    val messages                                  = app.injector.instanceOf[MessagesApi]
+    val playFrontendAccessibilityPage             = app.injector.instanceOf[views.html.AccessibilityProblemPage]
+    val playFrontendAccessibilityConfirmationPage =
       app.injector.instanceOf[views.html.AccessibilityProblemConfirmationPage]
-    val errorPage                                   = app.injector.instanceOf[views.html.InternalErrorPage]
+    val errorPage                                 = app.injector.instanceOf[views.html.InternalErrorPage]
 
     val controller = new AccessibilityController(
       hmrcDeskproConnector,
       authConnector,
       Configuration(),
       Stubs.stubMessagesControllerComponents(messagesApi = messages),
-      assetsFrontendAccessibilityPage,
-      assetsFrontendAccessibilityConfirmationPage,
       playFrontendAccessibilityPage,
       playFrontendAccessibilityConfirmationPage,
       errorPage

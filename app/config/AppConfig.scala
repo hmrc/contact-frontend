@@ -26,9 +26,6 @@ import scala.util.Try
 
 trait AppConfig {
 
-  def assetsPrefix: String
-  def analyticsToken: String
-  def analyticsHost: String
   def contactHmrcAboutTaxUrl: String
   def externalReportProblemUrl: String
   def externalReportProblemSecureUrl: String
@@ -36,11 +33,6 @@ trait AppConfig {
   def loginCallback(continueUrl: String): String
   def fallbackURLForLanguageSwitcher: String
   def enableLanguageSwitching: Boolean
-  def enablePlayFrontendAccessibilityForm: Boolean
-  def enablePlayFrontendFeedbackForm: Boolean
-  def enablePlayFrontendProblemReportNonjsForm: Boolean
-  def enablePlayFrontendSurveyForm: Boolean
-  def enablePlayFrontendContactHmrcForm: Boolean
 
   def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean
 
@@ -76,13 +68,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
   override lazy val externalReportProblemSecureUrl =
     s"$contactHost/contact/problem_reports_secure"
 
-  override lazy val assetsPrefix =
-    loadConfigString("frontend.assets.url") + loadConfigString(s"frontend.assets.version")
-
-  override lazy val analyticsToken = loadConfigString("google-analytics.token")
-
-  override lazy val analyticsHost = loadConfigString("google-analytics.host")
-
   override lazy val backUrlDestinationAllowList =
     loadConfigString("backUrlDestinationAllowList")
       .split(',')
@@ -97,31 +82,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
   override def enableLanguageSwitching =
     configuration
       .getOptional[Boolean]("enableLanguageSwitching")
-      .getOrElse(false)
-
-  override def enablePlayFrontendAccessibilityForm =
-    configuration
-      .getOptional[Boolean]("enablePlayFrontendAccessibilityForm")
-      .getOrElse(false)
-
-  override def enablePlayFrontendFeedbackForm =
-    configuration
-      .getOptional[Boolean]("enablePlayFrontendFeedbackForm")
-      .getOrElse(false)
-
-  override def enablePlayFrontendProblemReportNonjsForm: Boolean =
-    configuration
-      .getOptional[Boolean]("enablePlayFrontendProblemReportsForm")
-      .getOrElse(false)
-
-  override def enablePlayFrontendSurveyForm: Boolean =
-    configuration
-      .getOptional[Boolean]("enablePlayFrontendSurveyForm")
-      .getOrElse(false)
-
-  override def enablePlayFrontendContactHmrcForm: Boolean =
-    configuration
-      .getOptional[Boolean]("enablePlayFrontendContactHmrcForm")
       .getOrElse(false)
 
   lazy val featureSelector: FeatureSelector =

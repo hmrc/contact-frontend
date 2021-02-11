@@ -32,7 +32,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.DeskproEmailValidator
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
-import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage, contact_hmrc, contact_hmrc_confirmation}
+import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -71,8 +71,6 @@ class ContactHmrcController @Inject() (
   val authConnector: AuthConnector,
   val configuration: Configuration,
   mcc: MessagesControllerComponents,
-  assetsFrontendContactPage: contact_hmrc,
-  assetsFrontendContactConfirmationPage: contact_hmrc_confirmation,
   contactHmrcForm: contact_hmrc_form,
   contactHmrcFormConfirmation: contact_hmrc_form_confirmation,
   errorPage: InternalErrorPage,
@@ -116,8 +114,7 @@ class ContactHmrcController @Inject() (
   private def contactPage(form: Form[ContactForm], isLoggedIn: Boolean, submit: Call)(implicit
     request: Request[Any]
   ) =
-    if (appConfig.enablePlayFrontendContactHmrcForm) playFrontendContactPage(form, submit)
-    else assetsFrontendContactPage(form, loggedIn = isLoggedIn)
+    playFrontendContactPage(form, submit)
 
   def submit = Action.async { implicit request =>
     loginRedirection(routes.ContactHmrcController.index().url)(
@@ -174,11 +171,8 @@ class ContactHmrcController @Inject() (
   }
 
   private def doThanks(implicit request: Request[AnyRef]) = {
-    val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { ticketId =>
-      val view =
-        if (appConfig.enablePlayFrontendContactHmrcForm) playFrontendContactConfirmationPage()
-        else assetsFrontendContactConfirmationPage(ticketId)
-      Ok(view)
+    val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { _ =>
+      Ok(playFrontendContactConfirmationPage())
     }
     Future.successful(result)
   }

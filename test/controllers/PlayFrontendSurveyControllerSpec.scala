@@ -180,9 +180,7 @@ class PlayFrontendSurveyControllerSpec extends AnyWordSpec with Matchers with Gu
     val controller = new SurveyController(
       mock[AuditConnector],
       Stubs.stubMessagesControllerComponents(messagesApi = messagesApi),
-      mock[views.html.survey],
       playFrontendSurveyPage,
-      mock[views.html.survey_confirmation],
       mock[views.html.SurveyConfirmationPage]
     )(cconfig, ExecutionContext.Implicits.global)
   }
