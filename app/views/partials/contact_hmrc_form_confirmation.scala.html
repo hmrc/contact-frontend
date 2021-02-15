@@ -16,7 +16,7 @@
 
 @import config.AppConfig
 
-@this(ticketCreatedBody: views.html.ticket_created_body)
+@this(ticketCreatedBody: views.html.partials.ticket_created_body)
 
 @(ticketId: String)(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 

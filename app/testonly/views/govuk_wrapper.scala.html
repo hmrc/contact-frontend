@@ -16,8 +16,18 @@
 
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
 @import layouts.GovUkTemplate
+@import testonly.views.html.language_selection
 
-@this(govUkTemplate: GovUkTemplate, layoutsHead: uiLayouts.HeadWithTrackingConsent, layoutsFooter: uiLayouts.Footer, layoutsFooterLinks: uiLayouts.FooterLinks, layoutsServiceInfo: uiLayouts.ServiceInfo, layoutsMainContentHeader: uiLayouts.MainContentHeader, layoutsMainContent: uiLayouts.MainContent)
+@this(
+  govUkTemplate: GovUkTemplate,
+  layoutsHead: uiLayouts.HeadWithTrackingConsent,
+  layoutsFooter: uiLayouts.Footer,
+  layoutsFooterLinks: uiLayouts.FooterLinks,
+  layoutsServiceInfo: uiLayouts.ServiceInfo,
+  layoutsMainContentHeader: uiLayouts.MainContentHeader,
+  layoutsMainContent: uiLayouts.MainContent,
+  language_selection: language_selection
+)
 
 @(title: String,
   bodyClasses: Option[String] = None,
@@ -40,7 +50,7 @@
         <div class="content">
             <nav id="proposition-menu" class="header__menu" role="navigation">
                 <ul id="proposition-links" class="header__menu__proposition-links">
-                    @partials.language_selection(enableLanguageSwitching)
+                    @language_selection(enableLanguageSwitching)
                 </ul>
             </nav>
         </div>
@@ -52,8 +62,8 @@
 
 @bodyEnd = {
     @layoutsFooter(
-      analyticsToken = Some(appConfig.analyticsToken),
-      analyticsHost = appConfig.analyticsHost,
+      analyticsToken = None,
+      analyticsHost = "",
       ssoUrl = None,
       scriptElem = None,
       gaCalls = None)

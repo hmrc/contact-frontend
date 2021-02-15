@@ -34,7 +34,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions}
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.DeskproEmailValidator
-import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, InternalErrorPage, accessibility, accessibility_confirmation}
+import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, InternalErrorPage}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -91,8 +91,6 @@ class AccessibilityController @Inject() (
   val authConnector: AuthConnector,
   val configuration: Configuration,
   mcc: MessagesControllerComponents,
-  assetsFrontendAccessibilityPage: accessibility,
-  assetsFrontendAccessibilityConfirmationPage: accessibility_confirmation,
   playFrontendAccessibilityProblemPage: AccessibilityProblemPage,
   playFrontendAccessibilityProblemConfirmationPage: AccessibilityProblemConfirmationPage,
   errorPage: InternalErrorPage
@@ -198,14 +196,15 @@ class AccessibilityController @Inject() (
                 )
               )
             ),
-          data => {
-            for {
-              _ <- createAccessibilityTicket(data, None)
-              thanks = routes.AccessibilityController.unauthenticatedThanks()
-            } yield Redirect(thanks)
-          }.recover { case _ =>
-            InternalServerError(errorPage())
-          }
+          data =>
+            {
+              for {
+                _     <- createAccessibilityTicket(data, None)
+                thanks = routes.AccessibilityController.unauthenticatedThanks()
+              } yield Redirect(thanks)
+            }.recover { case _ =>
+              InternalServerError(errorPage())
+            }
         )
     }
 
@@ -217,22 +216,14 @@ class AccessibilityController @Inject() (
     request: Request[_],
     lang: Lang
   ): Html =
-    if (appConfig.enablePlayFrontendAccessibilityForm) {
-      playFrontendAccessibilityProblemPage(
-        form,
-        action
-      )
-    } else {
-      assetsFrontendAccessibilityPage(form, action.url, loggedIn)
-    }
+    playFrontendAccessibilityProblemPage(
+      form,
+      action
+    )
 
   private def accessibilityConfirmationPage(loggedIn: Boolean)(implicit
     request: Request[_],
     lang: Lang
   ): Html =
-    if (appConfig.enablePlayFrontendAccessibilityForm) {
-      playFrontendAccessibilityProblemConfirmationPage()
-    } else {
-      assetsFrontendAccessibilityConfirmationPage("", loggedIn = false)
-    }
+    playFrontendAccessibilityProblemConfirmationPage()
 }

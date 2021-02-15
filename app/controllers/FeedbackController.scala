@@ -35,7 +35,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions,
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
 import views.html.partials.{feedback_form, feedback_form_confirmation}
-import views.html.{InternalErrorPage, FeedbackConfirmationPage, FeedbackPage, feedback, feedback_confirmation}
+import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
 import play.api.http.HeaderNames._
 import play.twirl.api.Html
 
@@ -47,8 +47,6 @@ import scala.concurrent.{ExecutionContext, Future}
   val accessibleUrlValidator: BackUrlValidator,
   val configuration: Configuration,
   mcc: MessagesControllerComponents,
-  assetsFrontendFeedbackPage: feedback,
-  assetsFrontendFeedbackConfirmationPage: feedback_confirmation,
   playFrontendFeedbackConfirmationPage: FeedbackConfirmationPage,
   feedbackFormPartial: feedback_form,
   feedbackFormConfirmationPartial: feedback_form_confirmation,
@@ -161,19 +159,20 @@ import scala.concurrent.{ExecutionContext, Future}
       .bindFromRequest()(request)
       .fold(
         error => Future.successful(BadRequest(feedbackView(enrolments.isDefined, error))),
-        data => {
-          val ticketIdF = createDeskproFeedback(data, enrolments)
-          ticketIdF map { ticketId =>
-            Redirect(
-              enrolments
-                .map(_ => routes.FeedbackController.thanks(data.backUrl))
-                .getOrElse(routes.FeedbackController.unauthenticatedThanks(data.backUrl))
-            )
-              .withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+        data =>
+          {
+            val ticketIdF = createDeskproFeedback(data, enrolments)
+            ticketIdF map { ticketId =>
+              Redirect(
+                enrolments
+                  .map(_ => routes.FeedbackController.thanks(data.backUrl))
+                  .getOrElse(routes.FeedbackController.unauthenticatedThanks(data.backUrl))
+              )
+                .withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+            }
+          }.recover { case _ =>
+            InternalServerError(errorPage())
           }
-        }.recover { case _ =>
-          InternalServerError(errorPage())
-        }
       )
 
   private def feedbackView(loggedIn: Boolean, form: Form[FeedbackForm])(implicit request: Request[AnyRef]) =
@@ -250,18 +249,11 @@ import scala.concurrent.{ExecutionContext, Future}
     request: Request[_],
     lang: Lang
   ): Result =
-    if (appConfig.enablePlayFrontendFeedbackForm) {
-      Ok(
-        playFrontendFeedbackConfirmationPage(
-          backUrl = backUrl
-        )
+    Ok(
+      playFrontendFeedbackConfirmationPage(
+        backUrl = backUrl
       )
-    } else {
-      maybeTicketId match {
-        case Some(ticketId) => Ok(assetsFrontendFeedbackConfirmationPage(ticketId, loggedIn, backUrl))
-        case None           => BadRequest(errorPage())
-      }
-    }
+    )
 
   private def feedbackPage(
     form: Form[FeedbackForm],
@@ -272,18 +264,15 @@ import scala.concurrent.{ExecutionContext, Future}
   )(implicit
     request: Request[_],
     lang: Lang
-  ): Html =
-    if (appConfig.enablePlayFrontendFeedbackForm) {
-      val action =
-        if (loggedIn) routes.FeedbackController.submit(service, backUrl, canOmitComments)
-        else routes.FeedbackController.submitUnauthenticated(service, backUrl, canOmitComments)
-      playFrontendFeedbackPage(
-        form,
-        action
-      )
-    } else {
-      assetsFrontendFeedbackPage(form, loggedIn, service, backUrl, canOmitComments = canOmitComments)
-    }
+  ): Html = {
+    val action =
+      if (loggedIn) routes.FeedbackController.submit(service, backUrl, canOmitComments)
+      else routes.FeedbackController.submitUnauthenticated(service, backUrl, canOmitComments)
+    playFrontendFeedbackPage(
+      form,
+      action
+    )
+  }
 }
 
 object FeedbackFormBind {

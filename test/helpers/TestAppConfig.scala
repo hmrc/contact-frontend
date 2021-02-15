@@ -21,13 +21,6 @@ import play.api.mvc.Request
 import util.Feature
 
 class TestAppConfig extends AppConfig {
-
-  def assetsPrefix: String = ???
-
-  def analyticsToken: String = "token"
-
-  def analyticsHost: String = "localhost"
-
   def contactHmrcAboutTaxUrl: String = "some.contact.url"
 
   def externalReportProblemUrl: String = ???

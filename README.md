@@ -1,17 +1,21 @@
 contact-frontend
 ================
 
-This service allows users to contact the HMRC Customer Contact team for 3 major purposes:
-1) report problems and ask questions ('Get help with this page')
-2) provide feedback about the service ('Help and contact' & 'Providing Beta feedback about services')
-3) provide feedback about how well an issue was resolved by the HMRC Customer Contact team ('Customer Satisfaction')
+This service allows users to contact the HMRC Customer Contact team for 5 major purposes:
+1. reporting technical problems ('Is this page not working properly?')
+1. asking questions ('Help and contact')
+1. providing feedback on services ('Send your feedback')
+1. providing feedback for the HMRC Customer Contact team ('Survey')
+1. reporting accessibility problems with services ('Report an accessibility problem')
 
-Contact-frontend is responsible for showing forms pertaining to the purposes listed above, validating the input, and
-passing user requests to downstream services - to Deskpro for 'Get help with this page', 'Help and contact' and 'Providing Beta feedback about services', and an internal datastore for 'Customer Satisfaction' (contact [#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/) if you require more information about this).
+Contact-frontend is responsible for hosting forms related to the purposes listed above, validating the input, and
+passing user requests to downstream services - to Deskpro for 'Is this page not working properly?', 'Help and contact' 
+and 'Send your feedback', and an internal auditing service for 'Survey' (contact
+ [#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/) if you require more information about this).
 
 # Contents
    * [Forms provided by the Customer Contact Subsystem](#forms-provided-by-the-customer-contact-subsystem)
-      * [Contacting HMRC - <em>Get help with this page</em>](#contacting-hmrc---get-help-with-this-page)
+      * [Contacting HMRC - <em>Is this page not working properly?</em>](#contacting-hmrc---get-help-with-this-page)
       * [Contacting HMRC - <em>Help and contact</em>](#contacting-hmrc---help-and-contact)
       * [Providing feedback about Digital Customer Support Team](#providing-feedback-about-digital-customer-support-team)
       * [Providing Beta feedback about services](#providing-beta-feedback-about-services)
@@ -21,19 +25,14 @@ passing user requests to downstream services - to Deskpro for 'Get help with thi
       * [Creating own customer contact forms](#creating-own-customer-contact-forms)
    * [Other relevant details](#other-relevant-details)
       * [User details attached to the ticket](#user-details-attached-to-the-ticket)
-      * [Location of Javascript code used by the service](#location-of-javascript-code-used-by-the-service)
       * [Related projects, useful links](#appendix__linx)
       * [Slack](#appendix__links__slack)
 
-
 # Forms provided by the Customer Contact Subsystem <a name="forms-provided-by-the-customer-contact-subsystem"></a>
 
-## Contacting HMRC - *Get help with this page* <a name="contacting-hmrc---get-help-with-this-page"></a>
+## Contacting HMRC - *Is this page not working properly?* <a name="contacting-hmrc---get-help-with-this-page"></a>
 
-
-This form should be used as the standard way to allow users to report problems and ask questions about the relevant service in which this form is visualised.
-
-Here is a screenshot of the form:
+This form provides the primary way for users to report technical issues with tax services. Here is a screenshot of the form:
 
 ![alt tag](docs/get-help.png)
 
@@ -43,45 +42,22 @@ This contact form consists of the following fields:
 - the action performed by the user
 - the error seen by the user
 
-Requests of this type are forwarded to *Deskpro* with the subject *"Support Request"*. 
+Form submissions are forwarded to *Deskpro* with the subject *"Support Request"*. 
 The contents of the *action* and *error* fields are concatenated and stored in the ticket body.
 
-UI components allowing implementation of the form are provided by the [play-ui](https://github.com/hmrc/play-ui) library.
-Play UI library contains a Twirl template that allows you to render the "Get help with this page" link in the footer
-of a standard HMRC page, provided that you use the *hmrcGovUkTemplate* template. In order to use it, you must add the following lines into the relevant file using the *hmrcGovUkTemplate*:
+Newer services using play-frontend should follow the integration steps detailed 
+in [play-frontend-hmrc](https://github.com/hmrc/play-frontend-hmrc#helping-users-report-technical-issues).
 
-1) Define the 'get help form component'
-```
-@getHelpForm = @{
-  uiHelpers.reportAProblemLink(
-    /contact/problem_reports_ajax?service=<your-service-name-here>,
-    /contact/problem_reports_nonjs?service=<your-service-name-here>
-  )
-} 
-```
-
-2) Use it when instantiating the *hmrcGovUkTemplate*
-
-```
-@content = {
-  @uiLayouts.main_content(
-    article = ...,
-    mainClass = ...,
-    mainDataAttributes = ...,
-    mainContentHeader = ...,
-    serviceInfo = ...,
-    getHelpForm = getHelpForm,
-    sidebar = ...
-  )
-}
-```
+Historically, contact-frontend supported a version of the form that could be embedded within a service using either a 
+server-side partial or injected by Javascript. However, these mechanisms are not supported for services using play-frontend or
+play-nunjucks and are not recommended for reasons of accessibility and usability.
 
 [[Back to the top]](#top)
 
 ## Contacting HMRC - *Help and contact* <a name="contacting-hmrc---help-and-contact"></a>
 
-This form is very similar to the *Get help with this page* form.
-There are minor differences in how this form works in comparison to 'Get help with this page'.
+This form is very similar to the *Is this page not working properly?* form.
+There are minor differences in how this form works in comparison to 'Is this page not working properly?'.
 
 This contact form contains only three input fields:
 - name
@@ -90,43 +66,40 @@ This contact form contains only three input fields:
 
 Requests of this type are forwarded to *Deskpro* with the subject *"Contact form submission"*
 
-This functionality can be implemented by consuming services in two modes:
-* as a standalone form
-* as a form included in the underlying page, retrieved by a partial
-
-If you want to use the standalone version of the form, you have to redirect the user to one of the following URLs:
-* if the user is unauthenticated - `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc-unauthenticated?service=${serviceId}`
-* if the user is authenticated - `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc?service=${serviceId}`
+To use this form, render a link on your service to:
+* `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc-unauthenticated?service=${serviceId}` or
+* `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc?service=${serviceId}` if the user is authenticated
 
 '{environment}.' is not included in the case of the production environment.
 
-### Cross-domain linking
+`Help and contact` historically also supported embedding itself as a partial; however, this
+functionality is *deprecated* and should not be used.
 
-For cross-domain linking situations, an optional querystring parameter, referrerUrl, can also be supplied to the unauthenticated 
-standalone page. This parameter should contain the full, absolute, properly encoded URL of the page the user was on before they navigated to
+For linking across domains, a querystring parameter, referrerUrl, can also be supplied. This parameter should 
+contain the full, absolute, properly encoded URL of the page the user was on before they navigated to
 the contact form. For example, a link from the SCP sign in page would look like 
 `https://www.tax.service.gov.uk/contact/contact-hmrc-unauthenticated?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds`
 
 The referrer field is passed to the Deskpro service and lets operators know which page the user was on when they asked to
 contact HMRC. If the referrerUrl is not supplied, the application will attempt to use the HTTP Header and userAction parameter (if present). 
-However, this mechanism is not recommended because it relies on browsers correctly forwarding the HTTP Referer header in all situations.
-
-`Help and contact` historically also supported displaying the *Help and contact* page as a partial; however, this
-functionality is *deprecated* and should not be used.
+However, this mechanism is not recommended because it relies on browsers correctly forwarding the HTTP Referer header correctly.
 
 [[Back to the top]](#top)
 
 ## Providing feedback about the Digital Customer Support Team ('Customer Satisfaction') <a name="providing-feedback-about-digital-customer-support-team"></a>
-Upon resolving a customer issue, response emails are sent by the Digital Customer Support Team containing a link inviting users to complete a survey about the customer's satisfaction with the way their issue was handled, this survey being provided by contact-frontend. Data from the survey are then stored in Deskpro.
+Upon resolving a customer issue, response emails are sent by the Digital Customer Support Team containing a link 
+inviting users to complete a survey about the customer's satisfaction with the way their issue was handled, this 
+survey being provided by contact-frontend.
 
 Here is an example of the email received by the user:
+
 ![alt tag](docs/support-confirmation-email.png)
 
 This is how the DCST feedback form looks:
 
 ![alt tag](docs/survey.png)
 
-Feedback survey results currently are stored in Splunk as explicit audit events with the following properties:
+Feedback survey results currently are stored as explicit audit events with the following properties:
 * *auditSource* - "frontend"
 * *auditType* - "DeskproSurvey"
 * *details* 
@@ -134,7 +107,7 @@ Feedback survey results currently are stored in Splunk as explicit audit events 
     * *speed* - the response about satisfaction with the speed of DCST reply
     * *improve* - contents of the textual field with improvement suggestions
     * *ticketId* - the reference of the case (same as in email)
-    * *serviceId* - an identifier of the service - same as provided in the *Get help with this page* page
+    * *serviceId* - an identifier of the service - same as provided in the *Is this page not working properly?* page
 
 This functionality is used by Deskpro and shouldn't be used by any consuming service directly.
 Emails received from Deskpro should contain link in the following format:
@@ -159,18 +132,14 @@ This form consists of the following fields:
 
 Feedback responses are forwarded to Deskpro with the subject *"Beta feedback submission"*
 
-This functionality can be implemented by consuming services in two modes:
-* as a form displayed within a separate, standalone page
-* as a form included in the underlying page, retrieved by a partial and initially hidden
-
-If you want to display this form as a standalone page, you should render such a link on your page:
-* if the user is unauthenticated - `https://www.{environment}.tax.service.gov.uk/contact/beta-feedback-unauthenticated?service=${serviceId}&additional parameters`
-* if the user is authenticated - `https://www.{environment}.tax.service.gov.uk/contact/beta-feedback?service=${serviceId}&additional parameters`
+To use this form, render a link on your page to:
+* `https://www.{environment}.tax.service.gov.uk/contact/beta-feedback-unauthenticated?service=${serviceId}&additional parameters` or
+* `https://www.{environment}.tax.service.gov.uk/contact/beta-feedback?service=${serviceId}&additional parameters` if the user is authenticated
 
 '{environment}.' is not included in the case of the production environment.
 
 Customization flags:
-* *service* - consuming services should specify their identifier as the 'service' parameter of requests to contact-frontend. The value of this parameter will be later passed to Splunk and will allow you to properly analyze feedback
+* *service* - an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters
 * *canOmitComments* - consuming services can decide whether the 'comments' field is optional. To make this the case, the consuming service must add 'canOmitComments=true' field to the request
 * *backURL* - (only for standalone page mode). A 'Back' button redirecting the user back to the consuming service can be embedded into the Beta Feedback form. In order to achieve this, the consuming service has to specify a destination URL.
 
@@ -188,21 +157,21 @@ This form consists of the following fields:
 - user's name
 - user's email address
 
-Accessibility problems are forwards to Deskpro with the subject *"Accessibility Problem"*.
+Accessibility problems are forwarded to Deskpro with the subject *"Accessibility Problem"*.
 
-This functionality is presently only implemented as a standalone page.
+This form is linked to from [accessibility-statement-frontend](https://www.github.com/accessibility-statement-frontend)
+and is not intended to be used directly.
 
-To display the standalone page, create a link from your accessibility statement page:
-* if the user is unauthenticated - `https://www.{environment}.tax.service.gov.uk/contact/accessibility-unauthenticated?service=${serviceId}&userAction=${useraction}`
-* if the user is authenticated - `https://www.{environment}.tax.service.gov.uk/contact/accessility?service=${serviceId}&userAction=${useraction}`
+Services that have not yet migrated to accessibility-statement-frontend display a link that opens a new tab to:
+* `https://www.{environment}.tax.service.gov.uk/contact/accessibility-unauthenticated?service=${serviceId}&referrerUrl=${referrerUrl}` or
+* `https://www.{environment}.tax.service.gov.uk/contact/accessility?service=${serviceId}&referrerUrl=${referrerUrl}` if the user is authenticated.
 
 `{environment}` is not included in the case of the production environment.
 
 URL parameters:
-* *service* - consuming services should specify their identifier as the 'service' parameter of requests to contact-frontend. The value of this parameter will be later passed to Splunk and will allow you to properly analyze feedback
-* *userAction* - path of page the user reported in accessibility problem on. Since they arrive at the form from the accessibility statement page, we cannot rely on the referrer header to track this, so we use this field to store the this value
-
-The form is intended to be displayed in a new tab or window. When the form is completed they are redirected to a confirmation page and prompted to close the tab or window.
+* *service* - an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters
+* *referrerUrl* - the full, absolute, properly encoded URL of the page the user was on before they 
+  navigated to the accessibility form
 
 [[Back to the top]](#top)
 
@@ -247,14 +216,6 @@ Here is a list of supported identifiers:
 * UTR
 * VAT registration number
 * PAYE reference
-
-[[Back to the top]](#top)
-
-## Location of Javascript code used by the service <a name="location-of-javascript-code-used-by-the-service"></a>
-
-Part of the logic of contact-frontend (mainly related to reporting a problem) is performed by javascript code located in the [assets-frontend](https://github.com/hmrc/assets-frontend/blob/master/assets/javascripts/modules/reportAProblem.js) project.
-
-When making changes in the asset-frontend service, be aware that it may take long time for these changes to be adopted by service maintainers.
 
 [[Back to the top]](#top)
 

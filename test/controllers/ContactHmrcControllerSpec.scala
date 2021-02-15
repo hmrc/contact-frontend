@@ -45,7 +45,7 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
-class PlayFrontendContactHmrcControllerSpec
+class ContactHmrcControllerSpec
     extends AnyWordSpec
     with GivenWhenThen
     with Matchers
@@ -129,15 +129,15 @@ class PlayFrontendContactHmrcControllerSpec
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
       val fields = Map(
-        "contact-name"          -> "Bob The Builder",
-        "contact-email"         -> "bob@build-it.com",
-        "contact-comments"      -> "Can We Fix It?",
-        "isJavascript"          -> "false",
-        "referrer"              -> "n/a",
-        "csrfToken"             -> "n/a",
-        "service"               -> "scp",
-        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "userAction"            -> "/some-service-page"
+        "contact-name"     -> "Bob The Builder",
+        "contact-email"    -> "bob@build-it.com",
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript"     -> "false",
+        "referrer"         -> "n/a",
+        "csrfToken"        -> "n/a",
+        "service"          -> "scp",
+        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
+        "userAction"       -> "/some-service-page"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -172,15 +172,15 @@ class PlayFrontendContactHmrcControllerSpec
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
       val fields = Map(
-        "contact-name"          -> "Bob The Builder",
-        "contact-email"         -> "bob@build-it.com",
-        "contact-comments"      -> "Can We Fix It?",
-        "isJavascript"          -> "false",
-        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
-        "csrfToken"             -> "n/a",
-        "service"               -> "scp",
-        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "userAction"            -> ""
+        "contact-name"     -> "Bob The Builder",
+        "contact-email"    -> "bob@build-it.com",
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript"     -> "false",
+        "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"        -> "n/a",
+        "service"          -> "scp",
+        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
+        "userAction"       -> ""
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -211,15 +211,15 @@ class PlayFrontendContactHmrcControllerSpec
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
       val fields = Map(
-        "contact-name"          -> "Bob The Builder",
-        "contact-email"         -> "bob@build-it.com",
-        "contact-comments"      -> "Can We Fix It?",
-        "isJavascript"          -> "false",
-        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
-        "csrfToken"             -> "n/a",
-        "service"               -> "scp",
-        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "userAction"            -> "/overridden/path"
+        "contact-name"     -> "Bob The Builder",
+        "contact-email"    -> "bob@build-it.com",
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript"     -> "false",
+        "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"        -> "n/a",
+        "service"          -> "scp",
+        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
+        "userAction"       -> "/overridden/path"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -248,15 +248,15 @@ class PlayFrontendContactHmrcControllerSpec
     "display errors when form isn't filled out at all" in new TestScope {
 
       val fields = Map(
-        "contact-name"          -> "",
-        "contact-email"         -> "",
-        "contact-comments"      -> "",
-        "isJavascript"          -> "false",
-        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
-        "csrfToken"             -> "n/a",
-        "service"               -> "scp",
-        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "userAction"            -> "/overridden/path"
+        "contact-name"     -> "",
+        "contact-email"    -> "",
+        "contact-comments" -> "",
+        "isJavascript"     -> "false",
+        "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"        -> "n/a",
+        "service"          -> "scp",
+        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
+        "userAction"       -> "/overridden/path"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -279,15 +279,15 @@ class PlayFrontendContactHmrcControllerSpec
       val msg2500 = "x" * 2500
 
       val fields = Map(
-        "contact-name"          -> "Bob The Builder",
-        "contact-email"         -> "bob@build-it.com",
-        "contact-comments"      -> msg2500,
-        "isJavascript"          -> "false",
-        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
-        "csrfToken"             -> "n/a",
-        "service"               -> "scp",
-        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "userAction"            -> "/overridden/path"
+        "contact-name"     -> "Bob The Builder",
+        "contact-email"    -> "bob@build-it.com",
+        "contact-comments" -> msg2500,
+        "isJavascript"     -> "false",
+        "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"        -> "n/a",
+        "service"          -> "scp",
+        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
+        "userAction"       -> "/overridden/path"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -307,15 +307,15 @@ class PlayFrontendContactHmrcControllerSpec
       val badEmail = "firstname'email.gov."
 
       val fields = Map(
-        "contact-name"          -> "Bob The Builder",
-        "contact-email"         -> badEmail,
-        "contact-comments"      -> "Can We Fix It?",
-        "isJavascript"          -> "false",
-        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
-        "csrfToken"             -> "n/a",
-        "service"               -> "scp",
-        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "userAction"            -> "/overridden/path"
+        "contact-name"     -> "Bob The Builder",
+        "contact-email"    -> badEmail,
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript"     -> "false",
+        "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"        -> "n/a",
+        "service"          -> "scp",
+        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
+        "userAction"       -> "/overridden/path"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -335,15 +335,15 @@ class PlayFrontendContactHmrcControllerSpec
       val tooLongEmail = ("x" * 64) + "@" + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 57) + ".com"
 
       val fields = Map(
-        "contact-name"          -> "Bob The Builder",
-        "contact-email"         -> tooLongEmail,
-        "contact-comments"      -> "Can We Fix It?",
-        "isJavascript"          -> "false",
-        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
-        "csrfToken"             -> "n/a",
-        "service"               -> "scp",
-        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "userAction"            -> "/overridden/path"
+        "contact-name"     -> "Bob The Builder",
+        "contact-email"    -> tooLongEmail,
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript"     -> "false",
+        "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"        -> "n/a",
+        "service"          -> "scp",
+        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
+        "userAction"       -> "/overridden/path"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -361,15 +361,15 @@ class PlayFrontendContactHmrcControllerSpec
       val longName = "x" * 256
 
       val fields         = Map(
-        "contact-name"          -> longName,
-        "contact-email"         -> "bob@build-it.com",
-        "contact-comments"      -> "Can We Fix It?",
-        "isJavascript"          -> "false",
-        "referrer"              -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
-        "csrfToken"             -> "n/a",
-        "service"               -> "scp",
-        "abFeatures"            -> "GetHelpWithThisPageFeature_A",
-        "userAction"            -> "/overridden/path"
+        "contact-name"     -> longName,
+        "contact-email"    -> "bob@build-it.com",
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript"     -> "false",
+        "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
+        "csrfToken"        -> "n/a",
+        "service"          -> "scp",
+        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
+        "userAction"       -> "/overridden/path"
       )
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
       val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
@@ -389,13 +389,13 @@ class PlayFrontendContactHmrcControllerSpec
       mockDeskproConnector(Future.failed(new Exception("This is an expected test error")))
 
       val fields = Map(
-        "contact-name"          -> "Bob The Builder",
-        "contact-email"         -> "bob@build-it.com",
-        "contact-comments"      -> "Can We Fix It?",
-        "isJavascript"          -> "false",
-        "referrer"              -> "n/a",
-        "csrfToken"             -> "n/a",
-        "service"               -> "scp"
+        "contact-name"     -> "Bob The Builder",
+        "contact-email"    -> "bob@build-it.com",
+        "contact-comments" -> "Can We Fix It?",
+        "isJavascript"     -> "false",
+        "referrer"         -> "n/a",
+        "csrfToken"        -> "n/a",
+        "service"          -> "scp"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -583,8 +583,6 @@ class PlayFrontendContactHmrcControllerSpec
 
     val hmrcDeskproConnector = mock[HmrcDeskproConnector]
 
-    val contactPage             = app.injector.instanceOf[views.html.contact_hmrc]
-    val contactConfirmationPage = app.injector.instanceOf[views.html.contact_hmrc_confirmation]
     val contactForm             = app.injector.instanceOf[views.html.partials.contact_hmrc_form]
     val contactFormConfirmation =
       app.injector.instanceOf[views.html.partials.contact_hmrc_form_confirmation]
@@ -598,8 +596,6 @@ class PlayFrontendContactHmrcControllerSpec
         authConnector,
         configuration,
         Stubs.stubMessagesControllerComponents(messagesApi = messages),
-        contactPage,
-        contactConfirmationPage,
         contactForm,
         contactFormConfirmation,
         errorPage,

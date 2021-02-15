@@ -31,8 +31,8 @@ import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, GetHelpWithThisPageImprovedFieldValidation, GetHelpWithThisPageMoreVerboseConfirmation, GetHelpWithThisPageOnlyServerSideValidation}
-import views.html.partials.{error_feedback, error_feedback_inner}
-import views.html.{InternalErrorPage, ProblemReportsNonjsConfirmationPage, ProblemReportsNonjsPage, problem_reports_confirmation_nonjavascript, problem_reports_confirmation_nonjavascript_b, problem_reports_nonjavascript, ticket_created_body, ticket_created_body_b}
+import views.html.partials.{error_feedback, error_feedback_inner, ticket_created_body, ticket_created_body_b}
+import views.html.{InternalErrorPage, ProblemReportsNonjsConfirmationPage, ProblemReportsNonjsPage}
 import play.api.http.HeaderNames._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -135,11 +135,8 @@ class ProblemReportsController @Inject() (
   val hmrcDeskproConnector: HmrcDeskproConnector,
   val authConnector: AuthConnector,
   mcc: MessagesControllerComponents,
-  assetsFrontendProblemReportsPage: problem_reports_nonjavascript,
   playFrontendProblemReportsPage: ProblemReportsNonjsPage,
-  assetsFrontendProblemReportsConfirmationPage: problem_reports_confirmation_nonjavascript,
   playFrontendProblemReportsConfirmationPage: ProblemReportsNonjsConfirmationPage,
-  assetsFrontendProblemReportsConfirmationPage_B: problem_reports_confirmation_nonjavascript_b,
   errorFeedbackForm: error_feedback,
   errorFeedbackFormInner: error_feedback_inner,
   ticketCreatedBody: ticket_created_body,
@@ -247,37 +244,18 @@ class ProblemReportsController @Inject() (
     request: Request[_]
   ) = {
     val view =
-      if (appConfig.enablePlayFrontendProblemReportNonjsForm) {
-        playFrontendProblemReportsConfirmationPage()
-      } else {
-        if (appConfig.hasFeature(GetHelpWithThisPageMoreVerboseConfirmation, service)) {
-          assetsFrontendProblemReportsConfirmationPage_B(ticketId.ticket_id.toString, None)
-        } else {
-          assetsFrontendProblemReportsConfirmationPage(ticketId.ticket_id.toString, None)
-        }
-      }
+      playFrontendProblemReportsConfirmationPage()
     Ok(view)
   }
 
   private def problemReportsPage(form: Form[ProblemReport], service: Option[String], referrer: Option[String])(implicit
     request: Request[_]
   ) =
-    if (appConfig.enablePlayFrontendProblemReportNonjsForm) {
-      Ok(
-        playFrontendProblemReportsPage(
-          form,
-          routes.ProblemReportsController.submitNonJavaScript(service)
-        )
+    Ok(
+      playFrontendProblemReportsPage(
+        form,
+        routes.ProblemReportsController.submitNonJavaScript(service)
       )
-    } else {
-      Ok(
-        assetsFrontendProblemReportsPage(
-          form,
-          appConfig.externalReportProblemSecureUrl,
-          service,
-          referrer
-        )
-      )
-    }
+    )
 
 }
