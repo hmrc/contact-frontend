@@ -43,7 +43,7 @@ import util.BackUrlValidator
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PlayFrontendFeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()

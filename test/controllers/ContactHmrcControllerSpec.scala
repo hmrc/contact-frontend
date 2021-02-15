@@ -45,7 +45,7 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
-class PlayFrontendContactHmrcControllerSpec
+class ContactHmrcControllerSpec
     extends AnyWordSpec
     with GivenWhenThen
     with Matchers

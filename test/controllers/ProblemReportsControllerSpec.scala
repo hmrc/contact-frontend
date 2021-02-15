@@ -41,7 +41,7 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PlayFrontendProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite with Matchers {
+class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite with Matchers {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()

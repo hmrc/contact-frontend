@@ -170,12 +170,8 @@ class ContactHmrcController @Inject() (
     doThanks(request)
   }
 
-  private def doThanks(implicit request: Request[AnyRef]) = {
-    val result = request.session.get("ticketId").fold(BadRequest("Invalid data")) { _ =>
-      Ok(playFrontendContactConfirmationPage())
-    }
-    Future.successful(result)
-  }
+  private def doThanks(implicit request: Request[AnyRef]) =
+    Future.successful(Ok(playFrontendContactConfirmationPage()))
 
   def contactHmrcPartialForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Boolean) =
     Action.async { implicit request =>

@@ -36,7 +36,7 @@ import play.api.test.Helpers._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class PlayFrontendSurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with JsoupHelpers {
+class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with JsoupHelpers {
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(

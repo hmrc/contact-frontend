@@ -42,7 +42,7 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PlayFrontendAccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()

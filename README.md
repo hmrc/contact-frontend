@@ -1,11 +1,12 @@
 contact-frontend
 ================
 
-This service allows users to contact the HMRC Customer Contact team for 4 major purposes:
+This service allows users to contact the HMRC Customer Contact team for 5 major purposes:
 1. reporting technical problems ('Is this page not working properly?')
 1. asking questions ('Help and contact')
 1. providing feedback on services ('Send your feedback')
 1. providing feedback for the HMRC Customer Contact team ('Survey')
+1. reporting accessibility problems with services ('Report an accessibility problem')
 
 Contact-frontend is responsible for hosting forms related to the purposes listed above, validating the input, and
 passing user requests to downstream services - to Deskpro for 'Is this page not working properly?', 'Help and contact' 
