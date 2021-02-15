@@ -35,7 +35,7 @@
 @(feedbackForm: Form[FeedbackForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @pageTitle = @{
-    if(feedbackForm.hasErrors){Messages("error.browser.title.prefix")+" "+Messages("feedback.heading")} else Messages("feedback.heading")
+    if(feedbackForm.hasErrors){Messages("error.browser.title.prefix")+" "+Messages("feedback.title")} else Messages("feedback.title")
 }
 
 @mainLayout(pageTitle) {

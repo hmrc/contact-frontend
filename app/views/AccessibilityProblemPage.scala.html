@@ -34,7 +34,7 @@
 @(accessibilityForm: Form[AccessibilityForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @pageTitle = @{
-    if(accessibilityForm.hasErrors){Messages("error.browser.title.prefix")+" "+Messages("accessibility.heading")} else Messages("accessibility.heading")
+    if(accessibilityForm.hasErrors){Messages("error.browser.title.prefix")+" "+Messages("accessibility.title")} else Messages("accessibility.title")
 }
 
 @mainLayout(pageTitle) {

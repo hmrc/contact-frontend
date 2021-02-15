@@ -9,8 +9,10 @@ feedback.rating.error.invalid=Dewiswch opsiwn dilys i fesur eich profiad
 feedback.email.error.invalid=Rhowch gyfeiriad e-bost dilys
 feedback.email.error.length=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
 feedback.comments.error.required=Rhowch eich sylwadau
+feedback.title=Anfon eich adborth - GOV.UK
 feedback.heading=Anfon eich adborth
 feedback.send=Anfon
+feedback.confirmation.title=Eich adborth - GOV.UK
 feedback.confirmation.heading=Eich adborth
 feedback.confirmation.message=Mae eich adborth wedi dod i law.
 feedback.confirmation.back=Yn ôl
@@ -45,7 +47,8 @@ language-switcher.welsh=Cymraeg
 language-switcher.welsh.hover=Defnyddio''r cyfrif hwn yn Cymraeg
 button.back=Yn ôl
 
-problem_report.title=Cael help gyda phroblem dechnegol
+problem_report.title=Cael help gyda phroblem dechnegol - GOV.UK
+problem_report.heading=Cael help gyda phroblem dechnegol
 problem_report.paragraph.1=Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.
 problem_report.paragraph.2=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
 problem_report.name.label=Enw
@@ -74,7 +77,8 @@ problem_report.common.size_limit=Gallwch nodi hyd at {0} o gymeriadau
 common.problem_report.error_nojavascript_title=Cafwyd problem wrth anfon eich ymholiad
 deskpro.email_too_long=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
 
-survey.title=Arolwg
+survey.title=Arolwg - GOV.UK
+survey.heading=Arolwg
 survey.helpful.error.required=Tell us how satisfied you are with the answer we gave you
 survey.speed.error.required=Tell us how satisfied you are with the speed of our reply
 survey.improve.error.length=Improvement suggestions must be 2500 characters or fewer
@@ -96,6 +100,7 @@ deskpro.error.try.later=Try again later.
 deskpro.error.not.sent=Your message has not been sent.
 please.try.later=Rhowch gynnig arall arni yn nes ymlaen.
 
+contact.title=Cymorth a chysylltiadau - GOV.UK
 contact.heading=Cymorth a chysylltiadau
 contact.confirmation.message=Bydd rhywun yn cysylltu â chi cyn pen 2 ddiwrnod gwaith.
 contact.confirmation.message.b=Byddwn yn ateb neu''n rhoi gwybod i chi sut y byddwn yn delio â''ch neges cyn pen 2 ddiwrnod gwaith.
@@ -136,6 +141,7 @@ form.name=Enw
 problem_report.email=E-bost
 problem_report.email.b=Cyfeiriad e-bost
 
+accessibility.title=Rhoi gwybod am broblem hygyrchedd - GOV.UK
 accessibility.heading=Rhoi gwybod am broblem hygyrchedd
 accessibility.message.para1=Dylech dim ond defnyddio''r ffurflen hon i roi gwybod am unrhyw broblemau hygyrchedd rydych wedi dod o hyd iddynt wrth ddefnyddio''r gwasanaeth hwn. Peidiwch â chynnwys gwybodaeth bersonol nac ariannol, er enghraifft eich rhif Yswiriant Gwladol neu fanylion eich cerdyn credyd.
 accessibility.message.para2=Rydym yn adolygu ac yn ceisio mynd i''r afael ag unrhyw broblem hygyrchedd rydym y cael gwybod amdani.

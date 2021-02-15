@@ -44,7 +44,7 @@
     @if(problemReportForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary(errorList = problemReportForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
     }
-    @h1(content = Text(messages("problem_report.title")))
+    @h1(content = Text(messages("problem_report.heading")))
     @p(content = Text(messages("problem_report.paragraph.1")))
     @p(content = Text(messages("problem_report.paragraph.2")))
     @formWithCSRF(action, 'id -> "error-feedback-form") {

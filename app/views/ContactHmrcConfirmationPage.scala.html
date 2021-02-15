@@ -24,13 +24,9 @@
 )
 @()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
-@pageTitle = @{
-    Messages("contact.heading")
-}
+@mainLayout(Messages("contact.title")) {
 
-@mainLayout(pageTitle) {
-
-    @h1(content = Text(pageTitle))
+    @h1(content = Text(messages("contact.heading")))
     @h2(content = Text(messages("common.thank.you")))
 
     @p(content = Text(messages("contact.confirmation.message")))
