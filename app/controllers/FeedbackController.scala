@@ -337,7 +337,7 @@ object FeedbackFormBind {
           override def unbind(key: String, value: String): Map[String, String] = Map(key -> value)
 
         }).verifying(
-          "error.common.comments_too_long",
+          "feedback.comments.error.length",
           comment => {
             val result = comment.size <= 2000
             result

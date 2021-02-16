@@ -56,10 +56,10 @@ class ProblemReportsNonjsPageSpec
 
   val problemReportsForm: Form[ProblemReport] = Form[ProblemReport](
     mapping(
-      "report-name"   -> text.verifying("error.common.problem_report.name_mandatory", msg => !msg.isEmpty),
-      "report-email"  -> text.verifying("error.common.problem_report.email_mandatory", msg => !msg.isEmpty),
-      "report-action" -> text.verifying("error.common.problem_report.action_mandatory", msg => !msg.isEmpty),
-      "report-error"  -> text.verifying("error.common.problem_report.error_mandatory", msg => !msg.isEmpty),
+      "report-name"   -> text.verifying("problem_report.name.error.required", msg => !msg.isEmpty),
+      "report-email"  -> text.verifying("problem_report.email.error.required", msg => !msg.isEmpty),
+      "report-action" -> text.verifying("problem_report.action.error.required", msg => !msg.isEmpty),
+      "report-error"  -> text.verifying("problem_report.error.error.required", msg => !msg.isEmpty),
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
       "abFeatures"    -> optional(text),

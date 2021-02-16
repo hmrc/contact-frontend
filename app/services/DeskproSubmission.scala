@@ -101,10 +101,10 @@ trait DeskproSubmission {
 
   def problemMessage(action: String, error: String)(implicit messages: Messages): String =
     s"""
-    ${Messages("problem_report.action")}:
+    ${Messages("problem_report.action.label")}:
     $action
 
-    ${Messages("problem_report.error")}:
+    ${Messages("problem_report.error.label")}:
     $error
     """
 

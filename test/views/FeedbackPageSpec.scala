@@ -52,7 +52,7 @@ class FeedbackPageSpec
       "feedback-email"    -> text
         .verifying("feedback.email.error.invalid", email => email.nonEmpty),
       "feedback-comments" -> text
-        .verifying("error.common.comments_mandatory", comment => comment.nonEmpty),
+        .verifying("feedback.comments.error.required", comment => comment.nonEmpty),
       "isJavascript"      -> boolean,
       "referrer"          -> text,
       "csrfToken"         -> text,
