@@ -19,7 +19,7 @@
 @this(govukPanel: GovukPanel, govukBackLink: GovukBackLink, mainLayout: Layout)
 @(backUrl: Option[String] = None)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
-@mainLayout(pageTitle = messages("feedback.confirmation.heading")) {
+@mainLayout(pageTitle = messages("feedback.confirmation.title")) {
   @govukPanel(Panel(title = Text(messages("feedback.confirmation.message"))))
   @backUrl.map { url =>
     <a class="govuk-link" href="@url">@messages("feedback.confirmation.back")</a>

@@ -108,7 +108,7 @@ class ContactHmrcPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").text shouldBe "Help and contact"
+      content.select("title").text shouldBe "Help and contact - GOV.UK"
     }
 
     "display the correct page heading" in {
@@ -210,7 +210,7 @@ class ContactHmrcPageSpec
         ),
         action
       )
-      asDocument(contentWithErrors).title should be("Error: Help and contact")
+      asDocument(contentWithErrors).title should be("Error: Help and contact - GOV.UK")
     }
 
     "include the contact comment" in {

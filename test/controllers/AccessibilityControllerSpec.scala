@@ -93,7 +93,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       status(result) should be(200)
       val document = Jsoup.parse(contentAsString(result))
-      document.title()                                                             should be(Messages("accessibility.heading"))
+      document.title()                                                             should be(Messages("accessibility.title"))
       document.getElementById("accessibility-form")                                should not be null
       document.getElementById("service").`val`()                                   should be("")
       document.getElementsByAttributeValue("name", "userAction").first().`val`() shouldBe "test?1234=xyz"
@@ -141,7 +141,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       val errors   = document.select(".govuk-error-message").asScala
       errors.length should be(3)
 
-      document.title()                                                                     should be("Error: " + Messages("accessibility.heading"))
+      document.title()                                                                     should be("Error: " + Messages("accessibility.title"))
       errors.exists(_.text().contains(Messages("accessibility.problem.error.required"))) shouldBe true
       errors.exists(_.text().contains(Messages("accessibility.name.error.required")))    shouldBe true
       errors.exists(_.text().contains(Messages("accessibility.email.error.required")))   shouldBe true
@@ -164,7 +164,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
+      document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
@@ -188,7 +188,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
+      document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
@@ -210,7 +210,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
+      document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.exists(_.text().contains(Messages("accessibility.email.error.length"))) shouldBe true
     }
@@ -232,7 +232,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
+      document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.exists(_.text().contains(Messages("accessibility.name.error.length"))) shouldBe true
     }
@@ -312,7 +312,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       status(result) should be(200)
       val document = Jsoup.parse(contentAsString(result))
-      document.title()                                                             should be(Messages("accessibility.heading"))
+      document.title()                                                             should be(Messages("accessibility.title"))
       document
         .body()
         .select("form[id=accessibility-form]")
@@ -336,7 +336,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title()    should be("Error: " + Messages("accessibility.heading"))
+      document.title()    should be("Error: " + Messages("accessibility.title"))
       document
         .body()
         .select("form[id=accessibility-form]")
@@ -368,7 +368,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
+      document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
@@ -393,7 +393,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
+      document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
@@ -416,7 +416,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
+      document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.exists(_.text().contains(Messages("accessibility.email.error.length"))) shouldBe true
     }
@@ -439,7 +439,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("accessibility.heading"))
+      document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.exists(_.text().contains(Messages("accessibility.name.error.length"))) shouldBe true
     }

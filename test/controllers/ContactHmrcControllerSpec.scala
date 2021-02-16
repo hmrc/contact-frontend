@@ -268,7 +268,7 @@ class ContactHmrcControllerSpec
       val errors   = document.select(".govuk-error-message").asScala
       errors.length should be(3)
 
-      document.title() should be("Error: " + Messages("contact.heading"))
+      document.title() should be("Error: " + Messages("contact.title"))
 
       errors.exists(_.text().contains(Messages("contact.comments.error.required"))) shouldBe true
       errors.exists(_.text().contains(Messages("contact.name.error.required")))     shouldBe true
@@ -296,7 +296,7 @@ class ContactHmrcControllerSpec
       status(result) should be(400)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("contact.heading"))
+      document.title() should be("Error: " + Messages("contact.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
@@ -324,7 +324,7 @@ class ContactHmrcControllerSpec
       status(result) should be(400)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("contact.heading"))
+      document.title() should be("Error: " + Messages("contact.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
@@ -352,7 +352,7 @@ class ContactHmrcControllerSpec
       status(result) should be(400)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("contact.heading"))
+      document.title() should be("Error: " + Messages("contact.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.exists(_.text().contains(Messages("contact.email.error.length"))) shouldBe true
     }
@@ -379,7 +379,7 @@ class ContactHmrcControllerSpec
       import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
-      document.title() should be("Error: " + Messages("contact.heading"))
+      document.title() should be("Error: " + Messages("contact.title"))
       val errors = document.select(".govuk-error-message").asScala
       errors.exists(_.text().contains(Messages("contact.name.error.length"))) shouldBe true
     }

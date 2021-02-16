@@ -39,7 +39,7 @@
     @if(surveyForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary(errorList = surveyForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
     }
-    @h1(content = Text(messages("survey.title")))
+    @h1(content = Text(messages("survey.heading")))
     @formWithCSRF(action, 'id -> "survey-form") {
       @inputHidden(surveyForm("service-id"))
       @inputHidden(surveyForm("ticket-id"))

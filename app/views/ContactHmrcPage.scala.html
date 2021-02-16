@@ -35,8 +35,8 @@
 @(contactForm: Form[ContactForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @pageTitle = @{
-    if(contactForm.hasErrors){Messages("error.browser.title.prefix") + " " + Messages("contact.heading")}
-    else Messages("contact.heading")
+    if(contactForm.hasErrors){Messages("error.browser.title.prefix") + " " + Messages("contact.title")}
+    else Messages("contact.title")
 }
 
 @contactHmrcLink = @{
