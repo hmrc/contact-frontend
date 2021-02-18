@@ -67,7 +67,6 @@ survey.neutral.response=Niwtral
 survey.disagree.response=Anfodlon
 survey.strongly.disagree.response=Anfodlon iawn
 survey.tell.us.how.we.can.improve=Rhowch wybod i ni sut y gallwn wella''r cymorth a roddwn i chi.
-survey.2500.characters.or.less=2500 o gymeriadau neu lai
 survey.submit=Cyflwyno
 
 deskpro.error.page.title=Sorry, there is a problem with the service – Contact HMRC – GOV.UK
