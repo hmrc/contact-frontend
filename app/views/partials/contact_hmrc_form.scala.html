@@ -26,10 +26,10 @@
     </header>
     <p>@Html(Messages("contact.form.specific.query", uk.gov.hmrc.urls.Link.toExternalPage(url = "http://search2.hmrc.gov.uk/kb5/hmrc/contactus/home.page", value = Some("contact HMRC"), dataAttributes = Some(Map
             ("journey-click" -> "contact-page:Click:Contact HMRC"))).toHtml))</p>
-    <p>@Messages("contact.form.please.fill")</p>
+    <p>@Messages("contact.form.para2")</p>
 
-    <h2>@Messages("contact.form.how.help")</h2>
-    <p>@Messages("common.feedback.information.warning")</p>
+    <h2>@Messages("contact.form.heading2")</h2>
+    <p>@Messages("contact.form.para3")</p>
 }
 
 <form action="@externalContactHmrcUrl" method="POST" class="form--feedback" novalidate="novalidate">
@@ -40,20 +40,20 @@
     <fieldset>
         @input_text(
             contactForm("contact-name"),
-            label = Messages("form.your.name"),
+            label = Messages("contact.name.label"),
             inputClass = Some("form-control-3-4")
         )
 
         @input_text(
             contactForm("contact-email"),
-            label =  Messages("form.email.address"),
+            label =  Messages("contact.email.label"),
             inputClass = Some("form-control-3-4"),
             inputType = Some("email")
         )
 
         @input_textarea(
             field = contactForm("contact-comments"),
-            label = Messages("form.your.comments"),
+            label = Messages("contact.comments.label"),
             charLimit = Some(2000)
         )
 
@@ -62,7 +62,7 @@
         <input type="hidden" name="userAction" id="userAction" value="@contactForm("userAction").value" />
 
         <div class="form-field">
-            <button class="button" type="submit">@Messages("form.send")</button>
+            <button class="button" type="submit">@Messages("contact.button")</button>
         </div>
 
     </fieldset>

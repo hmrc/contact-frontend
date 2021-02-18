@@ -1,14 +1,16 @@
 common.thank.you=Thank you
-common.acknowledgment=Message received
 common.fullstop=.
 
+feedback.name.label=Full name
 feedback.name.error.required=Enter your full name
 feedback.name.error.length=Full name cannot be longer than 70 characters
 feedback.rating.error.required=Tell us what you think of the service
 feedback.rating.error.invalid=Please select a valid experience rating
+feedback.email.label=Email address
 feedback.email.error.invalid=Enter an email address in the correct format, like name@example.com
 feedback.email.error.length=Email address must be 255 characters or fewer
 feedback.comments.error.required=Enter your comments
+feedback.comments.error.length=The comment cannot be longer than 1000 characters
 feedback.title=Send your feedback - GOV.UK
 feedback.heading=Send your feedback
 feedback.send=Send
@@ -16,32 +18,12 @@ feedback.confirmation.title=Your feedback - GOV.UK
 feedback.confirmation.heading=Your feedback
 feedback.confirmation.message=Your feedback has been received.
 feedback.confirmation.back=Back
+feedback.comments.hint=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
 
-common.feedback.information.warning=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
 common.feedback.get.help=Is this page not working properly?
-common.feedback.title=Get help with a technical problem
-common.feedback.htmltitle=Get help with a technical problem – HM Revenue & Customs – GOV.UK
-common.feedback.only_use_form=Only use this form to report technical problems.
 
 error.browser.title.prefix=Error:
-error.common.problem_report.name_mandatory=Enter your full name
-error.common.problem_report.name_mandatory.b=Enter your full name
-error.common.problem_report.name_too_long=Full name must be 70 characters or fewer
-error.common.problem_report.name_too_long.b=Full name must be 70 characters or fewer
-error.common.problem_report.name_valid=Full name must only include letters a to z, numbers, hyphens, full stops, commas, apostrophes and spaces
-error.common.problem_report.name_valid.b=Full name must only include letters a to z, numbers, hyphens, full stops, commas, apostrophes and spaces
-error.common.problem_report.email_mandatory=Enter your email address
-error.common.problem_report.email_mandatory.b=Enter your email address
-error.common.problem_report.email_valid=Enter an email address in the correct format, like name@example.com
-error.common.problem_report.email_valid.b=Enter an email address in the correct format, like name@example.com
-error.common.problem_report.action_mandatory=Enter details of what you were doing
-error.common.problem_report.action_mandatory.b=Enter details of what you were doing
-error.common.problem_report.error_mandatory=Enter details of what went wrong
-error.common.problem_report.error_mandatory.b=Enter details of what went wrong
-error.common.comments_mandatory=Enter your comments
-error.common.comments_too_long=Comment must be 1000 characters or fewer
 error.summary.title=There is a problem
-
 
 language-switcher.english=English
 language-switcher.english.hover=Use this account in English
@@ -69,15 +51,7 @@ problem_report.error.error.required=Enter details of what went wrong
 problem_report.error.error.length=The comment cannot be longer than 1000 characters
 problem_report.button=Send
 
-problem_report.action=What were you doing?
-problem_report.action.b=What were you trying to do?
-problem_report.action.hint.b=For example, sign in, print something, find information, understand or use the service.
-problem_report.error=What do you need help with?
-problem_report.error.b=What problem do you want to tell us about?
-problem_report.error.hint.b=If you got a message telling you something was wrong, tell us what it says.
 problem_report.common.size_limit=You can enter up to {0} characters
-common.problem_report.error_nojavascript_title=There was a problem sending your query
-deskpro.email_too_long=Email address must be 255 characters or fewer
 
 survey.title=Survey - GOV.UK
 survey.heading=Survey
@@ -93,23 +67,17 @@ survey.neutral.response=Neutral
 survey.disagree.response=Dissatisfied
 survey.strongly.disagree.response=Very dissatisfied
 survey.tell.us.how.we.can.improve=Tell us how we can improve the support we give you (optional).
-survey.2500.characters.or.less=2500 characters or less
 survey.submit=Submit
 
 deskpro.error.page.title=Sorry, there is a problem with the service – Contact HMRC – GOV.UK
 deskpro.error.page.heading=Sorry, there is a problem with the service
 deskpro.error.try.later=Try again later.
 deskpro.error.not.sent=Your message has not been sent.
-please.try.later=Please try again later.
 
 contact.title=Help and contact - GOV.UK
 contact.heading=Help and contact
 contact.confirmation.message=Someone will get back to you within 2 working days.
-contact.confirmation.message.b=We will reply or let you know how we are dealing with your message within 2 working days.
 contact.form.specific.query=If you have a specific tax query {0}.
-contact.form.please.fill=If you need help using your tax account please fill in this form.
-contact.form.how.help=How can we help you?
-form.send=Send
 contact.name.label=Full name
 contact.name.error.required=Enter your full name
 contact.name.error.length=Full name must be 70 characters or fewer
@@ -127,10 +95,6 @@ contact.form.para2=If you need help using your tax account please fill in this f
 contact.form.para3=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
 contact.button=Send
 
-form.your.name=Full name
-form.email.address=Email address
-form.your.comments=Your comments
-
 form.online.services=What do you think of this online service?
 form.online.services.data=We use your feedback to make our services better.
 form.online.services.very_good=Very good
@@ -139,9 +103,6 @@ form.online.services.neutral=Neutral
 form.online.services.bad=Bad
 form.online.services.very_bad=Very bad
 form.comments=Comments
-form.name=Full name
-problem_report.email=Email address
-problem_report.email.b=Email address
 
 accessibility.title=Report an accessibility problem - GOV.UK
 accessibility.heading=Report an accessibility problem
@@ -150,9 +111,6 @@ accessibility.message.para2=We review and try to resolve all accessibility probl
 accessibility.problem.label=Describe the accessibility problem you have found
 accessibility.problem.error.required=Enter details of the accessibility problem
 accessibility.problem.error.length=Problem description must be 2000 characters or fewer
-
-# FIXME: to remove once play-frontend version is enabled permanently
-accessibility.subheading.contact=Your contact details
 
 accessibility.name.label=Full name
 accessibility.name.error.required=Enter your full name
@@ -167,8 +125,5 @@ accessibility.button=Report Problem
 accessibility.confirmation.title=Your accessibility problem has been reported.
 accessibility.confirmation.subheading=What happens next
 accessibility.confirmation.paragraph=We have received your message and will reply, or let you know how we are dealing with this, within 2 working days.
-
-# FIXME: to remove once play-frontend version is enabled permanently
-accessibility.close.window=You can now close this window or tab.
 
 testPage.title = Service test page

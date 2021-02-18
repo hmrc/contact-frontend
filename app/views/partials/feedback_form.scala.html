@@ -51,13 +51,13 @@
 
         @input_text(
             field = feedbackForm("feedback-name"),
-            label = Messages("form.name"),
+            label = Messages("feedback.name.label"),
             inputClass = Some("form-control-3-4")
         )
 
         @input_text(
             field = feedbackForm("feedback-email"),
-            label = Messages("form.email.address"),
+            label = Messages("feedback.email.label"),
             inputClass = Some("form-control-3-4"),
             inputType = Some("email")
         )
@@ -65,7 +65,7 @@
             field = feedbackForm("feedback-comments"),
             label = Messages("form.comments"),
             inputClass = Some("input--fullwidth"),
-            hint = Some(Messages("common.feedback.information.warning")),
+            hint = Some(Messages("feedback.comments.hint")),
             charLimit = Some(2000)
         )
 
@@ -77,7 +77,7 @@
         }
 
         <div class="form-field">
-            <button class="button" type="submit">@Messages("form.send")</button>
+            <button class="button" type="submit">@Messages("feedback.send")</button>
         </div>
 
     </fieldset>

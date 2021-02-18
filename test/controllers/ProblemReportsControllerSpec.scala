@@ -273,7 +273,6 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
     val errorFeedbackForm             = app.injector.instanceOf[views.html.partials.error_feedback]
     val errorFeedbackFormInner        = app.injector.instanceOf[views.html.partials.error_feedback_inner]
     val ticketCreatedBody             = app.injector.instanceOf[views.html.partials.ticket_created_body]
-    val ticketCreatedBody_B           = app.injector.instanceOf[views.html.partials.ticket_created_body_b]
 
     val controller = new ProblemReportsController(
       mock[HmrcDeskproConnector],
@@ -284,7 +283,6 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
       errorFeedbackForm,
       errorFeedbackFormInner,
       ticketCreatedBody,
-      ticketCreatedBody_B,
       playFrontendErrorFeedbackPage
     )(new CFConfig(app.configuration), ExecutionContext.Implicits.global)
 
