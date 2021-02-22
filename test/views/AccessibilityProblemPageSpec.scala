@@ -126,7 +126,7 @@ class AccessibilityProblemPageSpec
       val welshContent                = accessibilityProblemPage(accessibilityForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
-      paragraphs.first.text should include("Dylech dim ond defnyddio'r")
+      paragraphs.first.text should include("Dylech dim ond defnyddio’r")
     }
 
     "include the correct form tag" in {

@@ -333,7 +333,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite 
       val welshContent                = surveyPage(form, action)
 
       val paragraphs = welshContent.select("label[for=improve]")
-      paragraphs.first.text should be("Rhowch wybod i ni sut y gallwn wella'r cymorth a roddwn i chi.")
+      paragraphs.first.text should be("Rhowch wybod i ni sut y gallwn wella’r cymorth a roddwn i chi.")
     }
 
     "include a submit button" in {
