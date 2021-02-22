@@ -68,7 +68,7 @@ class AccessibilityProblemConfirmationPageSpec
       val welshContent                = accessibilityProblemConfirmationPage()
 
       val titles = welshContent.select("h1.govuk-panel__title")
-      titles.first.text should be("Mae'ch problem wedi ei nodi")
+      titles.first.text should be("Mae’ch problem wedi ei nodi")
     }
   }
 }

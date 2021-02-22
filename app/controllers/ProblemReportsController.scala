@@ -177,7 +177,7 @@ class ProblemReportsController @Inject() (
         val referrer = error.data.get("referrer").filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
 
         if (isAjax) {
-            Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
+          Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
         } else {
           Future.successful(problemReportsPage(error, error.data.get("service"), referrer))
         }
