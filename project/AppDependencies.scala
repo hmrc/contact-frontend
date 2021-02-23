@@ -16,8 +16,7 @@ object AppDependencies {
     "uk.gov.hmrc"              %% "play-language"              % "4.10.0-play-27",
     "commons-validator"         % "commons-validator"          % "1.6",
     "org.apache.httpcomponents" % "httpclient"                 % "4.4.1",
-    "uk.gov.hmrc"              %% "play-frontend-govuk"        % "0.60.0-play-27",
-    "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "0.41.0-play-27"
+    "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "0.45.0-play-27"
   )
 
   private def test(scope: String) = Seq(

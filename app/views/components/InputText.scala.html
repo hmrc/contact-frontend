@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+
 @this(govukInput: GovukInput)
 
 @(
@@ -27,16 +29,10 @@
     autocomplete: Option[String] = None
 )(implicit messages: Messages)
 @govukInput(Input(
-    id = field.id,
-    name = field.name,
     inputType = inputType,
     label = Label(classes = labelClasses, content = Text(label)),
     hint = hint.map(h => Hint(content = Text(h))),
-    value = field.value,
-    errorMessage = field.error.map(formError =>
-        ErrorMessage(content = Text(messages(formError.message, formError.args: _*)))
-    ),
     classes = classes,
     spellcheck = spellcheck,
-    autocomplete = autocomplete
-))
+    autocomplete = autocomplete).withFormField(field)
+)

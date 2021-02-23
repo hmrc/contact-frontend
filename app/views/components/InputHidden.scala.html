@@ -14,7 +14,12 @@
  * limitations under the License.
  *@
 
-@this()
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
-@(field: Field)
-<input type="hidden" name="@field.id" id="@field.id" value="@field.value" />
+@this(govukInput: GovukInput)
+
+@(field: Field)(implicit messages: Messages)
+
+@govukInput(
+  Input(inputType = "hidden").withFormField(field)
+)

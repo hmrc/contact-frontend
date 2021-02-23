@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+
 @this(govukCharacterCount: GovukCharacterCount)
 
 @(
@@ -25,14 +27,8 @@
     classes: String = ""
 )(implicit messages: Messages)
 @govukCharacterCount(CharacterCount(
-    name = field.id,
-    id = field.id,
     label = Label(classes = labelClasses, content = Text(label)),
     hint = hint.map(h => Hint(content = Text(h))),
-    value = field.value,
     maxLength = maxLength,
-    classes = classes,
-    errorMessage = field.error.map(formError =>
-        ErrorMessage(content = Text(messages(formError.message, formError.args: _*)))
-    ),
-))
+    classes = classes).withFormField(field)
+)

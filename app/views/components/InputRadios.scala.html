@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+
 @this(govukRadios: GovukRadios)
 
 @(
@@ -27,16 +29,10 @@
       content = Text(legend)
     ))
   )),
-  idPrefix = Some(field.name),
-  name = field.name,
-  errorMessage = field.error.map(formError =>
-    ErrorMessage(content = Text(messages(formError.message, formError.args: _*)))
-  ),
   items = items map { case (value: String, label: String) =>
     RadioItem(
       content = Text(label),
-      checked = field.value.contains(value),
       value = Some(value)
     )
-  }
-))
+  }).withFormField(field)
+)
