@@ -14,9 +14,10 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.charactercount.CharacterCount
 
-@this(govukCharacterCount: GovukCharacterCount)
+@this(hmrcCharacterCount: HmrcCharacterCount)
 
 @(
     field: Field,
@@ -26,7 +27,7 @@
     hint: Option[String] = None,
     classes: String = ""
 )(implicit messages: Messages)
-@govukCharacterCount(CharacterCount(
+@hmrcCharacterCount(CharacterCount(
     label = Label(classes = labelClasses, content = Text(label)),
     hint = hint.map(h => Hint(content = Text(h))),
     maxLength = maxLength,

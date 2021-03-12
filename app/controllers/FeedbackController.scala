@@ -156,7 +156,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
   private def doSubmit(enrolments: Option[Enrolments])(implicit request: Request[AnyContent]): Future[Result] =
     FeedbackFormBind.form
-      .bindFromRequest()(request)
+      .bindFromRequest()
       .fold(
         error => Future.successful(BadRequest(feedbackView(enrolments.isDefined, error))),
         data =>
@@ -222,7 +222,7 @@ import scala.concurrent.{ExecutionContext, Future}
   }
 
   def submitFeedbackPartialForm(resubmitUrl: String) = Action.async { implicit request =>
-    val form = FeedbackFormBind.form.bindFromRequest()(request)
+    val form = FeedbackFormBind.form.bindFromRequest()
     form.fold(
       error =>
         Future.successful(
