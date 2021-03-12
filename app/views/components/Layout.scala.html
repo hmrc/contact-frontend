@@ -16,19 +16,17 @@
 
 @import config.AppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.header.Header
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardFooter
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardFooter, HmrcScripts, HmrcHead}
 @import views.html.components.LanguageSelection
-@import views.html.components.Head
-@import views.html.components.Scripts
 
 @this(
         govukLayout: GovukLayout,
         hmrcHeader: HmrcHeader,
         hmrcStandardFooter: HmrcStandardFooter,
         hmrcBanner: HmrcBanner,
-        head: Head,
+        head: HmrcHead,
         languageSelection: LanguageSelection,
-        scripts: Scripts
+        scripts: HmrcScripts
 )
 
 @(pageTitle: String, beforeContent: Option[Html] = None, isWelshTranslationAvailable: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)

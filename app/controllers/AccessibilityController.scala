@@ -133,7 +133,7 @@ class AccessibilityController @Inject() (
       loginRedirection(action.url)(
         authorised(AuthProviders(GovernmentGateway)) {
           AccessibilityFormBind.form
-            .bindFromRequest()(request)
+            .bindFromRequest()
             .fold(
               (error: Form[AccessibilityForm]) =>
                 Future.successful(
@@ -184,7 +184,7 @@ class AccessibilityController @Inject() (
   def submitUnauthenticatedAccessibilityForm(service: Option[String], userAction: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       AccessibilityFormBind.form
-        .bindFromRequest()(request)
+        .bindFromRequest()
         .fold(
           (error: Form[AccessibilityForm]) =>
             Future.successful(

@@ -141,7 +141,7 @@ class ContactHmrcController @Inject() (
     referrerUrl: Option[String]
   )(implicit request: Request[AnyContent]) =
     ContactHmrcForm.form
-      .bindFromRequest()(request)
+      .bindFromRequest()
       .fold(
         error => {
           val submitUrl = {
@@ -190,7 +190,7 @@ class ContactHmrcController @Inject() (
 
   def submitContactHmrcPartialForm(resubmitUrl: String, renderFormOnly: Boolean) = Action.async { implicit request =>
     ContactHmrcForm.form
-      .bindFromRequest()(request)
+      .bindFromRequest()
       .fold(
         error => Future.successful(BadRequest(contactHmrcForm(error, resubmitUrl, renderFormOnly))),
         data =>
