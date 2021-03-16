@@ -15,30 +15,19 @@
  *@
 
 @import config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.header.Header
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardFooter, HmrcScripts, HmrcHead}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardHeader, HmrcStandardFooter, HmrcScripts, HmrcHead}
 @import views.html.components.LanguageSelection
 
 @this(
         govukLayout: GovukLayout,
-        hmrcHeader: HmrcHeader,
+        hmrcStandardHeader: HmrcStandardHeader,
         hmrcStandardFooter: HmrcStandardFooter,
-        hmrcBanner: HmrcBanner,
         head: HmrcHead,
         languageSelection: LanguageSelection,
         scripts: HmrcScripts
 )
 
 @(pageTitle: String, beforeContent: Option[Html] = None, isWelshTranslationAvailable: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
-@import appConfig._
-
-@headerBlock = {
-    @hmrcHeader(Header(
-        homepageUrl = "https://www.gov.uk/",
-        language = if(messages.lang.code == cy) Cy else En,
-        displayHmrcBanner = true
-    ))
-}
 
 @beforeContentBlock = {
     @if(isWelshTranslationAvailable && appConfig.enableLanguageSwitching) {
@@ -50,7 +39,7 @@
 @govukLayout(
     pageTitle = Some(pageTitle),
     headBlock = Some(head()),
-    headerBlock = Some(headerBlock),
+    headerBlock = Some(hmrcStandardHeader(displayHmrcBanner = true)),
     scriptsBlock = Some(scripts()),
     beforeContentBlock = Some(beforeContentBlock),
     footerBlock = Some(hmrcStandardFooter())

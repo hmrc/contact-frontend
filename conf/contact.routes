@@ -49,5 +49,3 @@ GET         /accessibility-unauthenticated/thanks        @controllers.Accessibil
 GET         /switch-to-welsh                             @controllers.LanguageController.switchToWelsh()
 GET         /switch-to-english                           @controllers.LanguageController.switchToEnglish()
 GET         /language/:lang                              @controllers.LanguageController.switchToLanguage(lang: String)
-
-GET         /assets/*file                                @controllers.Assets.versioned(path = "/public", file: Asset)
