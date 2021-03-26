@@ -13,7 +13,6 @@ object AppDependencies {
     "uk.gov.hmrc"              %% "play-ui"                    % "9.0.0-play-27",
     "uk.gov.hmrc"              %% "url-builder"                % "3.4.0-play-27",
     "uk.gov.hmrc"              %% "auth-client"                % "3.3.0-play-27",
-    "uk.gov.hmrc"              %% "play-language"              % "4.10.0-play-27",
     "commons-validator"         % "commons-validator"          % "1.6",
     "org.apache.httpcomponents" % "httpclient"                 % "4.4.1",
     "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "0.56.0-play-27"
