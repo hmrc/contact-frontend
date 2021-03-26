@@ -245,9 +245,7 @@ import scala.concurrent.{ExecutionContext, Future}
   }
 
   private def feedbackConfirmationPage(maybeTicketId: Option[String], loggedIn: Boolean, backUrl: Option[String])(
-    implicit
-    request: Request[_],
-    lang: Lang
+    implicit request: Request[_]
   ): Result =
     Ok(
       playFrontendFeedbackConfirmationPage(
@@ -258,12 +256,11 @@ import scala.concurrent.{ExecutionContext, Future}
   private def feedbackPage(
     form: Form[FeedbackForm],
     loggedIn: Boolean,
-    service: Option[String] = None,
-    backUrl: Option[String] = None,
+    service: Option[String],
+    backUrl: Option[String],
     canOmitComments: Boolean
   )(implicit
-    request: Request[_],
-    lang: Lang
+    request: Request[_]
   ): Html = {
     val action =
       if (loggedIn) routes.FeedbackController.submit(service, backUrl, canOmitComments)

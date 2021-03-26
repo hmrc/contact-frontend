@@ -23,7 +23,7 @@
 @if(lang.code == "cy") {
     <li>
 
-        <a title="@Messages("language-switcher.english.hover")" href="@controllers.routes.LanguageController.switchToEnglish" data-journey-click="Language:Click:English">@Messages("language-switcher.english")</a>
+        <a title="@Messages("language-switcher.english.hover")" href="@uk.gov.hmrc.hmrcfrontend.controllers.routes.LanguageController.switchToLanguage("en")" data-journey-click="Language:Click:English">@Messages("language-switcher.english")</a>
 
         <span class="faded-text--small bold">| @Messages("language-switcher.welsh")</span>
     </li>
@@ -31,7 +31,7 @@
     <li>
         <span class="faded-text--small bold">@Messages("language-switcher.english") |</span>
 
-        <a title="@Messages("language-switcher.welsh.hover")" href="@controllers.routes.LanguageController.switchToWelsh" data-journey-click="Language:Click:Welsh">@Messages("language-switcher.welsh")</a></li>
+        <a title="@Messages("language-switcher.welsh.hover")" href="@uk.gov.hmrc.hmrcfrontend.controllers.routes.LanguageController.switchToLanguage("cy")" data-journey-click="Language:Click:Welsh">@Messages("language-switcher.welsh")</a></li>
 }
 }
 

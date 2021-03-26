@@ -31,8 +31,6 @@ class TestAppConfig extends AppConfig {
 
   def loginCallback(continueUrl: String): String = ???
 
-  def fallbackURLForLanguageSwitcher: String = ???
-
   def enableLanguageSwitching: Boolean = true
 
   def enablePlayFrontendAccessibilityForm: Boolean = false

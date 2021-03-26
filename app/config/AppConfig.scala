@@ -31,15 +31,11 @@ trait AppConfig {
   def externalReportProblemSecureUrl: String
   def backUrlDestinationAllowList: Set[String]
   def loginCallback(continueUrl: String): String
-  def fallbackURLForLanguageSwitcher: String
   def enableLanguageSwitching: Boolean
 
   def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean
 
   def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature]
-
-  val en: String = "en"
-  val cy: String = "cy"
 }
 
 class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
@@ -75,9 +71,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .toSet
 
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
-
-  override def fallbackURLForLanguageSwitcher =
-    loadConfigString("platform.frontend.url")
 
   override def enableLanguageSwitching =
     configuration
