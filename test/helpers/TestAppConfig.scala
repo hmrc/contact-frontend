@@ -30,7 +30,7 @@ class TestAppConfig extends AppConfig {
   def backUrlDestinationAllowList: Set[String] = ???
 
   def loginCallback(continueUrl: String): String = ???
-  
+
   def enableLanguageSwitching: Boolean = true
 
   def enablePlayFrontendAccessibilityForm: Boolean = false
