@@ -213,8 +213,7 @@ class AccessibilityController @Inject() (
   }
 
   private def accessibilityPage(form: Form[AccessibilityForm], action: Call, loggedIn: Boolean)(implicit
-    request: Request[_],
-    lang: Lang
+    request: Request[_]
   ): Html =
     playFrontendAccessibilityProblemPage(
       form,
@@ -222,8 +221,7 @@ class AccessibilityController @Inject() (
     )
 
   private def accessibilityConfirmationPage(loggedIn: Boolean)(implicit
-    request: Request[_],
-    lang: Lang
+    request: Request[_]
   ): Html =
     playFrontendAccessibilityProblemConfirmationPage()
 }

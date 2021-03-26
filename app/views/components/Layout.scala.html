@@ -15,32 +15,24 @@
  *@
 
 @import config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardHeader, HmrcStandardFooter, HmrcScripts, HmrcHead}
-@import views.html.components.LanguageSelection
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardHeader, HmrcStandardFooter, HmrcScripts, HmrcHead, HmrcLanguageSelectHelper}
 
 @this(
         govukLayout: GovukLayout,
         hmrcStandardHeader: HmrcStandardHeader,
         hmrcStandardFooter: HmrcStandardFooter,
         head: HmrcHead,
-        languageSelection: LanguageSelection,
+        hmrcLanguageSelectHelper: HmrcLanguageSelectHelper,
         scripts: HmrcScripts
 )
 
 @(pageTitle: String, beforeContent: Option[Html] = None, isWelshTranslationAvailable: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
-
-@beforeContentBlock = {
-    @if(isWelshTranslationAvailable && appConfig.enableLanguageSwitching) {
-        @languageSelection()
-    }
-    @beforeContent
-}
 
 @govukLayout(
     pageTitle = Some(pageTitle),
     headBlock = Some(head()),
     headerBlock = Some(hmrcStandardHeader(displayHmrcBanner = true)),
     scriptsBlock = Some(scripts()),
-    beforeContentBlock = Some(beforeContentBlock),
+    beforeContentBlock = if(isWelshTranslationAvailable) Some(hmrcLanguageSelectHelper()) else None,
     footerBlock = Some(hmrcStandardFooter())
 )(contentBlock)

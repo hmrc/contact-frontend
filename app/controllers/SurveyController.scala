@@ -176,8 +176,7 @@ class SurveyController @Inject() (
     )
 
   private def surveyPage(form: Form[SurveyForm], action: Call)(implicit
-    request: Request[_],
-    lang: Lang
+    request: Request[_]
   ): Html =
     playFrontendSurveyPage(
       form,
@@ -185,8 +184,7 @@ class SurveyController @Inject() (
     )
 
   private def surveyConfirmationPage(implicit
-    request: Request[_],
-    lang: Lang
+    request: Request[_]
   ): Html =
     playFrontendSurveyConfirmationPage()
 }

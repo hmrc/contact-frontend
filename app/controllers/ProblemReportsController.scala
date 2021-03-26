@@ -55,7 +55,7 @@ object ProblemReportForm {
     body.get("service").flatMap(_.headOption)
   }
 
-  def form(implicit request: Request[_], appConfig: AppConfig) = Form[ProblemReport](
+  def form: Form[ProblemReport] = Form[ProblemReport](
     mapping(
       "report-name"   -> text
         .verifying(
