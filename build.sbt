@@ -17,7 +17,8 @@ lazy val microservice = Project(appName, file("."))
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(
     PlayKeys.playDefaultPort := 9250,
-    PlayKeys.devSettings ++= Seq("metrics.enabled" -> "false")
+    PlayKeys.devSettings ++= Seq("metrics.enabled" -> "false"),
+    pipelineStages in Assets := Seq(gzip)
   )
   .settings(
     TwirlKeys.templateImports ++= Seq(
