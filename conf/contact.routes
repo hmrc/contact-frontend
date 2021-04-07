@@ -31,12 +31,14 @@ POST        /problem_reports                             @controllers.ProblemRep
 GET         /problem_reports_ajax                        @controllers.ProblemReportsController.reportFormAjax(service: Option[String])
 GET         /problem_reports_nonjs                       @controllers.ProblemReportsController.reportFormNonJavaScript(service: Option[String])
 POST        /problem_reports_nonjs                       @controllers.ProblemReportsController.submitNonJavaScript(service: Option[String])
+
++nocsrf
 POST        /problem_reports_secure                      @controllers.ProblemReportsController.submitSecure
 
-GET			    /survey				 	                             @controllers.SurveyController.survey(ticketId: String, serviceId: String)
-POST		    /survey                                      @controllers.SurveyController.submit(ticketId: String, serviceId: String)
-POST		    /submitSurvey                                @controllers.SurveyController.submitDeprecated()
-GET			    /survey/confirmation 	                       @controllers.SurveyController.confirmation()
+GET			/survey				 	                     @controllers.SurveyController.survey(ticketId: String, serviceId: String)
+POST		/survey                                      @controllers.SurveyController.submit(ticketId: String, serviceId: String)
+POST		/submitSurvey                                @controllers.SurveyController.submitDeprecated()
+GET			/survey/confirmation 	                     @controllers.SurveyController.confirmation()
 
 GET         /accessibility                               @controllers.AccessibilityController.accessibilityForm(service: Option[String], userAction: Option[String])
 POST        /accessibility                               @controllers.AccessibilityController.submitAccessibilityForm(service: Option[String], userAction: Option[String])
