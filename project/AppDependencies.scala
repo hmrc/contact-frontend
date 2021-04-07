@@ -8,14 +8,14 @@ object AppDependencies {
   }
 
   private val compile = Seq(
-    "uk.gov.hmrc"              %% "bootstrap-frontend-play-27" % "3.4.0",
-    "uk.gov.hmrc"              %% "govuk-template"             % "5.63.0-play-27",
-    "uk.gov.hmrc"              %% "play-ui"                    % "9.0.0-play-27",
+    "uk.gov.hmrc"              %% "bootstrap-frontend-play-27" % "4.2.0",
+    "uk.gov.hmrc"              %% "govuk-template"             % "5.65.0-play-27",
+    "uk.gov.hmrc"              %% "play-ui"                    % "9.1.0-play-27",
     "uk.gov.hmrc"              %% "url-builder"                % "3.4.0-play-27",
     "uk.gov.hmrc"              %% "auth-client"                % "3.3.0-play-27",
     "commons-validator"         % "commons-validator"          % "1.6",
     "org.apache.httpcomponents" % "httpclient"                 % "4.4.1",
-    "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "0.56.0-play-27"
+    "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "0.57.0-play-27"
   )
 
   private def test(scope: String) = Seq(
@@ -30,7 +30,7 @@ object AppDependencies {
     "com.github.tomakehurst"  % "wiremock"                 % "1.58"           % scope,
     "org.scalacheck"         %% "scalacheck"               % "1.14.0"         % scope,
     "uk.gov.hmrc"            %% "bootstrap-test-play-27"   % "2.25.0"         % scope,
-    "uk.gov.hmrc"            %% "domain"                   % "5.10.0-play-27" % scope,
+    "uk.gov.hmrc"            %% "domain"                   % "5.11.0-play-27" % scope,
     "com.vladsch.flexmark"    % "flexmark-all"             % "0.35.10"        % scope
   )
 }

@@ -25,7 +25,7 @@ import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{Call, MessagesControllerComponents, Request, Result}
 import play.twirl.api.Html
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -48,6 +48,22 @@ class SurveyController @Inject() (
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   private val TicketId = "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$".r
+
+  // TODO: These header names have been copied from http-verbs after v13.0.0 of that library removed the call to get all
+  // headers without parameters. Ticket to assess what headers actually required: PLATUI-1111
+  private val allHeaderNames = Seq(
+    HeaderNames.xRequestId,
+    HeaderNames.xSessionId,
+    HeaderNames.xForwardedFor,
+    HeaderNames.xRequestChain,
+    HeaderNames.authorisation,
+    HeaderNames.trueClientIp,
+    HeaderNames.trueClientPort,
+    HeaderNames.googleAnalyticTokenId,
+    HeaderNames.googleAnalyticUserId,
+    HeaderNames.deviceID,
+    HeaderNames.akamaiReputation
+  )
 
   def validateTicketId(ticketId: String) = ticketId match {
     case TicketId() => true
@@ -125,7 +141,7 @@ class SurveyController @Inject() (
       DataEvent(
         auditSource = "frontend",
         auditType = "DeskproSurvey",
-        tags = hc.headers.toMap,
+        tags = hc.headers(names = allHeaderNames).toMap,
         detail = collection.immutable.HashMap(
           "helpful"   -> formData.helpful.getOrElse(0).toString,
           "speed"     -> formData.speed.getOrElse(0).toString,
