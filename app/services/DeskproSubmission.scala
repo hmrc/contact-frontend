@@ -52,7 +52,6 @@ trait DeskproSubmission {
       request = request,
       enrolmentsOption = enrolments,
       service = data.service,
-      abFeatures = data.abFeatures,
       userAction = data.userAction
     )
 
@@ -73,8 +72,7 @@ trait DeskproSubmission {
       isJavascript = data.javascriptEnabled,
       request = request,
       enrolmentsOption = enrolments,
-      service = data.service,
-      abFeatures = data.abFeatures
+      service = data.service
     )
 
   def createProblemReportsTicket(
@@ -94,7 +92,6 @@ trait DeskproSubmission {
       request = request,
       enrolmentsOption = enrolmentsOption,
       service = problemReport.service,
-      abFeatures = problemReport.abFeatures,
       userAction = problemReport.userAction
     )
   }
@@ -122,7 +119,6 @@ trait DeskproSubmission {
       request = req,
       enrolmentsOption = enrolments,
       service = accessibilityForm.service,
-      abFeatures = None,
       userAction = accessibilityForm.userAction
     )
 

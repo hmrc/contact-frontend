@@ -122,7 +122,6 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
             any[Request[AnyRef]](),
             meq(enrolments),
             meq(None),
-            meq(None),
             meq(None)
           )(any(classOf[HeaderCarrier]))
         ).thenReturn(Future.successful(TicketId(123)))
@@ -154,7 +153,6 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
             meq("/contact/problem_reports"),
             meq(true),
             any[Request[AnyRef]](),
-            meq(None),
             meq(None),
             meq(None),
             meq(None)
@@ -238,7 +236,6 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
             meq("/contact/problem_reports"),
             meq(false),
             any[Request[AnyRef]](),
-            meq(None),
             meq(None),
             meq(None),
             meq(None)
@@ -353,7 +350,6 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
           meq(deskproReferrer),
           meq(false),
           any[Request[AnyRef]](),
-          meq(None),
           meq(None),
           meq(None),
           meq(None)

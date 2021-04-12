@@ -59,7 +59,6 @@ object ContactHmrcForm {
       "referrer"         -> text,
       "csrfToken"        -> text,
       "service"          -> optional(text),
-      "abFeatures"       -> optional(text),
       "userAction"       -> optional(text)
     )(ContactForm.apply)(ContactForm.unapply)
   )
@@ -91,7 +90,7 @@ class ContactHmrcController @Inject() (
       Future.successful {
         val referrer  = request.headers.get(REFERER).getOrElse("n/a")
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-        val form      = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, None, None, None))
+        val form      = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, None, None))
         val view      = contactPage(form, true, routes.ContactHmrcController.submit())
         Ok(view)
       }
@@ -104,7 +103,7 @@ class ContactHmrcController @Inject() (
         val httpReferrer = request.headers.get(REFERER)
         val referrer     = referrerUrl orElse httpReferrer getOrElse "n/a"
         val csrfToken    = CSRF.getToken(request).map(_.value).getOrElse("")
-        val form         = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, None, userAction))
+        val form         = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, userAction))
         val action       = routes.ContactHmrcController.submitUnauthenticated(service, userAction, referrerUrl)
         val view         = contactPage(form, false, action)
         Ok(view)
@@ -179,7 +178,7 @@ class ContactHmrcController @Inject() (
         Ok(
           contactHmrcForm(
             ContactHmrcForm.form.fill(
-              ContactForm(request.headers.get(REFERER).getOrElse("n/a"), csrfToken, service, None, None)
+              ContactForm(request.headers.get(REFERER).getOrElse("n/a"), csrfToken, service, None)
             ),
             submitUrl,
             renderFormOnly
@@ -216,7 +215,6 @@ case class ContactForm(
   referrer: String,
   csrfToken: String,
   service: Option[String] = Some("unknown"),
-  abFeatures: Option[String] = None,
   userAction: Option[String] = None
 )
 
@@ -225,8 +223,7 @@ object ContactForm {
     referrer: String,
     csrfToken: String,
     service: Option[String],
-    abFeatures: Option[String],
     userAction: Option[String]
   ): ContactForm =
-    ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, abFeatures, userAction)
+    ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction)
 }

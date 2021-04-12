@@ -57,7 +57,6 @@ class FeedbackPageSpec
       "referrer"          -> text,
       "csrfToken"         -> text,
       "service"           -> optional(text),
-      "abFeatures"        -> optional(text),
       "backUrl"           -> optional(text),
       "canOmitComments"   -> boolean
     )(FeedbackForm.apply)(FeedbackForm.unapply)
@@ -72,7 +71,6 @@ class FeedbackPageSpec
     referrer = "n/a",
     csrfToken = "",
     service = Some("unknown"),
-    abFeatures = None,
     backUrl = None,
     canOmitComments = false
   )

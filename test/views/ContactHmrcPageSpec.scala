@@ -63,7 +63,6 @@ class ContactHmrcPageSpec
       "referrer"         -> text,
       "csrfToken"        -> text,
       "service"          -> optional(text),
-      "abFeatures"       -> optional(text),
       "userAction"       -> optional(text)
     )(ContactForm.apply)(ContactForm.unapply)
   )
@@ -75,7 +74,6 @@ class ContactHmrcPageSpec
     isJavascript = false,
     referrer = "referrer",
     csrfToken = "12345",
-    abFeatures = None,
     service = None,
     userAction = None
   )

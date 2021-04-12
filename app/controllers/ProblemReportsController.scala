@@ -92,7 +92,6 @@ object ProblemReportForm {
         .verifying("problem_report.error.error.length", error => error.size <= 1000),
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
-      "abFeatures"    -> optional(text),
       "referrer"      -> optional(text),
       "userAction"    -> optional(text)
     )(ProblemReport.apply)(ProblemReport.unapply)
@@ -107,7 +106,6 @@ object ProblemReportForm {
         reportError = "",
         isJavascript = false,
         service = service,
-        abFeatures = None,
         referrer = request.headers.get(REFERER),
         userAction = None
       )

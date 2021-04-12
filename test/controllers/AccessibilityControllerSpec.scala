@@ -249,7 +249,6 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])
       ).thenReturn(Future.successful(TicketId(1234)))
@@ -278,7 +277,6 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
           isJavascript = any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
-          any[Option[String]],
           any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])
@@ -456,7 +454,6 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])
       ).thenReturn(Future.successful(TicketId(1234)))
@@ -486,7 +483,6 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
           isJavascript = any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
-          any[Option[String]],
           any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])
