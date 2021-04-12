@@ -41,9 +41,7 @@ object ProblemReportForm {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
   private val validateEmail: (String) => Boolean    = emailValidator.validate
 
-  val REPORT_NAME_REGEX = """^[A-Za-z0-9\-\.,'\s]+$"""
-
-  val OLD_REPORT_NAME_REGEX = """^[A-Za-z\-.,()'"\s]+$"""
+  val REPORT_NAME_REGEX = """^[A-Za-z\-.,()'"\s]+$"""
 
   def resolveServiceFromPost(implicit request: Request[_]): Option[String] = {
     val body = request.body match {
@@ -68,7 +66,7 @@ object ProblemReportForm {
         )
         .verifying(
           "problem_report.name.error.valid",
-          name => name.matches(OLD_REPORT_NAME_REGEX) || name.isEmpty
+          name => name.matches(REPORT_NAME_REGEX) || name.isEmpty
         ),
       "report-email"  -> text
         .verifying(
@@ -100,7 +98,7 @@ object ProblemReportForm {
     )(ProblemReport.apply)(ProblemReport.unapply)
   )
 
-  def emptyForm(service: Option[String])(implicit request: Request[_], appConfig: AppConfig): Form[ProblemReport] =
+  def emptyForm(service: Option[String])(implicit request: Request[_]): Form[ProblemReport] =
     ProblemReportForm.form.fill(
       ProblemReport(
         reportName = "",
@@ -109,7 +107,7 @@ object ProblemReportForm {
         reportError = "",
         isJavascript = false,
         service = service,
-        abFeatures = Some(appConfig.getFeatures(service).mkString(";")),
+        abFeatures = None,
         referrer = request.headers.get(REFERER),
         userAction = None
       )

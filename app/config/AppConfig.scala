@@ -18,11 +18,6 @@ package config
 
 import javax.inject.Inject
 import play.api.Configuration
-import play.api.mvc.Request
-import util._
-
-import scala.collection.JavaConverters._
-import scala.util.Try
 
 trait AppConfig {
 
@@ -33,9 +28,6 @@ trait AppConfig {
   def loginCallback(continueUrl: String): String
   def enableLanguageSwitching: Boolean
 
-  def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean
-
-  def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature]
 }
 
 class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
@@ -48,12 +40,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
   private val contactHost = configuration
     .getOptional[String]("contact-frontend.host")
     .getOrElse("")
-
-  private val featureRules: Seq[FeatureEnablingRule] =
-    Try(configuration.underlying.getStringList("features")).toOption
-      .map(_.asScala.toList)
-      .getOrElse(List.empty)
-      .map(FeatureEnablingRule.parse)
 
   override def contactHmrcAboutTaxUrl: String =
     loadConfigString("contactHmrcAboutTax.url")
@@ -76,15 +62,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
     configuration
       .getOptional[Boolean]("enableLanguageSwitching")
       .getOrElse(false)
-
-  lazy val featureSelector: FeatureSelector =
-    new BucketBasedFeatureSelector(BucketCalculator.deviceIdBucketCalculator, featureRules)
-
-  override def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean =
-    false
-
-  override def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] =
-    Set.empty
 
   private def configNotFoundError(key: String) =
     throw new RuntimeException(s"Could not find config key '$key'")
