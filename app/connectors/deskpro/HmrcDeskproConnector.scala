@@ -42,7 +42,6 @@ class HmrcDeskproConnector @Inject() (http: HttpClient, servicesConfig: Services
     request: Request[AnyRef],
     enrolmentsOption: Option[Enrolments],
     service: Option[String],
-    abFeatures: Option[String],
     userAction: Option[String]
   )(implicit hc: HeaderCarrier): Future[TicketId] = {
     val ticket = Ticket
@@ -57,7 +56,6 @@ class HmrcDeskproConnector @Inject() (http: HttpClient, servicesConfig: Services
         request,
         enrolmentsOption,
         service,
-        abFeatures,
         userAction
       )
     http.POST[Ticket, TicketId](requestUrl("/deskpro/get-help-ticket"), ticket) recover { case nf: NotFoundException =>
@@ -75,8 +73,7 @@ class HmrcDeskproConnector @Inject() (http: HttpClient, servicesConfig: Services
     isJavascript: Boolean,
     request: Request[AnyRef],
     enrolmentsOption: Option[Enrolments],
-    service: Option[String],
-    abFeatures: Option[String]
+    service: Option[String]
   )(implicit hc: HeaderCarrier): Future[TicketId] =
     http.POST[Feedback, TicketId](
       requestUrl("/deskpro/feedback"),
@@ -91,8 +88,7 @@ class HmrcDeskproConnector @Inject() (http: HttpClient, servicesConfig: Services
         hc,
         request,
         enrolmentsOption,
-        service,
-        abFeatures
+        service
       )
     ) recover { case nf: NotFoundException =>
       throw UpstreamErrorResponse(nf.getMessage, 404, 500)

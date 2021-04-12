@@ -136,7 +136,6 @@ class ContactHmrcControllerSpec
         "referrer"         -> "n/a",
         "csrfToken"        -> "n/a",
         "service"          -> "scp",
-        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
         "userAction"       -> "/some-service-page"
       )
 
@@ -162,7 +161,6 @@ class ContactHmrcControllerSpec
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])
     }
@@ -179,7 +177,6 @@ class ContactHmrcControllerSpec
         "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
         "csrfToken"        -> "n/a",
         "service"          -> "scp",
-        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
         "userAction"       -> ""
       )
 
@@ -201,7 +198,6 @@ class ContactHmrcControllerSpec
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])
     }
@@ -218,7 +214,6 @@ class ContactHmrcControllerSpec
         "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
         "csrfToken"        -> "n/a",
         "service"          -> "scp",
-        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
         "userAction"       -> "/overridden/path"
       )
 
@@ -240,7 +235,6 @@ class ContactHmrcControllerSpec
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])
     }
@@ -255,7 +249,6 @@ class ContactHmrcControllerSpec
         "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
         "csrfToken"        -> "n/a",
         "service"          -> "scp",
-        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
         "userAction"       -> "/overridden/path"
       )
 
@@ -286,7 +279,6 @@ class ContactHmrcControllerSpec
         "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
         "csrfToken"        -> "n/a",
         "service"          -> "scp",
-        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
         "userAction"       -> "/overridden/path"
       )
 
@@ -314,7 +306,6 @@ class ContactHmrcControllerSpec
         "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
         "csrfToken"        -> "n/a",
         "service"          -> "scp",
-        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
         "userAction"       -> "/overridden/path"
       )
 
@@ -342,7 +333,6 @@ class ContactHmrcControllerSpec
         "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
         "csrfToken"        -> "n/a",
         "service"          -> "scp",
-        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
         "userAction"       -> "/overridden/path"
       )
 
@@ -368,7 +358,6 @@ class ContactHmrcControllerSpec
         "referrer"         -> "https://www.other-gov-domain.gov.uk/path/to/service/page",
         "csrfToken"        -> "n/a",
         "service"          -> "scp",
-        "abFeatures"       -> "GetHelpWithThisPageFeature_A",
         "userAction"       -> "/overridden/path"
       )
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -437,8 +426,7 @@ class ContactHmrcControllerSpec
         "isJavascript"     -> "false",
         "referrer"         -> "n/a",
         "csrfToken"        -> "n/a",
-        "service"          -> "scp",
-        "abFeatures"       -> "GetHelpWithThisPageFeature_A"
+        "service"          -> "scp"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -461,7 +449,6 @@ class ContactHmrcControllerSpec
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
-          any[Option[String]],
           any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])
@@ -532,8 +519,7 @@ class ContactHmrcControllerSpec
         "isJavascript"     -> "false",
         "referrer"         -> "n/a",
         "csrfToken"        -> "n/a",
-        "service"          -> "scp",
-        "abFeatures"       -> "GetHelpWithThisPageFeature_A"
+        "service"          -> "scp"
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
@@ -559,7 +545,6 @@ class ContactHmrcControllerSpec
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
-          any[Option[String]],
           any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])
@@ -614,7 +599,6 @@ class ContactHmrcControllerSpec
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
-          any[Option[String]],
           any[Option[String]],
           any[Option[String]]
         )(any[HeaderCarrier])

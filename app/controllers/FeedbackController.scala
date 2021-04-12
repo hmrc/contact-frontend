@@ -284,8 +284,7 @@ object FeedbackFormBind {
     referrer: Option[String] = None,
     backUrl: Option[String],
     canOmitComments: Boolean,
-    service: Option[String],
-    abFeatures: Option[String] = None
+    service: Option[String]
   )(implicit
     request: Request[AnyRef]
   ) =
@@ -299,7 +298,6 @@ object FeedbackFormBind {
         referrer.getOrElse(request.headers.get(REFERER).getOrElse("n/a")),
         csrfToken,
         Some(service.getOrElse("unknown")),
-        abFeatures,
         backUrl,
         canOmitComments
       )
@@ -344,7 +342,6 @@ object FeedbackFormBind {
         "referrer"        -> text,
         "csrfToken"       -> text,
         "service"         -> optional(text),
-        "abFeatures"      -> optional(text),
         "backUrl"         -> optional(text),
         "canOmitComments" -> boolean
       )(FeedbackForm.apply)(FeedbackForm.unapply)

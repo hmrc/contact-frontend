@@ -17,8 +17,6 @@
 package helpers
 
 import config.AppConfig
-import play.api.mvc.Request
-import util.Feature
 
 class TestAppConfig extends AppConfig {
   def contactHmrcAboutTaxUrl: String = "some.contact.url"
@@ -32,19 +30,5 @@ class TestAppConfig extends AppConfig {
   def loginCallback(continueUrl: String): String = ???
 
   def enableLanguageSwitching: Boolean = true
-
-  def enablePlayFrontendAccessibilityForm: Boolean = false
-
-  def enablePlayFrontendFeedbackForm: Boolean = false
-
-  def enablePlayFrontendProblemReportNonjsForm: Boolean = false
-
-  def enablePlayFrontendSurveyForm: Boolean = false
-
-  def enablePlayFrontendContactHmrcForm: Boolean = false
-
-  def hasFeature(f: Feature, service: Option[String])(implicit request: Request[_]): Boolean = ???
-
-  def getFeatures(service: Option[String])(implicit request: Request[_]): Set[Feature] = ???
 
 }

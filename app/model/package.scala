@@ -34,7 +34,6 @@ case class ProblemReport(
   reportError: String,
   isJavascript: Boolean,
   service: Option[String],
-  abFeatures: Option[String],
   referrer: Option[String],
   userAction: Option[String]
 )
@@ -48,7 +47,6 @@ case class FeedbackForm(
   referrer: String,
   csrfToken: String,
   service: Option[String],
-  abFeatures: Option[String] = None,
   backUrl: Option[String],
   canOmitComments: Boolean
 )
