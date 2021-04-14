@@ -16,6 +16,7 @@
 
 @import config.AppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardHeader, HmrcStandardFooter, HmrcScripts, HmrcHead, HmrcLanguageSelectHelper}
+@import views.html.helper.CSPNonce
 
 @this(
         govukLayout: GovukLayout,
@@ -30,9 +31,9 @@
 
 @govukLayout(
     pageTitle = Some(pageTitle),
-    headBlock = Some(head()),
+    headBlock = Some(head(nonce = CSPNonce.get)),
     headerBlock = Some(hmrcStandardHeader(displayHmrcBanner = true)),
-    scriptsBlock = Some(scripts()),
+    scriptsBlock = Some(scripts(nonce = CSPNonce.get)),
     beforeContentBlock = if(isWelshTranslationAvailable) Some(hmrcLanguageSelectHelper()) else None,
     footerBlock = Some(hmrcStandardFooter())
 )(contentBlock)
