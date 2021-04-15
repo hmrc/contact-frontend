@@ -18,7 +18,6 @@ package controllers
 
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
-import connectors.deskpro.domain.TicketId
 
 import javax.inject.{Inject, Singleton}
 import model.ProblemReport
@@ -26,7 +25,7 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{MessagesControllerComponents, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -117,8 +116,8 @@ class ProblemReportsController @Inject() (
   val hmrcDeskproConnector: HmrcDeskproConnector,
   val authConnector: AuthConnector,
   mcc: MessagesControllerComponents,
-  playFrontendProblemReportsPage: ProblemReportsNonjsPage,
-  playFrontendProblemReportsConfirmationPage: ProblemReportsNonjsConfirmationPage,
+  problemReportsNonjsPage: ProblemReportsNonjsPage,
+  confirmationPage: ProblemReportsNonjsConfirmationPage,
   errorFeedbackForm: error_feedback,
   errorFeedbackFormInner: error_feedback_inner,
   ticketCreatedBody: ticket_created_body,
@@ -131,65 +130,52 @@ class ProblemReportsController @Inject() (
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  //TODO default to true (or even remove the secure query string) once everyone is off play-frontend so that we use the CSRF check (needs play-partials 1.3.0 and above in every frontend)
-  def reportForm(secure: Option[Boolean], preferredCsrfToken: Option[String], service: Option[String]) = Action {
-    implicit request =>
-      val isSecure     = secure.getOrElse(false)
-      val postEndpoint = if (isSecure) appConfig.externalReportProblemSecureUrl else appConfig.externalReportProblemUrl
-      val csrfToken    = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
-
-      Ok(errorFeedbackForm(ProblemReportForm.emptyForm(service = service), postEndpoint, csrfToken, service, None))
+  def partialIndex(preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
+    val csrfToken = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
+    Ok(
+      errorFeedbackForm(
+        ProblemReportForm.emptyForm(service = service),
+        appConfig.externalReportProblemUrl,
+        csrfToken,
+        service,
+        None
+      )
+    )
   }
 
-  def reportFormAjax(service: Option[String]) = Action { implicit request =>
+  def partialAjaxIndex(service: Option[String]) = Action { implicit request =>
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
     val referrer  = request.headers.get(REFERER)
-    Ok(reportFormAjaxView(ProblemReportForm.emptyForm(service = service), service, csrfToken, referrer))
+    val form      = ProblemReportForm.emptyForm(service = service)
+    val view      = errorFeedbackFormInner(form, appConfig.externalReportProblemUrl, csrfToken, service, referrer)
+    Ok(view)
   }
 
-  private def reportFormAjaxView(
-    form: Form[ProblemReport],
-    service: Option[String],
-    csrfToken: Option[String],
-    referrer: Option[String]
-  )(implicit request: Request[_]) =
-    errorFeedbackFormInner(form, appConfig.externalReportProblemSecureUrl, csrfToken, service, referrer)
-
-  def reportFormNonJavaScript(service: Option[String]) = Action { implicit request =>
-    val referrer = request.headers.get(REFERER)
-    problemReportsPage(ProblemReportForm.emptyForm(service = service), service, referrer)
+  def index(service: Option[String]) = Action { implicit request =>
+    problemReportsPage(ProblemReportForm.emptyForm(service = service), service)
   }
 
-  def submitSecure: Action[AnyContent] = submit
-
-  def submitNonJavaScript(service: Option[String]): Action[AnyContent] = submit
-
-  def submit = Action.async { implicit request =>
+  def submit(service: Option[String]) = Action.async { implicit request =>
     val isAjax = request.headers.get("X-Requested-With").contains("XMLHttpRequest")
 
     ProblemReportForm.form.bindFromRequest.fold(
-      (error: Form[ProblemReport]) => {
-
-        val referrer = error.data.get("referrer").filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
-
+      formWithError =>
         if (isAjax) {
           Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
         } else {
-          Future.successful(problemReportsPage(error, error.data.get("service"), referrer))
-        }
-      },
+          Future.successful(problemReportsPage(formWithError, formWithError.data.get("service")))
+        },
       problemReport => {
-
         val referrer = problemReport.referrer.filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
-
         (for {
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
           ticketId            <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
         } yield
           if (isAjax) {
-            javascriptConfirmationPage(ticketId, problemReport.service)
+            val view = ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
+            Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
           } else {
-            nonJavascriptConfirmationPage(ticketId, problemReport.service)
+            Ok(confirmationPage())
           }) recover {
           case _ if !isAjax =>
             InternalServerError(errorPage())
@@ -198,27 +184,11 @@ class ProblemReportsController @Inject() (
     )
   }
 
-  private def javascriptConfirmationPage(ticketId: TicketId, service: Option[String])(implicit request: Request[_]) = {
-    val view = ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
-    Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
-  }
-
-  private def nonJavascriptConfirmationPage(ticketId: TicketId, service: Option[String])(implicit
+  private def problemReportsPage(form: Form[ProblemReport], service: Option[String])(implicit
     request: Request[_]
   ) = {
-    val view =
-      playFrontendProblemReportsConfirmationPage()
-    Ok(view)
+    val submit = routes.ProblemReportsController.submit(service)
+    Ok(problemReportsNonjsPage(form, submit))
   }
-
-  private def problemReportsPage(form: Form[ProblemReport], service: Option[String], referrer: Option[String])(implicit
-    request: Request[_]
-  ) =
-    Ok(
-      playFrontendProblemReportsPage(
-        form,
-        routes.ProblemReportsController.submitNonJavaScript(service)
-      )
-    )
 
 }

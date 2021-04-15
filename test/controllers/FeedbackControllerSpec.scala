@@ -52,7 +52,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
   "feedbackForm" should {
     "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in new TestScope {
-      val result = controller.feedbackForm(
+      val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
         canOmitComments = true
@@ -65,9 +65,9 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     }
   }
 
-  "unauthenticatedFeedbackForm" should {
+  "index" should {
     "include 'service', 'backUrl' and 'canOmitComments' hidden fields and bind to submit URL" in new TestScope {
-      val result = controller.unauthenticatedFeedbackForm(
+      val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
         canOmitComments = true
@@ -81,7 +81,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         .body()
         .select("form[id=feedback-form]")
         .first
-        .attr("action") shouldBe s"/contact/beta-feedback-unauthenticated?$queryString"
+        .attr("action") shouldBe s"/contact/beta-feedback?$queryString"
 
       page.body().select("input[name=service]").first.attr("value")   shouldBe "any-service"
       page.body().select("input[name=backUrl]").first.attr("value")   shouldBe "/any-service"
@@ -89,7 +89,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     }
   }
 
-  "feedbackPartialForm" should {
+  "partialIndex" should {
     val submitUrl       = "https:/abcdefg.com"
     val csrfToken       = "CSRF"
     val service         = Some("scp")
@@ -98,7 +98,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
     "use the (deprecated) referer parameter if supplied" in new TestScope {
       val result =
-        controller.feedbackPartialForm(submitUrl, csrfToken, service, referer, canOmitComments, None)(request)
+        controller.partialIndex(submitUrl, csrfToken, service, referer, canOmitComments, None)(request)
 
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementById("referrer").attr("value") shouldBe "https://www.example.com/some-service"
@@ -108,7 +108,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val referrerUrl = Some("https://www.other-example.com/some-service")
 
       val result =
-        controller.feedbackPartialForm(submitUrl, csrfToken, service, referer, canOmitComments, referrerUrl)(request)
+        controller.partialIndex(submitUrl, csrfToken, service, referer, canOmitComments, referrerUrl)(request)
 
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementById("referrer").attr("value") shouldBe "https://www.other-example.com/some-service"
@@ -116,16 +116,16 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
   }
 
-  "Submitting the feedback for unauthenticated user" should {
+  "Submitting the feedback" should {
 
     "redirect to confirmation page without 'back' button if 'back' link not provided" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(request)
+      val result = controller.submit()(request)
 
       status(result)             should be(303)
-      redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks-unauthenticated")
+      redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks")
 
       verifyRequestMade()
     }
@@ -134,7 +134,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(generateInvalidRequest())
+      val result = controller.submit()(generateInvalidRequest())
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
@@ -147,10 +147,10 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       hmrcConnectorWillReturnTheTicketId()
 
       val result =
-        controller.submitUnauthenticated()(generateRequest(comments = "Some comment", canOmitComments = true))
+        controller.submit()(generateRequest(comments = "Some comment", canOmitComments = true))
 
       status(result)             should be(303)
-      redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks-unauthenticated")
+      redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks")
 
       verifyRequestMade(comment = "Some comment")
     }
@@ -158,10 +158,10 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     "succeed without comment if 'canOmitComments' flag is true" in new TestScope {
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(generateRequest(comments = "", canOmitComments = true))
+      val result = controller.submit()(generateRequest(comments = "", canOmitComments = true))
 
       status(result)             should be(303)
-      redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks-unauthenticated")
+      redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks")
 
       verifyRequestMade(comment = "No comment given")
     }
@@ -169,7 +169,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     "fail without comment if 'canOmitComments' flag is false" in new TestScope {
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(generateRequest(comments = "", canOmitComments = false))
+      val result = controller.submit()(generateRequest(comments = "", canOmitComments = false))
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
@@ -182,7 +182,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(generateInvalidRequestWithBackUrlAndService())
+      val result = controller.submit()(generateInvalidRequestWithBackUrlAndService())
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
@@ -194,7 +194,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         .body()
         .select("form[id=feedback-form]")
         .first
-        .attr("action") shouldBe s"/contact/beta-feedback-unauthenticated?$queryString"
+        .attr("action") shouldBe s"/contact/beta-feedback?$queryString"
 
       page.body().select("input[name=service]").first.attr("value")   shouldBe "someService"
       page.body().select("input[name=backUrl]").first.attr("value")   shouldBe "http://www.back.url"
@@ -206,7 +206,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
       hmrcConnectorWillFail()
 
-      val result = controller.submitUnauthenticated()(request)
+      val result = controller.submit()(request)
       status(result) shouldBe 500
       val page = Jsoup.parse(contentAsString(result))
       page.body().select("h1").first.text() shouldBe "deskpro.error.page.heading"
@@ -216,36 +216,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitUnauthenticated()(requestWithBackLink)
-
-      status(result) should be(303)
-      val encodedBackUrl: String = URLEncoder.encode("http://www.back.url", "UTF-8")
-      redirectLocation(result) shouldBe Some(
-        s"/contact/beta-feedback/thanks-unauthenticated?backUrl=$encodedBackUrl"
-      )
-
-      verifyRequestMade()
-    }
-  }
-
-  "Submitting feedback for authenticated user" should {
-    "redirect to confirmation page without 'back' button if 'back' link not provided" in new TestScope {
-
-      hmrcConnectorWillReturnTheTicketId()
-
-      val result = controller.submit()(request.withSession(SessionKeys.authToken -> "authToken"))
-
-      status(result)             should be(303)
-      redirectLocation(result) shouldBe Some("/contact/beta-feedback/thanks")
-
-      verifyRequestMade()
-    }
-
-    "redirect to confirmation page with 'back' button if 'back' link provided" in new TestScope {
-
-      hmrcConnectorWillReturnTheTicketId()
-
-      val result = controller.submit()(requestWithBackLink.withSession(SessionKeys.authToken -> "authToken"))
+      val result = controller.submit()(requestWithBackLink)
 
       status(result) should be(303)
       val encodedBackUrl: String = URLEncoder.encode("http://www.back.url", "UTF-8")
@@ -257,7 +228,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     }
   }
 
-  "Feedback confirmation page for authenticated user " should {
+  "Feedback confirmation page " should {
     "not contain back button if not requested" in new TestScope {
 
       val submit = controller.thanks()(request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
@@ -290,48 +261,13 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     }
   }
 
-  "Feedback confirmation page for anonymous user " should {
-    "not contain back button if not requested" in new TestScope {
-
-      val submit = controller.unauthenticatedThanks()(
-        request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
-      )
-      val page   = Jsoup.parse(contentAsString(submit))
-
-      page.body().select(".govuk-back-link").first shouldBe null
-
-    }
-
-    "contain back button if requested and the back url is valid" in new TestScope {
-
-      val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.valid.url"))(
-        request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
-      )
-      val page   = Jsoup.parse(contentAsString(submit))
-
-      page.body().select(".govuk-link")                       should have size 2
-      page.body().select(".govuk-link").get(1).attr("href") shouldBe "http://www.valid.url"
-    }
-
-    "not contain back button if requested and the back url is invalid" in new TestScope {
-
-      val submit = controller.unauthenticatedThanks(backUrl = Some("http://www.invalid.url"))(
-        request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
-      )
-      val page   = Jsoup.parse(contentAsString(submit))
-
-      page.body().select(".govuk-back-link").first shouldBe null
-
-    }
-  }
-
   "Submitting the partial feedback form" should {
 
     "show errors if the form is not filled in correctly" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
-      val result = controller.submitFeedbackPartialForm("tstUrl")(generateInvalidRequest())
+      val result = controller.partialSubmit("tstUrl")(generateInvalidRequest())
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
@@ -345,7 +281,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       hmrcConnectorWillReturnTheTicketId()
 
       val result =
-        controller.submitFeedbackPartialForm("tstUrl")(generateRequest(comments = "", canOmitComments = true))
+        controller.partialSubmit("tstUrl")(generateRequest(comments = "", canOmitComments = true))
 
       status(result) should be(200)
       val page = Jsoup.parse(contentAsString(result))
@@ -359,7 +295,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       hmrcConnectorWillReturnTheTicketId()
 
       val result =
-        controller.submitFeedbackPartialForm("tstUrl")(generateRequest(comments = "", canOmitComments = false))
+        controller.partialSubmit("tstUrl")(generateRequest(comments = "", canOmitComments = false))
 
       status(result) should be(400)
       val page = Jsoup.parse(contentAsString(result))
@@ -436,7 +372,6 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       hmrcDeskproConnector,
       authConnector,
       backUrlValidator,
-      app.configuration,
       Stubs.stubMessagesControllerComponents(),
       playFrontendFeedbackConfirmationPage,
       feedbackPartialForm,

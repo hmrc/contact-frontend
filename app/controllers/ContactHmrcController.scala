@@ -19,16 +19,13 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
-import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.DeskproEmailValidator
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
@@ -68,111 +65,64 @@ object ContactHmrcForm {
 class ContactHmrcController @Inject() (
   val hmrcDeskproConnector: HmrcDeskproConnector,
   val authConnector: AuthConnector,
-  val configuration: Configuration,
   mcc: MessagesControllerComponents,
   contactHmrcForm: contact_hmrc_form,
   contactHmrcFormConfirmation: contact_hmrc_form_confirmation,
   errorPage: InternalErrorPage,
-  playFrontendContactPage: ContactHmrcPage,
-  playFrontendContactConfirmationPage: ContactHmrcConfirmationPage
+  contactHmrcPage: ContactHmrcPage,
+  contactHmrcConfirmationPage: ContactHmrcConfirmationPage
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with AuthorisedFunctions
-    with LoginRedirection
     with I18nSupport
     with ContactFrontendActions {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  def index = Action.async { implicit request =>
-    loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway)) {
-      Future.successful {
-        val referrer  = request.headers.get(REFERER).getOrElse("n/a")
-        val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-        val form      = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, None, None))
-        val view      = contactPage(form, true, routes.ContactHmrcController.submit())
-        Ok(view)
-      }
-    })
-  }
-
-  def indexUnauthenticated(service: Option[String], userAction: Option[String], referrerUrl: Option[String]) =
+  def index(service: Option[String], userAction: Option[String], referrerUrl: Option[String]) =
     Action.async { implicit request =>
       Future.successful {
         val httpReferrer = request.headers.get(REFERER)
         val referrer     = referrerUrl orElse httpReferrer getOrElse "n/a"
         val csrfToken    = CSRF.getToken(request).map(_.value).getOrElse("")
         val form         = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, userAction))
-        val action       = routes.ContactHmrcController.submitUnauthenticated(service, userAction, referrerUrl)
-        val view         = contactPage(form, false, action)
+        val submit       = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
+        val view         = contactHmrcPage(form, submit)
         Ok(view)
       }
     }
 
-  private def contactPage(form: Form[ContactForm], isLoggedIn: Boolean, submit: Call)(implicit
-    request: Request[Any]
-  ) =
-    playFrontendContactPage(form, submit)
-
-  def submit = Action.async { implicit request =>
-    loginRedirection(routes.ContactHmrcController.index().url)(
-      authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments) { allEnrolments =>
-        handleSubmit(Some(allEnrolments), routes.ContactHmrcController.thanks(), None, None, None)
-      }
-    )
-  }
-
-  def submitUnauthenticated(
+  def submit(
     service: Option[String],
     userAction: Option[String],
     referrerUrl: Option[String]
   ): Action[AnyContent] =
     Action.async { implicit request =>
-      handleSubmit(None, routes.ContactHmrcController.thanksUnauthenticated(), service, userAction, referrerUrl)
-    }
-
-  private def handleSubmit(
-    enrolments: Option[Enrolments],
-    thanksRoute: Call,
-    service: Option[String],
-    userAction: Option[String],
-    referrerUrl: Option[String]
-  )(implicit request: Request[AnyContent]) =
-    ContactHmrcForm.form
-      .bindFromRequest()
-      .fold(
-        error => {
-          val submitUrl = {
-            if (enrolments.isDefined) routes.ContactHmrcController.submit()
-            else routes.ContactHmrcController.submitUnauthenticated(service, userAction, referrerUrl)
-          }
-          Future.successful(BadRequest(contactPage(error, isLoggedIn = enrolments.isDefined, submitUrl)))
-        },
-        data =>
-          createDeskproTicket(data, enrolments)
-            .map { ticketId =>
-              Redirect(thanksRoute).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
-            }
-            .recover { case _ =>
+      ContactHmrcForm.form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            val submit = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
+            Future.successful(BadRequest(contactHmrcPage(formWithErrors, submit)))
+          },
+          data =>
+            (for {
+              maybeEnrolments <- maybeAuthenticatedUserEnrolments
+              ticketId        <- createDeskproTicket(data, maybeEnrolments)
+            } yield {
+              val thanks = routes.ContactHmrcController.thanks()
+              Redirect(thanks).withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+            }).recover { case _ =>
               InternalServerError(errorPage())
             }
-      )
+        )
+    }
 
   def thanks = Action.async { implicit request =>
-    loginRedirection(routes.ContactHmrcController.index().url)(authorised(AuthProviders(GovernmentGateway)) {
-      doThanks(request)
-    })
+    Future.successful(Ok(contactHmrcConfirmationPage()))
   }
 
-  def thanksUnauthenticated = Action.async { implicit request =>
-    doThanks(request)
-  }
-
-  private def doThanks(implicit request: Request[AnyRef]) =
-    Future.successful(Ok(playFrontendContactConfirmationPage()))
-
-  def contactHmrcPartialForm(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Boolean) =
+  def partialIndex(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Boolean) =
     Action.async { implicit request =>
       Future.successful {
         Ok(
@@ -187,7 +137,7 @@ class ContactHmrcController @Inject() (
       }
     }
 
-  def submitContactHmrcPartialForm(resubmitUrl: String, renderFormOnly: Boolean) = Action.async { implicit request =>
+  def partialSubmit(resubmitUrl: String, renderFormOnly: Boolean) = Action.async { implicit request =>
     ContactHmrcForm.form
       .bindFromRequest()
       .fold(
@@ -202,7 +152,7 @@ class ContactHmrcController @Inject() (
       )
   }
 
-  def contactHmrcPartialFormConfirmation(ticketId: String) = Action { implicit request =>
+  def partialThanks(ticketId: String) = Action { implicit request =>
     Ok(contactHmrcFormConfirmation(ticketId))
   }
 }

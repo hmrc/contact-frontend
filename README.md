@@ -48,9 +48,13 @@ The contents of the *action* and *error* fields are concatenated and stored in t
 Newer services using play-frontend should follow the integration steps detailed 
 in [play-frontend-hmrc](https://github.com/hmrc/play-frontend-hmrc#helping-users-report-technical-issues).
 
-Historically, contact-frontend supported a version of the form that could be embedded within a service using either a 
+Historically, `contact-frontend` supported a version of the form that could be embedded within a service using either a 
 server-side partial or injected by Javascript. However, these mechanisms are not supported for services using play-frontend or
 play-nunjucks and are not recommended for reasons of accessibility and usability.
+
+Additionally, `contact-frontend` historically had versions of all standalone pages requiring tax service user login, and
+versions not requiring login on endpoints suffixed with "-unauthenticated". The login requirement has now been
+deprecated to improve accessibility and usability to all tax service users. 
 
 [[Back to the top]](#top)
 
@@ -67,8 +71,7 @@ This contact form contains only three input fields:
 Requests of this type are forwarded to *Deskpro* with the subject *"Contact form submission"*
 
 To use this form, render a link on your service to:
-* `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc-unauthenticated?service=${serviceId}` or
-* `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc?service=${serviceId}` if the user is authenticated
+* `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc?service=${serviceId}`
 
 '{environment}.' is not included in the case of the production environment.
 
@@ -78,7 +81,7 @@ functionality is *deprecated* and should not be used.
 For linking across domains, a querystring parameter, referrerUrl, can also be supplied. This parameter should 
 contain the full, absolute, properly encoded URL of the page the user was on before they navigated to
 the contact form. For example, a link from the SCP sign in page would look like 
-`https://www.tax.service.gov.uk/contact/contact-hmrc-unauthenticated?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds`
+`https://www.tax.service.gov.uk/contact/contact-hmrc?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds`
 
 The referrer field is passed to the Deskpro service and lets operators know which page the user was on when they asked to
 contact HMRC. If the referrerUrl is not supplied, the application will attempt to use the HTTP Header and userAction parameter (if present). 
@@ -133,15 +136,14 @@ This form consists of the following fields:
 Feedback responses are forwarded to Deskpro with the subject *"Beta feedback submission"*
 
 To use this form, render a link on your page to:
-* `https://www.{environment}.tax.service.gov.uk/contact/beta-feedback-unauthenticated?service=${serviceId}&additional parameters` or
-* `https://www.{environment}.tax.service.gov.uk/contact/beta-feedback?service=${serviceId}&additional parameters` if the user is authenticated
+* `https://www.{environment}.tax.service.gov.uk/contact/beta-feedback?service=${serviceId}&additional parameters`
 
 '{environment}.' is not included in the case of the production environment.
 
 Customization flags:
 * *service* - an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters
 * *canOmitComments* - consuming services can decide whether the 'comments' field is optional. To make this the case, the consuming service must add 'canOmitComments=true' field to the request
-* *backURL* - (only for standalone page mode). A 'Back' button redirecting the user back to the consuming service can be embedded into the Beta Feedback form. In order to achieve this, the consuming service has to specify a destination URL.
+* *backURL* - a 'Back' button redirecting the user back to the consuming service can be embedded into the Beta Feedback form. In order to achieve this, the consuming service has to specify a destination URL.
 
 `Send your feedback` historically also supported displaying the *Send your feedback* page as a partial; however, this
 functionality is *deprecated* and should not be used.
@@ -163,8 +165,7 @@ This form is linked to from [accessibility-statement-frontend](https://www.githu
 and is not intended to be used directly.
 
 Services that have not yet migrated to accessibility-statement-frontend display a link that opens a new tab to:
-* `https://www.{environment}.tax.service.gov.uk/contact/accessibility-unauthenticated?service=${serviceId}&referrerUrl=${referrerUrl}` or
-* `https://www.{environment}.tax.service.gov.uk/contact/accessility?service=${serviceId}&referrerUrl=${referrerUrl}` if the user is authenticated.
+* `https://www.{environment}.tax.service.gov.uk/contact/accessility?service=${serviceId}&referrerUrl=${referrerUrl}`
 
 `{environment}` is not included in the case of the production environment.
 
@@ -193,7 +194,7 @@ play.filters.cors.allowedOrigins.1: "https://www.{environment}.tax.service.gov.u
 
 ## Creating customized customer contact forms <a name="creating-own-customer-contact-forms"></a>
 
-Currently it is not possible to customize forms in ways other than described above. If you have business
+Currently, it is not possible to customize forms in ways other than described above. If you have business
 requirements to customize customer contact form, please get in touch with PlatUI team ([#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/))
 
 [[Back to the top]](#top)
