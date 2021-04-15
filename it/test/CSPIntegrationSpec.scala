@@ -50,7 +50,7 @@ class CSPIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
 
       headers(
         CONTENT_SECURITY_POLICY
-      ) shouldBe "default-src 'self' 'unsafe-inline' 'unsafe-eval' www.googletagmanager.com www.google-analytics.com cdnjs.cloudflare.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com data:"
+      ) should fullyMatch regex "object-src 'none'; script-src 'nonce-[^']+' 'self' 'unsafe-inline' 'strict-dynamic' 'sha256-[^']+' https: http:; base-uri 'none'"
     }
   }
 }
