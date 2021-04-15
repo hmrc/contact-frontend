@@ -23,7 +23,6 @@ trait AppConfig {
 
   def contactHmrcAboutTaxUrl: String
   def externalReportProblemUrl: String
-  def externalReportProblemSecureUrl: String
   def backUrlDestinationAllowList: Set[String]
   def loginCallback(continueUrl: String): String
   def enableLanguageSwitching: Boolean
@@ -46,9 +45,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
 
   override lazy val externalReportProblemUrl =
     s"$contactHost/contact/problem_reports"
-
-  override lazy val externalReportProblemSecureUrl =
-    s"$contactHost/contact/problem_reports_secure"
 
   override lazy val backUrlDestinationAllowList =
     loadConfigString("backUrlDestinationAllowList")
