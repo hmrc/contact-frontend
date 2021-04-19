@@ -16,7 +16,7 @@
 
 package views
 
-import _root_.helpers.{JsoupHelpers, MessagesSupport}
+import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import controllers.ContactForm
 import org.scalatest.matchers.should.Matchers
@@ -36,17 +36,9 @@ import views.html.ContactHmrcPage
 class ContactHmrcPageSpec
     extends AnyWordSpec
     with Matchers
-    with GuiceOneAppPerSuite
+    with ApplicationSupport
     with MessagesSupport
     with JsoupHelpers {
-
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"     -> false,
-        "metrics.enabled" -> false
-      )
-      .build()
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
 

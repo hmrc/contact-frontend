@@ -16,7 +16,7 @@
 
 package views
 
-import _root_.helpers.{JsoupHelpers, MessagesSupport}
+import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import model.SurveyForm
 import org.scalatest.matchers.should.Matchers
@@ -30,7 +30,7 @@ import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import views.html.SurveyPage
 
-class SurveyPageSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with MessagesSupport with JsoupHelpers {
+class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport with MessagesSupport with JsoupHelpers {
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
   implicit lazy val messages: Messages = getMessages(app, fakeRequest)

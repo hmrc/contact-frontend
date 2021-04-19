@@ -17,7 +17,7 @@
 package views
 
 import config.AppConfig
-import _root_.helpers.{JsoupHelpers, MessagesSupport}
+import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import model.ProblemReport
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -36,17 +36,9 @@ import play.api.test.CSRFTokenHelper._
 class ProblemReportsNonjsPageSpec
     extends AnyWordSpec
     with Matchers
-    with GuiceOneAppPerSuite
+    with ApplicationSupport
     with MessagesSupport
     with JsoupHelpers {
-
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"     -> false,
-        "metrics.enabled" -> false
-      )
-      .build()
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/problem_reports_nonjs").withCSRFToken
 

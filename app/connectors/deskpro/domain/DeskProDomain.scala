@@ -19,7 +19,7 @@ package connectors.deskpro.domain
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Request
-import uk.gov.hmrc.auth.core.Enrolments
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 case class Ticket private (
@@ -33,14 +33,10 @@ case class Ticket private (
   authId: String,
   areaOfTax: String,
   sessionId: String,
-  userTaxIdentifiers: UserTaxIdentifiers,
+  userTaxIdentifiers: Map[String, String],
   service: Option[String],
   userAction: Option[String]
 )
-
-object UserTaxIdentifiers {
-  implicit val formats = Json.format[UserTaxIdentifiers]
-}
 
 object Ticket extends FieldTransformer with Logging {
 
@@ -85,14 +81,6 @@ object TicketId {
 
 case class TicketId(ticket_id: Int)
 
-case class UserTaxIdentifiers(
-  nino: Option[String],
-  ctUtr: Option[String],
-  utr: Option[String],
-  vrn: Option[String],
-  empRef: Option[String]
-)
-
 case class Feedback(
   name: String,
   email: String,
@@ -105,7 +93,7 @@ case class Feedback(
   authId: String,
   areaOfTax: String,
   sessionId: String,
-  userTaxIdentifiers: UserTaxIdentifiers,
+  userTaxIdentifiers: Map[String, String],
   service: Option[String]
 )
 
@@ -159,26 +147,43 @@ trait FieldTransformer {
 
   def ynValueOf(javascript: Boolean) = if (javascript) "Y" else "N"
 
-  private def extractIdentifier(enrolments: Enrolments, enrolment: String, identifierKey: String): Option[String] =
-    enrolments.getEnrolment(enrolment).flatMap(_.identifiers.find(_.key == identifierKey)).map(_.value)
+  def userTaxIdentifiersFromEnrolments(enrolmentsOption: Option[Enrolments]): Map[String, String] =
+    enrolmentsOption map enrolmentsToTaxIdentifiers getOrElse Map.empty
 
-  def userTaxIdentifiersFromEnrolments(enrolmentsOption: Option[Enrolments]) =
-    enrolmentsOption
-      .map { enrolments =>
-        val nino  = extractIdentifier(enrolments, "HMRC-NI", "NINO")
-        val saUtr = extractIdentifier(enrolments, "IR-SA", "UTR")
-        val ctUtr = extractIdentifier(enrolments, "IR-CT", "UTR")
-        val vrn   = extractIdentifier(enrolments, "HMCE-VATDEC-ORG", "VATRegNo")
-          .orElse(extractIdentifier(enrolments, "HMCE-VATVAR-ORG", "VATRegNo"))
+  private def enrolmentsToTaxIdentifiers(enrolments: Enrolments) = enrolments.enrolments
+    .flatMap(
+      enrolmentToTaxIdentifiers
+    )
+    .toMap
 
-        val empRef =
-          for (
-            taxOfficeNumber <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeNumber");
-            taxOfficeRef    <- extractIdentifier(enrolments, "IR-PAYE", "TaxOfficeReference")
-          )
-            yield s"$taxOfficeNumber/$taxOfficeRef"
+  private def enrolmentToTaxIdentifiers(enrolment: Enrolment) =
+    enrolment match {
+      case enrolment if enrolment.key == "IR-PAYE" => extractEmpRef(enrolment).toMap
+      case _                                       => nonPayeEnrolmentToTaxIdentifiers(enrolment).toMap
+    }
 
-        UserTaxIdentifiers(nino, ctUtr, saUtr, vrn, empRef)
-      }
-      .getOrElse(UserTaxIdentifiers(None, None, None, None, None))
+  private def extractEmpRef(enrolment: Enrolment)                            =
+    for (
+      taxOfficeNumber <- extractIdentifier(enrolment, "TaxOfficeNumber");
+      taxOfficeRef    <- extractIdentifier(enrolment, "TaxOfficeReference")
+    )
+      yield "empRef" -> s"$taxOfficeNumber/$taxOfficeRef"
+
+  private def extractIdentifier(enrolment: Enrolment, identifierKey: String) =
+    enrolment.identifiers.find(_.key == identifierKey).map(_.value)
+
+  private def nonPayeEnrolmentToTaxIdentifiers(enrolment: Enrolment) =
+    enrolment.identifiers map { (identifier: EnrolmentIdentifier) =>
+      enrolmentIdentifierToTaxIdentifier(enrolment, identifier)
+    }
+
+  private def enrolmentIdentifierToTaxIdentifier(enrolment: Enrolment, identifier: EnrolmentIdentifier) =
+    (enrolment.key, identifier.key, identifier.value) match {
+      case ("HMRC-NI", "NINO", value)             => "nino"                          -> value
+      case ("IR-SA", "UTR", value)                => "utr"                           -> value
+      case ("IR-CT", "UTR", value)                => "ctUtr"                         -> value
+      case ("HMCE-VATVAR-ORG", "VATRegNo", value) => "vrn"                           -> value
+      case ("HMCE-VATDEC-ORG", "VATRegNo", value) => "vrn"                           -> value
+      case (enrolmentKey, identifierKey, value)   => s"$enrolmentKey/$identifierKey" -> value
+    }
 }
