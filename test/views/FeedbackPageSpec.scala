@@ -16,7 +16,7 @@
 
 package views
 
-import _root_.helpers.{JsoupHelpers, MessagesSupport}
+import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import model.FeedbackForm
 import org.scalatest.matchers.should.Matchers
@@ -34,7 +34,7 @@ import views.html.FeedbackPage
 class FeedbackPageSpec
     extends AnyWordSpec
     with Matchers
-    with GuiceOneAppPerSuite
+    with ApplicationSupport
     with MessagesSupport
     with JsoupHelpers {
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken

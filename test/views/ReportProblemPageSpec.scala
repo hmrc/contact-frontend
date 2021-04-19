@@ -17,16 +17,14 @@
 package views
 
 import config.AppConfig
+import _root_.helpers.{ApplicationSupport}
 import _root_.helpers.{JsoupHelpers, MessagesSupport}
 import model.ReportProblemForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -36,17 +34,9 @@ import play.api.test.CSRFTokenHelper._
 class ReportProblemPageSpec
     extends AnyWordSpec
     with Matchers
-    with GuiceOneAppPerSuite
+    with ApplicationSupport
     with MessagesSupport
     with JsoupHelpers {
-
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"     -> false,
-        "metrics.enabled" -> false
-      )
-      .build()
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/problem_reports_nonjs").withCSRFToken
 

@@ -29,8 +29,8 @@ class AkkaIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneServerP
   private def veryLongUrl      = s"$baseUrl&referrerUrl=https%3A%2F%2Fexample.com%2F" + ("x" * 10000)
   private def extremelyLongUrl = s"$baseUrl&referrerUrl=https%3A%2F%2Fexample.com%2F" + ("x" * 20000)
 
-  override lazy val app: Application =
-    new GuiceApplicationBuilder()
+  override def fakeApplication(): Application =
+    GuiceApplicationBuilder()
       .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "auditing.enabled" -> false)
       .build()
 
