@@ -131,6 +131,94 @@ class HmrcDeskproConnectorSpec
     }
   }
 
+  "createFeedback" should {
+    "POST standard enrolments" in new Setup {
+      val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
+
+      implicit val messages = messagesApi.preferred(request)
+
+      await(
+        createFeedback(
+          Enrolments(enrolments)
+        )
+      )
+
+      endpointServer.verify(
+        postRequestedFor(urlEqualTo("/deskpro/feedback"))
+          .withHeader("Content-Type", equalTo("application/json"))
+          .withRequestBody(
+            equalToJson(
+              """{
+                |"name":"Eric",
+                |"email":"eric@example.com",
+                |"subject":"Beta feedback submission",
+                |"message":"No comment given",
+                |"referrer":"",
+                |"javascriptEnabled":"Y",
+                |"userAgent":"n/a",
+                |"authId":"n/a",
+                |"areaOfTax":"unknown",
+                |"sessionId":"n/a",
+                |"userTaxIdentifiers":{
+                |  "nino":"SOME-NINO",
+                |  "ctUtr":"SOME-CT-UTR",
+                |  "utr":"SOME-SA-UTR",
+                |  "vrn":"SOME-VATDEC-VATRegNo",
+                |  "empRef":"SOME-TaxOfficeNumber/SOME-TaxOfficeReference"
+                |},
+                |"service":"example-frontend",
+                |"rating":"4"
+                |}""".stripMargin
+            )
+          )
+      )
+    }
+
+    "POST additional enrolments" in new Setup {
+      val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
+
+      implicit val messages = messagesApi.preferred(request)
+
+      await(
+        createFeedback(
+          Enrolments(enrolments ++ additionalEnrolments)
+        )
+      )
+
+      endpointServer.verify(
+        postRequestedFor(urlEqualTo("/deskpro/feedback"))
+          .withHeader("Content-Type", equalTo("application/json"))
+          .withRequestBody(
+            equalToJson(
+              """{
+                |"name":"Eric",
+                |"email":"eric@example.com",
+                |"subject":"Beta feedback submission",
+                |"message":"No comment given",
+                |"referrer":"",
+                |"javascriptEnabled":"Y",
+                |"userAgent":"n/a",
+                |"authId":"n/a",
+                |"areaOfTax":"unknown",
+                |"sessionId":"n/a",
+                |"userTaxIdentifiers":{
+                |  "nino":"SOME-NINO",
+                |  "ctUtr":"SOME-CT-UTR",
+                |  "utr":"SOME-SA-UTR",
+                |  "vrn":"SOME-VATDEC-VATRegNo",
+                |  "empRef":"SOME-TaxOfficeNumber/SOME-TaxOfficeReference",
+                |  "HMCE-VAT-AGNT/AgentRefNo":"FOO",
+                |  "HMRC-AWRS-ORG/AWRSRefNumber":"BAR"
+                |},
+                |"service":"example-frontend",
+                |"rating":"4"
+                |}""".stripMargin
+            )
+          )
+      )
+    }
+  }
+
   class Setup {
     def hmrcDeskproConnector = app.injector.instanceOf[HmrcDeskproConnector]
 
@@ -149,6 +237,22 @@ class HmrcDeskproConnectorSpec
         enrolmentsOption = Some(enrolments),
         service = Some("example-frontend"),
         userAction = None
+      )
+    }
+
+    def createFeedback(enrolments: Enrolments) = {
+      implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+      hmrcDeskproConnector.createFeedback(
+        name = "Eric",
+        email = "eric@example.com",
+        rating = "4",
+        subject = "Beta feedback submission",
+        message = "No comment given",
+        referrer = "",
+        isJavascript = true,
+        request = request,
+        enrolmentsOption = Some(enrolments),
+        service = Some("example-frontend")
       )
     }
 
