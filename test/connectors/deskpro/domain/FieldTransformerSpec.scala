@@ -82,6 +82,10 @@ class FieldTransformerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       )
     }
 
+    "remove empty values from UserTaxIdentifiers" in new FieldTransformerScope {
+      transformer.userTaxIdentifiersFromEnrolments(Some(emptyEnrolments)) shouldBe Map.empty
+    }
+
     "transform business tax authorised user to UserTaxIdentifiers containing all the Business Tax Identifiers (and HMCE-VATDEC-ORG endorsement)" in new FieldTransformerScope {
       transformer.userTaxIdentifiersFromEnrolments(Some(bizTaxUserWithVatDec)) shouldBe Map(
         "utr"    -> "sa",
@@ -121,6 +125,13 @@ class FieldTransformerScope {
     Enrolments(
       Set(
         Enrolment("HMRC-NI").withIdentifier("NINO", "SH233544B")
+      )
+    )
+
+  lazy val emptyEnrolments =
+    Enrolments(
+      Set(
+        Enrolment("HMRC-NI").withIdentifier("NINO", "")
       )
     )
 

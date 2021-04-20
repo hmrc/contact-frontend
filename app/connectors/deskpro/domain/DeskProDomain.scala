@@ -154,6 +154,7 @@ trait FieldTransformer {
     .flatMap(
       enrolmentToTaxIdentifiers
     )
+    .filter(_._2.nonEmpty)
     .toMap
 
   private def enrolmentToTaxIdentifiers(enrolment: Enrolment) =
