@@ -26,12 +26,14 @@ GET         /contact-hmrc-unauthenticated                @controllers.ContactHmr
 POST        /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.submit(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
 GET         /contact-hmrc/thanks-unauthenticated         @controllers.ContactHmrcController.thanks
 
-GET         /problem_reports_nonjs                       @controllers.ProblemReportsController.index(service: Option[String])
-POST        /problem_reports_nonjs                       @controllers.ProblemReportsController.submit(service: Option[String])
-GET         /problem_reports                             @controllers.ProblemReportsController.partialIndex(csrfToken: Option[String], service: Option[String])
-POST        /problem_reports                             @controllers.ProblemReportsController.submit(service: Option[String])
-GET         /problem_reports_ajax                        @controllers.ProblemReportsController.partialAjaxIndex(service: Option[String])
-POST        /problem_reports_secure                      @controllers.ProblemReportsController.submit(service: Option[String])
+GET         /report-technical-problem                    @controllers.ReportProblemController.index(service: Option[String])
+POST        /report-technical-problem                    @controllers.ReportProblemController.submit(service: Option[String])
+GET         /problem_reports_nonjs                       @controllers.ReportProblemController.index(service: Option[String])
+POST        /problem_reports_nonjs                       @controllers.ReportProblemController.submit(service: Option[String])
+GET         /problem_reports                             @controllers.ReportProblemController.partialIndex(csrfToken: Option[String], service: Option[String])
+POST        /problem_reports                             @controllers.ReportProblemController.submitDeprecated(service: Option[String])
+GET         /problem_reports_ajax                        @controllers.ReportProblemController.partialAjaxIndex(service: Option[String])
+POST        /problem_reports_secure                      @controllers.ReportProblemController.submitDeprecated(service: Option[String])
 
 GET			    /survey				 	                             @controllers.SurveyController.survey(ticketId: String, serviceId: String)
 POST		    /survey                                      @controllers.SurveyController.submit(ticketId: String, serviceId: String)

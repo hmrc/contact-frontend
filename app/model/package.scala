@@ -27,7 +27,7 @@ case class AccessibilityForm(
   userAction: Option[String] = None
 )
 
-case class ProblemReport(
+case class ReportProblemForm(
   reportName: String,
   reportEmail: String,
   reportAction: String,

@@ -19,7 +19,7 @@
 
 @this()
 
-@(problemReportForm : Form[model.ProblemReport], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages)
+@(problemReportForm : Form[model.ReportProblemForm], actionUrl: String, csrfToken: Option[String], service : Option[String], referrer : Option[String])(implicit request : Request[_], lang : Lang, messages : Messages)
 
 <h2>@messages("problem_report.heading")</h2>
 <p>@messages("problem_report.paragraph.1")</p>
@@ -42,7 +42,7 @@
         _id = Some("report-name"),
         _maxlength = Some(70),
         _dataProperties = Map(
-            "data-rule-pattern" -> controllers.ProblemReportForm.REPORT_NAME_REGEX,
+            "data-rule-pattern" -> controllers.ReportProblemFormBind.REPORT_NAME_REGEX,
             "data-msg-pattern" -> messages("problem_report.name.error.valid"),
             "data-rule-required" -> "true",
             "data-msg-required" -> messages("problem_report.name.error.required")

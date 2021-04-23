@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import model.ProblemReport
+@import model.ReportProblemForm
 @import views.html.components.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
 
 @this(
@@ -33,7 +33,7 @@
     h2: Heading2,
     p: Paragraph
 )
-@(problemReportForm: Form[ProblemReport], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(problemReportForm: Form[ReportProblemForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @pageTitle = @{
     if(problemReportForm.hasErrors){Messages("error.browser.title.prefix") + " " + Messages("problem_report.title")}

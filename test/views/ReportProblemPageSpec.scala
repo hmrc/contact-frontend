@@ -18,7 +18,7 @@ package views
 
 import config.AppConfig
 import _root_.helpers.{JsoupHelpers, MessagesSupport}
-import model.ProblemReport
+import model.ReportProblemForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -30,10 +30,10 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.{AccessibilityProblemPage, ProblemReportsNonjsPage}
+import views.html.ReportProblemPage
 import play.api.test.CSRFTokenHelper._
 
-class ProblemReportsNonjsPageSpec
+class ReportProblemPageSpec
     extends AnyWordSpec
     with Matchers
     with GuiceOneAppPerSuite
@@ -54,7 +54,7 @@ class ProblemReportsNonjsPageSpec
 
   implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
-  val problemReportsForm: Form[ProblemReport] = Form[ProblemReport](
+  val problemReportsForm: Form[ReportProblemForm] = Form[ReportProblemForm](
     mapping(
       "report-name"   -> text.verifying("problem_report.name.error.required", msg => !msg.isEmpty),
       "report-email"  -> text.verifying("problem_report.email.error.required", msg => !msg.isEmpty),
@@ -64,10 +64,10 @@ class ProblemReportsNonjsPageSpec
       "service"       -> optional(text),
       "referrer"      -> optional(text),
       "userAction"    -> optional(text)
-    )(ProblemReport.apply)(ProblemReport.unapply)
+    )(ReportProblemForm.apply)(ReportProblemForm.unapply)
   )
 
-  val formValues: ProblemReport = ProblemReport(
+  val formValues: ReportProblemForm = ReportProblemForm(
     reportName = "Test Person",
     reportEmail = "test@example.com",
     reportAction = "Testing action",
@@ -81,8 +81,8 @@ class ProblemReportsNonjsPageSpec
   val action: Call = Call(method = "POST", url = "/contact/submit-error-feedback")
 
   "the Problem Reports standalone page" should {
-    val problemReportsNonjsPage = app.injector.instanceOf[ProblemReportsNonjsPage]
-    val content                 = problemReportsNonjsPage(problemReportsForm, action)
+    val reportProblemPage = app.injector.instanceOf[ReportProblemPage]
+    val content           = reportProblemPage(problemReportsForm, action)
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")
@@ -93,7 +93,7 @@ class ProblemReportsNonjsPageSpec
 
     "translate the hmrc banner into Welsh if requested" in {
       implicit val messages: Messages = getWelshMessages
-      val welshContent                = problemReportsNonjsPage(problemReportsForm, action)
+      val welshContent                = reportProblemPage(problemReportsForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -123,7 +123,7 @@ class ProblemReportsNonjsPageSpec
 
     "translate the help text into Welsh if requested" in {
       implicit val messages: Messages = getWelshMessages
-      val welshContent                = problemReportsNonjsPage(problemReportsForm, action)
+      val welshContent                = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
       paragraphs.first.text should include("Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.")
@@ -137,7 +137,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include the correct form action attribute" in {
-      val content = problemReportsNonjsPage(problemReportsForm, action)
+      val content = reportProblemPage(problemReportsForm, action)
 
       val forms = content.select("form[id=error-feedback-form]")
       forms                      should have size 1
@@ -149,7 +149,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include the service hidden input" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fill(
           formValues.copy(service = Some("my-service-name"))
         ),
@@ -161,7 +161,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include the referrer hidden input" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fill(
           formValues.copy(referrer = Some("my-referrer-url"))
         ),
@@ -173,7 +173,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include the userAction hidden input" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fill(
           formValues.copy(userAction = Some("my-user-action"))
         ),
@@ -190,7 +190,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include an error summary if errors occur" in {
-      val contentWithErrors = problemReportsNonjsPage(
+      val contentWithErrors = reportProblemPage(
         problemReportsForm.fillAndValidate(
           formValues.copy(reportName = "", reportEmail = "", reportAction = "", reportError = "")
         ),
@@ -202,7 +202,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include Error: in the title if errors occur" in {
-      val contentWithErrors = problemReportsNonjsPage(
+      val contentWithErrors = reportProblemPage(
         problemReportsForm.fillAndValidate(
           formValues.copy(reportName = "", reportEmail = "", reportAction = "", reportError = "")
         ),
@@ -227,7 +227,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include an error message for the problem input when a validation error exists" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fillAndValidate(
           formValues.copy(reportAction = "")
         ),
@@ -239,7 +239,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include the submitted problem input value" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fill(
           formValues.copy(reportAction = "Something went wrong for me")
         ),
@@ -252,7 +252,7 @@ class ProblemReportsNonjsPageSpec
 
     "translate the report action textarea label into Welsh if requested" in {
       implicit val messages: Messages = getWelshMessages
-      val welshContent                = problemReportsNonjsPage(problemReportsForm, action)
+      val welshContent                = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("label[for=report-action]")
       paragraphs.first.text should be("Beth oeddech yn ei wneud?")
@@ -270,7 +270,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include an error message for the report an error input when a validation error exists" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fillAndValidate(
           formValues.copy(reportError = "")
         ),
@@ -282,7 +282,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include the submitted report an error input value" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fill(
           formValues.copy(reportError = "This was the error I saw")
         ),
@@ -295,7 +295,7 @@ class ProblemReportsNonjsPageSpec
 
     "translate the report an error textarea label into Welsh if requested" in {
       implicit val messages: Messages = getWelshMessages
-      val welshContent                = problemReportsNonjsPage(problemReportsForm, action)
+      val welshContent                = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("label[for=report-error]")
       paragraphs.first.text should be("Gyda beth ydych angen help?")
@@ -323,7 +323,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include an error message for the name input" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fillAndValidate(
           formValues.copy(reportName = "")
         ),
@@ -335,7 +335,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include the submitted name input value" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fill(
           formValues.copy(reportName = "AN Other")
         ),
@@ -374,7 +374,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include an error message for the email input if a validation error exists" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fillAndValidate(
           formValues.copy(reportEmail = "")
         ),
@@ -386,7 +386,7 @@ class ProblemReportsNonjsPageSpec
     }
 
     "include the submitted email input value" in {
-      val contentWithService = problemReportsNonjsPage(
+      val contentWithService = reportProblemPage(
         problemReportsForm.fill(
           formValues.copy(reportEmail = "bloggs@example.com")
         ),

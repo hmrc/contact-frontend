@@ -26,9 +26,9 @@ import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
-import views.html.ProblemReportsNonjsConfirmationPage
+import views.html.ReportProblemConfirmationPage
 
-class ProblemReportsNonjsConfirmationPageSpec
+class ReportProblemConfirmationPageSpec
     extends AnyWordSpec
     with Matchers
     with GuiceOneAppPerSuite
@@ -48,7 +48,7 @@ class ProblemReportsNonjsConfirmationPageSpec
   implicit lazy val appConfig: AppConfig       = app.injector.instanceOf[AppConfig]
 
   "the Problem Reports standalone confirmation page" should {
-    val confirmationPage = app.injector.instanceOf[ProblemReportsNonjsConfirmationPage]
+    val confirmationPage = app.injector.instanceOf[ReportProblemConfirmationPage]
     val content          = confirmationPage()
 
     "include the H1 element with page title" in {
