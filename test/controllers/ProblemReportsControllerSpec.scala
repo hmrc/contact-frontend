@@ -57,7 +57,7 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
 
   "Requesting the standalone non-JavaScript page" should {
     "return 200 and valid HTML" in new TestScope {
-      val result = controller.reportFormNonJavaScript(Some("my-test-service"))(FakeRequest())
+      val result = controller.index(Some("my-test-service"))(FakeRequest())
 
       status(result) should be(200)
 
@@ -75,109 +75,57 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
 
   "Reporting a problem" should {
 
-    "return 200 and a valid html page for a valid request with " +
-      "JavaScript disabled for an unauthenticated user" in new TestScope {
+    "return 200 and a valid html page for a valid request with JavaScript disabled" in new TestScope {
 
-        hrmcConnectorWillReturnTheTicketId
+      hrmcConnectorWillReturnTheTicketId
 
-        val request = generateRequest(javascriptEnabled = false)
-        val result  = controller.submit()(request)
+      val request = generateRequest(javascriptEnabled = false)
+      val result  = controller.submit(None)(request)
 
-        status(result) should be(200)
+      status(result) should be(200)
 
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("govuk-error-summary").size() should be(0)
-        document.getElementsByClass("govuk-body").text()          should be(
-          "Someone will get back to you within 2 working days."
-        )
-      }
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementsByClass("govuk-error-summary").size() should be(0)
+      document.getElementsByClass("govuk-body").text()          should be(
+        "Someone will get back to you within 2 working days."
+      )
+    }
 
-    "return 200 and a valid html page for a valid request with " +
-      "JavaScript disabled for an unauthenticated user on standalone page" in new TestScope {
+    "return 200 and a valid json for a valid request with JavaScript enabled" in new TestScope {
+      when(
+        hmrcDeskproConnector.createDeskProTicket(
+          meq("John Densmore"),
+          meq("name@mail.com"),
+          meq("Support Request"),
+          meq(controller.problemMessage("Some Action", "Some Error")),
+          meq("/contact/problem_reports"),
+          meq(true),
+          any[Request[AnyRef]](),
+          meq(None),
+          meq(None),
+          meq(None)
+        )(any(classOf[HeaderCarrier]))
+      ).thenReturn(Future.successful(TicketId(123)))
 
-        hrmcConnectorWillReturnTheTicketId
+      val request = generateRequest(javascriptEnabled = true)
+      val result  = controller.submit(None)(request)
 
-        val request = generateRequest(javascriptEnabled = false)
-        val result  = controller.submitNonJavaScript(service = None)(request)
+      status(result) should be(200)
 
-        status(result) should be(200)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("govuk-error-summary").size() should be(0)
-        document.getElementsByClass("govuk-body").text()          should be(
-          "Someone will get back to you within 2 working days."
-        )
-      }
-
-    "return 200 and a valid html page for a valid request with " +
-      "JavaScript disabled for an authenticated user" in new TestScope {
-        when(
-          hmrcDeskproConnector.createDeskProTicket(
-            meq("John Densmore"),
-            meq("name@mail.com"),
-            meq("Support Request"),
-            meq(controller.problemMessage("Some Action", "Some Error")),
-            meq("/contact/problem_reports"),
-            meq(false),
-            any[Request[AnyRef]](),
-            meq(enrolments),
-            meq(None),
-            meq(None)
-          )(any(classOf[HeaderCarrier]))
-        ).thenReturn(Future.successful(TicketId(123)))
-
-        val request = generateRequest(
-          javascriptEnabled = false
-        ).withSession(
-          SessionKeys.authToken -> "authToken"
-        )
-        val result  = controller.submit()(request)
-
-        status(result) should be(200)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("govuk-error-summary").size() should be(0)
-        document.getElementsByClass("govuk-body").text()          should be(
-          "Someone will get back to you within 2 working days."
-        )
-      }
-
-    "return 200 and a valid json for a valid request with " +
-      "JavaScript enabled" in new TestScope {
-        when(
-          hmrcDeskproConnector.createDeskProTicket(
-            meq("John Densmore"),
-            meq("name@mail.com"),
-            meq("Support Request"),
-            meq(controller.problemMessage("Some Action", "Some Error")),
-            meq("/contact/problem_reports"),
-            meq(true),
-            any[Request[AnyRef]](),
-            meq(None),
-            meq(None),
-            meq(None)
-          )(any(classOf[HeaderCarrier]))
-        ).thenReturn(Future.successful(TicketId(123)))
-
-        val request = generateRequest(javascriptEnabled = true)
-        val result  = controller.submit()(request)
-
-        status(result) should be(200)
-
-        val message = contentAsJson(result).\("message").as[String]
-        contentAsJson(result).\("status").as[String] shouldBe "OK"
-        message                                        should include(
-          "<h2 id=\"feedback-thank-you-header\">Thank you</h2>"
-        )
-        message                                        should include(
-          "Someone will get back to you within 2 working days."
-        )
-      }
+      val message = contentAsJson(result).\("message").as[String]
+      contentAsJson(result).\("status").as[String] shouldBe "OK"
+      message                                        should include(
+        "<h2 id=\"feedback-thank-you-header\">Thank you</h2>"
+      )
+      message                                        should include(
+        "Someone will get back to you within 2 working days."
+      )
+    }
 
     "return 200 and a valid html page with validation error for invalid input with " +
       "JavaScript disabled" in new TestScope {
         val result =
-          controller.submit()(generateInvalidRequest(javascriptEnabled = false))
+          controller.submit(None)(generateInvalidRequest(javascriptEnabled = false))
 
         status(result) should be(200)
         verifyZeroInteractions(hmrcDeskproConnector)
@@ -189,7 +137,7 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
     "return 400 and a valid json containing validation errors for invalid input with " +
       "JavaScript enabled" in new TestScope {
 
-        val result = controller.submit()(generateInvalidRequest())
+        val result = controller.submit(None)(generateInvalidRequest())
 
         status(result)                                 should be(400)
         verifyZeroInteractions(hmrcDeskproConnector)
@@ -199,7 +147,7 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
 
     "fail if the email has invalid syntax (for DeskPRO)" in new TestScope {
       val request = generateRequest(javascriptEnabled = false, email = "a@a")
-      val submit  = controller.submit()(request)
+      val submit  = controller.submit(None)(request)
       val page    = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe 200
@@ -208,47 +156,45 @@ class ProblemReportsControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite 
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
-    "fail if the name has invalid characters with " +
-      "Javascript disabled" in new TestScope {
-        val request = generateRequest(
-          javascriptEnabled = false,
-          name = """<a href="blah.com">something</a>"""
-        ).withSession(
-          SessionKeys.authToken -> "authToken"
-        )
-        val submit  = controller.submit()(request)
-        val page    = Jsoup.parse(contentAsString(submit))
+    "fail if the name has invalid characters with Javascript disabled" in new TestScope {
+      val request = generateRequest(
+        javascriptEnabled = false,
+        name = """<a href="blah.com">something</a>"""
+      ).withSession(
+        SessionKeys.authToken -> "authToken"
+      )
+      val submit  = controller.submit(None)(request)
+      val page    = Jsoup.parse(contentAsString(submit))
 
-        status(submit) shouldBe 200
-        verifyZeroInteractions(hmrcDeskproConnector)
+      status(submit) shouldBe 200
+      verifyZeroInteractions(hmrcDeskproConnector)
 
-        page.getElementsByClass("govuk-error-summary").size() should be > 0
-      }
+      page.getElementsByClass("govuk-error-summary").size() should be > 0
+    }
 
-    "return error page if the Deskpro ticket creation fails with " +
-      "Javascript disabled" in new TestScope {
-        when(
-          hmrcDeskproConnector.createDeskProTicket(
-            meq("John Densmore"),
-            meq("name@mail.com"),
-            meq("Support Request"),
-            meq(controller.problemMessage("Some Action", "Some Error")),
-            meq("/contact/problem_reports"),
-            meq(false),
-            any[Request[AnyRef]](),
-            meq(None),
-            meq(None),
-            meq(None)
-          )(any(classOf[HeaderCarrier]))
-        ).thenReturn(Future.failed(new Exception("failed")))
+    "return error page if the Deskpro ticket creation fails with Javascript disabled" in new TestScope {
+      when(
+        hmrcDeskproConnector.createDeskProTicket(
+          meq("John Densmore"),
+          meq("name@mail.com"),
+          meq("Support Request"),
+          meq(controller.problemMessage("Some Action", "Some Error")),
+          meq("/contact/problem_reports"),
+          meq(false),
+          any[Request[AnyRef]](),
+          meq(None),
+          meq(None),
+          meq(None)
+        )(any(classOf[HeaderCarrier]))
+      ).thenReturn(Future.failed(new Exception("failed")))
 
-        val request = generateRequest(javascriptEnabled = false)
-        val result  = controller.submit()(request)
-        status(result) should be(500)
+      val request = generateRequest(javascriptEnabled = false)
+      val result  = controller.submit(None)(request)
+      status(result) should be(500)
 
-        val document = Jsoup.parse(contentAsString(result))
-        document.text() should include("Try again later.")
-      }
+      val document = Jsoup.parse(contentAsString(result))
+      document.text() should include("Try again later.")
+    }
 
   }
 

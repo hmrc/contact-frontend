@@ -23,8 +23,6 @@ class TestAppConfig extends AppConfig {
 
   def externalReportProblemUrl: String = ???
 
-  def externalReportProblemSecureUrl: String = ???
-
   def backUrlDestinationAllowList: Set[String] = ???
 
   def loginCallback(continueUrl: String): String = ???

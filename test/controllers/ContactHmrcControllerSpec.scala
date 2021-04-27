@@ -68,16 +68,39 @@ class ContactHmrcControllerSpec
 
   "ContactHmrcController" should {
 
-    "return expected OK for non-authenticated index page" in new TestScope {
+    "return expected OK for index page with no URL parameters" in new TestScope {
+      Given("a GET request")
+      mockDeskproConnector(Future.successful(TicketId(12345)))
+
+      val contactRequest = FakeRequest().withHeaders((REFERER, "/some-service-page"))
+
+      When("the page is requested with a service name via headers")
+      val contactResult =
+        controller.index(None, None, None)(contactRequest)
+
+      Then("the expected page should be returned")
+      status(contactResult) shouldBe 200
+
+      val page = Jsoup.parse(contentAsString(contactResult))
+      page
+        .body()
+        .select("form[id=contact-hmrc-form]")
+        .first
+        .attr("action")                                    shouldBe s"/contact/contact-hmrc"
+      page.body().getElementById("referrer").attr("value") shouldBe "/some-service-page"
+      page.body().getElementById("service").attr("value")  shouldBe ""
+    }
+
+    "return expected OK for index page with URL parameters" in new TestScope {
       Given("a GET request")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
       val contactRequest = FakeRequest().withHeaders((REFERER, "/some-service-page"))
       val serviceName    = Some("my-fake-service")
 
-      When("the unauthenticated Contact HMRC page is requested with a service name")
+      When("the page is requested with a service name via URL")
       val contactResult =
-        controller.indexUnauthenticated(serviceName, Some("my-action"), Some("/url-from-query"))(contactRequest)
+        controller.index(serviceName, Some("my-action"), Some("/url-from-query"))(contactRequest)
 
       Then("the expected page should be returned")
       status(contactResult) shouldBe 200
@@ -88,7 +111,7 @@ class ContactHmrcControllerSpec
         .body()
         .select("form[id=contact-hmrc-form]")
         .first
-        .attr("action")                                    shouldBe s"/contact/contact-hmrc-unauthenticated?$queryString"
+        .attr("action")                                    shouldBe s"/contact/contact-hmrc?$queryString"
       page.body().getElementById("referrer").attr("value") shouldBe "/url-from-query"
       page.body().getElementById("service").attr("value")  shouldBe "my-fake-service"
     }
@@ -101,8 +124,8 @@ class ContactHmrcControllerSpec
       val serviceName    = Some("my-fake-service")
       val referrerUrl    = Some("https://www.example.com/some-service")
 
-      When("the unauthenticated Contact HMRC page is requested with a service name and a referrer url")
-      val contactResult = controller.indexUnauthenticated(serviceName, None, referrerUrl)(contactRequest)
+      When("the page is requested with a service name and a referrer url")
+      val contactResult = controller.index(serviceName, None, referrerUrl)(contactRequest)
 
       Then("the referrer hidden input should contain that value")
       val page = Jsoup.parse(contentAsString(contactResult))
@@ -116,15 +139,15 @@ class ContactHmrcControllerSpec
       val contactRequest = FakeRequest()
       val serviceName    = Some("my-fake-service")
 
-      When("the unauthenticated Contact HMRC page is requested with a service name")
-      val contactResult = controller.indexUnauthenticated(serviceName, None, None)(contactRequest)
+      When("the page is requested with a service name")
+      val contactResult = controller.index(serviceName, None, None)(contactRequest)
 
       Then("the referrer hidden input should be n/a")
       val page = Jsoup.parse(contentAsString(contactResult))
       page.body().getElementById("referrer").attr("value") shouldBe "n/a"
     }
 
-    "return expected OK for non-authenticated submit page" in new TestScope {
+    "return expected OK for submit page" in new TestScope {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -141,12 +164,12 @@ class ContactHmrcControllerSpec
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
-      When("the request is POSTed to unauthenticated submit contact page")
-      val submitResult = controller.submitUnauthenticated(None, None, None)(contactRequest)
+      When("the request is POSTed to submit contact page")
+      val submitResult = controller.submit(None, None, None)(contactRequest)
 
       Then("the user is redirected to the thanks page")
       status(submitResult)               shouldBe 303
-      redirectLocation(submitResult).get shouldBe "/contact/contact-hmrc/thanks-unauthenticated"
+      redirectLocation(submitResult).get shouldBe "/contact/contact-hmrc/thanks"
 
       Then("the message is sent to the Deskpro connector")
       Mockito
@@ -182,8 +205,8 @@ class ContactHmrcControllerSpec
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
-      When("the request is POSTed to unauthenticated submit contact page")
-      controller.submitUnauthenticated(None, None, None)(contactRequest)
+      When("the request is POSTed to submit contact page")
+      controller.submit(None, None, None)(contactRequest)
 
       Then("the message is sent to the Deskpro connector")
       Mockito
@@ -219,8 +242,8 @@ class ContactHmrcControllerSpec
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
-      When("the request is POSTed to unauthenticated submit contact page")
-      controller.submitUnauthenticated(None, None, None)(contactRequest)
+      When("the request is POSTed to submit contact page")
+      controller.submit(None, None, None)(contactRequest)
 
       Then("the message is sent to the Deskpro connector")
       Mockito
@@ -253,7 +276,7 @@ class ContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
+      val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -283,7 +306,7 @@ class ContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
+      val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -310,7 +333,7 @@ class ContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
+      val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -337,7 +360,7 @@ class ContactHmrcControllerSpec
       )
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
+      val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -361,7 +384,7 @@ class ContactHmrcControllerSpec
         "userAction"       -> "/overridden/path"
       )
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
-      val result         = controller.submitUnauthenticated(None, None, None)(contactRequest)
+      val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
 
@@ -373,7 +396,7 @@ class ContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.name.error.length"))) shouldBe true
     }
 
-    "return expected Internal Error when hmrc-deskpro errors for non-authenticated submit page" in new TestScope {
+    "return expected Internal Error when hmrc-deskpro errors for submit page" in new TestScope {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.failed(new Exception("This is an expected test error")))
 
@@ -389,8 +412,8 @@ class ContactHmrcControllerSpec
 
       val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
 
-      When("the request is POSTed to unauthenticated submit contact page")
-      val submitResult = controller.submitUnauthenticated(None, None, None)(contactRequest)
+      When("the request is POSTed to submit contact page")
+      val submitResult = controller.submit(None, None, None)(contactRequest)
 
       And("the Deskpro connector fails")
 
@@ -398,13 +421,13 @@ class ContactHmrcControllerSpec
       status(submitResult) shouldBe 500
     }
 
-    "return expected OK for non-authenticated thanks page" in new TestScope {
+    "return expected OK for thanks page" in new TestScope {
       Given("a GET request")
 
       val contactRequest = FakeRequest().withSession(("ticketId", "12345"))
 
-      When("the unauthenticated Thanks for contacting HMRC page is requested")
-      val thanksResult = controller.thanksUnauthenticated(contactRequest)
+      When("the Thanks for contacting HMRC page is requested")
+      val thanksResult = controller.thanks(contactRequest)
 
       Then("the expected page should be returned")
       status(thanksResult) shouldBe 200
@@ -435,7 +458,7 @@ class ContactHmrcControllerSpec
 
       When("we submit the request")
       val result =
-        controller.submitContactHmrcPartialForm(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
+        controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
 
       Then("ticket is sent to deskpro")
       Mockito
@@ -470,7 +493,7 @@ class ContactHmrcControllerSpec
 
       When("we submit the request")
       val result =
-        controller.submitContactHmrcPartialForm(resubmitUrl = resubmitUrl, renderFormOnly = true)(contactRequest)
+        controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = true)(contactRequest)
 
       Then("ticket is not sent to deskpro")
       Mockito.verifyZeroInteractions(hmrcDeskproConnector)
@@ -495,7 +518,7 @@ class ContactHmrcControllerSpec
 
       When("we submit the request")
       val result =
-        controller.submitContactHmrcPartialForm(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
+        controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
 
       Then("ticket is not sent to deskpro")
       Mockito.verifyZeroInteractions(hmrcDeskproConnector)
@@ -531,7 +554,7 @@ class ContactHmrcControllerSpec
 
       When("we submit the request")
       val result =
-        controller.submitContactHmrcPartialForm(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
+        controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
 
       Then("ticket is sent to deskpro")
       Mockito
@@ -579,7 +602,6 @@ class ContactHmrcControllerSpec
       new ContactHmrcController(
         hmrcDeskproConnector,
         authConnector,
-        configuration,
         Stubs.stubMessagesControllerComponents(messagesApi = messages),
         contactForm,
         contactFormConfirmation,

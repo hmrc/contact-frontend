@@ -25,13 +25,10 @@ import play.api.data.Forms._
 import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
-import play.api.Configuration
+import play.api.mvc.{MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
-import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolments}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
 import views.html.partials.{feedback_form, feedback_form_confirmation}
@@ -45,157 +42,71 @@ import scala.concurrent.{ExecutionContext, Future}
   val hmrcDeskproConnector: HmrcDeskproConnector,
   val authConnector: AuthConnector,
   val accessibleUrlValidator: BackUrlValidator,
-  val configuration: Configuration,
   mcc: MessagesControllerComponents,
-  playFrontendFeedbackConfirmationPage: FeedbackConfirmationPage,
+  feedbackConfirmationPage: FeedbackConfirmationPage,
   feedbackFormPartial: feedback_form,
   feedbackFormConfirmationPartial: feedback_form_confirmation,
-  playFrontendFeedbackPage: FeedbackPage,
+  feedbackPage: FeedbackPage,
   errorPage: InternalErrorPage
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport
-    with AuthorisedFunctions
-    with LoginRedirection
     with ContactFrontendActions {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   val formId = "FeedbackForm"
 
-  def feedbackForm(service: Option[String] = None, backUrl: Option[String] = None, canOmitComments: Boolean) =
+  def index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean) =
     Action.async { implicit request =>
-      loginRedirection(routes.FeedbackController.feedbackForm(service, backUrl).url)(
-        authorised(AuthProviders(GovernmentGateway)) {
-          Future.successful(
-            Ok(
-              feedbackPage(
-                FeedbackFormBind.emptyForm(
-                  CSRF
-                    .getToken(request)
-                    .map {
-                      _.value
-                    }
-                    .getOrElse(""),
-                  backUrl = backUrl,
-                  canOmitComments = canOmitComments,
-                  service = service
-                ),
-                loggedIn = true,
-                service,
-                backUrl,
-                canOmitComments = canOmitComments
-              )
-            )
+      Future.successful(
+        Ok(
+          renderFeedbackPage(
+            FeedbackFormBind.emptyForm(
+              CSRF.getToken(request).map(_.value).getOrElse(""),
+              backUrl = backUrl,
+              canOmitComments = canOmitComments,
+              service = service
+            ),
+            service,
+            backUrl,
+            canOmitComments = canOmitComments
           )
-        }
-      )
-    }
-
-  def unauthenticatedFeedbackForm(
-    service: Option[String] = None,
-    backUrl: Option[String] = None,
-    canOmitComments: Boolean
-  ) = Action.async { implicit request =>
-    Future.successful(
-      Ok(
-        feedbackPage(
-          FeedbackFormBind.emptyForm(
-            CSRF.getToken(request).map(_.value).getOrElse(""),
-            backUrl = backUrl,
-            canOmitComments = canOmitComments,
-            service = service
-          ),
-          loggedIn = false,
-          service,
-          backUrl,
-          canOmitComments = canOmitComments
         )
       )
-    )
-  }
-
-  def submitDeprecated = Action.async { implicit request =>
-    authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments) { allEnrolments =>
-      doSubmit(Some(allEnrolments))
-    }
-  }
-
-  def submitUnauthenticatedDeprecated = Action.async { implicit request =>
-    doSubmit(None)
-  }
-
-  def submit(service: Option[String] = None, backUrl: Option[String] = None, canOmitComments: Boolean = false) =
-    Action.async { implicit request =>
-      authorised(AuthProviders(GovernmentGateway)).retrieve(Retrievals.allEnrolments) { allEnrolments =>
-        doSubmit(Some(allEnrolments))
-      }
     }
 
-  def submitUnauthenticated(
+  def submit(
     service: Option[String] = None,
     backUrl: Option[String] = None,
     canOmitComments: Boolean = false
   ) = Action.async { implicit request =>
-    doSubmit(None)
-  }
-
-  def thanks(backUrl: Option[String] = None) = Action.async { implicit request =>
-    val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
-
-    loginRedirection(routes.FeedbackController.thanks(validatedBackUrl).url)(
-      authorised(AuthProviders(GovernmentGateway))(doThanks(true, request, validatedBackUrl))
-    )
-  }
-
-  def unauthenticatedThanks(backUrl: Option[String] = None) = Action.async { implicit request =>
-    val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
-    doThanks(false, request, validatedBackUrl)
-  }
-
-  private def doSubmit(enrolments: Option[Enrolments])(implicit request: Request[AnyContent]): Future[Result] =
     FeedbackFormBind.form
       .bindFromRequest()
       .fold(
-        error => Future.successful(BadRequest(feedbackView(enrolments.isDefined, error))),
+        formWithError => Future.successful(BadRequest(feedbackView(formWithError))),
         data =>
           {
-            val ticketIdF = createDeskproFeedback(data, enrolments)
-            ticketIdF map { ticketId =>
-              Redirect(
-                enrolments
-                  .map(_ => routes.FeedbackController.thanks(data.backUrl))
-                  .getOrElse(routes.FeedbackController.unauthenticatedThanks(data.backUrl))
-              )
-                .withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
-            }
+            for {
+              maybeEnrolments <- maybeAuthenticatedUserEnrolments()
+              ticketId        <- createDeskproFeedback(data, maybeEnrolments)
+            } yield Redirect(
+              routes.FeedbackController.thanks(data.backUrl)
+            )
+              .withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
           }.recover { case _ =>
             InternalServerError(errorPage())
           }
       )
-
-  private def feedbackView(loggedIn: Boolean, form: Form[FeedbackForm])(implicit request: Request[AnyRef]) =
-    feedbackPage(
-      form,
-      loggedIn,
-      form("service").value,
-      form("backUrl").value,
-      form("canOmitComments").value.exists(_ == "true")
-    )
-
-  private def doThanks(implicit
-    loggedIn: Boolean,
-    request: Request[AnyRef],
-    backUrl: Option[String]
-  ): Future[Result] = {
-    val maybeTicketId = request.session.get("ticketId")
-    val result        =
-      feedbackConfirmationPage(maybeTicketId, loggedIn, backUrl)
-    Future.successful(result)
   }
 
-  def feedbackPartialForm(
+  def thanks(backUrl: Option[String] = None) = Action.async { implicit request =>
+    val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
+    Future.successful(Ok(feedbackConfirmationPage(backUrl = validatedBackUrl)))
+  }
+
+  def partialIndex(
     submitUrl: String,
     csrfToken: String,
     service: Option[String],
@@ -221,13 +132,13 @@ import scala.concurrent.{ExecutionContext, Future}
     }
   }
 
-  def submitFeedbackPartialForm(resubmitUrl: String) = Action.async { implicit request =>
+  def partialSubmit(resubmitUrl: String) = Action.async { implicit request =>
     val form = FeedbackFormBind.form.bindFromRequest()
     form.fold(
       error =>
         Future.successful(
           BadRequest(
-            feedbackFormPartial(error, resubmitUrl, canOmitComments = form("canOmitComments").value.exists(_ == "true"))
+            feedbackFormPartial(error, resubmitUrl, canOmitComments = form("canOmitComments").value.contains("true"))
           )
         ),
       data =>
@@ -240,35 +151,28 @@ import scala.concurrent.{ExecutionContext, Future}
     )
   }
 
-  def feedbackPartialFormConfirmation(ticketId: String) = Action { implicit request =>
+  def partialThanks(ticketId: String) = Action { implicit request =>
     Ok(feedbackFormConfirmationPartial(ticketId, None))
   }
 
-  private def feedbackConfirmationPage(maybeTicketId: Option[String], loggedIn: Boolean, backUrl: Option[String])(
-    implicit request: Request[_]
-  ): Result =
-    Ok(
-      playFrontendFeedbackConfirmationPage(
-        backUrl = backUrl
-      )
+  private def feedbackView(form: Form[FeedbackForm])(implicit request: Request[AnyRef]) =
+    renderFeedbackPage(
+      form,
+      form("service").value,
+      form("backUrl").value,
+      form("canOmitComments").value.contains("true")
     )
 
-  private def feedbackPage(
+  private def renderFeedbackPage(
     form: Form[FeedbackForm],
-    loggedIn: Boolean,
     service: Option[String],
     backUrl: Option[String],
     canOmitComments: Boolean
   )(implicit
     request: Request[_]
   ): Html = {
-    val action =
-      if (loggedIn) routes.FeedbackController.submit(service, backUrl, canOmitComments)
-      else routes.FeedbackController.submitUnauthenticated(service, backUrl, canOmitComments)
-    playFrontendFeedbackPage(
-      form,
-      action
-    )
+    val action = routes.FeedbackController.submit(service, backUrl, canOmitComments)
+    feedbackPage(form, action)
   }
 }
 
