@@ -166,8 +166,10 @@ class ReportProblemController @Inject() (
 
   private def doSubmit(service: Option[String])(implicit request: MessagesRequest[AnyContent]) =
     ReportProblemFormBind.form.bindFromRequest.fold(
-      formWithError =>
-        Future.successful(BadRequest(page(formWithError, service.orElse(formWithError.data.get("service"))))),
+      formWithError => {
+        val serviceFromForm = formWithError.data.get("service").flatMap(s => if (s.isEmpty) None else Some(s))
+        Future.successful(BadRequest(page(formWithError, service.orElse(serviceFromForm))))
+      },
       problemReport => {
         val referrer = problemReport.referrer.filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
         (for {
@@ -198,7 +200,6 @@ class ReportProblemController @Inject() (
 
   private def page(form: Form[ReportProblemForm], service: Option[String])(implicit
     request: Request[_]
-  ) =
-    reportProblemPage(form, routes.ReportProblemController.submit(service))
+  ) = reportProblemPage(form, routes.ReportProblemController.submit(service))
 
 }
