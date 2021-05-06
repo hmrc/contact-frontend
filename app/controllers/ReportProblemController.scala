@@ -20,23 +20,23 @@ import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 
 import javax.inject.{Inject, Singleton}
-import model.ProblemReport
+import model.ReportProblemForm
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.libs.json.Json
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, MessagesRequest, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.DeskproEmailValidator
 import views.html.partials.{error_feedback, error_feedback_inner, ticket_created_body}
-import views.html.{InternalErrorPage, ProblemReportsNonjsConfirmationPage, ProblemReportsNonjsPage}
+import views.html.{InternalErrorPage, ReportProblemConfirmationPage, ReportProblemPage}
 import play.api.http.HeaderNames._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object ProblemReportForm {
+object ReportProblemFormBind {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
   private val validateEmail: (String) => Boolean    = emailValidator.validate
 
@@ -52,7 +52,7 @@ object ProblemReportForm {
     body.get("service").flatMap(_.headOption)
   }
 
-  def form: Form[ProblemReport] = Form[ProblemReport](
+  def form: Form[ReportProblemForm] = Form[ReportProblemForm](
     mapping(
       "report-name"   -> text
         .verifying(
@@ -93,12 +93,12 @@ object ProblemReportForm {
       "service"       -> optional(text),
       "referrer"      -> optional(text),
       "userAction"    -> optional(text)
-    )(ProblemReport.apply)(ProblemReport.unapply)
+    )(ReportProblemForm.apply)(ReportProblemForm.unapply)
   )
 
-  def emptyForm(service: Option[String])(implicit request: Request[_]): Form[ProblemReport] =
-    ProblemReportForm.form.fill(
-      ProblemReport(
+  def emptyForm(service: Option[String])(implicit request: Request[_]): Form[ReportProblemForm] =
+    ReportProblemFormBind.form.fill(
+      ReportProblemForm(
         reportName = "",
         reportEmail = "",
         reportAction = "",
@@ -112,12 +112,12 @@ object ProblemReportForm {
 }
 
 @Singleton
-class ProblemReportsController @Inject() (
+class ReportProblemController @Inject() (
   val hmrcDeskproConnector: HmrcDeskproConnector,
   val authConnector: AuthConnector,
   mcc: MessagesControllerComponents,
-  problemReportsNonjsPage: ProblemReportsNonjsPage,
-  confirmationPage: ProblemReportsNonjsConfirmationPage,
+  reportProblemPage: ReportProblemPage,
+  confirmationPage: ReportProblemConfirmationPage,
   errorFeedbackForm: error_feedback,
   errorFeedbackFormInner: error_feedback_inner,
   ticketCreatedBody: ticket_created_body,
@@ -130,11 +130,15 @@ class ProblemReportsController @Inject() (
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
+  def index(service: Option[String]) = Action { implicit request =>
+    Ok(page(ReportProblemFormBind.emptyForm(service = service), service))
+  }
+
   def partialIndex(preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
     val csrfToken = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
     Ok(
       errorFeedbackForm(
-        ProblemReportForm.emptyForm(service = service),
+        ReportProblemFormBind.emptyForm(service = service),
         appConfig.externalReportProblemUrl,
         csrfToken,
         service,
@@ -146,49 +150,55 @@ class ProblemReportsController @Inject() (
   def partialAjaxIndex(service: Option[String]) = Action { implicit request =>
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
     val referrer  = request.headers.get(REFERER)
-    val form      = ProblemReportForm.emptyForm(service = service)
+    val form      = ReportProblemFormBind.emptyForm(service = service)
     val view      = errorFeedbackFormInner(form, appConfig.externalReportProblemUrl, csrfToken, service, referrer)
     Ok(view)
   }
 
-  def index(service: Option[String]) = Action { implicit request =>
-    problemReportsPage(ProblemReportForm.emptyForm(service = service), service)
+  def submit(service: Option[String]) = Action.async { implicit request =>
+    doSubmit(service)
   }
 
-  def submit(service: Option[String]) = Action.async { implicit request =>
-    val isAjax = request.headers.get("X-Requested-With").contains("XMLHttpRequest")
+  def submitDeprecated(service: Option[String]) = Action.async { implicit request =>
+    if (request.headers.get("X-Requested-With").contains("XMLHttpRequest")) doSubmitPartial
+    else doSubmit(service)
+  }
 
-    ProblemReportForm.form.bindFromRequest.fold(
+  private def doSubmit(service: Option[String])(implicit request: MessagesRequest[AnyContent]) =
+    ReportProblemFormBind.form.bindFromRequest.fold(
       formWithError =>
-        if (isAjax) {
-          Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR"))))
-        } else {
-          Future.successful(problemReportsPage(formWithError, formWithError.data.get("service")))
-        },
+        Future.successful(BadRequest(page(formWithError, service.orElse(formWithError.data.get("service"))))),
+      problemReport => {
+        val referrer = problemReport.referrer.filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
+        (for {
+          maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
+          _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
+        } yield Ok(confirmationPage())) recover { case _ =>
+          InternalServerError(errorPage())
+        }
+      }
+    )
+
+  private def doSubmitPartial(implicit request: MessagesRequest[AnyContent]) =
+    ReportProblemFormBind.form.bindFromRequest.fold(
+      formWithError => Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR")))),
       problemReport => {
         val referrer = problemReport.referrer.filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
         (for {
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
           ticketId            <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-        } yield
-          if (isAjax) {
-            val view = ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
-            Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
-          } else {
-            Ok(confirmationPage())
-          }) recover {
-          case _ if !isAjax =>
-            InternalServerError(errorPage())
+        } yield {
+          val view = ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
+          Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
+        }) recover { case _ =>
+          InternalServerError(Json.toJson(Map("status" -> "ERROR")))
         }
       }
     )
-  }
 
-  private def problemReportsPage(form: Form[ProblemReport], service: Option[String])(implicit
+  private def page(form: Form[ReportProblemForm], service: Option[String])(implicit
     request: Request[_]
-  ) = {
-    val submit = routes.ProblemReportsController.submit(service)
-    Ok(problemReportsNonjsPage(form, submit))
-  }
+  ) =
+    reportProblemPage(form, routes.ReportProblemController.submit(service))
 
 }

@@ -22,7 +22,7 @@
 
 @getHelpForm = {
   @errorFeedback(
-    form = controllers.ProblemReportForm.emptyForm(service = None),
+    form = controllers.ReportProblemFormBind.emptyForm(service = None),
     actionUrl=appConfig.externalReportProblemUrl,
     csrfToken=play.filters.csrf.CSRF.getToken(request).map(_.value),
     service=None,

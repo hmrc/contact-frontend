@@ -48,9 +48,12 @@ The contents of the *action* and *error* fields are concatenated and stored in t
 Newer services using play-frontend should follow the integration steps detailed 
 in [play-frontend-hmrc](https://github.com/hmrc/play-frontend-hmrc#helping-users-report-technical-issues).
 
+To link to this form directly, render a link on your service to:
+* `https://www.{environment}.tax.service.gov.uk/contact/report-technical-problem?service=${serviceId}`
+
 Historically, `contact-frontend` supported a version of the form that could be embedded within a service using either a 
-server-side partial or injected by Javascript. However, these mechanisms are not supported for services using play-frontend or
-play-nunjucks and are not recommended for reasons of accessibility and usability.
+server-side partial or injected by Javascript. However, these mechanisms are not supported for services using 
+`play-frontend-hmrc` or `play-nunjucks` and are not recommended for reasons of accessibility and usability.
 
 Additionally, `contact-frontend` historically had versions of all standalone pages requiring tax service user login, and
 versions not requiring login on endpoints suffixed with "-unauthenticated". The login requirement has now been

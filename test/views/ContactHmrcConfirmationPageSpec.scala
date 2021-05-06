@@ -26,7 +26,7 @@ import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
-import views.html.{ContactHmrcConfirmationPage, ProblemReportsNonjsConfirmationPage}
+import views.html.ContactHmrcConfirmationPage
 
 class ContactHmrcConfirmationPageSpec
     extends AnyWordSpec

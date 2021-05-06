@@ -19,7 +19,7 @@ package services
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import controllers.ContactForm
-import model.{AccessibilityForm, FeedbackForm, ProblemReport}
+import model.{AccessibilityForm, FeedbackForm, ReportProblemForm}
 import org.apache.http.client.utils.URIBuilder
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
@@ -76,7 +76,7 @@ trait DeskproSubmission {
     )
 
   def createProblemReportsTicket(
-    problemReport: ProblemReport,
+    problemReport: ReportProblemForm,
     request: Request[AnyRef],
     enrolmentsOption: Option[Enrolments],
     referrer: Option[String]
