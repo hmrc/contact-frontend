@@ -141,6 +141,33 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
       document.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
+    "return Bad Request, page with validation error, and correct submit URL if no service URL param for invalid input" in new TestScope {
+      val headers = Seq((REFERER, deskproReferrer), ("User-Agent", "iAmAUserAgent"))
+      val request = FakeRequest()
+        .withHeaders(headers: _*)
+        .withFormUrlEncodedBody(
+          "report-name"     -> deskproName,
+          "THIS-WILL-ERROR" -> deskproEmail,
+          "report-action"   -> "Some Action",
+          "report-error"    -> "Some Error",
+          "isJavascript"    -> "false",
+          "service"         -> ""
+        )
+
+      val result = controller.submit(None)(request)
+
+      status(result) should be(BAD_REQUEST)
+      verifyZeroInteractions(hmrcDeskproConnector)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementsByClass("govuk-error-summary").size() should be > 0
+      document
+        .body()
+        .select("form[id=error-feedback-form]")
+        .first
+        .attr("action")                                       shouldBe s"/contact/report-technical-problem"
+    }
+
     "return Bad Request and page with validation error if the name has invalid characters" in new TestScope {
       val request = generateRequest(
         isAjaxRequest = false,
