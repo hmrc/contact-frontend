@@ -11,10 +11,10 @@ feedback.email.error.invalid=Nodwch gyfeiriad e-bost yn y fformat cywir, megis e
 feedback.email.error.length=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
 feedback.comments.error.required=Rhowch eich sylwadau
 feedback.comments.error.length=Ni all y sylwadau fod yn hirach na 2000 o gymeriadau
-feedback.title=Anfon eich adborth - GOV.UK
+feedback.title=Anfon eich adborth – GOV.UK
 feedback.heading=Anfon eich adborth
 feedback.send=Anfon
-feedback.confirmation.title=Eich adborth - GOV.UK
+feedback.confirmation.title=Eich adborth – GOV.UK
 feedback.confirmation.heading=Eich adborth
 feedback.confirmation.message=Mae eich adborth wedi dod i law.
 feedback.confirmation.back=Yn ôl
@@ -31,7 +31,7 @@ language-switcher.welsh=Cymraeg
 language-switcher.welsh.hover=Defnyddio’r cyfrif hwn yn Cymraeg
 button.back=Yn ôl
 
-problem_report.title=Cael help gyda phroblem dechnegol - GOV.UK
+problem_report.title=Cael help gyda phroblem dechnegol – GOV.UK
 problem_report.heading=Cael help gyda phroblem dechnegol
 problem_report.paragraph.1=Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.
 problem_report.paragraph.2=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
@@ -53,7 +53,7 @@ problem_report.button=Anfon
 
 problem_report.common.size_limit=Gallwch nodi hyd at {0} o gymeriadau
 
-survey.title=Arolwg - GOV.UK
+survey.title=Arolwg – GOV.UK
 survey.heading=Arolwg
 survey.helpful.error.required=Rhowch wybod i ni pa mor fodlon ydych gyda’r ateb a gawsoch gennym
 survey.speed.error.required=Rhowch wybod i ni pa mor fodlon ydych gyda’r amser a gymerwyd gennym i’ch ateb
@@ -74,7 +74,7 @@ deskpro.error.page.heading=Mae’n ddrwg gennym – mae problem gyda’r gwasana
 deskpro.error.try.later=Rhowch gynnig arall arni yn nes ymlaen.
 deskpro.error.not.sent=Nid yw’ch neges wedi’i hanfon.
 
-contact.title=Cymorth a chysylltiadau - GOV.UK
+contact.title=Cymorth a chysylltiadau – GOV.UK
 contact.heading=Cymorth a chysylltiadau
 contact.confirmation.message=Bydd rhywun yn cysylltu â chi cyn pen 2 ddiwrnod gwaith.
 contact.form.specific.query=Os oes gennych ymholiad penodol ynghylch treth {0}.
@@ -104,7 +104,7 @@ form.online.services.bad=Gwael
 form.online.services.very_bad=Gwael iawn
 form.comments=Sylwadau
 
-accessibility.title=Rhoi gwybod am broblem hygyrchedd - GOV.UK
+accessibility.title=Rhoi gwybod am broblem hygyrchedd – GOV.UK
 accessibility.heading=Rhoi gwybod am broblem hygyrchedd
 accessibility.message.para1=Dylech dim ond defnyddio’r ffurflen hon i roi gwybod am unrhyw broblemau hygyrchedd rydych wedi dod o hyd iddynt wrth ddefnyddio’r gwasanaeth hwn. Peidiwch â chynnwys gwybodaeth bersonol nac ariannol, er enghraifft eich rhif Yswiriant Gwladol neu fanylion eich cerdyn credyd.
 accessibility.message.para2=Rydym yn adolygu ac yn ceisio mynd i’r afael ag unrhyw broblem hygyrchedd rydym y cael gwybod amdani.
@@ -126,4 +126,4 @@ accessibility.confirmation.title=Mae’ch problem wedi ei nodi
 accessibility.confirmation.subheading=Yr hyn sy’n digwydd nesaf
 accessibility.confirmation.paragraph=Rydym yn adolygu ac yn ceisio mynd i’r afael ag unrhyw broblem hygyrchedd y rhoddir gwybod amdani. Os ydych wedi rhoi’ch manylion cyswllt i ni, rhown wybod i chi am hynt eich gwybodaeth.
 
-testPage.title = Service test page
+testPage.title = Service test page – GOV.UK

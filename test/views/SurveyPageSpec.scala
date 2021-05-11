@@ -86,7 +86,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite 
     }
 
     "display the correct browser title" in {
-      content.select("title").text shouldBe "Survey - GOV.UK"
+      content.select("title").text shouldBe "Survey – GOV.UK"
     }
 
     "display the correct page heading" in {
@@ -154,7 +154,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite 
         ),
         action
       )
-      asDocument(contentWithErrors).title should be("Error: Survey - GOV.UK")
+      asDocument(contentWithErrors).title should be("Error: Survey – GOV.UK")
     }
 
     "include a legend for the helpful radios" in {
