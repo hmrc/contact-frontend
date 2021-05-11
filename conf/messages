@@ -11,10 +11,10 @@ feedback.email.error.invalid=Enter an email address in the correct format, like 
 feedback.email.error.length=Email address must be 255 characters or fewer
 feedback.comments.error.required=Enter your comments
 feedback.comments.error.length=The comment cannot be longer than 1000 characters
-feedback.title=Send your feedback - GOV.UK
+feedback.title=Send your feedback – GOV.UK
 feedback.heading=Send your feedback
 feedback.send=Send
-feedback.confirmation.title=Your feedback - GOV.UK
+feedback.confirmation.title=Your feedback – GOV.UK
 feedback.confirmation.heading=Your feedback
 feedback.confirmation.message=Your feedback has been received.
 feedback.confirmation.back=Back
@@ -31,7 +31,7 @@ language-switcher.welsh=Cymraeg
 language-switcher.welsh.hover=Defnyddio’r cyfrif hwn yn Cymraeg
 button.back=Back
 
-problem_report.title=Get help with a technical problem - GOV.UK
+problem_report.title=Get help with a technical problem – GOV.UK
 problem_report.heading=Get help with a technical problem
 problem_report.paragraph.1=Only use this form to report technical problems.
 problem_report.paragraph.2=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
@@ -53,7 +53,7 @@ problem_report.button=Send
 
 problem_report.common.size_limit=You can enter up to {0} characters
 
-survey.title=Survey - GOV.UK
+survey.title=Survey – GOV.UK
 survey.heading=Survey
 survey.confirmation.title=Thank you, your feedback has been received.
 survey.helpful.error.required=Tell us how satisfied you are with the answer we gave you
@@ -74,7 +74,7 @@ deskpro.error.page.heading=Sorry, there is a problem with the service
 deskpro.error.try.later=Try again later.
 deskpro.error.not.sent=Your message has not been sent.
 
-contact.title=Help and contact - GOV.UK
+contact.title=Help and contact – GOV.UK
 contact.heading=Help and contact
 contact.confirmation.message=Someone will get back to you within 2 working days.
 contact.form.specific.query=If you have a specific tax query {0}.
@@ -104,7 +104,7 @@ form.online.services.bad=Bad
 form.online.services.very_bad=Very bad
 form.comments=Comments
 
-accessibility.title=Report an accessibility problem - GOV.UK
+accessibility.title=Report an accessibility problem – GOV.UK
 accessibility.heading=Report an accessibility problem
 accessibility.message.para1=Please only use this form to report any accessibility problems you have found when using this service. Do not include personal or financial information, for example your National Insurance number or credit card details.
 accessibility.message.para2=We review and try to resolve all accessibility problems reported to us.
@@ -126,4 +126,4 @@ accessibility.confirmation.title=Your accessibility problem has been reported.
 accessibility.confirmation.subheading=What happens next
 accessibility.confirmation.paragraph=We have received your message and will reply, or let you know how we are dealing with this, within 2 working days.
 
-testPage.title = Service test page
+testPage.title = Service test page – GOV.UK
