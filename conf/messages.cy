@@ -127,3 +127,4 @@ accessibility.confirmation.subheading=Yr hyn sy’n digwydd nesaf
 accessibility.confirmation.paragraph=Rydym yn adolygu ac yn ceisio mynd i’r afael ag unrhyw broblem hygyrchedd y rhoddir gwybod amdani. Os ydych wedi rhoi’ch manylion cyswllt i ni, rhown wybod i chi am hynt eich gwybodaeth.
 
 testPage.title = Service test page – GOV.UK
+testPage.heading  = Service test page
