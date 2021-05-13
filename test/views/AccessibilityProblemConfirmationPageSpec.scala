@@ -17,7 +17,7 @@
 package views
 
 import config.AppConfig
-import _root_.helpers.{JsoupHelpers, MessagesSupport}
+import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -31,17 +31,9 @@ import views.html.AccessibilityProblemConfirmationPage
 class AccessibilityProblemConfirmationPageSpec
     extends AnyWordSpec
     with Matchers
-    with GuiceOneAppPerSuite
+    with ApplicationSupport
     with MessagesSupport
     with JsoupHelpers {
-
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"     -> false,
-        "metrics.enabled" -> false
-      )
-      .build()
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
   implicit lazy val messages: Messages         = getMessages(app, fakeRequest)

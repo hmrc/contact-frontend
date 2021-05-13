@@ -16,7 +16,7 @@
 
 package views
 
-import _root_.helpers.{JsoupHelpers, MessagesSupport}
+import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -28,7 +28,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.ErrorPage
 
-class ErrorPageSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with MessagesSupport with JsoupHelpers {
+class ErrorPageSpec extends AnyWordSpec with Matchers with ApplicationSupport with MessagesSupport with JsoupHelpers {
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
   implicit lazy val messages: Messages = getMessages(app, fakeRequest)

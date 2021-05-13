@@ -25,7 +25,18 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{DefaultWSCookie, WSClient, WSResponse}
 import play.api.test.Helpers._
 
-class CSRFIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneServerPerSuite {
+class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoints with GuiceOneServerPerSuite {
+
+  override def fakeApplication(): Application =
+    GuiceApplicationBuilder()
+      .configure(
+        "metrics.jvm"                             -> false,
+        "metrics.enabled"                         -> false,
+        "auditing.enabled"                        -> false,
+        "microservice.services.hmrc-deskpro.port" -> endpointPort
+      )
+      .build()
+
   private def problemReportsSecureUrl = s"http://localhost:$port/contact/problem_reports_secure"
   private def problemReportsNonjsUrl  = s"http://localhost:$port/contact/problem_reports_nonjs"
   private def feedbackUrl             = s"http://localhost:$port/contact/beta-feedback-unauthenticated"
@@ -104,15 +115,6 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneServerP
         )
     )
   }
-
-  override lazy val app: Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"      -> false,
-        "metrics.enabled"  -> false,
-        "auditing.enabled" -> false
-      )
-      .build()
 
   "The Play application's CSRF configuration" should {
     "respond with a 403 for problem_reports_secure if no CSRF token present" in {
