@@ -116,19 +116,14 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
   }
 
   "Reporting a problem via the standalone page" should {
-    "return OK and a valid html page for a valid request" in new TestScope {
+    "redirect to a Thank You html page for a valid request" in new TestScope {
       hrmcConnectorWillReturnTheTicketId
 
       val request = generateRequest(isAjaxRequest = false)
       val result  = controller.submit(None)(request)
 
-      status(result) should be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByClass("govuk-error-summary").size() should be(0)
-      document.getElementsByClass("govuk-body").text()          should be(
-        "Someone will get back to you within 2 working days."
-      )
+      status(result)             should be(SEE_OTHER)
+      redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
     }
 
     "return Bad Request and page with validation error for invalid input" in new TestScope {
@@ -303,19 +298,14 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
   }
 
   "Reporting a problem via the deprecated non-Ajax partial" should {
-    "return 200 and a valid json for a valid request" in new TestScope {
+    "redirect to a Thank You html page for a valid request" in new TestScope {
       hrmcConnectorWillReturnTheTicketId
 
       val request = generateRequest(isAjaxRequest = false)
       val result  = controller.submitDeprecated(None)(request)
 
-      status(result) should be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByClass("govuk-error-summary").size() should be(0)
-      document.getElementsByClass("govuk-body").text()          should be(
-        "Someone will get back to you within 2 working days."
-      )
+      status(result)             should be(SEE_OTHER)
+      redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
     }
 
     "return 400 and JSON containing validation errors for invalid input" in new TestScope {
@@ -378,6 +368,20 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
       document.text() should include("Try again later.")
     }
 
+  }
+
+  "Requesting the standalone thanks page" should {
+    "return OK and valid html" in new TestScope {
+      val result = controller.thanks()(FakeRequest())
+
+      status(result) should be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementsByClass("govuk-error-summary").size() should be(0)
+      document.getElementsByClass("govuk-body").text()          should be(
+        "Someone will get back to you within 2 working days."
+      )
+    }
   }
 
   class TestScope extends MockitoSugar {
