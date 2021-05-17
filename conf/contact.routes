@@ -28,6 +28,7 @@ GET         /contact-hmrc/thanks-unauthenticated         @controllers.ContactHmr
 
 GET         /report-technical-problem                    @controllers.ReportProblemController.index(service: Option[String])
 POST        /report-technical-problem                    @controllers.ReportProblemController.submit(service: Option[String])
+GET         /report-technical-problem/thanks             @controllers.ReportProblemController.thanks
 GET         /problem_reports_nonjs                       @controllers.ReportProblemController.index(service: Option[String])
 POST        /problem_reports_nonjs                       @controllers.ReportProblemController.submit(service: Option[String])
 GET         /problem_reports                             @controllers.ReportProblemController.partialIndex(csrfToken: Option[String], service: Option[String])

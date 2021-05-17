@@ -25,7 +25,7 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContent, MessagesControllerComponents, MessagesRequest, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -175,7 +175,7 @@ class ReportProblemController @Inject() (
         (for {
           maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
           _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-        } yield Ok(confirmationPage())) recover { case _ =>
+        } yield Redirect(routes.ReportProblemController.thanks())) recover { case _ =>
           InternalServerError(errorPage())
         }
       }
@@ -201,5 +201,9 @@ class ReportProblemController @Inject() (
   private def page(form: Form[ReportProblemForm], service: Option[String])(implicit
     request: Request[_]
   ) = reportProblemPage(form, routes.ReportProblemController.submit(service))
+
+  def thanks(): Action[AnyContent] = Action { implicit request =>
+    Ok(confirmationPage())
+  }
 
 }
