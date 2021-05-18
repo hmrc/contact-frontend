@@ -57,12 +57,12 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
 
   "Requesting the standalone page" should {
     "return OK and valid HTML" in new TestScope {
-      val result = controller.index(Some("my-test-service"))(FakeRequest())
+      val result = controller.index(Some("my-test-service"), Some("my-referrer-url"))(FakeRequest())
 
       status(result) should be(OK)
 
       val document    = Jsoup.parse(contentAsString(result))
-      val queryString = s"service=my-test-service"
+      val queryString = s"service=my-test-service&referrerUrl=my-referrer-url"
       document
         .body()
         .select("form[id=error-feedback-form]")
@@ -71,6 +71,17 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
 
       document.getElementById("error-feedback-form")            should not be null
       document.getElementsByClass("govuk-error-summary").size() should be(0)
+    }
+  }
+
+  "Requesting the deprecated standalone page" should {
+    "redirect to the non-deprecated page with the REFERER passed via the URL" in new TestScope {
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "url-to-persist"))
+      val result = controller.indexDeprecated(Some("my-test-service"))(requestWithHeaders)
+
+      status(result) should be(SEE_OTHER)
+      val queryString = s"service=my-test-service&referrerUrl=url-to-persist"
+      redirectLocation(result) should be(Some(s"/contact/report-technical-problem?$queryString"))
     }
   }
 
@@ -120,14 +131,14 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
       hrmcConnectorWillReturnTheTicketId
 
       val request = generateRequest(isAjaxRequest = false)
-      val result  = controller.submit(None)(request)
+      val result  = controller.submit(None, None)(request)
 
       status(result)             should be(SEE_OTHER)
       redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
     }
 
     "return Bad Request and page with validation error for invalid input" in new TestScope {
-      val result = controller.submit(None)(generateInvalidRequest(isAjaxRequest = false))
+      val result = controller.submit(None, None)(generateInvalidRequest(isAjaxRequest = false))
 
       status(result) should be(BAD_REQUEST)
       verifyZeroInteractions(hmrcDeskproConnector)
@@ -149,7 +160,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
           "service"         -> ""
         )
 
-      val result = controller.submit(None)(request)
+      val result = controller.submit(None, None)(request)
 
       status(result) should be(BAD_REQUEST)
       verifyZeroInteractions(hmrcDeskproConnector)
@@ -169,7 +180,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
         name = """<a href="blah.com">something</a>"""
       )
 
-      val submit = controller.submit(None)(request)
+      val submit = controller.submit(None, None)(request)
       val page   = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
@@ -180,7 +191,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
 
     "return Bad Request and page with validation error if the email has invalid syntax (for Deskpro)" in new TestScope {
       val request = generateRequest(isAjaxRequest = false, email = "a@a")
-      val submit  = controller.submit(None)(request)
+      val submit  = controller.submit(None, None)(request)
       val page    = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
@@ -206,7 +217,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
       ).thenReturn(Future.failed(new Exception("failed")))
 
       val request = generateRequest(isAjaxRequest = false)
-      val result  = controller.submit(None)(request)
+      val result  = controller.submit(None, None)(request)
       status(result) should be(INTERNAL_SERVER_ERROR)
 
       val document = Jsoup.parse(contentAsString(result))
