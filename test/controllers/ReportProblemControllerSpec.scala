@@ -57,12 +57,12 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
 
   "Requesting the standalone page" should {
     "return OK and valid HTML" in new TestScope {
-      val result = controller.index(Some("my-test-service"))(FakeRequest())
+      val result = controller.index(Some("my-test-service"), Some("my-referrer-url"))(FakeRequest())
 
       status(result) should be(OK)
 
       val document    = Jsoup.parse(contentAsString(result))
-      val queryString = s"service=my-test-service"
+      val queryString = s"service=my-test-service&referrerUrl=my-referrer-url"
       document
         .body()
         .select("form[id=error-feedback-form]")
@@ -71,6 +71,46 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
 
       document.getElementById("error-feedback-form")            should not be null
       document.getElementsByClass("govuk-error-summary").size() should be(0)
+    }
+
+    "bind the referrer from the URL rather than headers if both provided" in new TestScope {
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
+      val result             = controller.index(Some("my-test-service"), Some("referrer-from-url"))(requestWithHeaders)
+
+      status(result) should be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementById("referrer").`val` should be("referrer-from-url")
+    }
+
+    "bind the referrer from the header if no URL parameter passed in" in new TestScope {
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
+      val result             = controller.index(Some("my-test-service"), None)(requestWithHeaders)
+
+      status(result) should be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementById("referrer").`val` should be("referrer-from-header")
+    }
+  }
+
+  "Requesting the deprecated standalone page" should {
+    "redirect to the non-deprecated page with the REFERER passed via the URL" in new TestScope {
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
+      val result             = controller.indexDeprecated(Some("my-test-service"), Some("referrer-from-url"))(requestWithHeaders)
+
+      status(result) should be(SEE_OTHER)
+      val queryString = s"service=my-test-service&referrerUrl=referrer-from-url"
+      redirectLocation(result) should be(Some(s"/contact/report-technical-problem?$queryString"))
+    }
+
+    "redirect to the non-deprecated page with the REFERER passed via the header" in new TestScope {
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
+      val result             = controller.indexDeprecated(Some("my-test-service"), None)(requestWithHeaders)
+
+      status(result) should be(SEE_OTHER)
+      val queryString = s"service=my-test-service&referrerUrl=referrer-from-header"
+      redirectLocation(result) should be(Some(s"/contact/report-technical-problem?$queryString"))
     }
   }
 
@@ -120,14 +160,38 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
       hrmcConnectorWillReturnTheTicketId
 
       val request = generateRequest(isAjaxRequest = false)
-      val result  = controller.submit(None)(request)
+      val result  = controller.submit(None, None)(request)
+
+      status(result)             should be(SEE_OTHER)
+      redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
+    }
+
+    "bind the referrerUrl parameter if provided in the URL" in new TestScope {
+      when(
+        hmrcDeskproConnector.createDeskProTicket(
+          meq("John Densmore"),
+          meq("name@mail.com"),
+          meq("Support Request"),
+          meq(controller.problemMessage("Some Action", "Some Error")),
+          meq("referrer-from-url"),
+          meq(true),
+          any[Request[AnyRef]](),
+          meq(None),
+          meq(None),
+          meq(None)
+        )(any(classOf[HeaderCarrier]))
+      ).thenReturn(Future.successful(TicketId(123)))
+
+      val request           = generateRequest(isAjaxRequest = true)
+      val requestWithHeader = request.withHeaders((REFERER, "referrer-from-request"))
+      val result            = controller.submit(None, Some("referrer-from-url"))(requestWithHeader)
 
       status(result)             should be(SEE_OTHER)
       redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
     }
 
     "return Bad Request and page with validation error for invalid input" in new TestScope {
-      val result = controller.submit(None)(generateInvalidRequest(isAjaxRequest = false))
+      val result = controller.submit(None, None)(generateInvalidRequest(isAjaxRequest = false))
 
       status(result) should be(BAD_REQUEST)
       verifyZeroInteractions(hmrcDeskproConnector)
@@ -149,7 +213,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
           "service"         -> ""
         )
 
-      val result = controller.submit(None)(request)
+      val result = controller.submit(None, None)(request)
 
       status(result) should be(BAD_REQUEST)
       verifyZeroInteractions(hmrcDeskproConnector)
@@ -169,7 +233,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
         name = """<a href="blah.com">something</a>"""
       )
 
-      val submit = controller.submit(None)(request)
+      val submit = controller.submit(None, None)(request)
       val page   = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
@@ -180,7 +244,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
 
     "return Bad Request and page with validation error if the email has invalid syntax (for Deskpro)" in new TestScope {
       val request = generateRequest(isAjaxRequest = false, email = "a@a")
-      val submit  = controller.submit(None)(request)
+      val submit  = controller.submit(None, None)(request)
       val page    = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
@@ -206,7 +270,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
       ).thenReturn(Future.failed(new Exception("failed")))
 
       val request = generateRequest(isAjaxRequest = false)
-      val result  = controller.submit(None)(request)
+      val result  = controller.submit(None, None)(request)
       status(result) should be(INTERNAL_SERVER_ERROR)
 
       val document = Jsoup.parse(contentAsString(result))
