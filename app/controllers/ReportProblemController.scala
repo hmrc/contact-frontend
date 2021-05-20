@@ -96,9 +96,7 @@ object ReportProblemFormBind {
     )(ReportProblemForm.apply)(ReportProblemForm.unapply)
   )
 
-  def emptyForm(service: Option[String], referrer: Option[String])(implicit
-    request: Request[_]
-  ): Form[ReportProblemForm] =
+  def emptyForm(service: Option[String], referrer: Option[String]): Form[ReportProblemForm] =
     ReportProblemFormBind.form.fill(
       ReportProblemForm(
         reportName = "",
@@ -144,9 +142,10 @@ class ReportProblemController @Inject() (
 
   def partialIndex(preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
     val csrfToken = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
+    val referrer  = request.headers.get(REFERER)
     Ok(
       errorFeedbackForm(
-        form = ReportProblemFormBind.emptyForm(service = service, referrer = None),
+        form = ReportProblemFormBind.emptyForm(service, referrer),
         actionUrl = appConfig.externalReportProblemUrl,
         csrfToken = csrfToken,
         service = service,
