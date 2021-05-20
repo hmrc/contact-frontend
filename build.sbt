@@ -54,7 +54,6 @@ lazy val unitTestSettings =
           )
         )
       )
-//      addTestReportOption(Test, "test-reports")
     )
 
 lazy val AcceptanceTest = config("acceptance") extend Test
@@ -65,7 +64,6 @@ lazy val acceptanceTestSettings =
       // The following is needed to preserve the -Dbrowser option to the HMRC webdriver factory library
       fork in AcceptanceTest := false,
       (testOptions in AcceptanceTest) := Seq(Tests.Filter(_ startsWith "acceptance")),
-//      addTestReportOption(AcceptanceTest, "acceptance-test-reports")
       AcceptanceTest / run / javaOptions ++= Seq(
         "-Dconfig.resource=test.application.conf",
         "-Dlogger.resource=logback-test.xml"

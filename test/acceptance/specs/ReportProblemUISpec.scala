@@ -16,11 +16,10 @@
 
 package acceptance.specs
 
-import acceptance.pages.{ProblemReportPage, ThankYouPage}
-import acceptance.specs.BaseSpec
-import acceptance.specs.tags.{UiTests}
+import acceptance.pages.{ReportProblemPage, ThankYouPage}
+import acceptance.specs.tags.UiTests
 
-class ProblemReportUISpec extends BaseSpec {
+class ReportProblemUISpec extends BaseSpec {
 
   info("Happy path for reporting a problem")
 
@@ -30,13 +29,13 @@ class ProblemReportUISpec extends BaseSpec {
 
       Given("A user is on the report a problem page")
 
-      go to ProblemReportPage
-      pageTitle shouldBe ProblemReportPage.title
+      go to ReportProblemPage
+      pageTitle shouldBe ReportProblemPage.title
 
-      ProblemReportPage.completeProblemReportForm
+      ReportProblemPage.completeReportForm
 
       When("User submits the report")
-      ProblemReportPage.submitProblemReportForm
+      ReportProblemPage.submitReportForm
 
       Then("The thank you page is displayed")
       eventually {

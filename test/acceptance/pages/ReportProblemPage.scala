@@ -16,9 +16,7 @@
 
 package acceptance.pages
 
-import acceptance.conf.TestConfiguration
-
-object ProblemReportPage extends BasePage {
+object ReportProblemPage extends BasePage {
 
   val url: String = wrapUrl("/problem_reports_nonjs?service=pay")
   val title       = "Get help with a technical problem – GOV.UK"
@@ -28,10 +26,10 @@ object ProblemReportPage extends BasePage {
   def actionField: TextArea  = textArea("report-action")
   def errorField: TextArea   = textArea("report-error")
 
-  def submitProblemReportForm =
+  def submitReportForm =
     click on CssSelectorQuery(".govuk-button[type=submit]")
 
-  def completeProblemReportForm = {
+  def completeReportForm = {
     nameField.value = "Rhiamon Tandy"
     emailField.value = "rtandy0@vinaora.com"
     actionField.value =
