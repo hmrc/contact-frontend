@@ -69,7 +69,6 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
         .first
         .attr("action") shouldBe s"/contact/report-technical-problem?$queryString"
 
-      document.getElementById("referrer").`val`                 should be("my-referrer-url")
       document.getElementById("error-feedback-form")            should not be null
       document.getElementsByClass("govuk-error-summary").size() should be(0)
     }
