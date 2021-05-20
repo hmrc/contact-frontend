@@ -96,11 +96,20 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
 
   "Requesting the deprecated standalone page" should {
     "redirect to the non-deprecated page with the REFERER passed via the URL" in new TestScope {
-      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-to-persist"))
-      val result             = controller.indexDeprecated(Some("my-test-service"))(requestWithHeaders)
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
+      val result             = controller.indexDeprecated(Some("my-test-service"), Some("referrer-from-url"))(requestWithHeaders)
 
       status(result) should be(SEE_OTHER)
-      val queryString = s"service=my-test-service&referrerUrl=referrer-to-persist"
+      val queryString = s"service=my-test-service&referrerUrl=referrer-from-url"
+      redirectLocation(result) should be(Some(s"/contact/report-technical-problem?$queryString"))
+    }
+
+    "redirect to the non-deprecated page with the REFERER passed via the header" in new TestScope {
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
+      val result             = controller.indexDeprecated(Some("my-test-service"), None)(requestWithHeaders)
+
+      status(result) should be(SEE_OTHER)
+      val queryString = s"service=my-test-service&referrerUrl=referrer-from-header"
       redirectLocation(result) should be(Some(s"/contact/report-technical-problem?$queryString"))
     }
   }

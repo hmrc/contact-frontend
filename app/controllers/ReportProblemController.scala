@@ -135,8 +135,8 @@ class ReportProblemController @Inject() (
     Ok(page(ReportProblemFormBind.emptyForm(service, referrer), service, referrerUrl))
   }
 
-  def indexDeprecated(service: Option[String]) = Action { implicit request =>
-    val referrer = request.headers.get(REFERER)
+  def indexDeprecated(service: Option[String], referrerUrl: Option[String]) = Action { implicit request =>
+    val referrer = referrerUrl.orElse(request.headers.get(REFERER))
     Redirect(routes.ReportProblemController.index(service, referrer))
   }
 
@@ -157,7 +157,7 @@ class ReportProblemController @Inject() (
   def partialAjaxIndex(service: Option[String]) = Action { implicit request =>
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
     val referrer  = request.headers.get(REFERER)
-    val form      = ReportProblemFormBind.emptyForm(service = service, referrer = referrer)
+    val form      = ReportProblemFormBind.emptyForm(service, referrer)
     val view      = errorFeedbackFormInner(form, appConfig.externalReportProblemUrl, csrfToken, service, referrer)
     Ok(view)
   }
