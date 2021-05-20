@@ -69,18 +69,39 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
         .first
         .attr("action") shouldBe s"/contact/report-technical-problem?$queryString"
 
+      document.getElementById("referrer").`val`                 should be("my-referrer-url")
       document.getElementById("error-feedback-form")            should not be null
       document.getElementsByClass("govuk-error-summary").size() should be(0)
+    }
+
+    "bind the referrer from the URL rather than headers if both provided" in new TestScope {
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
+      val result             = controller.index(Some("my-test-service"), Some("referrer-from-url"))(requestWithHeaders)
+
+      status(result) should be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementById("referrer").`val` should be("referrer-from-url")
+    }
+
+    "bind the referrer from the header if no URL parameter passed in" in new TestScope {
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
+      val result             = controller.index(Some("my-test-service"), None)(requestWithHeaders)
+
+      status(result) should be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementById("referrer").`val` should be("referrer-from-header")
     }
   }
 
   "Requesting the deprecated standalone page" should {
     "redirect to the non-deprecated page with the REFERER passed via the URL" in new TestScope {
-      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "url-to-persist"))
-      val result = controller.indexDeprecated(Some("my-test-service"))(requestWithHeaders)
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-to-persist"))
+      val result             = controller.indexDeprecated(Some("my-test-service"))(requestWithHeaders)
 
       status(result) should be(SEE_OTHER)
-      val queryString = s"service=my-test-service&referrerUrl=url-to-persist"
+      val queryString = s"service=my-test-service&referrerUrl=referrer-to-persist"
       redirectLocation(result) should be(Some(s"/contact/report-technical-problem?$queryString"))
     }
   }
@@ -132,6 +153,30 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
 
       val request = generateRequest(isAjaxRequest = false)
       val result  = controller.submit(None, None)(request)
+
+      status(result)             should be(SEE_OTHER)
+      redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
+    }
+
+    "bind the referrerUrl parameter if provided in the URL" in new TestScope {
+      when(
+        hmrcDeskproConnector.createDeskProTicket(
+          meq("John Densmore"),
+          meq("name@mail.com"),
+          meq("Support Request"),
+          meq(controller.problemMessage("Some Action", "Some Error")),
+          meq("referrer-from-url"),
+          meq(true),
+          any[Request[AnyRef]](),
+          meq(None),
+          meq(None),
+          meq(None)
+        )(any(classOf[HeaderCarrier]))
+      ).thenReturn(Future.successful(TicketId(123)))
+
+      val request           = generateRequest(isAjaxRequest = true)
+      val requestWithHeader = request.withHeaders((REFERER, "referrer-from-request"))
+      val result            = controller.submit(None, Some("referrer-from-url"))(requestWithHeader)
 
       status(result)             should be(SEE_OTHER)
       redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
