@@ -12,7 +12,8 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it"))
   )
   .settings(publishingSettings: _*)
-  .configs(IntegrationTest)
+  .configs(IntegrationTest, AcceptanceTest)
+  .settings(unitTestSettings, acceptanceTestSettings)
   .settings(integrationTestSettings(): _*)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(
@@ -37,10 +38,34 @@ lazy val microservice = Project(appName, file("."))
     // ***************
   )
 
-lazy val testSettings: Seq[Def.Setting[_]] = Seq(
-  fork := true,
-  javaOptions ++= Seq(
-    "-Dconfig.resource=test.application.conf",
-    "-Dlogger.resource=logback-test.xml"
-  )
-)
+lazy val unitTestSettings =
+  inConfig(Test)(Defaults.testTasks) ++
+    Seq(
+      testOptions in Test := Seq(
+        Tests.Filters(
+          Seq(
+            _ startsWith "connectors",
+            _ startsWith "controllers",
+            _ startsWith "helpers",
+            _ startsWith "resources",
+            _ startsWith "services",
+            _ startsWith "util",
+            _ startsWith "views"
+          )
+        )
+      )
+    )
+
+lazy val AcceptanceTest = config("acceptance") extend Test
+
+lazy val acceptanceTestSettings =
+  inConfig(AcceptanceTest)(Defaults.testTasks) ++
+    Seq(
+      // The following is needed to preserve the -Dbrowser option to the HMRC webdriver factory library
+      fork in AcceptanceTest := false,
+      (testOptions in AcceptanceTest) := Seq(Tests.Filter(_ startsWith "acceptance")),
+      AcceptanceTest / run / javaOptions ++= Seq(
+        "-Dconfig.resource=test.application.conf",
+        "-Dlogger.resource=logback-test.xml"
+      )
+    )

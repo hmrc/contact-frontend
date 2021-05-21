@@ -32,6 +32,8 @@ object AppDependencies {
     "uk.gov.hmrc"            %% "bootstrap-test-play-27"   % "2.25.0"         % scope,
     "uk.gov.hmrc"            %% "domain"                   % "5.11.0-play-27" % scope,
     "com.vladsch.flexmark"    % "flexmark-all"             % "0.35.10"        % scope,
+    "uk.gov.hmrc"            %% "webdriver-factory"        % "0.18.0"         % scope,
+    "org.scalatestplus"      %% "selenium-3-141"           % "3.2.0.0"        % scope,
     "com.github.tomakehurst"  % "wiremock"                 % "2.18.0"         % "test"
   )
 }
