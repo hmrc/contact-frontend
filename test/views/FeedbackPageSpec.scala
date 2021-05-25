@@ -475,7 +475,7 @@ class FeedbackPageSpec
       content.body should not include "Is this page not working properly?"
     }
 
-    "include a link to the problem reports nonjs form with service filled from the form" in {
+    "include a link to the report technical problem form with service filled from the form" in {
       val contentWithService = feedbackPage(
         form.fill(
           formValues.copy(service = Some("foo"))
@@ -483,7 +483,7 @@ class FeedbackPageSpec
         action
       )
 
-      val links = contentWithService.select("a[href=/contact/problem_reports_nonjs?newTab=true&service=foo]")
+      val links = contentWithService.select("a[href=/contact/report-technical-problem?newTab=true&service=foo]")
       links              should have size 1
       links.first.text shouldBe "Is this page not working properly? (opens in new tab)"
     }
