@@ -28,7 +28,7 @@ object AppDependencies {
     "org.jsoup"               % "jsoup"                    % "1.11.3"         % scope,
     "com.github.tomakehurst"  % "wiremock"                 % "1.58"           % scope,
     "org.scalacheck"         %% "scalacheck"               % "1.14.0"         % scope,
-    "uk.gov.hmrc"            %% "bootstrap-test-play-28"   % "5.3.0"         % scope,
+    "uk.gov.hmrc"            %% "bootstrap-test-play-28"   % "5.3.0"          % scope,
     "uk.gov.hmrc"            %% "domain"                   % "5.11.0-play-27" % scope,
     "com.vladsch.flexmark"    % "flexmark-all"             % "0.35.10"        % scope,
     "uk.gov.hmrc"            %% "webdriver-factory"        % "0.18.0"         % scope,
