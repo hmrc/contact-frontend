@@ -3,8 +3,6 @@ resolvers += Resolver.url("HMRC-open-artefacts-ivy2", url("https://open.artefact
   Resolver.ivyStylePatterns
 )
 
-resolvers += "HMRC Releases" at "https://dl.bintray.com/hmrc/releases"
-
 resolvers += Resolver.typesafeRepo("releases")
 
 addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "3.0.0")
