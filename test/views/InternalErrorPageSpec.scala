@@ -52,9 +52,9 @@ class InternalErrorPageSpec
       banners.first.text should be("HM Revenue & Customs")
     }
 
-    "include the hmrc language toggle" in {
+    "not include the hmrc language toggle" in {
       val languageSelect = content.select(".hmrc-language-select")
-      languageSelect should have size 1
+      languageSelect should have size 0
     }
 
     "display the correct browser title" in {
