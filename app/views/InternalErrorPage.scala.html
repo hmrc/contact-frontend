@@ -23,7 +23,7 @@
 )
 @()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 @defining(messages("deskpro.error.page.title")) { pageTitle =>
-  @mainLayout(pageTitle, isWelshTranslationAvailable = true) {
+  @mainLayout(pageTitle, isWelshTranslationAvailable = false) {
     @h1(content = Text(messages("deskpro.error.page.heading")))
     @p(content = Text(messages("deskpro.error.try.later")))
     @p(content = Text(messages("deskpro.error.not.sent")))
