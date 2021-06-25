@@ -15,25 +15,20 @@
  *@
 
 @import config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardHeader, HmrcStandardFooter, HmrcScripts, HmrcHead, HmrcLanguageSelectHelper}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import views.html.helper.CSPNonce
 
 @this(
         govukLayout: GovukLayout,
-        hmrcStandardHeader: HmrcStandardHeader,
-        hmrcStandardFooter: HmrcStandardFooter,
-        head: HmrcHead,
-        hmrcLanguageSelectHelper: HmrcLanguageSelectHelper,
-        scripts: HmrcScripts
+        hmrcLayout: HmrcLayout
 )
 
-@(pageTitle: String, beforeContent: Option[Html] = None, isWelshTranslationAvailable: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(pageTitle: String, isWelshTranslationAvailable: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
-@govukLayout(
-    pageTitle = Some(pageTitle),
-    headBlock = Some(head(nonce = CSPNonce.get)),
-    headerBlock = Some(hmrcStandardHeader(displayHmrcBanner = true)),
-    scriptsBlock = Some(scripts(nonce = CSPNonce.get)),
-    beforeContentBlock = if(isWelshTranslationAvailable) Some(hmrcLanguageSelectHelper()) else None,
-    footerBlock = Some(hmrcStandardFooter())
+@hmrcLayout(
+  pageTitle = Some(pageTitle),
+    nonce = CSPNonce.get,
+    isWelshTranslationAvailable = isWelshTranslationAvailable,
+    displayHmrcBanner = true
 )(contentBlock)
+
