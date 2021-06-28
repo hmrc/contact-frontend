@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package controllers
+package connectors.enrolments
 
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolments}
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-trait ContactFrontendActions extends AuthorisedFunctions {
+case class EnrolmentsConnector @Inject() (authConnector: AuthConnector)(implicit executionContext: ExecutionContext)
+    extends AuthorisedFunctions {
 
-  implicit val executionContext: ExecutionContext
-
-  protected def maybeAuthenticatedUserEnrolments()(implicit
+  def maybeAuthenticatedUserEnrolments()(implicit
     hc: HeaderCarrier,
     request: Request[_]
   ): Future[Option[Enrolments]] =

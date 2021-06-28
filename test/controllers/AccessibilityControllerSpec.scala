@@ -19,6 +19,7 @@ package controllers
 import config.CFConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
+import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -29,14 +30,11 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.HeaderNames.REFERER
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.Application
-import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
-import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
+import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
@@ -279,13 +277,8 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
     val hmrcDeskproConnector: HmrcDeskproConnector = mock[HmrcDeskproConnector]
 
-    val authConnector: AuthConnector = new AuthConnector {
-      override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
-        hc: HeaderCarrier,
-        ec: ExecutionContext
-      ): Future[A] =
-        Future.successful(Json.parse("{ \"allEnrolments\" : []}").as[A](retrieval.reads))
-    }
+    val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
+    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
 
     implicit val cconfig: CFConfig = new CFConfig(app.configuration)
 
@@ -297,7 +290,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
     val controller = new AccessibilityController(
       hmrcDeskproConnector,
-      authConnector,
+      enrolmentsConnector,
       Stubs.stubMessagesControllerComponents(messagesApi = messages),
       playFrontendAccessibilityPage,
       playFrontendAccessibilityConfirmationPage,

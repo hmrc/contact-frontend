@@ -18,6 +18,7 @@ package controllers
 
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
+import connectors.enrolments.EnrolmentsConnector
 
 import javax.inject.{Inject, Singleton}
 import model.FeedbackForm
@@ -28,7 +29,6 @@ import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
-import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator}
 import views.html.partials.{feedback_form, feedback_form_confirmation}
@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton class FeedbackController @Inject() (
   val hmrcDeskproConnector: HmrcDeskproConnector,
-  val authConnector: AuthConnector,
+  enrolmentsConnector: EnrolmentsConnector,
   val accessibleUrlValidator: BackUrlValidator,
   mcc: MessagesControllerComponents,
   feedbackConfirmationPage: FeedbackConfirmationPage,
@@ -51,8 +51,7 @@ import scala.concurrent.{ExecutionContext, Future}
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport
-    with ContactFrontendActions {
+    with I18nSupport {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
@@ -89,7 +88,7 @@ import scala.concurrent.{ExecutionContext, Future}
         data =>
           {
             for {
-              maybeEnrolments <- maybeAuthenticatedUserEnrolments()
+              maybeEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
               ticketId        <- createDeskproFeedback(data, maybeEnrolments)
             } yield Redirect(
               routes.FeedbackController.thanks(data.backUrl)
@@ -143,7 +142,7 @@ import scala.concurrent.{ExecutionContext, Future}
         ),
       data =>
         (for {
-          enrolments <- maybeAuthenticatedUserEnrolments()
+          enrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
           ticketId   <- createDeskproFeedback(data, enrolments)
         } yield Ok(ticketId.ticket_id.toString)).recover { case _ =>
           InternalServerError

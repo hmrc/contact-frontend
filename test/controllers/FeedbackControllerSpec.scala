@@ -17,10 +17,10 @@
 package controllers
 
 import java.net.URLEncoder
-
 import config.CFConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
+import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -30,13 +30,10 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
-import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
+import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.BackUrlValidator
@@ -313,6 +310,9 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
     def hmrcConnectorWillReturnTheTicketId() = mockHmrcConnector(Future.successful(TicketId(123)))
 
+    val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
+    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
+
     val feedbackName: String     = "John Densmore"
     val feedbackRating: String   = "2"
     val feedbackEmail: String    = "name@mail.com"
@@ -349,14 +349,6 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         any[Option[String]]
       )(any[HeaderCarrier])
 
-    val authConnector = new AuthConnector {
-      override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
-        hc: HeaderCarrier,
-        ec: ExecutionContext
-      ): Future[A] =
-        Future.successful(Json.parse("{ \"allEnrolments\" : []}").as[A](retrieval.reads))
-    }
-
     val backUrlValidator = new BackUrlValidator() {
       override def validate(backUrl: String) = backUrl == "http://www.valid.url"
     }
@@ -370,7 +362,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
     val controller = new FeedbackController(
       hmrcDeskproConnector,
-      authConnector,
+      enrolmentsConnector,
       backUrlValidator,
       Stubs.stubMessagesControllerComponents(),
       playFrontendFeedbackConfirmationPage,
@@ -379,8 +371,6 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       playFrontendFeedbackPage,
       errorPage
     )(new CFConfig(app.configuration), ExecutionContext.Implicits.global)
-
-    val enrolments = Some(Enrolments(Set()))
 
     def generateRequest(
       javascriptEnabled: Boolean = true,
