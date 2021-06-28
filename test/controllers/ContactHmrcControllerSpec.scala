@@ -21,6 +21,7 @@ import akka.stream.ActorMaterializer
 import config.CFConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
+import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => mockitoEq}
 import org.mockito.Mockito
@@ -38,7 +39,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, contentAsString, redirectLocation, _}
-import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
+import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
@@ -581,15 +582,15 @@ class ContactHmrcControllerSpec
 
   class TestScope extends MockitoSugar {
 
-    val authConnector = mock[AuthConnector]
-
     val configuration = app.configuration
 
     implicit val appConfig        = new CFConfig(configuration)
     implicit val executionContext = ExecutionContext.Implicits.global
     implicit val messages         = app.injector.instanceOf[MessagesApi]
 
-    val hmrcDeskproConnector = mock[HmrcDeskproConnector]
+    val hmrcDeskproConnector                     = mock[HmrcDeskproConnector]
+    val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
+    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
 
     val contactForm             = app.injector.instanceOf[views.html.partials.contact_hmrc_form]
     val contactFormConfirmation =
@@ -601,7 +602,7 @@ class ContactHmrcControllerSpec
     val controller =
       new ContactHmrcController(
         hmrcDeskproConnector,
-        authConnector,
+        enrolmentsConnector,
         Stubs.stubMessagesControllerComponents(messagesApi = messages),
         contactForm,
         contactFormConfirmation,

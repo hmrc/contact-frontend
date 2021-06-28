@@ -18,6 +18,7 @@ package controllers
 
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
+import connectors.enrolments.EnrolmentsConnector
 
 import javax.inject.Inject
 import model.AccessibilityForm
@@ -28,7 +29,6 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Req
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission
-import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.DeskproEmailValidator
 import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, InternalErrorPage}
@@ -85,7 +85,7 @@ object AccessibilityFormBind {
 
 class AccessibilityController @Inject() (
   val hmrcDeskproConnector: HmrcDeskproConnector,
-  val authConnector: AuthConnector,
+  enrolmentsConnector: EnrolmentsConnector,
   mcc: MessagesControllerComponents,
   accessibilityProblemPage: AccessibilityProblemPage,
   accessibilityProblemConfirmationPage: AccessibilityProblemConfirmationPage,
@@ -93,8 +93,7 @@ class AccessibilityController @Inject() (
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport
-    with ContactFrontendActions {
+    with I18nSupport {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
@@ -128,7 +127,7 @@ class AccessibilityController @Inject() (
             {
               val thanks = routes.AccessibilityController.thanks()
               for {
-                maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
+                maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
                 _                   <- createAccessibilityTicket(data, maybeUserEnrolments)
               } yield Redirect(thanks)
             }.recover { case _ =>

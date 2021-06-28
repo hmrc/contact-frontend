@@ -18,6 +18,7 @@ package controllers
 
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
+import connectors.enrolments.EnrolmentsConnector
 
 import javax.inject.{Inject, Singleton}
 import model.ReportProblemForm
@@ -27,12 +28,10 @@ import play.api.i18n.{I18nSupport, Lang}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request}
 import services.DeskproSubmission
-import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.DeskproEmailValidator
 import views.html.partials.{error_feedback, error_feedback_inner, ticket_created_body}
 import views.html.{InternalErrorPage, ReportProblemConfirmationPage, ReportProblemPage}
-import play.api.http.HeaderNames._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -114,7 +113,7 @@ object ReportProblemFormBind {
 @Singleton
 class ReportProblemController @Inject() (
   val hmrcDeskproConnector: HmrcDeskproConnector,
-  val authConnector: AuthConnector,
+  enrolmentsConnector: EnrolmentsConnector,
   mcc: MessagesControllerComponents,
   reportProblemPage: ReportProblemPage,
   confirmationPage: ReportProblemConfirmationPage,
@@ -124,7 +123,6 @@ class ReportProblemController @Inject() (
   errorPage: InternalErrorPage
 )(implicit appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
-    with ContactFrontendActions
     with DeskproSubmission
     with I18nSupport {
 
@@ -190,7 +188,7 @@ class ReportProblemController @Inject() (
           .orElse(problemReport.referrer.filter(_.trim.nonEmpty))
           .orElse(request.headers.get(REFERER))
         (for {
-          maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
+          maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
           _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
         } yield Redirect(routes.ReportProblemController.thanks())) recover { case _ =>
           InternalServerError(errorPage())
@@ -204,7 +202,7 @@ class ReportProblemController @Inject() (
       problemReport => {
         val referrer = problemReport.referrer.filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
         (for {
-          maybeUserEnrolments <- maybeAuthenticatedUserEnrolments
+          maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
           ticketId            <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
         } yield {
           val view = ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
