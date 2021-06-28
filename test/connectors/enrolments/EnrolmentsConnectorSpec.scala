@@ -16,7 +16,6 @@
 
 package connectors.enrolments
 
-import org.junit.rules.ExpectedException
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{Json, _}
