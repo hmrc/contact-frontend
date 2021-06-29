@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+
 @import model.FeedbackForm
 @import views.html.components.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Paragraph, ReportTechnicalIssue}
 
@@ -25,6 +26,7 @@
     inputText: InputText,
     inputRadios: InputRadios,
     govukButton: GovukButton,
+    govukCheckboxes: GovukCheckboxes,
     govukErrorSummary: GovukErrorSummary,
     formWithCSRF: PlayFrontendFormWithCSRF,
     mainLayout: Layout,
@@ -53,17 +55,36 @@
           @inputHidden(backUrlField)
         }
       }
-      @inputRadios(
-        feedbackForm("feedback-rating"),
-        legend = Messages("form.online.services"),
-        items = Seq(
-          ("5", Messages("form.online.services.very_good")),
-          ("4", Messages("form.online.services.good")),
-          ("3", Messages("form.online.services.neutral")),
-          ("2", Messages("form.online.services.bad")),
-          ("1", Messages("form.online.services.very_bad"))
-        )
-      )
+        @govukCheckboxes(Checkboxes(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text("Which types of waste do you transport?"),
+                    classes = "govuk-fieldset__legend--l",
+                    isPageHeading = true
+                ))
+            )),
+            hint = Some(Hint(
+                content = Text("Select all that apply.")
+            )),
+            items = Seq(
+                CheckboxItem(
+                    content = Text("Waste from animal carcasses"),
+                    value = "5"
+                ),
+                CheckboxItem(
+                    content = Text("Waste from mines or quarries"),
+                    value = "4"
+                ),
+                CheckboxItem(
+                    divider = Some("or")
+                ),
+                CheckboxItem(
+                    content = Text("Farm or agricultural waste"),
+                    value = "1",
+                    behaviour = Some(ExclusiveCheckbox)
+                )
+            )
+        ).withFormField(feedbackForm("feedback-rating")))
       @inputText(
         feedbackForm("feedback-name"),
         label = messages("feedback.name.label"),

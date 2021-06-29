@@ -36,7 +36,7 @@
 
 @mainLayout(pageTitle) {
     @if(dateInputForm.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummary(errorList = dateInputForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+        @govukErrorSummary(ErrorSummary(errorList = dateInputForm.errors.asTextErrorLinksWithNestedKeys(Map("date" -> "date.day")), title = Text(messages("error.summary.title"))))
     }
     @formWithCSRF(action, 'id -> "date-input-form") {
 
