@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import views.html.components.{Layout, Heading1, ReportTechnicalIssue}
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 
 @this(
     dateInput: GovukDateInput,
@@ -36,7 +37,7 @@
 
 @mainLayout(pageTitle) {
     @if(dateInputForm.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummary(errorList = dateInputForm.errors.asTextErrorLinksWithNestedKeys(Map("date" -> "date.day")), title = Text(messages("error.summary.title"))))
+        @govukErrorSummary(ErrorSummary().withFormTextErrors(dateInputForm, mapping = Map("date" -> "date.day")))
     }
     @formWithCSRF(action, 'id -> "date-input-form") {
 
