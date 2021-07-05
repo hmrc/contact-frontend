@@ -78,7 +78,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
       status(result) should be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("referrer").`val` should be("referrer-from-url")
+      document.select("input[name=referrer]").`val` should be("referrer-from-url")
     }
 
     "bind the referrer from the header if no URL parameter passed in" in new TestScope {
@@ -88,7 +88,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
       status(result) should be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("referrer").`val` should be("referrer-from-header")
+      document.select("input[name=referrer]").`val` should be("referrer-from-header")
     }
   }
 

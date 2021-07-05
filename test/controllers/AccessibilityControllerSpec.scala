@@ -68,7 +68,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       val document = Jsoup.parse(contentAsString(result))
       document.title()                                                             should be(Messages("accessibility.title"))
       document.getElementById("accessibility-form")                                should not be null
-      document.getElementById("service").`val`()                                   should be("")
+      document.getElementsByAttributeValue("name", "service").`val`()              should be("")
       document.getElementsByAttributeValue("name", "userAction").first().`val`() shouldBe "test?1234=xyz"
       document.getElementsByAttributeValue("name", "referrer").first().`val`()   shouldBe "some.referrer.url"
     }

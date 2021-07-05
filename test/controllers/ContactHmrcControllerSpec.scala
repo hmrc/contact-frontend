@@ -87,9 +87,9 @@ class ContactHmrcControllerSpec
         .body()
         .select("form[id=contact-hmrc-form]")
         .first
-        .attr("action")                                    shouldBe s"/contact/contact-hmrc"
-      page.body().getElementById("referrer").attr("value") shouldBe "/some-service-page"
-      page.body().getElementById("service").attr("value")  shouldBe ""
+        .attr("action")                                        shouldBe s"/contact/contact-hmrc"
+      page.body().select("input[name=referrer]").attr("value") shouldBe "/some-service-page"
+      page.body().select("input[name=service]").attr("value")  shouldBe ""
     }
 
     "return expected OK for index page with URL parameters" in new TestScope {
@@ -112,9 +112,9 @@ class ContactHmrcControllerSpec
         .body()
         .select("form[id=contact-hmrc-form]")
         .first
-        .attr("action")                                    shouldBe s"/contact/contact-hmrc?$queryString"
-      page.body().getElementById("referrer").attr("value") shouldBe "/url-from-query"
-      page.body().getElementById("service").attr("value")  shouldBe "my-fake-service"
+        .attr("action")                                shouldBe s"/contact/contact-hmrc?$queryString"
+      page.body().select("input[name=referrer]").`val` shouldBe "/url-from-query"
+      page.body().select("input[name=service]").`val`  shouldBe "my-fake-service"
     }
 
     "use the referrerUrl parameter if supplied" in new TestScope {
@@ -130,7 +130,7 @@ class ContactHmrcControllerSpec
 
       Then("the referrer hidden input should contain that value")
       val page = Jsoup.parse(contentAsString(contactResult))
-      page.body().getElementById("referrer").attr("value") shouldBe "https://www.example.com/some-service"
+      page.body().select("input[name=referrer]").`val` shouldBe "https://www.example.com/some-service"
     }
 
     "fallback to n/a if no referrer information is available" in new TestScope {
@@ -145,7 +145,7 @@ class ContactHmrcControllerSpec
 
       Then("the referrer hidden input should be n/a")
       val page = Jsoup.parse(contentAsString(contactResult))
-      page.body().getElementById("referrer").attr("value") shouldBe "n/a"
+      page.body().select("input[name=referrer]").`val` shouldBe "n/a"
     }
 
     "return expected OK for submit page" in new TestScope {
