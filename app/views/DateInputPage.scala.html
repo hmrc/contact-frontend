@@ -37,7 +37,7 @@
 
 @mainLayout(pageTitle) {
     @if(dateInputForm.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummary().withFormTextErrors(dateInputForm, mapping = Map("date" -> "date.day")))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(dateInputForm, mapping = Map("date" -> "date.day")))
     }
     @formWithCSRF(action, 'id -> "date-input-form") {
 
