@@ -137,7 +137,9 @@ class AccessibilityProblemPageSpec
     }
 
     "include a CSRF token as a hidden input" in {
-      content.select("input[name=csrfToken]") should have size 1
+      val input = content.select("input[name=csrfToken]")
+      input              should have size 1
+      input.attr("type") should be("hidden")
     }
 
     "include the service hidden input" in {
