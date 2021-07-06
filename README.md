@@ -168,7 +168,7 @@ This form is linked to from [accessibility-statement-frontend](https://www.githu
 and is not intended to be used directly.
 
 Services that have not yet migrated to accessibility-statement-frontend display a link that opens a new tab to:
-* `https://www.{environment}.tax.service.gov.uk/contact/accessility?service=${serviceId}&referrerUrl=${referrerUrl}`
+* `https://www.{environment}.tax.service.gov.uk/contact/accessibility?service=${serviceId}&referrerUrl=${referrerUrl}`
 
 `{environment}` is not included in the case of the production environment.
 
