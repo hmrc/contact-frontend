@@ -23,7 +23,6 @@ feedback.comments.hint=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariann
 common.feedback.get.help=A yw’r dudalen hon yn gweithio’n iawn?
 
 error.browser.title.prefix=Gwall:
-error.summary.title=Mae problem wedi codi
 
 language-switcher.english=English
 language-switcher.english.hover=Use this account in English
