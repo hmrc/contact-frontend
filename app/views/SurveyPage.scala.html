@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import model.SurveyForm
 @import views.html.components.{Layout, InputRadios, InputHidden, InputCharacterCount, Heading1}
 
@@ -37,7 +37,7 @@
 
 @mainLayout(pageTitle) {
     @if(surveyForm.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummary(errorList = surveyForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(surveyForm))
     }
     @h1(content = Text(messages("survey.heading")))
     @formWithCSRF(action, 'id -> "survey-form") {
