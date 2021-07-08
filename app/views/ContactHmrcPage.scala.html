@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import views.html.components.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
 
 @this(
@@ -45,7 +45,7 @@
 
 @mainLayout(pageTitle) {
     @if(contactForm.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummary(errorList = contactForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(contactForm))
     }
     @h1(content = Text(messages("contact.heading")))
     @p(content = HtmlContent(messages("contact.form.para1") + " " + contactHmrcLink + messages("common.fullstop")))

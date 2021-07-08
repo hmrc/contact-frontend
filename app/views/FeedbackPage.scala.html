@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import model.FeedbackForm
 @import views.html.components.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Paragraph, ReportTechnicalIssue}
 
@@ -40,7 +40,7 @@
 
 @mainLayout(pageTitle) {
     @if(feedbackForm.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummary(errorList = feedbackForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(feedbackForm))
     }
     @h1(content = Text(messages("feedback.heading")))
     @p(content = Text(messages("form.online.services.data")))
