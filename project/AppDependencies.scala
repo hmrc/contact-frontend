@@ -8,14 +8,14 @@ object AppDependencies {
   }
 
   private val compile = Seq(
-    "uk.gov.hmrc"              %% "bootstrap-frontend-play-28" % "5.7.0",
+    "uk.gov.hmrc"              %% "bootstrap-frontend-play-28" % "5.8.0-SNAPSHOT",
     "uk.gov.hmrc"              %% "govuk-template"             % "5.68.0-play-27",
     "uk.gov.hmrc"              %% "play-ui"                    % "9.6.0-play-28",
     "uk.gov.hmrc"              %% "url-builder"                % "3.5.0-play-28",
     "uk.gov.hmrc"              %% "auth-client"                % "5.6.0-play-28",
     "commons-validator"         % "commons-validator"          % "1.6",
     "org.apache.httpcomponents" % "httpclient"                 % "4.4.1",
-    "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "0.82.0-play-28"
+    "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "0.84.0-play-28-SNAPSHOT"
   )
 
   private def test(scope: String) = Seq(

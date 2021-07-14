@@ -9,7 +9,8 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     scalaVersion := "2.12.10",
     majorVersion := 3,
-    libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it"))
+    libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it")),
+    resolvers += Resolver.mavenLocal
   )
   .settings(publishingSettings: _*)
   .configs(IntegrationTest, AcceptanceTest)

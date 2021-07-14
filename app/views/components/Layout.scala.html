@@ -14,12 +14,13 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcLayout,HmrcTimeoutDialogHelper}
 @import views.html.helper.CSPNonce
 
 @this(
         govukLayout: GovukLayout,
-        hmrcLayout: HmrcLayout
+        hmrcLayout: HmrcLayout,
+        hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
 )
 
 @(pageTitle: String, isWelshTranslationAvailable: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
@@ -28,6 +29,6 @@
   pageTitle = Some(pageTitle),
     nonce = CSPNonce.get,
     isWelshTranslationAvailable = isWelshTranslationAvailable,
+    additionalHeadBlock = Some(hmrcTimeoutDialogHelper(signOutUrl = "/sign-out")),
     displayHmrcBanner = true
 )(contentBlock)
-
