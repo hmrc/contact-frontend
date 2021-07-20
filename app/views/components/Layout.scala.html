@@ -17,10 +17,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import views.html.helper.CSPNonce
 
-@this(
-        govukLayout: GovukLayout,
-        hmrcLayout: HmrcLayout
-)
+@this(hmrcLayout: HmrcLayout)
 
 @(pageTitle: String, isWelshTranslationAvailable: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
