@@ -89,11 +89,8 @@ import scala.concurrent.{ExecutionContext, Future}
           {
             for {
               maybeEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
-              ticketId        <- createDeskproFeedback(data, maybeEnrolments)
-            } yield Redirect(
-              routes.FeedbackController.thanks(data.backUrl)
-            )
-              .withSession(request.session + ("ticketId" -> ticketId.ticket_id.toString))
+              _               <- createDeskproFeedback(data, maybeEnrolments)
+            } yield Redirect(routes.FeedbackController.thanks(data.backUrl))
           }.recover { case _ =>
             InternalServerError(errorPage())
           }
