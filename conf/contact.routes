@@ -1,5 +1,6 @@
 ->          /govuk-frontend                              govuk.Routes
 ->          /hmrc-frontend                               hmrcfrontend.Routes
+->          /bootstrap                                   bootstrap.Routes
 
 GET         /beta-feedback                               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false)
 POST        /beta-feedback                               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false)
