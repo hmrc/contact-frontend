@@ -16,12 +16,9 @@
 
 @import views.html.components.Layout
 
-@this(govukPanel: GovukPanel, govukBackLink: GovukBackLink, mainLayout: Layout)
+@this(govukPanel: GovukPanel, mainLayout: Layout)
 @(backUrl: Option[String] = None)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
-@mainLayout(pageTitle = messages("feedback.confirmation.title")) {
+@mainLayout(pageTitle = messages("feedback.confirmation.title"), backLink = backUrl) {
   @govukPanel(Panel(title = Text(messages("feedback.confirmation.message"))))
-  @backUrl.map { url =>
-    <a class="govuk-link" href="@url">@messages("feedback.confirmation.back")</a>
-  }
 }

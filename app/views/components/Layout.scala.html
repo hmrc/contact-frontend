@@ -19,12 +19,13 @@
 
 @this(hmrcLayout: HmrcLayout)
 
-@(pageTitle: String, isWelshTranslationAvailable: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(pageTitle: String, isWelshTranslationAvailable: Boolean = true, backLink: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @hmrcLayout(
   pageTitle = Some(pageTitle),
   nonce = CSPNonce.get,
   isWelshTranslationAvailable = isWelshTranslationAvailable,
-  displayHmrcBanner = true
+  displayHmrcBanner = true,
+  backLinkUrl = backLink
 )(contentBlock)
 

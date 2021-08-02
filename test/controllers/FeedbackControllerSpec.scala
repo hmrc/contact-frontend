@@ -241,9 +241,9 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       )
       val page   = Jsoup.parse(contentAsString(submit))
 
-      page.body().select(".govuk-link") should have size 2
+      page.body().select(".govuk-back-link") should have size 1
 
-      page.body().select(".govuk-link").get(1).attr("href") shouldBe "http://www.valid.url"
+      page.body().select(".govuk-back-link").get(0).attr("href") shouldBe "http://www.valid.url"
     }
 
     "not contain back link if requested and the back url is invalid" in new TestScope {
