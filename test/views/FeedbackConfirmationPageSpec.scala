@@ -48,9 +48,9 @@ class FeedbackConfirmationPageSpec
 
     "include a back link" in {
       val contentWithBackLink = feedbackConfirmationPage(backUrl = Some("/foo"))
-      val backlinks           = contentWithBackLink.select("a.govuk-link")
-      backlinks                     should have size 2
-      backlinks.get(1).attr("href") should be("/foo")
+      val backlinks           = contentWithBackLink.select("a.govuk-back-link")
+      backlinks                     should have size 1
+      backlinks.get(0).attr("href") should be("/foo")
     }
 
     "translate the title into Welsh if requested" in {
