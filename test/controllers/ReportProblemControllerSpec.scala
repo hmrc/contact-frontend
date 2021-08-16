@@ -458,7 +458,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
     val errorFeedbackFormInner = app.injector.instanceOf[views.html.partials.error_feedback_inner]
     val ticketCreatedBody      = app.injector.instanceOf[views.html.partials.ticket_created_body]
 
-    val controller = new ReportProblemController(
+    val controller = new DemoController(
       mock[HmrcDeskproConnector],
       enrolmentsConnector,
       Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),

@@ -1,3 +1,4 @@
 ->         /contact              contact.Routes
 ->         /template             template.Routes
 GET        /admin/metrics        @com.kenshoo.play.metrics.MetricsController.metrics
+GET        /platui-1290          @controllers.DemoController.index(show: Option[String])
