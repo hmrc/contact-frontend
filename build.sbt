@@ -22,11 +22,6 @@ lazy val microservice = Project(appName, file("."))
     pipelineStages in Assets := Seq(gzip)
   )
   .settings(
-    TwirlKeys.templateImports ++= Seq(
-      "config.AppConfig",
-      "uk.gov.hmrc.govukfrontend.views.html.components._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.components._"
-    ),
     // ***************
     // Use the silencer plugin to suppress warnings from unused imports in compiled twirl templates
     scalacOptions += "-P:silencer:pathFilters=views;routes",

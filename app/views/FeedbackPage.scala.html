@@ -14,19 +14,22 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcCharacterCount, CharacterCount}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.{RichCharacterCount, RichErrorSummary}
 @import model.FeedbackForm
-@import views.html.components.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Paragraph, ReportTechnicalIssue}
+@import views.html.components.{Layout, InputHidden, Heading1, Paragraph, ReportTechnicalIssue}
+@import config.AppConfig
 
 @this(
-    inputCharacterCount: InputCharacterCount,
+    hmrcCharacterCount: HmrcCharacterCount,
     inputHidden: InputHidden,
-    inputText: InputText,
-    inputRadios: InputRadios,
+    govukInput: GovukInput,
+    govukRadios: GovukRadios,
     govukButton: GovukButton,
     govukErrorSummary: GovukErrorSummary,
-    formWithCSRF: PlayFrontendFormWithCSRF,
+    formWithCSRF: FormWithCSRF,
     mainLayout: Layout,
     h1: Heading1,
     p: Paragraph,
@@ -42,8 +45,8 @@
     @if(feedbackForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(feedbackForm))
     }
-    @h1(content = Text(messages("feedback.heading")))
-    @p(content = Text(messages("form.online.services.data")))
+    @h1("feedback.heading")
+    @p("form.online.services.data")
     @formWithCSRF(action, 'id -> "feedback-form") {
       @inputHidden(feedbackForm("service"))
       @inputHidden(feedbackForm("referrer"))
@@ -53,40 +56,35 @@
           @inputHidden(backUrlField)
         }
       }
-      @inputRadios(
-        feedbackForm("feedback-rating"),
-        legend = Messages("form.online.services"),
+      @govukRadios(Radios(
         items = Seq(
-          ("5", Messages("form.online.services.very_good")),
-          ("4", Messages("form.online.services.good")),
-          ("3", Messages("form.online.services.neutral")),
-          ("2", Messages("form.online.services.bad")),
-          ("1", Messages("form.online.services.very_bad"))
-        )
-      )
-      @inputText(
-        feedbackForm("feedback-name"),
-        label = messages("feedback.name.label"),
+            ("5", "form.online.services.very_good"),
+            ("4", "form.online.services.good"),
+            ("3", "form.online.services.neutral"),
+            ("2", "form.online.services.bad"),
+            ("1", "form.online.services.very_bad")
+        )).withFormField(feedbackForm("feedback-rating"))
+              .withHeadingAndSectionCaption("form.online.services", "personal.details"))
+      @govukInput(Input(
+        label = "feedback.name.label",
         classes = "govuk-!-width-two-thirds",
         spellcheck = Some(false),
         autocomplete = Some("name")
-      )
-      @inputText(
-        feedbackForm("feedback-email"),
+      ).withFormField(feedbackForm("feedback-name")))
+      @govukInput(Input(
         inputType = "email",
-        label = messages("feedback.email.label"),
+        label = "feedback.email.label",
         classes = "govuk-!-width-two-thirds",
         spellcheck = Some(false),
         autocomplete = Some("email")
-      )
-      @inputCharacterCount(
-        feedbackForm("feedback-comments"),
-        hint = Some(messages("feedback.comments.hint")),
-        label = messages("form.comments"),
+      ).withFormField(feedbackForm("feedback-email")))
+      @hmrcCharacterCount(CharacterCount(
+        hint = Some("feedback.comments.hint".toHint()),
+        label = "form.comments",
         maxLength = Some(2000)
-      )
+      ).withFormField(feedbackForm("feedback-comments")))
       @govukButton(Button(
-        content = Text(messages("feedback.send")),
+        content = "feedback.send",
         inputType = Some("submit"),
         preventDoubleClick = true
       ))

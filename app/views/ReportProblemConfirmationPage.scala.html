@@ -15,6 +15,7 @@
  *@
 
 @import views.html.components.{Layout, Heading1, Heading2, Paragraph}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @this(
     mainLayout: Layout,
@@ -22,13 +23,12 @@
     h2: Heading2,
     p: Paragraph
 )
-@()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@()(implicit request: RequestHeader, messages: Messages)
 
 @mainLayout(Messages("contact.title")) {
 
-    @h1(content = Text(Messages("contact.heading")))
-    @h2(content = Text(messages("common.thank.you")))
-
-    @p(content = Text(messages("contact.confirmation.message")))
+    @h1("contact.heading")
+    @h2("common.thank.you")
+    @p("contact.confirmation.message")
 
 }

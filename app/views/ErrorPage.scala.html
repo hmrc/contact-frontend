@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *@
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
 @import views.html.components.{Layout, Heading1, Paragraph}
 
@@ -21,7 +22,7 @@
     h1: Heading1,
     p: Paragraph
 )
-@(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader, messages: Messages)
 @mainLayout(pageTitle, isWelshTranslationAvailable = false) {
     @h1(content = Text(heading))
     @p(content = Text(message))

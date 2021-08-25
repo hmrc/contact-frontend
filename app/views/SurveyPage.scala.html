@@ -14,22 +14,26 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcCharacterCount, CharacterCount}
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.{RichCharacterCount, RichErrorSummary}
 @import model.SurveyForm
-@import views.html.components.{Layout, InputRadios, InputHidden, InputCharacterCount, Heading1}
+@import views.html.components.{Layout, InputHidden, Heading1}
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLegend
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcSectionCaption
 
 @this(
-    inputCharacterCount: InputCharacterCount,
+    hmrcCharacterCount: HmrcCharacterCount,
     inputHidden: InputHidden,
-    inputRadios: InputRadios,
+    govukRadios: GovukRadios,
     govukButton: GovukButton,
     govukErrorSummary: GovukErrorSummary,
-    formWithCSRF: PlayFrontendFormWithCSRF,
+    formWithCSRF: FormWithCSRF,
     mainLayout: Layout,
     h1: Heading1
 )
-@(surveyForm: Form[SurveyForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(surveyForm: Form[SurveyForm], action: Call)(implicit request: RequestHeader, messages: Messages)
 
 @pageTitle = @{
     if(surveyForm.hasErrors){messages("error.browser.title.prefix")+" "+messages("survey.title")} else messages("survey.title")
@@ -39,35 +43,36 @@
     @if(surveyForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(surveyForm))
     }
-    @h1(content = Text(messages("survey.heading")))
+    @h1("survey.heading")
     @formWithCSRF(action, 'id -> "survey-form") {
       @inputHidden(surveyForm("service-id"))
       @inputHidden(surveyForm("ticket-id"))
       @defining(Seq(
-        ("5", messages("survey.strongly.agree.response")),
-        ("4", messages("survey.agree.response")),
-        ("3", messages("survey.neutral.response")),
-        ("2", messages("survey.disagree.response")),
-        ("1", messages("survey.strongly.disagree.response"))
+        ("5", "survey.strongly.agree.response"),
+        ("4", "survey.agree.response"),
+        ("3", "survey.neutral.response"),
+        ("2", "survey.disagree.response"),
+        ("1", "survey.strongly.disagree.response")
       )) { items =>
-        @inputRadios(
-          surveyForm("helpful"),
-          legend = messages("survey.was.answer.helpful.question"),
+        @govukRadios(Radios(
           items = items
-        )
-        @inputRadios(
-          surveyForm("speed"),
-          legend = messages("survey.satisfied.with.speed.question"),
+        ).withFormField(surveyForm("helpful"))
+          .withHeading("survey.was.answer.helpful.question"))
+        @govukRadios(Radios(
+          fieldset = Some("survey.satisfied.with.speed.question"),
           items = items
-        )
+        ).withFormField(surveyForm("speed")))
+        @govukRadios(Radios(
+          fieldset = Some("survey.satisfied.with.speed.question".toFieldset()),
+          items = items
+        ).withFormField(surveyForm("speed")))
       }
-      @inputCharacterCount(
-        surveyForm("improve"),
-        label = messages("survey.tell.us.how.we.can.improve"),
+      @hmrcCharacterCount(CharacterCount(
+        label = "survey.tell.us.how.we.can.improve",
         maxLength = Some(2500)
-      )
+      ).withFormField(surveyForm("improve")))
       @govukButton(Button(
-        content = Text(messages("survey.submit")),
+        content = "survey.submit",
         inputType = Some("submit"),
         preventDoubleClick = true
       ))

@@ -14,24 +14,26 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcCharacterCount, CharacterCount}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.{RichCharacterCount, RichErrorSummary}
 @import model.AccessibilityForm
-@import views.html.components.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
+@import views.html.components.{Layout, InputHidden, Heading1, Heading2, Paragraph}
 
 @this(
-    inputCharacterCount: InputCharacterCount,
+    hmrcCharacterCount: HmrcCharacterCount,
     inputHidden: InputHidden,
-    inputText: InputText,
+    govukInput: GovukInput,
     govukButton: GovukButton,
     govukErrorSummary: GovukErrorSummary,
-    formWithCSRF: PlayFrontendFormWithCSRF,
+    formWithCSRF: FormWithCSRF,
     mainLayout: Layout,
     h1: Heading1,
     h2: Heading2,
     p: Paragraph
 )
-@(accessibilityForm: Form[AccessibilityForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(accessibilityForm: Form[AccessibilityForm], action: Call)(implicit request: RequestHeader, messages: Messages)
 
 @pageTitle = @{
     if(accessibilityForm.hasErrors){Messages("error.browser.title.prefix")+" "+Messages("accessibility.title")} else Messages("accessibility.title")
@@ -41,39 +43,33 @@
     @if(accessibilityForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(accessibilityForm))
     }
-    @h1(content = Text(messages("accessibility.heading")))
-    @p(content = Text(messages("accessibility.message.para1")))
-    @p(content = Text(messages("accessibility.message.para2")))
+    @h1("accessibility.heading".toText())
+    @p("accessibility.message.para1")
+    @p("accessibility.message.para2")
     @formWithCSRF(action, 'id -> "accessibility-form") {
         @inputHidden(accessibilityForm("service"))
         @inputHidden(accessibilityForm("referrer"))
         @inputHidden(accessibilityForm("userAction"))
-        @inputCharacterCount(
-            accessibilityForm("problemDescription"),
-            label = messages("accessibility.problem.label"),
-            labelClasses = "govuk-label--s",
+        @hmrcCharacterCount(CharacterCount(
+            label = Label(classes = "govuk-label--s", content = "accessibility.problem.label"),
             maxLength = Some(2000)
-        )
-        @inputText(
-            accessibilityForm("name"),
-            label = messages("accessibility.name.label"),
-            labelClasses = "govuk-label--s",
+        ).withFormField(accessibilityForm("problemDescription")))
+        @govukInput(Input(
+            label = Label(classes = "govuk-label--s", content = "accessibility.name.label"),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("name")
-        )
-        @inputText(
-            accessibilityForm("email"),
+        ).withFormField(accessibilityForm("name")))
+        @govukInput(Input(
             inputType = "email",
-            label = messages("accessibility.email.label"),
-            labelClasses = "govuk-label--s",
-            hint = Some(messages("accessibility.email.hint")),
+            label = Label(classes = "govuk-label--s", content = "accessibility.email.label"),
+            hint = Some("accessibility.email.hint"),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("email")
-        )
+        ).withFormField(accessibilityForm("email")))
         @govukButton(Button(
-            content = Text(messages("accessibility.button")),
+            content = "accessibility.button",
             inputType = Some("submit"),
             preventDoubleClick = true
         ))

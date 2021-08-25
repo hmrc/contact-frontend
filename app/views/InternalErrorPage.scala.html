@@ -15,17 +15,19 @@
  *@
 
 @import views.html.components.{Layout, Heading1, Paragraph}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import config.AppConfig
 
 @this(
     mainLayout: Layout,
     h1: Heading1,
     p: Paragraph
 )
-@()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@()(implicit request: RequestHeader, messages: Messages)
 @defining(messages("deskpro.error.page.title")) { pageTitle =>
   @mainLayout(pageTitle, isWelshTranslationAvailable = false) {
-    @h1(content = Text(messages("deskpro.error.page.heading")))
-    @p(content = Text(messages("deskpro.error.try.later")))
-    @p(content = Text(messages("deskpro.error.not.sent")))
+    @h1("deskpro.error.page.heading")
+    @p("deskpro.error.try.later")
+    @p("deskpro.error.not.sent")
   }
 }

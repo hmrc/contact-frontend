@@ -14,26 +14,27 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcCharacterCount, CharacterCount}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.{RichCharacterCount, RichErrorSummary}
 @import model.ReportProblemForm
-@import views.html.components.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
+@import views.html.components.{Layout, InputHidden, Heading1, Heading2, Paragraph}
 
 @this(
-    inputCharacterCount: InputCharacterCount,
+    hmrcCharacterCount: HmrcCharacterCount,
     govukInput: GovukInput,
     inputHidden: InputHidden,
-    inputText: InputText,
     govukButton: GovukButton,
     govukFieldset: GovukFieldset,
     govukErrorSummary: GovukErrorSummary,
-    formWithCSRF: PlayFrontendFormWithCSRF,
+    formWithCSRF: FormWithCSRF,
     mainLayout: Layout,
     h1: Heading1,
     h2: Heading2,
     p: Paragraph
 )
-@(problemReportForm: Form[ReportProblemForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(problemReportForm: Form[ReportProblemForm], action: Call)(implicit request: RequestHeader, messages: Messages)
 
 @pageTitle = @{
     if(problemReportForm.hasErrors){Messages("error.browser.title.prefix") + " " + Messages("problem_report.title")}
@@ -44,42 +45,38 @@
     @if(problemReportForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(problemReportForm))
     }
-    @h1(content = Text(messages("problem_report.heading")))
-    @p(content = Text(messages("problem_report.paragraph.1")))
-    @p(content = Text(messages("problem_report.paragraph.2")))
+    @h1("problem_report.heading")
+    @p("problem_report.paragraph.1")
+    @p("problem_report.paragraph.2")
     @formWithCSRF(action, 'id -> "error-feedback-form") {
         @inputHidden(problemReportForm("service"))
         @inputHidden(problemReportForm("referrer"))
         @inputHidden(problemReportForm("userAction"))
-        @inputText(
-            problemReportForm("report-name"),
-            label = messages("problem_report.name.label"),
+        @govukInput(Input(
+            label = "problem_report.name.label",
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("name")
-        )
-        @inputText(
-            problemReportForm("report-email"),
+        ).withFormField(problemReportForm("report-name")))
+        @govukInput(Input(
             inputType = "email",
-            label = messages("problem_report.email.label"),
+            label = "problem_report.email.label".toLabel(),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("email")
-        )
-        @inputCharacterCount(
-            problemReportForm("report-action"),
-            label = messages("problem_report.action.label"),
+        ).withFormField(problemReportForm("report-email")))
+        @hmrcCharacterCount(CharacterCount(
+            label = "problem_report.action.label",
             classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
-        )
-        @inputCharacterCount(
-            problemReportForm("report-error"),
-            label = messages("problem_report.error.label"),
+        ).withFormField(problemReportForm("report-action")))
+        @hmrcCharacterCount(CharacterCount(
+            label = "problem_report.error.label",
             classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
-        )
+        ).withFormField(problemReportForm("report-error")))
         @govukButton(Button(
-            content = Text(messages("problem_report.button")),
+            content = "problem_report.button",
             inputType = Some("submit"),
             preventDoubleClick = true
         ))
