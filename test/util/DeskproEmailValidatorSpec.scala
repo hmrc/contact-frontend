@@ -25,9 +25,14 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
 
   "Given a valid email address, an email validator" should {
     "return true" in {
-      emailValidator.validate("some.name@foo.com")   shouldBe true
-      emailValidator.validate("some.name@foo.co.uk") shouldBe true
-      emailValidator.validate("some_name@foo.biz")   shouldBe true
+      emailValidator.validate("some.name@foo.com")     shouldBe true
+      emailValidator.validate("some.name@foo.co.uk")   shouldBe true
+      emailValidator.validate("some_name@foo.biz")     shouldBe true
+      emailValidator.validate("somename@foo.com")      shouldBe true
+      emailValidator.validate("s@f.c")                 shouldBe true
+      emailValidator.validate("SOMENAME@foo.com")      shouldBe true
+      emailValidator.validate("SOMENAME@FOO.COM")      shouldBe true
+      emailValidator.validate("some.name@mailserver1") shouldBe true
     }
   }
 
@@ -41,9 +46,23 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
 
   "Given an email address with an invalid domain, an email validator" should {
     "return false" in {
-      emailValidator.validate("some.name@o.2")     shouldBe false
-      emailValidator.validate("some.name@moo.min") shouldBe false
-      emailValidator.validate("some.name@foo")     shouldBe false
+      emailValidator.validate("some.name@foo.")        shouldBe false
+      emailValidator.validate("some.name@.com")        shouldBe false
+      emailValidator.validate("some_name@foo_bar.com") shouldBe false
+    }
+  }
+
+  "Given an email address with a valid IP address, an email validator" should {
+    "return true" in {
+      emailValidator.validate("some.name@01.01.01.01")   shouldBe true
+      emailValidator.validate("some.name@251.12.19.223") shouldBe true
+    }
+  }
+
+  "Given an email address with an invalid IP address, an email validator" should {
+    "return true" in {
+      emailValidator.validate("some.name@111.222.333.444") shouldBe false
+      emailValidator.validate("some.name@251.12.19")       shouldBe false
     }
   }
 }
