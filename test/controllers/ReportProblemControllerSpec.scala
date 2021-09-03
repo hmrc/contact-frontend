@@ -241,7 +241,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
     }
 
     "return Bad Request and page with validation error if the email has invalid syntax (for Deskpro)" in new TestScope {
-      val request = generateRequest(isAjaxRequest = false, email = "a.a.a")
+      val request = generateRequest(isAjaxRequest = false, email = "a@a")
       val submit  = controller.submit(None, None)(request)
       val page    = Jsoup.parse(contentAsString(submit))
 
@@ -314,7 +314,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
     }
 
     "return Bad Request and JSON with error status if the email has invalid syntax (for DeskPRO)" in new TestScope {
-      val request = generateRequest(isAjaxRequest = true, email = "a.a.a")
+      val request = generateRequest(isAjaxRequest = true, email = "a@a")
       val submit  = controller.submitDeprecated(None)(request)
 
       status(submit) should be(BAD_REQUEST)
@@ -381,7 +381,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
     }
 
     "fail if the email has invalid syntax (for DeskPRO)" in new TestScope {
-      val request = generateRequest(isAjaxRequest = false, email = "a.a.a")
+      val request = generateRequest(isAjaxRequest = false, email = "a@a")
       val submit  = controller.submitDeprecated(None)(request)
       val page    = Jsoup.parse(contentAsString(submit))
 
