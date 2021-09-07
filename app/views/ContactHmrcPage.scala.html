@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcCharacterCount, CharacterCount}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.{RichCharacterCount, RichErrorSummary}
 @import views.html.components.{Layout, InputHidden, Heading1, Heading2, Paragraph}
 @import config.AppConfig
@@ -49,35 +50,35 @@
     @if(contactForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(contactForm))
     }
-    @h1("contact.heading")
+    @h1(messages("contact.heading"))
     @p(content = HtmlContent(messages("contact.form.para1") + " " + contactHmrcLink + messages("common.fullstop")))
-    @p("contact.form.para2")
-    @h2("contact.form.heading2")
-    @p("contact.form.para3")
+    @p(messages("contact.form.para2"))
+    @h2(messages("contact.form.heading2"))
+    @p(messages("contact.form.para3"))
 
     @formWithCSRF(action, 'id -> "contact-hmrc-form") {
         @inputHidden(contactForm("service"))
         @inputHidden(contactForm("referrer"))
         @inputHidden(contactForm("userAction"))
         @govukInput(Input(
-            label = "contact.name.label",
+            label = messages("contact.name.label"),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("name")
         ).withFormField(contactForm("contact-name")))
         @govukInput(Input(
             inputType = "email",
-            label = "contact.email.label",
+            label = messages("contact.email.label"),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("email")
         ).withFormField(contactForm("contact-email")))
         @hmrcCharacterCount(CharacterCount(
-            label = "contact.comments.label",
+            label = messages(("contact.comments.label")),
             maxLength = Some(2000)
         ).withFormField(contactForm("contact-comments")))
         @govukButton(Button(
-            content = "contact.button",
+            content = messages(("contact.button")),
             inputType = Some("submit"),
             preventDoubleClick = true
         ))

@@ -18,9 +18,10 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 
 @this(govukPanel: GovukPanel, govukBackLink: GovukBackLink, mainLayout: Layout)
 @()(implicit request: RequestHeader, messages: Messages)
 @mainLayout(pageTitle = messages("survey.title")) {
-  @govukPanel(Panel(title = "survey.confirmation.title"))
+  @govukPanel(Panel(title = messages("survey.confirmation.title")))
 }

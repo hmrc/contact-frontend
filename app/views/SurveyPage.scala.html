@@ -22,6 +22,7 @@
 @import views.html.components.{Layout, InputHidden, Heading1}
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLegend
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcSectionCaption
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 
 @this(
     hmrcCharacterCount: HmrcCharacterCount,
@@ -43,36 +44,36 @@
     @if(surveyForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(surveyForm))
     }
-    @h1("survey.heading")
+    @h1(messages("survey.heading"))
     @formWithCSRF(action, 'id -> "survey-form") {
       @inputHidden(surveyForm("service-id"))
       @inputHidden(surveyForm("ticket-id"))
       @defining(Seq(
-        ("5", "survey.strongly.agree.response"),
-        ("4", "survey.agree.response"),
-        ("3", "survey.neutral.response"),
-        ("2", "survey.disagree.response"),
-        ("1", "survey.strongly.disagree.response")
+        ("5", messages("survey.strongly.agree.response")),
+        ("4", messages("survey.agree.response")),
+        ("3", messages("survey.neutral.response")),
+        ("2", messages("survey.disagree.response")),
+        ("1", messages("survey.strongly.disagree.response"))
       )) { items =>
         @govukRadios(Radios(
           items = items
         ).withFormField(surveyForm("helpful"))
-          .withHeading("survey.was.answer.helpful.question"))
+          .withHeading(messages("survey.was.answer.helpful.question")))
         @govukRadios(Radios(
-          fieldset = Some("survey.satisfied.with.speed.question"),
+          fieldset = Some(messages("survey.satisfied.with.speed.question")),
           items = items
         ).withFormField(surveyForm("speed")))
         @govukRadios(Radios(
-          fieldset = Some("survey.satisfied.with.speed.question".toFieldset()),
+          fieldset = Some(messages("survey.satisfied.with.speed.question")),
           items = items
         ).withFormField(surveyForm("speed")))
       }
       @hmrcCharacterCount(CharacterCount(
-        label = "survey.tell.us.how.we.can.improve",
+        label = messages("survey.tell.us.how.we.can.improve"),
         maxLength = Some(2500)
       ).withFormField(surveyForm("improve")))
       @govukButton(Button(
-        content = "survey.submit",
+        content = messages("survey.submit"),
         inputType = Some("submit"),
         preventDoubleClick = true
       ))

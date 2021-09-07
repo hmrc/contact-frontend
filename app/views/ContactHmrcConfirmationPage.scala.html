@@ -16,6 +16,7 @@
 
 @import views.html.components.{Layout, Heading1, Heading2, Paragraph}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 
 @this(
         mainLayout: Layout,
@@ -27,8 +28,8 @@
 
 @mainLayout(Messages("contact.title")) {
 
-    @h1("contact.heading")
-    @h2("common.thank.you")
-    @p("contact.confirmation.message")
+    @h1(messages("contact.heading"))
+    @h2(messages("common.thank.you"))
+    @p(messages("contact.confirmation.message"))
 
 }

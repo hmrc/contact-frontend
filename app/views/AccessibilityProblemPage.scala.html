@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.{RichCharacterCount, RichErrorSummary}
 @import model.AccessibilityForm
 @import views.html.components.{Layout, InputHidden, Heading1, Heading2, Paragraph}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 
 @this(
     hmrcCharacterCount: HmrcCharacterCount,
@@ -43,33 +44,33 @@
     @if(accessibilityForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(accessibilityForm))
     }
-    @h1("accessibility.heading".toText())
-    @p("accessibility.message.para1")
-    @p("accessibility.message.para2")
+    @h1(messages("accessibility.heading"))
+    @p(messages("accessibility.message.para1"))
+    @p(messages("accessibility.message.para2"))
     @formWithCSRF(action, 'id -> "accessibility-form") {
         @inputHidden(accessibilityForm("service"))
         @inputHidden(accessibilityForm("referrer"))
         @inputHidden(accessibilityForm("userAction"))
         @hmrcCharacterCount(CharacterCount(
-            label = Label(classes = "govuk-label--s", content = "accessibility.problem.label"),
+            label = Label(classes = "govuk-label--s", content = messages("accessibility.problem.label")),
             maxLength = Some(2000)
         ).withFormField(accessibilityForm("problemDescription")))
         @govukInput(Input(
-            label = Label(classes = "govuk-label--s", content = "accessibility.name.label"),
+            label = Label(classes = "govuk-label--s", content = messages("accessibility.name.label")),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("name")
         ).withFormField(accessibilityForm("name")))
         @govukInput(Input(
             inputType = "email",
-            label = Label(classes = "govuk-label--s", content = "accessibility.email.label"),
-            hint = Some("accessibility.email.hint"),
+            label = Label(classes = "govuk-label--s", content = messages("accessibility.email.label")),
+            hint = Some(messages("accessibility.email.hint")),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("email")
         ).withFormField(accessibilityForm("email")))
         @govukButton(Button(
-            content = "accessibility.button",
+            content = messages("accessibility.button"),
             inputType = Some("submit"),
             preventDoubleClick = true
         ))

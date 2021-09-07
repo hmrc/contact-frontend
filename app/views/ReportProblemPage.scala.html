@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcCharacterCount, CharacterCount}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.{RichCharacterCount, RichErrorSummary}
 @import model.ReportProblemForm
 @import views.html.components.{Layout, InputHidden, Heading1, Heading2, Paragraph}
@@ -45,38 +46,38 @@
     @if(problemReportForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(problemReportForm))
     }
-    @h1("problem_report.heading")
-    @p("problem_report.paragraph.1")
-    @p("problem_report.paragraph.2")
+    @h1(messages("problem_report.heading"))
+    @p(messages("problem_report.paragraph.1"))
+    @p(messages("problem_report.paragraph.2"))
     @formWithCSRF(action, 'id -> "error-feedback-form") {
         @inputHidden(problemReportForm("service"))
         @inputHidden(problemReportForm("referrer"))
         @inputHidden(problemReportForm("userAction"))
         @govukInput(Input(
-            label = "problem_report.name.label",
+            label = messages("problem_report.name.label"),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("name")
         ).withFormField(problemReportForm("report-name")))
         @govukInput(Input(
             inputType = "email",
-            label = "problem_report.email.label".toLabel(),
+            label = messages("problem_report.email.label"),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("email")
         ).withFormField(problemReportForm("report-email")))
         @hmrcCharacterCount(CharacterCount(
-            label = "problem_report.action.label",
+            label = messages("problem_report.action.label"),
             classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
         ).withFormField(problemReportForm("report-action")))
         @hmrcCharacterCount(CharacterCount(
-            label = "problem_report.error.label",
+            label = messages("problem_report.error.label"),
             classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
         ).withFormField(problemReportForm("report-error")))
         @govukButton(Button(
-            content = "problem_report.button",
+            content = messages("problem_report.button"),
             inputType = Some("submit"),
             preventDoubleClick = true
         ))

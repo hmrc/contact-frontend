@@ -16,6 +16,7 @@
 
 @import views.html.components.{Layout, Heading1, Paragraph}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 @import config.AppConfig
 
 @this(
@@ -26,8 +27,8 @@
 @()(implicit request: RequestHeader, messages: Messages)
 @defining(messages("deskpro.error.page.title")) { pageTitle =>
   @mainLayout(pageTitle, isWelshTranslationAvailable = false) {
-    @h1("deskpro.error.page.heading")
-    @p("deskpro.error.try.later")
-    @p("deskpro.error.not.sent")
+    @h1(messages("deskpro.error.page.heading"))
+    @p(messages("deskpro.error.try.later"))
+    @p(messages("deskpro.error.not.sent"))
   }
 }

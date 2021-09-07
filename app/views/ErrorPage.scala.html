@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 
 @import views.html.components.{Layout, Heading1, Paragraph}
 
@@ -24,6 +25,6 @@
 )
 @(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader, messages: Messages)
 @mainLayout(pageTitle, isWelshTranslationAvailable = false) {
-    @h1(content = Text(heading))
-    @p(content = Text(message))
+    @h1(content = heading)
+    @p(content = message)
 }
