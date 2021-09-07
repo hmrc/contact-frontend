@@ -38,8 +38,8 @@
 @(problemReportForm: Form[ReportProblemForm], action: Call)(implicit request: RequestHeader, messages: Messages)
 
 @pageTitle = @{
-    if(problemReportForm.hasErrors){Messages("error.browser.title.prefix") + " " + Messages("problem_report.title")}
-    else Messages("problem_report.title")
+    if(problemReportForm.hasErrors){messages("error.browser.title.prefix") + " " + messages("problem_report.title")}
+    else messages("problem_report.title")
 }
 
 @mainLayout(pageTitle) {

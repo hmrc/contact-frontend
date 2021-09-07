@@ -18,7 +18,6 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcCharacterCount, CharacterCount}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.{RichCharacterCount, RichErrorSummary}
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 @import model.FeedbackForm
 @import views.html.components.{Layout, InputHidden, Heading1, Paragraph, ReportTechnicalIssue}
 @import config.AppConfig
@@ -39,15 +38,15 @@
 @(feedbackForm: Form[FeedbackForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @pageTitle = @{
-    if(feedbackForm.hasErrors){Messages("error.browser.title.prefix")+" "+Messages("feedback.title")} else Messages("feedback.title")
+    if(feedbackForm.hasErrors){messages("error.browser.title.prefix")+" "+messages("feedback.title")} else messages("feedback.title")
 }
 
 @mainLayout(pageTitle) {
     @if(feedbackForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(feedbackForm))
     }
-    @h1(messages("feedback.heading"))
-    @p(messages("form.online.services.data"))
+    @h1(messages("feedback.heading").toText)
+    @p(messages("form.online.services.data").toText)
     @formWithCSRF(action, 'id -> "feedback-form") {
       @inputHidden(feedbackForm("service"))
       @inputHidden(feedbackForm("referrer"))
@@ -64,28 +63,28 @@
             ("3", messages("form.online.services.neutral")),
             ("2", messages("form.online.services.bad")),
             ("1", messages("form.online.services.very_bad"))
-        )).withFormField(feedbackForm("feedback-rating"))
-              .withHeadingAndSectionCaption(messages("form.online.services"), messages("personal.details")))
+        ).toRadioItems).withFormField(feedbackForm("feedback-rating"))
+              .withHeadingAndSectionCaption(messages("form.online.services").toText, messages("personal.details").toText))
       @govukInput(Input(
-        label = messages("feedback.name.label"),
+        label = messages("feedback.name.label").toLabel,
         classes = "govuk-!-width-two-thirds",
         spellcheck = Some(false),
         autocomplete = Some("name")
       ).withFormField(feedbackForm("feedback-name")))
       @govukInput(Input(
         inputType = "email",
-        label = messages("feedback.email.label"),
+        label = messages("feedback.email.label").toLabel,
         classes = "govuk-!-width-two-thirds",
         spellcheck = Some(false),
         autocomplete = Some("email")
       ).withFormField(feedbackForm("feedback-email")))
       @hmrcCharacterCount(CharacterCount(
-        hint = Some(messages("feedback.comments.hint")),
-        label = messages("form.comments"),
+        hint = Some(messages("feedback.comments.hint").toHint),
+        label = messages("form.comments").toLabel,
         maxLength = Some(2000)
       ).withFormField(feedbackForm("feedback-comments")))
       @govukButton(Button(
-        content = messages("feedback.send"),
+        content = messages("feedback.send").toText,
         inputType = Some("submit"),
         preventDoubleClick = true
       ))

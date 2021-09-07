@@ -17,11 +17,10 @@
 @import views.html.components.Layout
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 
 @this(govukPanel: GovukPanel, mainLayout: Layout)
 @(backUrl: Option[String] = None)(implicit request: RequestHeader, messages: Messages)
 
 @mainLayout(pageTitle = messages("feedback.confirmation.title"), backLink = backUrl) {
-  @govukPanel(Panel(title = messages("feedback.confirmation.message")))
+  @govukPanel(Panel(title = messages("feedback.confirmation.message").toText))
 }

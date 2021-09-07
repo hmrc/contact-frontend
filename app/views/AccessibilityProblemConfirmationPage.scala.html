@@ -17,13 +17,12 @@
 @import views.html.components.{Layout, Heading2, Paragraph}
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicitConversions._
 
 @this(govukPanel: GovukPanel, mainLayout: Layout, h2: Heading2, p: Paragraph)
 @()(implicit request: RequestHeader, messages: Messages)
 
-@mainLayout(pageTitle = Messages("accessibility.title")) {
-    @govukPanel(Panel(title = messages("accessibility.confirmation.title")))
-    @h2(messages("accessibility.confirmation.subheading"))
-    @p(messages("accessibility.confirmation.paragraph"))
+@mainLayout(pageTitle = messages("accessibility.title")) {
+    @govukPanel(Panel(title = messages("accessibility.confirmation.title").toText))
+    @h2(messages("accessibility.confirmation.subheading").toText)
+    @p(messages("accessibility.confirmation.paragraph").toText)
 }
