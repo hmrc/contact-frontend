@@ -1,5 +1,60 @@
 # Maintaining contact-frontend and hmrc-deskpro
 
+## Prerequisites
+
+* [Node.js](https://nodejs.org/en/) `>= 12.13.1`
+
+* [Mongo DB](https://www.mongodb.com/)
+
+The easiest way to run Mongo is using [docker](https://hub.docker.com/_/mongo).
+
+* [service manager](https://www.github.com/hmrc/service-manager)
+    
+You will need the HMRCDESKPRO service running locally:
+
+```shell script
+sm --start HMRCDESKPRO
+```
+
+## To run locally
+
+To start the application locally with the test-only endpoints enabled,
+
+```shell script
+./run.sh
+```
+
+You should then be able to navigate to the following endpoints:
+
+* http://localhost:9250/contact/contact-hmrc?service=foo
+* http://localhost:9250/contact/report-technical-problem?service=foo
+* http://localhost:9250/contact/survey?ticketId=ABCD-EFGH-ASDF&serviceId=foo
+* http://localhost:9250/contact/beta-feedback?service=foo
+* http://localhost:9250/contact/accessibility?service=foo
+
+## Running all unit and integration tests together
+
+To run the Scala unit and integration tests,
+
+```shell script
+sbt a11yTest it:test
+```
+
+The above tests include accessibility checks via the
+[sbt-accessibility-linter](https://www.github.com/hmrc/sbt-accessibility-linter)
+plugin.
+
+## Running UI acceptance tests
+
+To run the UI acceptance tests locally, you will need a copy of Chrome
+and the Chrome browser driver installed at /usr/local/bin/chromedriver
+
+```shell script
+./run_acceptance_tests.sh
+```
+
+The Chrome driver is available at https://chromedriver.chromium.org/
+
 ## ADRs in contact-frontend
 
 We are using MADRs to record architecturally significant decisions in this service. To find out more

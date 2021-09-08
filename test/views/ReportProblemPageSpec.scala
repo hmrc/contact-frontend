@@ -17,7 +17,7 @@
 package views
 
 import config.AppConfig
-import _root_.helpers.{ApplicationSupport}
+import _root_.helpers.ApplicationSupport
 import _root_.helpers.{JsoupHelpers, MessagesSupport}
 import model.ReportProblemForm
 import org.scalatest.matchers.should.Matchers
@@ -30,13 +30,15 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.ReportProblemPage
 import play.api.test.CSRFTokenHelper._
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 
 class ReportProblemPageSpec
     extends AnyWordSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers {
+    with JsoupHelpers
+    with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/problem_reports_nonjs").withCSRFToken
 
@@ -73,6 +75,10 @@ class ReportProblemPageSpec
   "the Problem Reports standalone page" should {
     val reportProblemPage = app.injector.instanceOf[ReportProblemPage]
     val content           = reportProblemPage(problemReportsForm, action)
+
+    "pass accessibility checks" in {
+      content.toString() should passAccessibilityChecks
+    }
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")
