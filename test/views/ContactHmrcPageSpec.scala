@@ -21,16 +21,14 @@ import config.AppConfig
 import controllers.ContactForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.ContactHmrcPage
 
 class ContactHmrcPageSpec
@@ -38,7 +36,8 @@ class ContactHmrcPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers {
+    with JsoupHelpers
+    with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
 
@@ -75,6 +74,10 @@ class ContactHmrcPageSpec
   "the Contact Hmrc standalone page" should {
     val contactHmrcPage = app.injector.instanceOf[ContactHmrcPage]
     val content         = contactHmrcPage(contactHmrcForm, action)
+
+    "pass accessibility checks" in {
+      content.toString() should passAccessibilityChecks
+    }
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")

@@ -21,24 +21,23 @@ import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import model.AccessibilityForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.AccessibilityProblemPage
 import play.api.test.CSRFTokenHelper._
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 
 class AccessibilityProblemPageSpec
     extends AnyWordSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers {
+    with JsoupHelpers
+    with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
@@ -75,6 +74,10 @@ class AccessibilityProblemPageSpec
   "the report an accessibility problem page" should {
     val accessibilityProblemPage = app.injector.instanceOf[AccessibilityProblemPage]
     val content                  = accessibilityProblemPage(accessibilityForm, action)
+
+    "pass accessibility checks" in {
+      content.toString() should passAccessibilityChecks
+    }
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")

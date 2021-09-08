@@ -20,20 +20,19 @@ import config.AppConfig
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import views.html.AccessibilityProblemConfirmationPage
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 
 class AccessibilityProblemConfirmationPageSpec
     extends AnyWordSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers {
+    with JsoupHelpers
+    with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
   implicit lazy val messages: Messages         = getMessages(app, fakeRequest)
@@ -42,6 +41,10 @@ class AccessibilityProblemConfirmationPageSpec
   "the report an accessibility problem confirmation page" should {
     val accessibilityProblemConfirmationPage = app.injector.instanceOf[AccessibilityProblemConfirmationPage]
     val content                              = accessibilityProblemConfirmationPage()
+
+    "pass accessibility checks" in {
+      content.toString() should passAccessibilityChecks
+    }
 
     "include the confirmation panel" in {
       val panels = content.select("h1.govuk-panel__title")

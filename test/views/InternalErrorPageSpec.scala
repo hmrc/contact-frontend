@@ -20,12 +20,12 @@ import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.InternalErrorPage
 
 class InternalErrorPageSpec
@@ -33,7 +33,8 @@ class InternalErrorPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers {
+    with JsoupHelpers
+    with AccessibilityMatchers {
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
   implicit lazy val messages: Messages = getMessages(app, fakeRequest)
@@ -44,6 +45,10 @@ class InternalErrorPageSpec
     val errorTemplate = app.injector.instanceOf[InternalErrorPage]
     val content       =
       errorTemplate()
+
+    "pass accessibility checks" in {
+      content.toString() should passAccessibilityChecks
+    }
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")

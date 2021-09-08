@@ -20,10 +20,10 @@ import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.FeedbackConfirmationPage
 
 class FeedbackConfirmationPageSpec
@@ -31,7 +31,8 @@ class FeedbackConfirmationPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers {
+    with JsoupHelpers
+    with AccessibilityMatchers {
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
   implicit lazy val messages: Messages         = getMessages(app, fakeRequest)
   implicit lazy val appConfig: AppConfig       = app.injector.instanceOf[AppConfig]
@@ -39,6 +40,10 @@ class FeedbackConfirmationPageSpec
   "the feedback confirmation page" should {
     val feedbackConfirmationPage = app.injector.instanceOf[FeedbackConfirmationPage]
     val content                  = feedbackConfirmationPage()
+
+    "pass accessibility checks" in {
+      content.toString() should passAccessibilityChecks
+    }
 
     "include the confirmation panel" in {
       val panels = content.select("h1")
