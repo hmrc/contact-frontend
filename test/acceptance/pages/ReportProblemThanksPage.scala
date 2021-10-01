@@ -16,20 +16,12 @@
 
 package acceptance.pages
 
-import acceptance.conf.TestConfiguration
-import acceptance.driver.BrowserDriver
-import org.scalatest.matchers.should.Matchers
-import org.scalatestplus.selenium.{Page, WebBrowser}
+object ReportProblemThanksPage extends BasePage {
+  val url: String        = wrapUrl("/report-technical-problem?service=pay")
+  val pageTitle          = "Help and contact – GOV.UK"
+  val expectedHeading    = "Help and contact"
+  val expectedSubHeading = "Thank you"
 
-trait BasePage extends Matchers with Page with WebBrowser with BrowserDriver {
-
-  val url: String
-
-  def wrapUrl(partialUrl: String): String =
-    TestConfiguration.url("contact-frontend") + partialUrl
-
-  val pageTitle: String
-
-  def errorPageTitle: String = s"Error: $pageTitle"
-
+  def heading    = tagName("h1").element.text
+  def subHeading = tagName("h2").element.text
 }

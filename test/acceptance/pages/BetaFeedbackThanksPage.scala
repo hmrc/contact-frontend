@@ -16,14 +16,13 @@
 
 package acceptance.pages
 
-import acceptance.conf.TestConfiguration
+object BetaFeedbackThanksPage extends BasePage {
 
-object ThankYouPage extends BasePage {
-  val url: String        = wrapUrl("/report-technical-problem?service=pay")
-  val title              = "Help and contact – GOV.UK"
-  val expectedHeading    = "Help and contact"
-  val expectedSubHeading = "Thank you"
+  val url: String = wrapUrl("/beta-feedback/thanks")
+  val pageTitle   = "Your feedback – GOV.UK"
 
-  def heading    = tagName("h1").element.text
-  def subHeading = tagName("h2").element.text
+  val expectedHeading = "Your feedback has been received."
+
+  def heading = tagName("h1").element.text
+
 }

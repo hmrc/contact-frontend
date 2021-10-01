@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package acceptance.pages
+package acceptance.support
 
-import acceptance.conf.TestConfiguration
-import acceptance.driver.BrowserDriver
-import org.scalatest.matchers.should.Matchers
-import org.scalatestplus.selenium.{Page, WebBrowser}
+import scala.util.Random
 
-trait BasePage extends Matchers with Page with WebBrowser with BrowserDriver {
+trait Helpers {
 
-  val url: String
+  protected val validName: String  = "Firstname Lastname"
+  protected val validEmail: String = "firstname.lastname@example.com"
 
-  def wrapUrl(partialUrl: String): String =
-    TestConfiguration.url("contact-frontend") + partialUrl
-
-  val pageTitle: String
-
-  def errorPageTitle: String = s"Error: $pageTitle"
-
+  protected def generateRandomString(length: Int): String =
+    Random.alphanumeric.take(length).mkString
 }
