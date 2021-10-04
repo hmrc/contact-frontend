@@ -20,8 +20,9 @@ import acceptance.support.Helpers
 
 object ReportProblemPage extends BasePage with Helpers {
 
-  val url: String = wrapUrl("/problem_reports_nonjs?service=pay")
-  val pageTitle   = "Get help with a technical problem – GOV.UK"
+  val url: String            = wrapUrl("/problem_reports_nonjs?service=pay")
+  val pageTitle: String      = "Get help with a technical problem – GOV.UK"
+  val welshPageTitle: String = "Cael help gyda phroblem dechnegol – GOV.UK"
 
   def nameField: TextField   = textField("report-name")
   def emailField: EmailField = emailField("report-email")
@@ -37,4 +38,5 @@ object ReportProblemPage extends BasePage with Helpers {
     actionField.value = generateRandomString(25)
     errorField.value = generateRandomString(25)
   }
+
 }

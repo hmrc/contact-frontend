@@ -20,8 +20,9 @@ import acceptance.support.Helpers
 
 object BetaFeedbackPage extends BasePage with Helpers {
 
-  val url: String = wrapUrl("/beta-feedback?service=pay")
-  val pageTitle   = "Send your feedback – GOV.UK"
+  val url: String            = wrapUrl("/beta-feedback?service=pay")
+  val pageTitle: String      = "Send your feedback – GOV.UK"
+  val welshPageTitle: String = "Anfon eich adborth – GOV.UK"
 
   def ratingRadioGroup        = radioButtonGroup("feedback-rating")
   def nameField: TextField    = textField("feedback-name")
@@ -40,6 +41,7 @@ object BetaFeedbackPage extends BasePage with Helpers {
     commentsField.value = generateRandomString(commentsLength)
   }
 
-  def submitReportForm =
+  def submitReportForm() =
     click on CssSelectorQuery(".govuk-button[type=submit]")
+
 }

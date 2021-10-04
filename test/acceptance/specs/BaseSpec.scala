@@ -31,6 +31,7 @@ trait BaseSpec
     extends AnyFeatureSpec
     with GivenWhenThen
     with BeforeAndAfterAll
+    with BeforeAndAfterEach
     with Matchers
     with WebBrowser
     with AcceptanceTestServer
@@ -52,6 +53,9 @@ trait BaseSpec
       Try(SingletonDriver.closeInstance())
     }
   }
+
+  override def beforeEach(): Unit =
+    WebBrowser.deleteAllCookies()
 
   override def withFixture(test: NoArgTest): Outcome = {
     val fixture = super.withFixture(test)
