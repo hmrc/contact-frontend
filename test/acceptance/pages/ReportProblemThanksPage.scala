@@ -17,11 +17,14 @@
 package acceptance.pages
 
 object ReportProblemThanksPage extends BasePage {
-  val url: String        = wrapUrl("/report-technical-problem?service=pay")
-  val pageTitle          = "Help and contact – GOV.UK"
-  val expectedHeading    = "Help and contact"
-  val expectedSubHeading = "Thank you"
+  val url: String            = wrapUrl("/report-technical-problem?service=pay")
+  val pageTitle: String      = "Help and contact – GOV.UK"
+  val welshPageTitle: String = "Cymorth a chysylltiadau – GOV.UK"
 
-  def heading    = tagName("h1").element.text
-  def subHeading = tagName("h2").element.text
+  val expectedHeading: String    = "Help and contact"
+  val expectedSubHeading: String = "Thank you"
+
+  def heading: String    = tagName("h1").element.text
+  def subHeading: String = tagName("h2").element.text
+
 }

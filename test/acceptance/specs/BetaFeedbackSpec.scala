@@ -165,4 +165,22 @@ class BetaFeedbackSpec extends BaseSpec {
       }
     }
   }
+
+  Feature("Language switching") {
+
+    Scenario("I switch my language to Welsh", UiTests) {
+
+      Given("I am on the send your feedback page")
+      go to BetaFeedbackPage
+      pageTitle shouldBe BetaFeedbackPage.pageTitle
+
+      When("When I use the language switch toggle")
+      click on partialLinkText("Cymraeg")
+
+      Then("I see the beta-feedback page in Welsh")
+      eventually {
+        pageTitle shouldBe BetaFeedbackPage.welshPageTitle
+      }
+    }
+  }
 }

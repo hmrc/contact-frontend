@@ -18,11 +18,12 @@ package acceptance.pages
 
 object BetaFeedbackThanksPage extends BasePage {
 
-  val url: String = wrapUrl("/beta-feedback/thanks")
-  val pageTitle   = "Your feedback – GOV.UK"
+  val url: String            = wrapUrl("/beta-feedback/thanks")
+  val pageTitle: String      = "Your feedback – GOV.UK"
+  val welshPageTitle: String = "Eich adborth – GOV.UK"
 
-  val expectedHeading = "Your feedback has been received."
+  val expectedHeading: String = "Your feedback has been received."
 
-  def heading = tagName("h1").element.text
+  def heading: String = tagName("h1").element.text
 
 }

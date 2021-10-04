@@ -30,6 +30,8 @@ trait BasePage extends Matchers with Page with WebBrowser with BrowserDriver {
 
   val pageTitle: String
 
+  val welshPageTitle: String
+
   def errorPageTitle: String = s"Error: $pageTitle"
 
 }
