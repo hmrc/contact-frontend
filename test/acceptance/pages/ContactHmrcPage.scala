@@ -18,26 +18,23 @@ package acceptance.pages
 
 import acceptance.support.Helpers
 
-object BetaFeedbackPage extends BasePage with Helpers {
+object ContactHmrcPage extends BasePage with Helpers {
 
-  val url: String            = wrapUrl("/beta-feedback?service=pay")
-  val pageTitle: String      = "Send your feedback – GOV.UK"
-  val welshPageTitle: String = "Anfon eich adborth – GOV.UK"
+  val url: String            = wrapUrl("/contact-hmrc")
+  val pageTitle: String      = "Help and contact – GOV.UK"
+  val welshPageTitle: String = "Cymorth a chysylltiadau – GOV.UK"
 
-  def ratingRadioGroup        = radioButtonGroup("feedback-rating")
-  def nameField: TextField    = textField("feedback-name")
-  def emailField: EmailField  = emailField("feedback-email")
-  def commentsField: TextArea = textArea("feedback-comments")
+  def nameField: TextField    = textField("contact-name")
+  def emailField: EmailField  = emailField("contact-email")
+  def commentsField: TextArea = textArea("contact-comments")
 
   def completeReportForm(
     name: String = validName,
     email: String = validEmail,
-    rating: Int = 5,
     commentsLength: Int = 25
   ) = {
     nameField.value = name
     emailField.value = email
-    ratingRadioGroup.value = rating.toString
     commentsField.value = generateRandomString(commentsLength)
   }
 
