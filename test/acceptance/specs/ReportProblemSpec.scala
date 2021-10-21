@@ -33,7 +33,7 @@ class ReportProblemSpec extends BaseSpec {
 
       When("I submit the report")
       ReportProblemPage.completeReportForm()
-      ReportProblemPage.submitReportForm()
+      ReportProblemPage.submitForm()
 
       Then("I see the thank you page")
       eventually {

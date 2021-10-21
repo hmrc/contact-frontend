@@ -16,59 +16,59 @@
 
 package acceptance.specs
 
-import acceptance.pages.{BetaFeedbackPage, BetaFeedbackThanksPage}
+import acceptance.pages.{ContactHmrcPage, ContactHmrcThanksPage}
 import acceptance.specs.tags.UiTests
 import acceptance.support.CustomMatchers.containInOrder
 
-class BetaFeedbackSpec extends BaseSpec {
+class ContactHmrcSpec extends BaseSpec {
 
-  info("UI tests for /contact/beta-feedback")
+  info("UI tests for /contact/contact-hmrc")
 
-  Feature("Successfully submit a beta feedback form") {
+  Feature("Successfully submit a help and contact form") {
 
-    Scenario("I am able to successfully submit a feedback form", UiTests) {
+    Scenario("I am able to successfully submit a help and contact form", UiTests) {
 
-      Given("I am on the send your feedback page")
-      go to BetaFeedbackPage
-      pageTitle shouldBe BetaFeedbackPage.pageTitle
+      Given("I am on the help and contact page")
+      go to ContactHmrcPage
+      pageTitle shouldBe ContactHmrcPage.pageTitle
 
       When("I complete all the fields")
-      BetaFeedbackPage.completeReportForm()
+      ContactHmrcPage.completeReportForm()
 
       And("I submit the form")
-      BetaFeedbackPage.submitForm
+      ContactHmrcPage.submitForm
 
       Then("I see the submission confirmation page")
       eventually {
-        pageTitle shouldBe BetaFeedbackThanksPage.pageTitle
+        pageTitle shouldBe ContactHmrcThanksPage.pageTitle
       }
 
-      BetaFeedbackThanksPage.heading shouldBe BetaFeedbackThanksPage.expectedHeading
+      ContactHmrcThanksPage.heading    shouldBe ContactHmrcThanksPage.expectedHeading
+      ContactHmrcThanksPage.subHeading shouldBe ContactHmrcThanksPage.expectedSubheading
     }
   }
 
-  Feature("Validation fails when submitting an incomplete beta feedback form") {
+  Feature("Validation fails when submitting an incomplete help and contact form") {
 
     Scenario("I do not complete all the fields", UiTests) {
 
-      Given("I am on the send your feedback page")
-      go to BetaFeedbackPage
-      pageTitle shouldBe BetaFeedbackPage.pageTitle
+      Given("I am on the help and contact page")
+      go to ContactHmrcPage
+      pageTitle shouldBe ContactHmrcPage.pageTitle
 
       When("When I do not complete all the fields ")
 
       And("I submit the form")
-      BetaFeedbackPage.submitForm
+      ContactHmrcPage.submitForm
 
       Then("Then I see an error message citing the required fields")
       eventually {
-        pageTitle shouldBe BetaFeedbackPage.errorPageTitle
+        pageTitle shouldBe ContactHmrcPage.errorPageTitle
       }
 
       val orderedErrorMessages = List(
-        "Tell us what you think of the service",
+        "Enter your email address",
         "Enter your full name",
-        "Enter an email address in the correct format, like name@example.com",
         "Enter your comments"
       )
 
@@ -83,19 +83,19 @@ class BetaFeedbackSpec extends BaseSpec {
 
     Scenario("I provide an invalid email address", UiTests) {
 
-      Given("I am on the send your feedback page")
-      go to BetaFeedbackPage
-      pageTitle shouldBe BetaFeedbackPage.pageTitle
+      Given("I am on the help and contact page")
+      go to ContactHmrcPage
+      pageTitle shouldBe ContactHmrcPage.pageTitle
 
       When("When I provide an invalid email address ")
-      BetaFeedbackPage.completeReportForm(email = "firstname.lastname")
+      ContactHmrcPage.completeReportForm(email = "firstname.lastname")
 
       And("I submit the form")
-      BetaFeedbackPage.submitForm
+      ContactHmrcPage.submitForm
 
       Then("Then I see an error message citing the required fields")
       eventually {
-        pageTitle shouldBe BetaFeedbackPage.errorPageTitle
+        pageTitle shouldBe ContactHmrcPage.errorPageTitle
       }
 
       val orderedErrorMessages = List(
@@ -113,23 +113,23 @@ class BetaFeedbackSpec extends BaseSpec {
 
     Scenario("I put too many characters in the text field", UiTests) {
 
-      Given("I am on the send your feedback page")
-      go to BetaFeedbackPage
-      pageTitle shouldBe BetaFeedbackPage.pageTitle
+      Given("I am on the help and contact page")
+      go to ContactHmrcPage
+      pageTitle shouldBe ContactHmrcPage.pageTitle
 
       When("When I write more than the allocated characters in a text field")
-      BetaFeedbackPage.completeReportForm(commentsLength = 2001)
+      ContactHmrcPage.completeReportForm(commentsLength = 2001)
 
       And("I submit the form")
-      BetaFeedbackPage.submitForm
+      ContactHmrcPage.submitForm
 
       Then("I see an error message telling me that I have exceeded the character limit")
       eventually {
-        pageTitle shouldBe BetaFeedbackPage.errorPageTitle
+        pageTitle shouldBe ContactHmrcPage.errorPageTitle
       }
 
       val orderedErrorMessages = List(
-        "The comment cannot be longer than 1000 characters"
+        "Comment must be 2000 characters or fewer"
       )
 
       eventually {
@@ -143,16 +143,16 @@ class BetaFeedbackSpec extends BaseSpec {
 
     Scenario("I put too many characters in the text field", UiTests) {
 
-      Given("I am on the send your feedback page")
-      go to BetaFeedbackPage
-      pageTitle shouldBe BetaFeedbackPage.pageTitle
+      Given("I am on the help and contact page")
+      go to ContactHmrcPage
+      pageTitle shouldBe ContactHmrcPage.pageTitle
 
       When("When I write more than the allocated characters in a text field")
-      BetaFeedbackPage.completeReportForm(commentsLength = 2001)
+      ContactHmrcPage.completeReportForm(commentsLength = 2001)
 
       Then("I see an error message telling me that I have exceeded the character limit")
       eventually {
-        pageTitle shouldBe BetaFeedbackPage.pageTitle
+        pageTitle shouldBe ContactHmrcPage.pageTitle
       }
 
       val orderedErrorMessages = List(
@@ -170,16 +170,16 @@ class BetaFeedbackSpec extends BaseSpec {
 
     Scenario("I switch my language to Welsh", UiTests) {
 
-      Given("I am on the send your feedback page")
-      go to BetaFeedbackPage
-      pageTitle shouldBe BetaFeedbackPage.pageTitle
+      Given("I am on the help and contact page")
+      go to ContactHmrcPage
+      pageTitle shouldBe ContactHmrcPage.pageTitle
 
       When("When I use the language switch toggle")
       click on partialLinkText("Cymraeg")
 
       Then("I see the beta-feedback page in Welsh")
       eventually {
-        pageTitle shouldBe BetaFeedbackPage.welshPageTitle
+        pageTitle shouldBe ContactHmrcPage.welshPageTitle
       }
     }
   }

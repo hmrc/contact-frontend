@@ -29,9 +29,6 @@ object ReportProblemPage extends BasePage with Helpers {
   def actionField: TextArea  = textArea("report-action")
   def errorField: TextArea   = textArea("report-error")
 
-  def submitReportForm() =
-    click on CssSelectorQuery(".govuk-button[type=submit]")
-
   def completeReportForm() = {
     nameField.value = validName
     emailField.value = validEmail
