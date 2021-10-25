@@ -93,7 +93,7 @@ class AccessibilityProblemReportSpec extends BaseSpec {
       And("I submit the form")
       AccessibilityProblemReportPage.submitForm
 
-      Then("Then I see an error message citing the required fields")
+      Then("I see an error message citing the required fields")
       eventually {
         pageTitle shouldBe AccessibilityProblemReportPage.errorPageTitle
       }
