@@ -16,60 +16,60 @@
 
 package acceptance.specs
 
-import acceptance.pages.{ContactHmrcPage, ContactHmrcThanksPage}
+import acceptance.pages.{AccessibilityProblemReportPage, AccessibilityProblemReportThanksPage}
 import acceptance.specs.tags.UiTests
 import acceptance.support.CustomMatchers.containInOrder
 
-class ContactHmrcSpec extends BaseSpec {
+class AccessibilityProblemReportSpec extends BaseSpec {
 
-  info("UI tests for /contact/contact-hmrc")
+  info("UI tests for /contact/accessibility")
 
-  Feature("Successfully submit a help and contact form") {
+  Feature("Successfully submit a report accessibility problem form") {
 
-    Scenario("I am able to successfully submit a help and contact form", UiTests) {
+    Scenario("I am able to successfully submit a report accessibility problem form", UiTests) {
 
-      Given("I am on the help and contact page")
-      go to ContactHmrcPage
-      pageTitle shouldBe ContactHmrcPage.pageTitle
+      Given("I am on the report accessibility problem page")
+      go to AccessibilityProblemReportPage
+      pageTitle shouldBe AccessibilityProblemReportPage.pageTitle
 
       When("I complete all the fields")
-      ContactHmrcPage.completeReportForm()
+      AccessibilityProblemReportPage.completeReportForm()
 
       And("I submit the form")
-      ContactHmrcPage.submitForm
+      AccessibilityProblemReportPage.submitForm
 
       Then("I see the submission confirmation page")
       eventually {
-        pageTitle shouldBe ContactHmrcThanksPage.pageTitle
+        pageTitle shouldBe AccessibilityProblemReportThanksPage.pageTitle
       }
 
-      ContactHmrcThanksPage.heading    shouldBe ContactHmrcThanksPage.expectedHeading
-      ContactHmrcThanksPage.subHeading shouldBe ContactHmrcThanksPage.expectedSubheading
+      AccessibilityProblemReportThanksPage.heading    shouldBe AccessibilityProblemReportThanksPage.expectedHeading
+      AccessibilityProblemReportThanksPage.subHeading shouldBe AccessibilityProblemReportThanksPage.expectedSubheading
     }
   }
 
-  Feature("Validation fails when submitting an incomplete help and contact form") {
+  Feature("Validation fails when submitting an incomplete report accessibility problem form") {
 
     Scenario("I do not complete all the fields", UiTests) {
 
-      Given("I am on the help and contact page")
-      go to ContactHmrcPage
-      pageTitle shouldBe ContactHmrcPage.pageTitle
+      Given("I am on the report accessibility problem page")
+      go to AccessibilityProblemReportPage
+      pageTitle shouldBe AccessibilityProblemReportPage.pageTitle
 
       When("When I do not complete all the fields ")
 
       And("I submit the form")
-      ContactHmrcPage.submitForm
+      AccessibilityProblemReportPage.submitForm
 
       Then("Then I see an error message citing the required fields")
       eventually {
-        pageTitle shouldBe ContactHmrcPage.errorPageTitle
+        pageTitle shouldBe AccessibilityProblemReportPage.errorPageTitle
       }
 
       val orderedErrorMessages = List(
-        "Enter your email address",
+        "Enter details of the accessibility problem",
         "Enter your full name",
-        "Enter your comments"
+        "Enter your email address"
       )
 
       eventually {
@@ -83,19 +83,19 @@ class ContactHmrcSpec extends BaseSpec {
 
     Scenario("I provide an invalid email address", UiTests) {
 
-      Given("I am on the help and contact page")
-      go to ContactHmrcPage
-      pageTitle shouldBe ContactHmrcPage.pageTitle
+      Given("I am on the report accessibility problem page")
+      go to AccessibilityProblemReportPage
+      pageTitle shouldBe AccessibilityProblemReportPage.pageTitle
 
       When("When I provide an invalid email address ")
-      ContactHmrcPage.completeReportForm(email = "firstname.lastname")
+      AccessibilityProblemReportPage.completeReportForm(email = "firstname.lastname")
 
       And("I submit the form")
-      ContactHmrcPage.submitForm
+      AccessibilityProblemReportPage.submitForm
 
       Then("Then I see an error message citing the required fields")
       eventually {
-        pageTitle shouldBe ContactHmrcPage.errorPageTitle
+        pageTitle shouldBe AccessibilityProblemReportPage.errorPageTitle
       }
 
       val orderedErrorMessages = List(
@@ -113,23 +113,23 @@ class ContactHmrcSpec extends BaseSpec {
 
     Scenario("I put too many characters in the text field", UiTests) {
 
-      Given("I am on the help and contact page")
-      go to ContactHmrcPage
-      pageTitle shouldBe ContactHmrcPage.pageTitle
+      Given("I am on the report accessibility problem page")
+      go to AccessibilityProblemReportPage
+      pageTitle shouldBe AccessibilityProblemReportPage.pageTitle
 
       When("When I write more than the allocated characters in a text field")
-      ContactHmrcPage.completeReportForm(commentsLength = 2001)
+      AccessibilityProblemReportPage.completeReportForm(commentsLength = 2001)
 
       And("I submit the form")
-      ContactHmrcPage.submitForm
+      AccessibilityProblemReportPage.submitForm
 
       Then("I see an error message telling me that I have exceeded the character limit")
       eventually {
-        pageTitle shouldBe ContactHmrcPage.errorPageTitle
+        pageTitle shouldBe AccessibilityProblemReportPage.errorPageTitle
       }
 
       val orderedErrorMessages = List(
-        "Comment must be 2000 characters or fewer"
+        "Problem description must be 2000 characters or fewer"
       )
 
       eventually {
@@ -143,16 +143,16 @@ class ContactHmrcSpec extends BaseSpec {
 
     Scenario("I put too many characters in the text field", UiTests) {
 
-      Given("I am on the help and contact page")
-      go to ContactHmrcPage
-      pageTitle shouldBe ContactHmrcPage.pageTitle
+      Given("I am on the report accessibility problem page")
+      go to AccessibilityProblemReportPage
+      pageTitle shouldBe AccessibilityProblemReportPage.pageTitle
 
       When("When I write more than the allocated characters in a text field")
-      ContactHmrcPage.completeReportForm(commentsLength = 2001)
+      AccessibilityProblemReportPage.completeReportForm(commentsLength = 2001)
 
       Then("I see an error message telling me that I have exceeded the character limit")
       eventually {
-        pageTitle shouldBe ContactHmrcPage.pageTitle
+        pageTitle shouldBe AccessibilityProblemReportPage.pageTitle
       }
 
       val orderedErrorMessages = List(
@@ -170,16 +170,16 @@ class ContactHmrcSpec extends BaseSpec {
 
     Scenario("I switch my language to Welsh", UiTests) {
 
-      Given("I am on the help and contact page")
-      go to ContactHmrcPage
-      pageTitle shouldBe ContactHmrcPage.pageTitle
+      Given("I am on the report accessibility problem page")
+      go to AccessibilityProblemReportPage
+      pageTitle shouldBe AccessibilityProblemReportPage.pageTitle
 
       When("When I use the language switch toggle")
       click on partialLinkText("Cymraeg")
 
       Then("I see the help and contact page in Welsh")
       eventually {
-        pageTitle shouldBe ContactHmrcPage.welshPageTitle
+        pageTitle shouldBe AccessibilityProblemReportPage.welshPageTitle
       }
     }
   }
