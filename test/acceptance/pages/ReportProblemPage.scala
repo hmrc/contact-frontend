@@ -29,11 +29,16 @@ object ReportProblemPage extends BasePage with Helpers {
   def actionField: TextArea  = textArea("report-action")
   def errorField: TextArea   = textArea("report-error")
 
-  def completeReportForm() = {
-    nameField.value = validName
-    emailField.value = validEmail
-    actionField.value = generateRandomString(25)
-    errorField.value = generateRandomString(25)
+  def completeReportForm(
+    name: String = validName,
+    email: String = validEmail,
+    actionLength: Int = 25,
+    errorLength: Int = 25
+  ) = {
+    nameField.value = name
+    emailField.value = email
+    actionField.value = generateRandomString(actionLength)
+    errorField.value = generateRandomString(errorLength)
   }
 
 }
