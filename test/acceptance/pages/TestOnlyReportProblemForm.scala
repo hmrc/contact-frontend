@@ -20,14 +20,6 @@ import acceptance.support.Helpers
 import org.openqa.selenium.By
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 
-object TestOnlyReportProblemPartialPage extends TestOnlyReportProblemForm {
-  val url: String = wrapUrl("/test-only")
-}
-
-object TestOnlyReportProblemPartialPageAjax extends TestOnlyReportProblemForm {
-  val url: String = wrapUrl("/test-only/ajax")
-}
-
 trait TestOnlyReportProblemForm extends BasePage with Helpers {
 
   val pageTitle: String      = "Service test page – GOV.UK"
@@ -72,4 +64,12 @@ trait TestOnlyReportProblemForm extends BasePage with Helpers {
   override def submitForm() =
     click on CssSelectorQuery(".button[type=submit]")
 
+}
+
+object TestOnlyReportProblemPartialPage extends TestOnlyReportProblemForm {
+  val url: String = wrapUrl("/test-only")
+}
+
+object TestOnlyReportProblemPartialPageAjax extends TestOnlyReportProblemForm {
+  val url: String = wrapUrl("/test-only/ajax")
 }
