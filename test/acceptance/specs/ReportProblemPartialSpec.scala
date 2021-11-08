@@ -16,6 +16,8 @@
 
 // This is a comment for PR builder purposes
 
+// And this is another
+
 package acceptance.specs
 
 import acceptance.pages.{TestOnlyReportProblemPartialPage, TestOnlyReportProblemPartialPageAjax}
