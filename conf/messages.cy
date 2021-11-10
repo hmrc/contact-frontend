@@ -40,7 +40,6 @@ problem_report.action.label=Beth oeddech yn ei wneud?
 problem_report.error.label=Gyda beth ydych angen help?
 problem_report.name.error.required=Rhowch eich enw
 problem_report.name.error.length=Ni all eich enw fod yn hirach na 70 o gymeriadau
-problem_report.name.error.valid=Rhowch lythrennau neu atalnodi’n unig
 problem_report.email.error.required=Rhowch eich cyfeiriad e-bost
 problem_report.email.error.valid=Nodwch gyfeiriad e-bost yn y fformat cywir, megis enw@enghraifft.com
 problem_report.email.error.length=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
@@ -124,6 +123,8 @@ accessibility.button=Anfon
 accessibility.confirmation.title=Mae’ch problem wedi ei nodi
 accessibility.confirmation.subheading=Yr hyn sy’n digwydd nesaf
 accessibility.confirmation.paragraph=Rydym yn adolygu ac yn ceisio mynd i’r afael ag unrhyw broblem hygyrchedd y rhoddir gwybod amdani. Os ydych wedi rhoi’ch manylion cyswllt i ni, rhown wybod i chi am hynt eich gwybodaeth.
+
+forms.name.error.invalid=Rhowch lythrennau neu atalnodi’n unig
 
 testPage.title = Service test page – GOV.UK
 testPage.heading  = Service test page

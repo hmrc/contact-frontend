@@ -66,7 +66,7 @@ class ReportProblemSpec extends BaseSpec {
       }
 
       val orderedErrorMessages = List(
-        "Full name must only include letters a to z, numbers, hyphens, full stops, commas, apostrophes and spaces"
+        "Full name must only include letters a to z, hyphens, full stops, commas, apostrophes and spaces"
       )
 
       eventually {

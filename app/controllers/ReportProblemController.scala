@@ -29,7 +29,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.DeskproEmailValidator
+import util.{DeskproEmailValidator, NameValidator}
 import views.html.partials.{error_feedback, error_feedback_inner, ticket_created_body}
 import views.html.{InternalErrorPage, ReportProblemConfirmationPage, ReportProblemPage}
 
@@ -37,9 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object ReportProblemFormBind {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
-  private val validateEmail: (String) => Boolean    = emailValidator.validate
-
-  val REPORT_NAME_REGEX = """^[A-Za-z\-.,()'"\s]+$"""
+  private val nameValidator                         = NameValidator()
 
   def resolveServiceFromPost(implicit request: Request[_]): Option[String] = {
     val body = request.body match {
@@ -56,38 +54,38 @@ object ReportProblemFormBind {
       "report-name"   -> text
         .verifying(
           "problem_report.name.error.required",
-          name => !name.isEmpty
+          name => name.nonEmpty
         )
         .verifying(
           "problem_report.name.error.length",
-          name => name.size <= 70
+          name => name.length <= 70
         )
         .verifying(
-          "problem_report.name.error.valid",
-          name => name.matches(REPORT_NAME_REGEX) || name.isEmpty
+          "forms.name.error.invalid",
+          name => nameValidator.validate(name) || name.isEmpty
         ),
       "report-email"  -> text
         .verifying(
           s"problem_report.email.error.required",
-          email => !email.isEmpty
+          email => email.nonEmpty
         )
         .verifying(
           s"problem_report.email.error.valid",
-          email => validateEmail(email) || email.isEmpty
+          email => emailValidator.validate(email) || email.isEmpty
         )
         .verifying("problem_report.email.error.length", email => email.length <= 255),
       "report-action" -> text
         .verifying(
           s"problem_report.action.error.required",
-          action => !action.isEmpty
+          action => action.nonEmpty
         )
-        .verifying("problem_report.action.error.length", action => action.size <= 1000),
+        .verifying("problem_report.action.error.length", action => action.length <= 1000),
       "report-error"  -> text
         .verifying(
           s"problem_report.error.error.required",
-          error => !error.isEmpty
+          error => error.nonEmpty
         )
-        .verifying("problem_report.error.error.length", error => error.size <= 1000),
+        .verifying("problem_report.error.error.length", error => error.length <= 1000),
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
       "referrer"      -> optional(text),
