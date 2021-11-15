@@ -30,7 +30,7 @@ import play.api.mvc.{MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{BackUrlValidator, DeskproEmailValidator}
+import util.{BackUrlValidator, DeskproEmailValidator, NameValidator}
 import views.html.partials.{feedback_form, feedback_form_confirmation}
 import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
 import play.api.http.HeaderNames._
@@ -176,8 +176,8 @@ object FeedbackFormBind {
 
   import model.FeedbackFormConfig._
 
-  private val emailValidator                     = new DeskproEmailValidator()
-  private val validateEmail: (String) => Boolean = emailValidator.validate
+  private val emailValidator = DeskproEmailValidator()
+  private val nameValidator  = NameValidator()
 
   def emptyForm(
     csrfToken: String,
@@ -213,17 +213,18 @@ object FeedbackFormBind {
             rating => rating.map(validExperiences.contains(_)).getOrElse(true)
           ),
         "feedback-name"     -> text
-          .verifying("feedback.name.error.required", name => !name.trim.isEmpty)
-          .verifying("feedback.name.error.length", name => name.size <= 70),
+          .verifying("feedback.name.error.required", name => name.trim.nonEmpty)
+          .verifying("forms.name.error.invalid", name => nameValidator.validate(name))
+          .verifying("feedback.name.error.length", name => name.length <= 70),
         "feedback-email"    -> text
-          .verifying("feedback.email.error.invalid", validateEmail)
-          .verifying("feedback.email.error.length", email => email.size <= 255),
+          .verifying("feedback.email.error.invalid", email => emailValidator.validate(email))
+          .verifying("feedback.email.error.length", email => email.length <= 255),
         "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
 
           override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
             val commentsCanBeOmitted = data.get("canOmitComments").contains("true")
             data.get(key) match {
-              case Some(value) if !value.trim.isEmpty || commentsCanBeOmitted => Right(value.trim)
+              case Some(value) if value.trim.nonEmpty || commentsCanBeOmitted => Right(value.trim)
               case Some(_)                                                    => Left(Seq(FormError(key, "feedback.comments.error.required", Nil)))
               case None                                                       => Left(Seq(FormError(key, "error.required", Nil)))
             }

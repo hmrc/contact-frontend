@@ -40,7 +40,6 @@ problem_report.action.label=What were you doing?
 problem_report.error.label=What do you need help with?
 problem_report.name.error.required=Enter your full name
 problem_report.name.error.length=Full name cannot be longer than 70 characters
-problem_report.name.error.valid=Full name must only include letters a to z, numbers, hyphens, full stops, commas, apostrophes and spaces
 problem_report.email.error.required=Enter your email address
 problem_report.email.error.valid=Enter an email address in the correct format, like name@example.com
 problem_report.email.error.length=Your email address cannot be longer than 255 characters
@@ -124,6 +123,8 @@ accessibility.button=Report Problem
 accessibility.confirmation.title=Your accessibility problem has been reported.
 accessibility.confirmation.subheading=What happens next
 accessibility.confirmation.paragraph=We have received your message and will reply, or let you know how we are dealing with this, within 2 working days.
+
+forms.name.error.invalid=Full name must only include letters a to z, hyphens, full stops, commas, apostrophes and spaces
 
 testPage.title = Service test page – GOV.UK
 testPage.heading = Service test page

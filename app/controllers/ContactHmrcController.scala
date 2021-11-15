@@ -28,7 +28,7 @@ import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.DeskproEmailValidator
+import util.{DeskproEmailValidator, NameValidator}
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
@@ -36,22 +36,24 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object ContactHmrcForm {
 
-  private val emailValidator = new DeskproEmailValidator()
+  private val emailValidator = DeskproEmailValidator()
+  private val nameValidator  = NameValidator()
 
   val form = Form[ContactForm](
     mapping(
       "contact-name"     -> text
         .verifying("contact.name.error.required", name => name.trim.nonEmpty)
+        .verifying("forms.name.error.invalid", name => nameValidator.validate(name))
         .verifying("contact.name.error.length", name => name.length <= 70),
       "contact-email"    -> text
-        .verifying("contact.email.error.required", email => !email.trim.isEmpty)
+        .verifying("contact.email.error.required", email => email.trim.nonEmpty)
         .verifying("contact.email.error.invalid", email => email.trim.isEmpty || emailValidator.validate(email))
         .verifying(
           "contact.email.error.length",
           email => !(email.trim.isEmpty || emailValidator.validate(email)) || email.length <= 255
         ),
       "contact-comments" -> text
-        .verifying("contact.comments.error.required", comment => !comment.trim.isEmpty)
+        .verifying("contact.comments.error.required", comment => comment.trim.nonEmpty)
         .verifying("contact.comments.error.length", comment => comment.length <= 2000),
       "isJavascript"     -> boolean,
       "referrer"         -> text,

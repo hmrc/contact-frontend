@@ -30,13 +30,14 @@ import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.DeskproEmailValidator
+import util.{DeskproEmailValidator, NameValidator}
 import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, InternalErrorPage}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 object AccessibilityFormBind {
   private val emailValidator = DeskproEmailValidator()
+  private val nameValidator  = NameValidator()
 
   def emptyForm(
     csrfToken: String,
@@ -64,6 +65,7 @@ object AccessibilityFormBind {
         .verifying("accessibility.problem.error.length", msg => msg.length <= 2000),
       "name"               -> text
         .verifying("accessibility.name.error.required", name => name.trim.nonEmpty)
+        .verifying("forms.name.error.invalid", name => nameValidator.validate(name))
         .verifying("accessibility.name.error.length", name => name.length <= 70),
       "email"              -> text
         .verifying("accessibility.email.error.required", name => name.trim.nonEmpty)
