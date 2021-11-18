@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package views
+package a11y
 
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
+import _root_.helpers.{ApplicationSupport, MessagesSupport}
 import config.AppConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -24,7 +24,7 @@ import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.InternalErrorPage
 
 class InternalErrorPageSpec
@@ -32,7 +32,7 @@ class InternalErrorPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers {
+    with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
@@ -45,38 +45,8 @@ class InternalErrorPageSpec
     val content       =
       errorTemplate()
 
-    "include the hmrc banner" in {
-      val banners = content.select(".hmrc-organisation-logo")
-
-      banners            should have size 1
-      banners.first.text should be("HM Revenue & Customs")
-    }
-
-    "not include the hmrc language toggle" in {
-      val languageSelect = content.select(".hmrc-language-select")
-      languageSelect should have size 0
-    }
-
-    "display the correct browser title" in {
-      content.select("title").text shouldBe "Sorry, there is a problem with the service – Contact HMRC – GOV.UK"
-    }
-
-    "display the correct page heading" in {
-      val headers = content.select("h1")
-      headers.size       shouldBe 1
-      headers.first.text shouldBe "Sorry, there is a problem with the service"
-    }
-
-    "return the deskpro specific content" in {
-      contentAsString(content) should include(
-        "Your message has not been sent."
-      )
-    }
-
-    "return the generic content" in {
-      contentAsString(content) should include(
-        "Try again later."
-      )
+    "pass accessibility checks" in {
+      content.toString() should passAccessibilityChecks
     }
   }
 }
