@@ -16,9 +16,8 @@
 
 package views
 
+import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
-import _root_.helpers.ApplicationSupport
-import _root_.helpers.{JsoupHelpers, MessagesSupport}
 import model.ReportProblemForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -26,19 +25,17 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
+import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.ReportProblemPage
-import play.api.test.CSRFTokenHelper._
-import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 
 class ReportProblemPageSpec
     extends AnyWordSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers
-    with AccessibilityMatchers {
+    with JsoupHelpers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/problem_reports_nonjs").withCSRFToken
 
@@ -48,10 +45,10 @@ class ReportProblemPageSpec
 
   val problemReportsForm: Form[ReportProblemForm] = Form[ReportProblemForm](
     mapping(
-      "report-name"   -> text.verifying("problem_report.name.error.required", msg => !msg.isEmpty),
-      "report-email"  -> text.verifying("problem_report.email.error.required", msg => !msg.isEmpty),
-      "report-action" -> text.verifying("problem_report.action.error.required", msg => !msg.isEmpty),
-      "report-error"  -> text.verifying("problem_report.error.error.required", msg => !msg.isEmpty),
+      "report-name"   -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
+      "report-email"  -> text.verifying("problem_report.email.error.required", msg => msg.nonEmpty),
+      "report-action" -> text.verifying("problem_report.action.error.required", msg => msg.nonEmpty),
+      "report-error"  -> text.verifying("problem_report.error.error.required", msg => msg.nonEmpty),
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
       "referrer"      -> optional(text),
@@ -75,10 +72,6 @@ class ReportProblemPageSpec
   "the Problem Reports standalone page" should {
     val reportProblemPage = app.injector.instanceOf[ReportProblemPage]
     val content           = reportProblemPage(problemReportsForm, action)
-
-    "pass accessibility checks" in {
-      content.toString() should passAccessibilityChecks
-    }
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")

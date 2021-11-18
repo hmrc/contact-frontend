@@ -23,7 +23,6 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
-import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.ContactHmrcConfirmationPage
 
 class ContactHmrcConfirmationPageSpec
@@ -31,8 +30,7 @@ class ContactHmrcConfirmationPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers
-    with AccessibilityMatchers {
+    with JsoupHelpers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/submit")
   implicit lazy val messages: Messages         = getMessages(app, fakeRequest)
@@ -41,10 +39,6 @@ class ContactHmrcConfirmationPageSpec
   "the Contact Hmrc standalone confirmation page" should {
     val confirmationPage = app.injector.instanceOf[ContactHmrcConfirmationPage]
     val content          = confirmationPage()
-
-    "pass accessibility checks" in {
-      content.toString() should passAccessibilityChecks
-    }
 
     "include the H1 element with page title" in {
       val heading1 = content.select("h1")

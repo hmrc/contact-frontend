@@ -33,8 +33,9 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= Seq(
       compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.4.4" cross CrossVersion.full),
       "com.github.ghik" % "silencer-lib" % "1.4.4" % Provided cross CrossVersion.full
-    )
+    ),
     // ***************
+    A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")
   )
 
 lazy val unitTestSettings =

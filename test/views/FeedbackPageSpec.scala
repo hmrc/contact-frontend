@@ -28,7 +28,6 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.FeedbackPage
 
 class FeedbackPageSpec
@@ -36,8 +35,8 @@ class FeedbackPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers
-    with AccessibilityMatchers {
+    with JsoupHelpers {
+
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
   implicit lazy val messages: Messages = getMessages(app, fakeRequest)
@@ -81,10 +80,6 @@ class FeedbackPageSpec
   "the feedback page" should {
     val feedbackPage = app.injector.instanceOf[FeedbackPage]
     val content      = feedbackPage(form, action)
-
-    "pass accessibility checks" in {
-      content.toString() should passAccessibilityChecks
-    }
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")

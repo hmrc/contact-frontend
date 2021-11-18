@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package views
+package a11y
 
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
+import _root_.helpers.{ApplicationSupport, MessagesSupport}
 import config.AppConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.SurveyConfirmationPage
 
 class SurveyConfirmationPageSpec
@@ -30,7 +31,7 @@ class SurveyConfirmationPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers {
+    with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
   implicit lazy val messages: Messages         = getMessages(app, fakeRequest)
@@ -40,18 +41,8 @@ class SurveyConfirmationPageSpec
     val feedbackConfirmationPage = app.injector.instanceOf[SurveyConfirmationPage]
     val content                  = feedbackConfirmationPage()
 
-    "include the confirmation panel" in {
-      val panels = content.select("h1")
-      panels            should have size 1
-      panels.first.text should be("Thank you, your feedback has been received.")
-    }
-
-    "translate the title into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = feedbackConfirmationPage()
-
-      val titles = welshContent.select("h1")
-      titles.first.text should be("Diolch, mae eich adborth wedi dod i law.")
+    "pass accessibility checks" in {
+      content.toString() should passAccessibilityChecks
     }
   }
 }

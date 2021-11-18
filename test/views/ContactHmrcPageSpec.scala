@@ -28,7 +28,6 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.ContactHmrcPage
 
 class ContactHmrcPageSpec
@@ -36,8 +35,7 @@ class ContactHmrcPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers
-    with AccessibilityMatchers {
+    with JsoupHelpers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
 
@@ -47,9 +45,9 @@ class ContactHmrcPageSpec
 
   val contactHmrcForm: Form[ContactForm] = Form[ContactForm](
     mapping(
-      "contact-name"     -> text.verifying("contact.name.error.required", msg => !msg.isEmpty),
-      "contact-email"    -> text.verifying("contact.email.error.required", msg => !msg.isEmpty),
-      "contact-comments" -> text.verifying("contact.comments.error.required", msg => !msg.isEmpty),
+      "contact-name"     -> text.verifying("contact.name.error.required", msg => msg.nonEmpty),
+      "contact-email"    -> text.verifying("contact.email.error.required", msg => msg.nonEmpty),
+      "contact-comments" -> text.verifying("contact.comments.error.required", msg => msg.nonEmpty),
       "isJavascript"     -> boolean,
       "referrer"         -> text,
       "csrfToken"        -> text,
@@ -74,10 +72,6 @@ class ContactHmrcPageSpec
   "the Contact Hmrc standalone page" should {
     val contactHmrcPage = app.injector.instanceOf[ContactHmrcPage]
     val content         = contactHmrcPage(contactHmrcForm, action)
-
-    "pass accessibility checks" in {
-      content.toString() should passAccessibilityChecks
-    }
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")

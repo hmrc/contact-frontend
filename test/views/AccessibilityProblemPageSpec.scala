@@ -16,8 +16,8 @@
 
 package views
 
-import config.AppConfig
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
+import config.AppConfig
 import model.AccessibilityForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -25,19 +25,17 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
+import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.AccessibilityProblemPage
-import play.api.test.CSRFTokenHelper._
-import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 
 class AccessibilityProblemPageSpec
     extends AnyWordSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    with JsoupHelpers
-    with AccessibilityMatchers {
+    with JsoupHelpers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
@@ -47,9 +45,9 @@ class AccessibilityProblemPageSpec
 
   val accessibilityForm: Form[AccessibilityForm] = Form[AccessibilityForm](
     mapping(
-      "problemDescription" -> text.verifying("accessibility.problem.error.required", msg => !msg.isEmpty),
-      "name"               -> text.verifying("accessibility.name.error.required", msg => !msg.isEmpty),
-      "email"              -> text.verifying("accessibility.email.error.invalid", msg => !msg.isEmpty),
+      "problemDescription" -> text.verifying("accessibility.problem.error.required", msg => msg.nonEmpty),
+      "name"               -> text.verifying("accessibility.name.error.required", msg => msg.nonEmpty),
+      "email"              -> text.verifying("accessibility.email.error.invalid", msg => msg.nonEmpty),
       "isJavascript"       -> boolean,
       "referrer"           -> text,
       "csrfToken"          -> text,
@@ -74,10 +72,6 @@ class AccessibilityProblemPageSpec
   "the report an accessibility problem page" should {
     val accessibilityProblemPage = app.injector.instanceOf[AccessibilityProblemPage]
     val content                  = accessibilityProblemPage(accessibilityForm, action)
-
-    "pass accessibility checks" in {
-      content.toString() should passAccessibilityChecks
-    }
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")

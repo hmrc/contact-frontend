@@ -27,16 +27,10 @@ import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
-import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.SurveyPage
 
-class SurveyPageSpec
-    extends AnyWordSpec
-    with Matchers
-    with ApplicationSupport
-    with MessagesSupport
-    with JsoupHelpers
-    with AccessibilityMatchers {
+class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport with MessagesSupport with JsoupHelpers {
+
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
   implicit lazy val messages: Messages = getMessages(app, fakeRequest)
@@ -69,10 +63,6 @@ class SurveyPageSpec
   "The survey page" should {
     val surveyPage = app.injector.instanceOf[SurveyPage]
     val content    = surveyPage(form, action)
-
-    "pass accessibility checks" in {
-      content.toString() should passAccessibilityChecks
-    }
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")
