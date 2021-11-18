@@ -1,0 +1,10 @@
+{
+  "add": [
+    {
+      "reason": "This issue is only seen on our test-only pages, which are not served in Production.",
+      "url": "http://localhost:9032/assets/3.17.0/javascripts/application.min.js",
+      "ruleId": 10003,
+      "newLevel": -1
+    }
+  ]
+}
