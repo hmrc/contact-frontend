@@ -36,6 +36,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
+import util.RefererHeaderRetriever
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,9 +45,9 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
-        "metrics.jvm"                          -> false,
-        "metrics.enabled"                      -> false,
-        "enablePlayFrontendProblemReportsForm" -> true
+        "metrics.jvm"      -> false,
+        "metrics.enabled"  -> false,
+        "useRefererHeader" -> true
       )
       .build()
 
@@ -457,6 +458,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
     val errorFeedbackForm      = app.injector.instanceOf[views.html.partials.error_feedback]
     val errorFeedbackFormInner = app.injector.instanceOf[views.html.partials.error_feedback_inner]
     val ticketCreatedBody      = app.injector.instanceOf[views.html.partials.ticket_created_body]
+    val cfconfig               = new CFConfig(app.configuration)
 
     val controller = new ReportProblemController(
       mock[HmrcDeskproConnector],
@@ -467,8 +469,9 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
       errorFeedbackForm,
       errorFeedbackFormInner,
       ticketCreatedBody,
-      errorPage
-    )(new CFConfig(app.configuration), ExecutionContext.Implicits.global)
+      errorPage,
+      new RefererHeaderRetriever(cfconfig)
+    )(cfconfig, ExecutionContext.Implicits.global)
 
     val deskproName: String           = "John Densmore"
     val deskproEmail: String          = "name@mail.com"

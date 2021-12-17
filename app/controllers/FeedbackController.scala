@@ -30,10 +30,9 @@ import play.api.mvc.{MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{BackUrlValidator, DeskproEmailValidator, NameValidator}
+import util.{BackUrlValidator, DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.partials.{feedback_form, feedback_form_confirmation}
 import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
-import play.api.http.HeaderNames._
 import play.twirl.api.Html
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,7 +46,8 @@ import scala.concurrent.{ExecutionContext, Future}
   feedbackFormPartial: feedback_form,
   feedbackFormConfirmationPartial: feedback_form_confirmation,
   feedbackPage: FeedbackPage,
-  errorPage: InternalErrorPage
+  errorPage: InternalErrorPage,
+  headerRetriever: RefererHeaderRetriever
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
@@ -115,7 +115,7 @@ import scala.concurrent.{ExecutionContext, Future}
         feedbackFormPartial(
           FeedbackFormBind.emptyForm(
             csrfToken,
-            referrerUrl orElse referer,
+            referrerUrl orElse referer orElse headerRetriever.refererFromHeaders,
             None,
             canOmitComments = canOmitComments,
             service = service
@@ -185,9 +185,7 @@ object FeedbackFormBind {
     backUrl: Option[String],
     canOmitComments: Boolean,
     service: Option[String]
-  )(implicit
-    request: Request[AnyRef]
-  ) =
+  ): Form[FeedbackForm] =
     FeedbackFormBind.form.fill(
       FeedbackForm(
         experienceRating = None,
@@ -195,7 +193,7 @@ object FeedbackFormBind {
         email = "",
         comments = "",
         javascriptEnabled = false,
-        referrer.getOrElse(request.headers.get(REFERER).getOrElse("n/a")),
+        referrer.getOrElse("n/a"),
         csrfToken,
         Some(service.getOrElse("unknown")),
         backUrl,

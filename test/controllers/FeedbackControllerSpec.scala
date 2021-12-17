@@ -36,7 +36,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
-import util.BackUrlValidator
+import util.{BackUrlValidator, RefererHeaderRetriever}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,7 +44,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "enablePlayFrontendFeedbackForm" -> true)
+      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "useRefererHeader" -> true)
       .build()
 
   "feedbackForm" should {
@@ -359,6 +359,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     val playFrontendFeedbackConfirmationPage =
       app.injector.instanceOf[views.html.FeedbackConfirmationPage]
     val errorPage                            = app.injector.instanceOf[views.html.InternalErrorPage]
+    val cfconfig                             = new CFConfig(app.configuration)
 
     val controller = new FeedbackController(
       hmrcDeskproConnector,
@@ -369,8 +370,9 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       feedbackPartialForm,
       feedbackFormConfirmation,
       playFrontendFeedbackPage,
-      errorPage
-    )(new CFConfig(app.configuration), ExecutionContext.Implicits.global)
+      errorPage,
+      new RefererHeaderRetriever(cfconfig)
+    )(cfconfig, ExecutionContext.Implicits.global)
 
     def generateRequest(
       javascriptEnabled: Boolean = true,
