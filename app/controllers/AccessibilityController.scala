@@ -30,7 +30,7 @@ import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator}
+import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, InternalErrorPage}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -91,7 +91,8 @@ class AccessibilityController @Inject() (
   mcc: MessagesControllerComponents,
   accessibilityProblemPage: AccessibilityProblemPage,
   accessibilityProblemConfirmationPage: AccessibilityProblemConfirmationPage,
-  errorPage: InternalErrorPage
+  errorPage: InternalErrorPage,
+  headerRetriever: RefererHeaderRetriever
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
@@ -107,7 +108,7 @@ class AccessibilityController @Inject() (
     Action.async { implicit request =>
       Future.successful {
         val submit    = routes.AccessibilityController.submit(service, userAction)
-        val referrer  = referrerUrl orElse request.headers.get(REFERER)
+        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
         val form      = AccessibilityFormBind.emptyForm(csrfToken, referrer, service, userAction)
         Ok(accessibilityPage(form, submit))

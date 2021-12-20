@@ -8,9 +8,9 @@ This service allows users to contact the HMRC Customer Contact team for 5 major 
 1. providing feedback for the HMRC Customer Contact team ('Survey')
 1. reporting accessibility problems with services ('Report an accessibility problem')
 
-Contact-frontend is responsible for hosting forms related to the purposes listed above, validating the input, and
-passing user requests to downstream services - to Deskpro for 'Is this page not working properly?', 'Help and contact' 
-and 'Send your feedback', and an internal auditing service for 'Survey' (contact
+`contact-frontend` is responsible for hosting forms related to the purposes listed above, validating the input, and
+passing user requests to downstream services - to Deskpro for 'Is this page not working properly?', 'Help and contact', 
+'Send your feedback' and 'Report an accessibility problem', and an internal auditing service for 'Survey' (contact
  [#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/) if you require more information about this).
 
 # Contents
@@ -22,6 +22,7 @@ and 'Send your feedback', and an internal auditing service for 'Survey' (contact
       * [Report an accessibility problem](#report-an-accessibility-problem) 
    * [Integration guide](#integration-guide)
       * [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
+      * [referer header forwarding to Deskpro](#referer-header-forwarding-to-deskpro)
       * [Creating own customer contact forms](#creating-own-customer-contact-forms)
    * [Other relevant details](#other-relevant-details)
       * [User details attached to the ticket](#user-details-attached-to-the-ticket)
@@ -45,12 +46,20 @@ This contact form consists of the following fields:
 Form submissions are forwarded to *Deskpro* with the subject *"Support Request"*. 
 The contents of the *action* and *error* fields are concatenated and stored in the ticket body.
 
-Newer services using play-frontend should follow the integration steps detailed 
-in [play-frontend-hmrc](https://github.com/hmrc/play-frontend-hmrc#helping-users-report-technical-issues).
+To link to this form, it is recommended that services follow the integration steps detailed in
+[play-frontend-hmrc](https://github.com/hmrc/play-frontend-hmrc#helping-users-report-technical-issues). By using the
+`play-frontend-hmrc` helper, the required query string parameters `service` and `referrerUrl` will be bound correctly to 
+the link. 
 
-To link to this form directly, render a link on your service to:
-* `https://www.{environment}.tax.service.gov.uk/contact/report-technical-problem?service=${serviceId}`
+The format for the link should be rendered as follows:
+* `https://www.{environment}.tax.service.gov.uk/contact/report-technical-problem?service=${serviceId}&referrerUrl=${urlOfPageContainingLink}`
 
+| URL parameter  | Description                                                                                                          |
+| ---------------| -------------------------------------------------------------------------------------------------------------------- |
+| `service`      | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
+| `referrerUrl`  | the full, absolute, properly encoded URL of the page the user was on before they navigated to the contact form       |
+
+### Deprecation notes
 Historically, `contact-frontend` supported a version of the form that could be embedded within a service using either a 
 server-side partial or injected by Javascript. However, these mechanisms are not supported for services using 
 `play-frontend-hmrc` or `play-nunjucks` and are not recommended for reasons of accessibility and usability.
@@ -74,21 +83,17 @@ This contact form contains only three input fields:
 Requests of this type are forwarded to *Deskpro* with the subject *"Contact form submission"*
 
 To use this form, render a link on your service to:
-* `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc?service=${serviceId}`
+* `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc?service=${serviceId}&referrerUrl=${urlOfPageContainingLink}`
 
 '{environment}.' is not included in the case of the production environment.
 
-`Help and contact` historically also supported embedding itself as a partial; however, this
-functionality is *deprecated* and should not be used.
+| URL parameter  | Description                                                                                                          |
+| ---------------| -------------------------------------------------------------------------------------------------------------------- |
+| `service`      | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
+| `referrerUrl`  | the full, absolute, properly encoded URL of the page the user was on before they navigated to the contact form. For example, a link from the SCP sign in page would look like `https://www.tax.service.gov.uk/contact/contact-hmrc?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds` |
 
-For linking across domains, a querystring parameter, referrerUrl, can also be supplied. This parameter should 
-contain the full, absolute, properly encoded URL of the page the user was on before they navigated to
-the contact form. For example, a link from the SCP sign in page would look like 
-`https://www.tax.service.gov.uk/contact/contact-hmrc?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds`
-
-The referrer field is passed to the Deskpro service and lets operators know which page the user was on when they asked to
-contact HMRC. If the referrerUrl is not supplied, the application will attempt to use the HTTP Header and userAction parameter (if present). 
-However, this mechanism is not recommended because it relies on browsers correctly forwarding the HTTP Referer header correctly.
+### Deprecation notes
+`Help and contact` previously also supported embedding itself as a partial; however, this functionality is *deprecated* and should not be used. 
 
 [[Back to the top]](#top)
 
@@ -143,11 +148,13 @@ To use this form, render a link on your page to:
 
 '{environment}.' is not included in the case of the production environment.
 
-Customization flags:
-* *service* - an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters
-* *canOmitComments* - consuming services can decide whether the 'comments' field is optional. To make this the case, the consuming service must add 'canOmitComments=true' field to the request
-* *backURL* - a 'Back' button redirecting the user back to the consuming service can be embedded into the Beta Feedback form. In order to achieve this, the consuming service has to specify a destination URL.
+| URL parameter      | Description                                                                                                          |
+| -------------------| -------------------------------------------------------------------------------------------------------------------- |
+| `service`          | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
+| `canOmitComments`  | consuming services can decide whether the 'comments' field is optional. To make this the case, the consuming service must add 'canOmitComments=true' field to the request |
+| `backURL`          | a 'Back' button redirecting the user back to the consuming service can be embedded into the Beta Feedback form. In order to achieve this, the consuming service has to specify a destination URL |
 
+### Deprecation notes
 `Send your feedback` historically also supported displaying the *Send your feedback* page as a partial; however, this
 functionality is *deprecated* and should not be used.
 
@@ -172,10 +179,10 @@ Services that have not yet migrated to accessibility-statement-frontend display 
 
 `{environment}` is not included in the case of the production environment.
 
-URL parameters:
-* *service* - an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters
-* *referrerUrl* - the full, absolute, properly encoded URL of the page the user was on before they 
-  navigated to the accessibility form
+| URL parameter  | Description                                                                                                          |
+| ---------------| -------------------------------------------------------------------------------------------------------------------- |
+| `service`      | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
+| `referrerUrl`  | the full, absolute, properly encoded URL of the page the user was on before they navigated to the contact form       |
 
 [[Back to the top]](#top)
 
@@ -195,6 +202,15 @@ play.filters.cors.allowedOrigins.1: "https://www.{environment}.tax.service.gov.u
 
 [[Back to the top]](#top)
 
+## referer header forwarding to Deskpro
+
+Historically, `contact-frontend` forwarded the `referer` header to Deskpro when a form was submitted, allowing customer 
+service agents to view the page from which an end user navigated to `contact-frontend`. This behaviour is now being
+deprecated, and instead the `referrerUrl` should be passed as a query string parameter (see individual page parameters 
+above).
+
+[[Back to the top]](#top)
+
 ## Creating customized customer contact forms <a name="creating-own-customer-contact-forms"></a>
 
 Currently, it is not possible to customize forms in ways other than described above. If you have business
@@ -207,9 +223,11 @@ requirements to customize customer contact form, please get in touch with PlatUI
 ## User details attached to the ticket <a name="user-details-attached-to-the-ticket"></a>
 
 In addition to the information provided by the user, the service collects the following context data:
-* *HTTP Referrer header* - this should be the same as the URL of the page on which the user initiated the contact journey. Deskpro uses it to classify issues.
+* *HTTP Referrer header* - this is the URL of the page on which the user initiated the contact journey, as passed on the
+  URL as a query string parameter. Deskpro uses it to classify issues.
 * *HTTP UserAgent header* - this tells us what browser the user has
-* *user tax identifiers* - if the user his logged in, user tax identifiers will be attached to the tickets. These identifiers can later be seen in Deskpro
+* *user tax identifiers* - if the user has logged in, user tax identifiers will be attached to the tickets. These 
+  identifiers can later be seen in Deskpro
 * *whether user's browser uses Javascript* 
 * *user's id* - as provided in the HeaderCarrier object
 * *sessionId* - as provided in the HeaderCarrier object

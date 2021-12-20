@@ -29,7 +29,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator}
+import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.partials.{error_feedback, error_feedback_inner, ticket_created_body}
 import views.html.{InternalErrorPage, ReportProblemConfirmationPage, ReportProblemPage}
 
@@ -118,7 +118,8 @@ class ReportProblemController @Inject() (
   errorFeedbackForm: error_feedback,
   errorFeedbackFormInner: error_feedback_inner,
   ticketCreatedBody: ticket_created_body,
-  errorPage: InternalErrorPage
+  errorPage: InternalErrorPage,
+  headerRetriever: RefererHeaderRetriever
 )(implicit appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
@@ -127,18 +128,18 @@ class ReportProblemController @Inject() (
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   def index(service: Option[String], referrerUrl: Option[String]) = Action { implicit request =>
-    val referrer = referrerUrl.orElse(request.headers.get(REFERER))
+    val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
     Ok(page(ReportProblemFormBind.emptyForm(service, referrer), service, referrerUrl))
   }
 
   def indexDeprecated(service: Option[String], referrerUrl: Option[String]) = Action { implicit request =>
-    val referrer = referrerUrl.orElse(request.headers.get(REFERER))
+    val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
     Redirect(routes.ReportProblemController.index(service, referrer))
   }
 
   def partialIndex(preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
     val csrfToken = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
-    val referrer  = request.headers.get(REFERER)
+    val referrer  = headerRetriever.refererFromHeaders
     Ok(
       errorFeedbackForm(
         form = ReportProblemFormBind.emptyForm(service, referrer),
@@ -152,7 +153,7 @@ class ReportProblemController @Inject() (
 
   def partialAjaxIndex(service: Option[String]) = Action { implicit request =>
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
-    val referrer  = request.headers.get(REFERER)
+    val referrer  = headerRetriever.refererFromHeaders
     val form      = ReportProblemFormBind.emptyForm(service, referrer)
     val view      = errorFeedbackFormInner(form, appConfig.externalReportProblemUrl, csrfToken, service, referrer)
     Ok(view)
@@ -184,7 +185,7 @@ class ReportProblemController @Inject() (
       problemReport => {
         val referrer = referrerUrl
           .orElse(problemReport.referrer.filter(_.trim.nonEmpty))
-          .orElse(request.headers.get(REFERER))
+          .orElse(headerRetriever.refererFromHeaders)
         (for {
           maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
           _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
@@ -198,7 +199,7 @@ class ReportProblemController @Inject() (
     ReportProblemFormBind.form.bindFromRequest.fold(
       formWithError => Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR")))),
       problemReport => {
-        val referrer = problemReport.referrer.filter(_.trim.nonEmpty).orElse(request.headers.get(REFERER))
+        val referrer = problemReport.referrer.filter(_.trim.nonEmpty) orElse headerRetriever.refererFromHeaders
         (for {
           maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
           ticketId            <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)

@@ -26,6 +26,7 @@ trait AppConfig {
   def backUrlDestinationAllowList: Set[String]
   def loginCallback(continueUrl: String): String
   def enableLanguageSwitching: Boolean
+  def useRefererFromRequest: Boolean
 
 }
 
@@ -59,7 +60,8 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .getOptional[Boolean]("enableLanguageSwitching")
       .getOrElse(false)
 
+  override def useRefererFromRequest: Boolean = configuration.getOptional[Boolean]("useRefererHeader").getOrElse(false)
+
   private def configNotFoundError(key: String) =
     throw new RuntimeException(s"Could not find config key '$key'")
-
 }

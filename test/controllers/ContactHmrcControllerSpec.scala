@@ -42,6 +42,7 @@ import play.api.test.Helpers.{contentAsJson, contentAsString, redirectLocation, 
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
+import util.RefererHeaderRetriever
 
 import collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -56,7 +57,7 @@ class ContactHmrcControllerSpec
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "enablePlayFrontendContactHmrcForm" -> true)
+      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "useRefererHeader" -> true)
       .build()
 
   implicit val actorSystem: ActorSystem        = ActorSystem()
@@ -608,7 +609,8 @@ class ContactHmrcControllerSpec
         contactFormConfirmation,
         errorPage,
         pfContactPage,
-        pfConfirmationPage
+        pfConfirmationPage,
+        new RefererHeaderRetriever(appConfig)
       )
 
     def mockDeskproConnector(result: Future[TicketId]): Unit =

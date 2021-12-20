@@ -37,6 +37,7 @@ import play.api.Application
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
+import util.RefererHeaderRetriever
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,7 +45,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "enablePlayFrontendAccessibilityForm" -> true)
+      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "useRefererHeader" -> true)
       .build()
 
   implicit val message: Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
@@ -294,7 +295,8 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       Stubs.stubMessagesControllerComponents(messagesApi = messages),
       playFrontendAccessibilityPage,
       playFrontendAccessibilityConfirmationPage,
-      errorPage
+      errorPage,
+      new RefererHeaderRetriever(cconfig)
     )(cconfig, ExecutionContext.Implicits.global)
 
     def generateRequest(desc: String, formName: String, email: String, isJavascript: Boolean, referrer: String) = {

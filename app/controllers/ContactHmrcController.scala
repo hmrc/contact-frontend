@@ -28,7 +28,7 @@ import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator}
+import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
@@ -73,7 +73,8 @@ class ContactHmrcController @Inject() (
   contactHmrcFormConfirmation: contact_hmrc_form_confirmation,
   errorPage: InternalErrorPage,
   contactHmrcPage: ContactHmrcPage,
-  contactHmrcConfirmationPage: ContactHmrcConfirmationPage
+  contactHmrcConfirmationPage: ContactHmrcConfirmationPage,
+  headerRetriever: RefererHeaderRetriever
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
@@ -84,12 +85,11 @@ class ContactHmrcController @Inject() (
   def index(service: Option[String], userAction: Option[String], referrerUrl: Option[String]) =
     Action.async { implicit request =>
       Future.successful {
-        val httpReferrer = request.headers.get(REFERER)
-        val referrer     = referrerUrl orElse httpReferrer getOrElse "n/a"
-        val csrfToken    = CSRF.getToken(request).map(_.value).getOrElse("")
-        val form         = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, userAction))
-        val submit       = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
-        val view         = contactHmrcPage(form, submit)
+        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders getOrElse "n/a"
+        val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
+        val form      = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, userAction))
+        val submit    = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
+        val view      = contactHmrcPage(form, submit)
         Ok(view)
       }
     }

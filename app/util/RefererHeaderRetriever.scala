@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package helpers
+package util
 
 import config.AppConfig
+import play.api.http.HeaderNames
+import play.api.mvc.{AnyContent, Request}
 
-class TestAppConfig extends AppConfig {
-  def contactHmrcAboutTaxUrl: String = "some.contact.url"
+import javax.inject.Inject
 
-  def externalReportProblemUrl: String = ???
+class RefererHeaderRetriever @Inject() (appConfig: AppConfig) extends HeaderNames {
 
-  def backUrlDestinationAllowList: Set[String] = ???
-
-  def loginCallback(continueUrl: String): String = ???
-
-  def enableLanguageSwitching: Boolean = true
-
-  def useRefererFromRequest: Boolean = true
+  // This helper checks config to see if retrieval of referer header is enabled, and if so retrieve from headers.
+  // This allows the fallback behaviour of retrieving referer header to be centrally flagged on or off.
+  def refererFromHeaders(implicit request: Request[AnyContent]): Option[String] =
+    if (appConfig.useRefererFromRequest) request.headers.get(REFERER) else None
 }
