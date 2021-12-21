@@ -7,21 +7,21 @@
       "newLevel": -1
     },
     {
-      "reason": "This issue is only seen on our test-only pages, which are not served in Production.",
+      "reason": "The modernizr.js file is only seen on our test-only pages, which are not served in Production.",
       "url": "http://localhost:9032/assets/3.17.0/javascripts/vendor/modernizr.js",
-      "ruleId": 10003,
+      "ruleId": 10021,
       "newLevel": -1
     },
     {
-      "reason": "This issue is only seen on our test-only pages, which are not served in Production.",
+      "reason": "The assets-frontend js file is only seen on our test-only pages, which are not served in Production.",
       "url": "http://localhost:9032/assets/3.17.0/javascripts/application.min.js",
-      "ruleId": 10003,
+      "ruleId": 10021,
       "newLevel": -1
     },
     {
-      "reason": "This issue is only seen on our test-only pages, which are not served in Production.",
+      "reason": "The assets-frontend css file is only seen on our test-only pages, which are not served in Production.",
       "url": "http://localhost:9032/assets/3.17.0/stylesheets/application.min.css",
-      "ruleId": 10003,
+      "ruleId": 10021,
       "newLevel": -1
     }
   ]
