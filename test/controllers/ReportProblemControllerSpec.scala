@@ -506,6 +506,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
           "report-email"  -> email,
           "report-action" -> "Some Action",
           "report-error"  -> "Some Error",
+          "csrfToken"     -> "token",
           "isJavascript"  -> isAjaxRequest.toString
         )
     }

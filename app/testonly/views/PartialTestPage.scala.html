@@ -18,13 +18,13 @@
 
 @this(mainContent: testonly.views.html.main, errorFeedback: partials.error_feedback)
 
-@()(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@(csrfToken: Option[String])(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
 
 @getHelpForm = {
   @errorFeedback(
-    form = controllers.ReportProblemFormBind.emptyForm(service = None, referrer = None),
+    form = controllers.ReportProblemFormBind.emptyForm(csrfToken.getOrElse(""), service = None, referrer = None),
     actionUrl=appConfig.externalReportProblemUrl,
-    csrfToken=play.filters.csrf.CSRF.getToken(request).map(_.value),
+    csrfToken,
     service=None,
     referrer=None)
 }

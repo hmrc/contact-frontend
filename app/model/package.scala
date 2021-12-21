@@ -35,6 +35,7 @@ case class ReportProblemForm(
   isJavascript: Boolean,
   service: Option[String],
   referrer: Option[String],
+  csrfToken: String,
   userAction: Option[String]
 )
 

@@ -37,7 +37,8 @@ class TestController @Inject() (
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   val problemPartial: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(partialTestPage()))
+    val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
+    Future.successful(Ok(partialTestPage(csrfToken)))
   }
 
   val problemAjax: Action[AnyContent] = Action.async { implicit request =>
