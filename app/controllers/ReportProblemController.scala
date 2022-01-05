@@ -89,11 +89,12 @@ object ReportProblemFormBind {
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
       "referrer"      -> optional(text),
+      "csrfToken"     -> text,
       "userAction"    -> optional(text)
     )(ReportProblemForm.apply)(ReportProblemForm.unapply)
   )
 
-  def emptyForm(service: Option[String], referrer: Option[String]): Form[ReportProblemForm] =
+  def emptyForm(csrfToken: String, service: Option[String], referrer: Option[String]): Form[ReportProblemForm] =
     ReportProblemFormBind.form.fill(
       ReportProblemForm(
         reportName = "",
@@ -103,6 +104,7 @@ object ReportProblemFormBind {
         isJavascript = false,
         service = service,
         referrer = referrer,
+        csrfToken = csrfToken,
         userAction = None
       )
     )
@@ -128,8 +130,9 @@ class ReportProblemController @Inject() (
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   def index(service: Option[String], referrerUrl: Option[String]) = Action { implicit request =>
-    val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
-    Ok(page(ReportProblemFormBind.emptyForm(service, referrer), service, referrerUrl))
+    val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
+    val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders
+    Ok(page(ReportProblemFormBind.emptyForm(csrfToken, service, referrer), service, referrerUrl))
   }
 
   def indexDeprecated(service: Option[String], referrerUrl: Option[String]) = Action { implicit request =>
@@ -142,7 +145,7 @@ class ReportProblemController @Inject() (
     val referrer  = headerRetriever.refererFromHeaders
     Ok(
       errorFeedbackForm(
-        form = ReportProblemFormBind.emptyForm(service, referrer),
+        form = ReportProblemFormBind.emptyForm(csrfToken.getOrElse(""), service, referrer),
         actionUrl = appConfig.externalReportProblemUrl,
         csrfToken = csrfToken,
         service = service,
@@ -154,7 +157,7 @@ class ReportProblemController @Inject() (
   def partialAjaxIndex(service: Option[String]) = Action { implicit request =>
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
     val referrer  = headerRetriever.refererFromHeaders
-    val form      = ReportProblemFormBind.emptyForm(service, referrer)
+    val form      = ReportProblemFormBind.emptyForm(csrfToken.getOrElse(""), service, referrer)
     val view      = errorFeedbackFormInner(form, appConfig.externalReportProblemUrl, csrfToken, service, referrer)
     Ok(view)
   }

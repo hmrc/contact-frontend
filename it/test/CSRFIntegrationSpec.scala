@@ -48,7 +48,8 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
     "report-name"   -> "Joe",
     "report-email"  -> "things@example.com",
     "report-action" -> "Doing stuff",
-    "report-error"  -> "Things broken"
+    "report-error"  -> "Things broken",
+    "csrfToken" -> "token"
   )
 
   private val contactForm = Map(

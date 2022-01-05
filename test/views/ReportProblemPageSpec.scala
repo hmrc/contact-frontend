@@ -52,6 +52,7 @@ class ReportProblemPageSpec
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
       "referrer"      -> optional(text),
+      "csrfToken"     -> text,
       "userAction"    -> optional(text)
     )(ReportProblemForm.apply)(ReportProblemForm.unapply)
   )
@@ -63,6 +64,7 @@ class ReportProblemPageSpec
     reportError = "Testing error",
     isJavascript = false,
     referrer = None,
+    csrfToken = "",
     service = None,
     userAction = None
   )
