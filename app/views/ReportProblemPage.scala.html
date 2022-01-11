@@ -47,6 +47,7 @@
     @h1(content = Text(messages("problem_report.heading")))
     @p(content = Text(messages("problem_report.paragraph.1")))
     @p(content = Text(messages("problem_report.paragraph.2")))
+    @p(content = Text(messages("problem_report.paragraph.3")))
     @formWithCSRF(action, 'id -> "error-feedback-form") {
         @inputHidden(problemReportForm("service"))
         @inputHidden(problemReportForm("referrer"))

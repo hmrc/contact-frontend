@@ -34,6 +34,7 @@ problem_report.title=Cael help gyda phroblem dechnegol – GOV.UK
 problem_report.heading=Cael help gyda phroblem dechnegol
 problem_report.paragraph.1=Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.
 problem_report.paragraph.2=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
+problem_report.paragraph.3=Peidiwch â chynnwys manylion am unrhyw achosion ymchwilio i dwyll sydd ar y gweill.
 problem_report.name.label=Enw llawn
 problem_report.email.label=Cyfeiriad e-bost
 problem_report.action.label=Beth oeddech yn ei wneud?
@@ -91,6 +92,7 @@ contact.form.heading2=Sut allwn eich helpu?
 contact.form.para1=Os oes gennych ymholiad penodol ynghylch treth
 contact.form.para2=Os oes angen cymorth arnoch i ddefnyddio’ch cyfrif treth, llenwch y ffurflen hon.
 contact.form.para3=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
+contact.form.para4=Peidiwch â chynnwys manylion am unrhyw achosion ymchwilio i dwyll sydd ar y gweill.
 contact.hmrc.link=Cysylltu â CThEM
 
 form.online.services=Beth yw eich barn am y gwasanaeth ar-lein hwn?

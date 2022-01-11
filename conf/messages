@@ -34,6 +34,7 @@ problem_report.title=Get help with a technical problem – GOV.UK
 problem_report.heading=Get help with a technical problem
 problem_report.paragraph.1=Only use this form to report technical problems.
 problem_report.paragraph.2=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
+problem_report.paragraph.3=Do not include details of an on-going fraud report case.
 problem_report.name.label=Full name
 problem_report.email.label=Email address
 problem_report.action.label=What were you doing?
@@ -91,6 +92,7 @@ contact.form.heading2=How can we help you?
 contact.form.para1=If you have a specific tax query
 contact.form.para2=If you need help using your tax account please fill in this form.
 contact.form.para3=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
+contact.form.para4=Do not include details of an on-going fraud report case.
 contact.button=Send
 
 form.online.services=What do you think of this online service?
