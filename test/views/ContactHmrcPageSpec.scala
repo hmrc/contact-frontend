@@ -110,12 +110,6 @@ class ContactHmrcPageSpec
       )
     }
 
-    "include the warning regarding ongoing fraud" in {
-      contentAsString(content) should include(
-        "Do not include details of an on-going fraud report case."
-      )
-    }
-
     "translate the help text into Welsh if requested" in {
       implicit val messages: Messages = getWelshMessages
       val welshContent                = contactHmrcPage(contactHmrcForm, action)

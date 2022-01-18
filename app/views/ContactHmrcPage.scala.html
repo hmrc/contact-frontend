@@ -52,7 +52,6 @@
     @p(content = Text(messages("contact.form.para2")))
     @h2(content = Text(messages("contact.form.heading2")))
     @p(content = Text(messages("contact.form.para3")))
-    @p(content = Text(messages("contact.form.para4")))
 
     @formWithCSRF(action, 'id -> "contact-hmrc-form") {
         @inputHidden(contactForm("service"))
