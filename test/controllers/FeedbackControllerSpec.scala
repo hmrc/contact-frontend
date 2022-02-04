@@ -84,6 +84,35 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       page.body().select("input[name=backUrl]").first.attr("value")   shouldBe "/any-service"
       page.body().select("input[name=canOmitComments]").attr("value") shouldBe "true"
     }
+
+    "include 'referrer' hidden field if passed in request headers" in new TestScope {
+      val result = controller.index(
+        service = Some("any-service"),
+        backUrl = Some("/any-service"),
+        canOmitComments = true
+      )(FakeRequest("GET", "/foo").withHeaders((REFERER, "some-referring-url")))
+
+      val page = Jsoup.parse(contentAsString(result))
+
+      val encodedBackUrl = URLEncoder.encode("/any-service", "UTF-8")
+      val queryString    = s"service=any-service&backUrl=$encodedBackUrl&canOmitComments=true"
+      page.body().select("input[name=referrer]").first.attr("value") shouldBe "some-referring-url"
+    }
+
+    "set 'referrer' hidden field to n/a if not passed in request headers" in new TestScope {
+      val result = controller.index(
+        service = Some("any-service"),
+        backUrl = Some("/any-service"),
+        canOmitComments = true
+      )(FakeRequest("GET", "/foo"))
+
+      val page = Jsoup.parse(contentAsString(result))
+
+      val encodedBackUrl = URLEncoder.encode("/any-service", "UTF-8")
+      val queryString    = s"service=any-service&backUrl=$encodedBackUrl&canOmitComments=true"
+      page.body().select("input[name=referrer]").first.attr("value") shouldBe "n/a"
+    }
+
   }
 
   "partialIndex" should {
