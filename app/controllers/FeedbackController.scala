@@ -64,6 +64,7 @@ import scala.concurrent.{ExecutionContext, Future}
           renderFeedbackPage(
             FeedbackFormBind.emptyForm(
               CSRF.getToken(request).map(_.value).getOrElse(""),
+              referrer = headerRetriever.refererFromHeaders,
               backUrl = backUrl,
               canOmitComments = canOmitComments,
               service = service
