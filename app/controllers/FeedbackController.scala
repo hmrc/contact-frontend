@@ -57,21 +57,23 @@ import scala.concurrent.{ExecutionContext, Future}
 
   val formId = "FeedbackForm"
 
-  def index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean) =
+  def index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean, referrerUrl: Option[String]) =
     Action.async { implicit request =>
+      val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
       Future.successful(
         Ok(
           renderFeedbackPage(
             FeedbackFormBind.emptyForm(
               CSRF.getToken(request).map(_.value).getOrElse(""),
-              referrer = headerRetriever.refererFromHeaders,
+              referrer = referrer,
               backUrl = backUrl,
               canOmitComments = canOmitComments,
               service = service
             ),
             service,
             backUrl,
-            canOmitComments = canOmitComments
+            canOmitComments = canOmitComments,
+            referrer
           )
         )
       )
@@ -80,7 +82,8 @@ import scala.concurrent.{ExecutionContext, Future}
   def submit(
     service: Option[String] = None,
     backUrl: Option[String] = None,
-    canOmitComments: Boolean = false
+    canOmitComments: Boolean = false,
+    referrerUrl: Option[String] = None
   ) = Action.async { implicit request =>
     FeedbackFormBind.form
       .bindFromRequest()
@@ -157,18 +160,20 @@ import scala.concurrent.{ExecutionContext, Future}
       form,
       form("service").value,
       form("backUrl").value,
-      form("canOmitComments").value.contains("true")
+      form("canOmitComments").value.contains("true"),
+      form("referrer").value
     )
 
   private def renderFeedbackPage(
     form: Form[FeedbackForm],
     service: Option[String],
     backUrl: Option[String],
-    canOmitComments: Boolean
+    canOmitComments: Boolean,
+    referrerUrl: Option[String]
   )(implicit
     request: Request[_]
   ): Html = {
-    val action = routes.FeedbackController.submit(service, backUrl, canOmitComments)
+    val action = routes.FeedbackController.submit(service, backUrl, canOmitComments, referrerUrl)
     feedbackPage(form, action)
   }
 }

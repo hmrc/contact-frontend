@@ -1,11 +1,11 @@
 ->          /hmrc-frontend                               hmrcfrontend.Routes
 
-GET         /beta-feedback                               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false)
-POST        /beta-feedback                               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false)
-GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false)
-POST        /beta-feedback-unauthenticated               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false)
-POST        /beta-feedback/submit                        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false)
-POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false)
+GET         /beta-feedback                               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
+POST        /beta-feedback                               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
+GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
+POST        /beta-feedback-unauthenticated               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
+POST        /beta-feedback/submit                        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
+POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
 GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks(backUrl: Option[String])
 GET         /beta-feedback/thanks-unauthenticated        @controllers.FeedbackController.thanks(backUrl: Option[String])
 

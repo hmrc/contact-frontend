@@ -148,11 +148,12 @@ To use this form, render a link on your page to:
 
 '{environment}.' is not included in the case of the production environment.
 
-| URL parameter      | Description                                                                                                          |
-| -------------------| -------------------------------------------------------------------------------------------------------------------- |
-| `service`          | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
-| `canOmitComments`  | consuming services can decide whether the 'comments' field is optional. To make this the case, the consuming service must add 'canOmitComments=true' field to the request |
-| `backURL`          | a 'Back' button redirecting the user back to the consuming service can be embedded into the Beta Feedback form. In order to achieve this, the consuming service has to specify a destination URL |
+| URL parameter     | Description                                                                                                          |
+| ------------------| -------------------------------------------------------------------------------------------------------------------- |
+| `service`         | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
+| `canOmitComments` | consuming services can decide whether the 'comments' field is optional. To make this the case, the consuming service must add 'canOmitComments=true' field to the request |
+| `backURL`         | an optional 'Back' button redirecting the user back to the consuming service can be embedded into the Beta Feedback form. In order to achieve this, the consuming service has to specify a destination URL |
+| `referrerUrl`     | the full, absolute, properly encoded URL of the page the user was on before they navigated to the contact form. For example, a link from the SCP sign in page would look like `https://www.tax.service.gov.uk/contact/beta-feedback?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds` |
 
 ### Deprecation notes
 `Send your feedback` historically also supported displaying the *Send your feedback* page as a partial; however, this

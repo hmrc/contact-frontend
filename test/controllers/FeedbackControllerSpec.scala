@@ -52,7 +52,8 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
-        canOmitComments = true
+        canOmitComments = true,
+        referrerUrl = None
       )(FakeRequest("GET", "/foo"))
 
       val page = Jsoup.parse(contentAsString(result))
@@ -67,7 +68,8 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
-        canOmitComments = true
+        canOmitComments = true,
+        referrerUrl = None
       )(FakeRequest("GET", "/foo"))
 
       val page = Jsoup.parse(contentAsString(result))
@@ -85,31 +87,45 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       page.body().select("input[name=canOmitComments]").attr("value") shouldBe "true"
     }
 
-    "include 'referrer' hidden field if passed in request headers" in new TestScope {
+    "include 'referrer' hidden field from query string when passed as both parameter and headers" in new TestScope {
       val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
-        canOmitComments = true
-      )(FakeRequest("GET", "/foo").withHeaders((REFERER, "some-referring-url")))
+        canOmitComments = true,
+        referrerUrl = Some("any-referring-parameter")
+      )(FakeRequest("GET", "/foo").withHeaders((REFERER, "any-referring-header")))
 
       val page = Jsoup.parse(contentAsString(result))
 
       val encodedBackUrl = URLEncoder.encode("/any-service", "UTF-8")
-      val queryString    = s"service=any-service&backUrl=$encodedBackUrl&canOmitComments=true"
-      page.body().select("input[name=referrer]").first.attr("value") shouldBe "some-referring-url"
+      page.body().select("input[name=referrer]").first.attr("value") shouldBe "any-referring-parameter"
     }
 
-    "set 'referrer' hidden field to n/a if not passed in request headers" in new TestScope {
+    "include 'referrer' hidden field from header when passed in request headers only" in new TestScope {
       val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
-        canOmitComments = true
+        canOmitComments = true,
+        referrerUrl = None
+      )(FakeRequest("GET", "/foo").withHeaders((REFERER, "any-referring-header")))
+
+      val page = Jsoup.parse(contentAsString(result))
+
+      val encodedBackUrl = URLEncoder.encode("/any-service", "UTF-8")
+      page.body().select("input[name=referrer]").first.attr("value") shouldBe "any-referring-header"
+    }
+
+    "set 'referrer' hidden field to n/a if not passed in query string or request headers" in new TestScope {
+      val result = controller.index(
+        service = Some("any-service"),
+        backUrl = Some("/any-service"),
+        canOmitComments = true,
+        referrerUrl = None
       )(FakeRequest("GET", "/foo"))
 
       val page = Jsoup.parse(contentAsString(result))
 
       val encodedBackUrl = URLEncoder.encode("/any-service", "UTF-8")
-      val queryString    = s"service=any-service&backUrl=$encodedBackUrl&canOmitComments=true"
       page.body().select("input[name=referrer]").first.attr("value") shouldBe "n/a"
     }
 
@@ -204,7 +220,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       verifyZeroInteractions(hmrcDeskproConnector)
     }
 
-    "include 'service', 'backUrl' and 'canOmitComments' fields in the returned page if form not filled in correctly" in new TestScope {
+    "include 'service', 'backUrl', 'canOmitComments' and 'referrer' fields in the returned page if form not filled in correctly" in new TestScope {
 
       hmrcConnectorWillReturnTheTicketId()
 
@@ -214,18 +230,19 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val page = Jsoup.parse(contentAsString(result))
       page.body().select(".govuk-error-message").size should be > 0
 
-      val encodedBackUrl = URLEncoder.encode("http://www.back.url", "UTF-8")
-      val queryString    = s"service=someService&backUrl=$encodedBackUrl&canOmitComments=true"
-      page
-        .body()
-        .select("form[id=feedback-form]")
-        .first
-        .attr("action") shouldBe s"/contact/beta-feedback?$queryString"
+      val backUrl            = "http://www.back.url"
+      val referrerUrl        = "http://www.referrer.url"
+      val encodedBackUrl     = URLEncoder.encode(backUrl, "UTF-8")
+      val encodedReferrerUrl = URLEncoder.encode(referrerUrl, "UTF-8")
 
-      page.body().select("input[name=service]").first.attr("value")   shouldBe "someService"
-      page.body().select("input[name=backUrl]").first.attr("value")   shouldBe "http://www.back.url"
-      page.body().select("input[name=canOmitComments]").attr("value") shouldBe "true"
+      val queryString =
+        s"service=someService&backUrl=$encodedBackUrl&canOmitComments=true&referrerUrl=$encodedReferrerUrl"
 
+      page.body().select("form[id=feedback-form]").first.attr("action") shouldBe s"/contact/beta-feedback?$queryString"
+      page.body().select("input[name=service]").first.attr("value")     shouldBe "someService"
+      page.body().select("input[name=canOmitComments]").attr("value")   shouldBe "true"
+      page.body().select("input[name=backUrl]").first.attr("value")     shouldBe backUrl
+      page.body().select("input[name=referrer]").attr("value")          shouldBe referrerUrl
     }
 
     "return service error page if call to hmrc-deskpro failed" in new TestScope {
@@ -438,7 +455,8 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         "isJavascript"    -> "true",
         "backUrl"         -> "http://www.back.url",
         "service"         -> "someService",
-        "canOmitComments" -> "true"
+        "canOmitComments" -> "true",
+        "referrer"        -> "http://www.referrer.url"
       )
 
     val request = generateRequest()
