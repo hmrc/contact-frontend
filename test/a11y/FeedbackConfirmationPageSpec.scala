@@ -39,10 +39,15 @@ class FeedbackConfirmationPageSpec
 
   "the feedback confirmation page" should {
     val feedbackConfirmationPage = app.injector.instanceOf[FeedbackConfirmationPage]
-    val content                  = feedbackConfirmationPage()
 
     "pass accessibility checks" in {
+      val content = feedbackConfirmationPage()
       content.toString() should passAccessibilityChecks
+    }
+
+    "pass accessibility checks with a back URL" in {
+      val contentWithBackUrl = feedbackConfirmationPage(backUrl = Some("my-back-url"))
+      contentWithBackUrl.toString() should passAccessibilityChecks
     }
   }
 }
