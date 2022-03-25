@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import views.html.helper.CSPNonce
 
-@this(hmrcLayout: HmrcLayout)
+@this(hmrcLayout: CustomHmrcLayout, hmrcAccountMenu: HmrcAccountMenu)
 
 @(pageTitle: String, isWelshTranslationAvailable: Boolean = true, backLink: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
@@ -25,7 +25,8 @@
   pageTitle = Some(pageTitle),
   nonce = CSPNonce.get,
   isWelshTranslationAvailable = isWelshTranslationAvailable,
-  displayHmrcBanner = true,
-  backLinkUrl = backLink
+  displayHmrcBanner = false,
+  backLinkUrl = backLink,
+  beforeContentBlock = Some(hmrcAccountMenu(AccountMenu()))
 )(contentBlock)
 

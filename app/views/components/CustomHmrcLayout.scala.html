@@ -1,0 +1,103 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukLayout
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukBackLink
+@import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsMainContent
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardHeader
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardFooter
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcHead
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLanguageSelectHelper
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcScripts
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.userresearchbanner.UserResearchBanner
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.phasebanner.PhaseBanner
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.pagelayout.PageLayout
+@import uk.gov.hmrc.govukfrontend.views.html.components.FixedWidthPageLayout
+@import uk.gov.hmrc.hmrcfrontend.views.Aliases.Header
+
+@this(
+        govukLayout: GovukLayout,
+        hmrcStandardHeader: CustomHmrcHeader,
+        hmrcStandardFooter: HmrcStandardFooter,
+        hmrcHead: HmrcHead,
+        hmrcLanguageSelectHelper: HmrcLanguageSelectHelper,
+        hmrcScripts: HmrcScripts,
+        govukBackLink: GovukBackLink,
+        defaultMainContent: TwoThirdsMainContent,
+        fixedWidthPageLayout: FixedWidthPageLayout
+)
+
+@(
+        serviceName: Option[String] = None,
+        pageTitle: Option[String] = None,
+        isWelshTranslationAvailable: Boolean = false,
+        signOutUrl: Option[String] = None,
+        serviceUrl: Option[String] = None,
+        userResearchBannerUrl: Option[String] = None,
+        accessibilityStatementUrl: Option[String] = None,
+        backLinkUrl: Option[String] = None,
+        displayHmrcBanner: Boolean = false,
+        phaseBanner: Option[PhaseBanner] = None,
+        additionalHeadBlock: Option[Html] = None,
+        additionalScriptsBlock: Option[Html] = None,
+        beforeContentBlock: Option[Html] = None,
+        nonce: Option[String] = None,
+        mainContentLayout: Option[Html => Html] = Some(defaultMainContent(_)),
+        additionalBannersBlock: Option[Html] = None,
+        pageLayout: Option[PageLayout => Html] = Some(fixedWidthPageLayout(_)),
+        headerContainerClasses: String = Header.defaultObject.containerClasses
+)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+
+@headerBlock = {
+    @hmrcStandardHeader(
+        serviceUrl = serviceUrl,
+        signOutUrl = signOutUrl,
+        serviceName = serviceName,
+        userResearchBanner = userResearchBannerUrl.map(url => UserResearchBanner(url = url)),
+        phaseBanner = phaseBanner,
+        displayHmrcBanner = displayHmrcBanner,
+        additionalBannersBlock = additionalBannersBlock,
+        containerClasses = headerContainerClasses
+    )
+}
+
+@beforeContent = {
+    @if(beforeContentBlock.isDefined) {
+        @beforeContentBlock
+    } else {
+        @if(isWelshTranslationAvailable) {
+            @hmrcLanguageSelectHelper()
+        }
+        @backLinkUrl.map(url =>
+            govukBackLink(BackLink(href = url, content = Text(messages("back.text"))))
+        )
+    }
+}
+
+@govukLayout(
+    pageTitle = pageTitle,
+    headBlock = Some(hmrcHead(nonce = nonce, headBlock = additionalHeadBlock)),
+    headerBlock = Some(headerBlock),
+    scriptsBlock = Some(hmrcScripts(nonce = nonce, scriptsBlock = additionalScriptsBlock)),
+    beforeContentBlock = Some(beforeContent),
+    footerBlock = Some(hmrcStandardFooter(accessibilityStatementUrl = accessibilityStatementUrl)),
+    mainContentLayout = mainContentLayout,
+    assetPath = None,
+    cspNonce = nonce,
+    pageLayout = pageLayout
+)(contentBlock)
