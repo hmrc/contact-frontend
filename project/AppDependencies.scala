@@ -14,7 +14,7 @@ object AppDependencies {
     "uk.gov.hmrc"              %% "url-builder"                % "3.5.0-play-28",
     "uk.gov.hmrc"              %% "auth-client"                % "5.6.0-play-28",
     "org.apache.httpcomponents" % "httpclient"                 % "4.4.1",
-    "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "1.19.0-play-28"
+    "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "3.9.0-play-28"
   )
 
   private def test(scope: String) = Seq(
@@ -32,6 +32,6 @@ object AppDependencies {
     "com.vladsch.flexmark"    % "flexmark-all"             % "0.35.10"       % scope,
     "uk.gov.hmrc"            %% "webdriver-factory"        % "0.23.0"        % scope,
     "org.scalatestplus"      %% "selenium-3-141"           % "3.2.0.0"       % scope,
-    "com.github.tomakehurst"  % "wiremock"                 % "2.18.0"        % "test"
+    "com.github.tomakehurst"  % "wiremock"                 % "2.18.0"        % scope
   )
 }
