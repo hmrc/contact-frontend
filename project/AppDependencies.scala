@@ -32,6 +32,6 @@ object AppDependencies {
     "com.vladsch.flexmark"    % "flexmark-all"             % "0.35.10"       % scope,
     "uk.gov.hmrc"            %% "webdriver-factory"        % "0.23.0"        % scope,
     "org.scalatestplus"      %% "selenium-3-141"           % "3.2.0.0"       % scope,
-    "com.github.tomakehurst"  % "wiremock"                 % "2.18.0"        % scope
+    "com.github.tomakehurst"  % "wiremock"                 % "2.18.0"        % "test"
   )
 }
