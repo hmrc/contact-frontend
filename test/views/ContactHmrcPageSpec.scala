@@ -115,7 +115,9 @@ class ContactHmrcPageSpec
       val welshContent                = contactHmrcPage(contactHmrcForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
-      paragraphs.first.text should include("Os oes gennych ymholiad penodol ynghylch treth Cysylltu â CThEM.")
+      paragraphs.first.text should include(
+        "Os oes gennych ymholiad penodol ynghylch treth Cysylltu â CThEM (yn agor tab newydd)."
+      )
     }
 
     "include the correct form tag" in {
