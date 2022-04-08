@@ -17,6 +17,8 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import views.html.components.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
 @this(
     inputCharacterCount: InputCharacterCount,
@@ -30,7 +32,8 @@
     mainLayout: Layout,
     h1: Heading1,
     h2: Heading2,
-    p: Paragraph
+    p: Paragraph,
+    link: HmrcNewTabLinkHelper
 )
 @(contactForm: Form[ContactForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
@@ -40,7 +43,7 @@
 }
 
 @contactHmrcLink = @{
-    <a href={appConfig.contactHmrcAboutTaxUrl} class="govuk-link" rel="noreferrer noopener" target="_blank">{messages("contact.hmrc.link")}</a>
+  link(NewTabLinkHelper(text = messages("contact.hmrc.link"), href = Some(appConfig.contactHmrcAboutTaxUrl)))
 }
 
 @mainLayout(pageTitle) {
@@ -48,7 +51,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(contactForm))
     }
     @h1(content = Text(messages("contact.heading")))
-    @p(content = HtmlContent(messages("contact.form.para1") + " " + contactHmrcLink + messages("common.fullstop")))
+    @p(content = HtmlContent(messages("contact.form.para1") + " " + contactHmrcLink.trim + messages("common.fullstop")))
     @p(content = Text(messages("contact.form.para2")))
     @h2(content = Text(messages("contact.form.heading2")))
     @p(content = Text(messages("contact.form.para3")))
