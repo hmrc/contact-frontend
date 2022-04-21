@@ -19,8 +19,9 @@ package acceptance.specs
 import acceptance.pages.{TestOnlyReportProblemPartialPage, TestOnlyReportProblemPartialPageAjax}
 import acceptance.pages.TestOnlyReportProblemPartialPage._
 import acceptance.specs.tags.UiTests
+import acceptance.support.IntegrationPatience
 
-class ReportProblemPartialSpec extends BaseSpec {
+class ReportProblemPartialSpec extends BaseSpec with IntegrationPatience {
 
   info("UI tests for partial `Is this page not working properly` embedded form")
 
