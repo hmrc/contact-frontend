@@ -19,9 +19,14 @@ package acceptance.specs
 import acceptance.pages.{TestOnlyReportProblemPartialPage, TestOnlyReportProblemPartialPageAjax}
 import acceptance.pages.TestOnlyReportProblemPartialPage._
 import acceptance.specs.tags.UiTests
-import acceptance.support.IntegrationPatience
+import org.scalatest.concurrent.IntegrationPatience
+import org.scalatest.time.{Seconds, Span}
 
 class ReportProblemPartialSpec extends BaseSpec with IntegrationPatience {
+
+  private val timeoutInSeconds: Int                    = 2
+  override implicit val patienceConfig: PatienceConfig =
+    PatienceConfig(timeout = scaled(Span(timeoutInSeconds, Seconds)))
 
   info("UI tests for partial `Is this page not working properly` embedded form")
 
