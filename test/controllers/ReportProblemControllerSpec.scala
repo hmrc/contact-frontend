@@ -201,7 +201,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
 
     "return Bad Request, page with validation error, and correct submit URL if no service URL param for invalid input" in new TestScope {
       val headers = Seq((REFERER, deskproReferrer), ("User-Agent", "iAmAUserAgent"))
-      val request = FakeRequest()
+      val request = FakeRequest("POST", "/")
         .withHeaders(headers: _*)
         .withFormUrlEncodedBody(
           "report-name"     -> deskproName,
@@ -499,7 +499,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
         ("X-Requested-With", "XMLHttpRequest")
       ).filter(_ => isAjaxRequest)
 
-      FakeRequest()
+      FakeRequest("POST", "/")
         .withHeaders(headers: _*)
         .withFormUrlEncodedBody(
           "report-name"   -> name,
@@ -520,7 +520,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite w
         ("X-Requested-With", "XMLHttpRequest")
       ).filter(_ => isAjaxRequest)
 
-      FakeRequest()
+      FakeRequest("POST", "/")
         .withHeaders(headers: _*)
         .withFormUrlEncodedBody("isJavascript" -> isAjaxRequest.toString)
     }

@@ -440,16 +440,16 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         "isJavascript"           -> javascriptEnabled.toString
       ) ++ backUrl.map("backUrl" -> _)
 
-      FakeRequest()
+      FakeRequest("POST", "/")
         .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
         .withFormUrlEncodedBody(fields.toSeq: _*)
     }
 
-    def generateInvalidRequest()                      = FakeRequest()
+    def generateInvalidRequest()                      = FakeRequest("POST", "/")
       .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
       .withFormUrlEncodedBody("isJavascript" -> "true")
 
-    def generateInvalidRequestWithBackUrlAndService() = FakeRequest()
+    def generateInvalidRequestWithBackUrlAndService() = FakeRequest("POST", "/")
       .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
       .withFormUrlEncodedBody(
         "isJavascript"    -> "true",

@@ -27,6 +27,7 @@ import play.api.mvc.Result
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.test.Helpers._
 
+import scala.language.postfixOps
 import scala.concurrent.Await
 import scala.concurrent.duration._
 

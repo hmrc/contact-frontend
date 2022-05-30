@@ -164,7 +164,7 @@ class ContactHmrcControllerSpec
         "userAction"       -> "/some-service-page"
       )
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to submit contact page")
       val submitResult = controller.submit(None, None, None)(contactRequest)
@@ -205,7 +205,7 @@ class ContactHmrcControllerSpec
         "userAction"       -> ""
       )
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to submit contact page")
       controller.submit(None, None, None)(contactRequest)
@@ -242,7 +242,7 @@ class ContactHmrcControllerSpec
         "userAction"       -> "/overridden/path"
       )
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to submit contact page")
       controller.submit(None, None, None)(contactRequest)
@@ -277,7 +277,7 @@ class ContactHmrcControllerSpec
         "userAction"       -> "/overridden/path"
       )
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
       val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
@@ -307,7 +307,7 @@ class ContactHmrcControllerSpec
         "userAction"       -> "/overridden/path"
       )
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
       val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
@@ -334,7 +334,7 @@ class ContactHmrcControllerSpec
         "userAction"       -> "/overridden/path"
       )
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
       val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
@@ -361,7 +361,7 @@ class ContactHmrcControllerSpec
         "userAction"       -> "/overridden/path"
       )
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
       val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
@@ -385,7 +385,7 @@ class ContactHmrcControllerSpec
         "service"          -> "scp",
         "userAction"       -> "/overridden/path"
       )
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
       val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
@@ -412,7 +412,7 @@ class ContactHmrcControllerSpec
         "service"          -> "scp"
       )
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
       When("the request is POSTed to submit contact page")
       val submitResult = controller.submit(None, None, None)(contactRequest)
@@ -454,7 +454,7 @@ class ContactHmrcControllerSpec
         "service"          -> "scp"
       )
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
       val resubmitUrl = "/contact-frontend/form"
 
@@ -489,7 +489,7 @@ class ContactHmrcControllerSpec
 
       val fields = Map.empty
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
       val resubmitUrl = "/contact-frontend/form"
 
@@ -514,7 +514,7 @@ class ContactHmrcControllerSpec
 
       val fields = Map.empty
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
       val resubmitUrl = "/contact-frontend/form"
 
@@ -547,7 +547,7 @@ class ContactHmrcControllerSpec
         "service"          -> "scp"
       )
 
-      val contactRequest = FakeRequest().withFormUrlEncodedBody(fields.toSeq: _*)
+      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
       val resubmitUrl = "/contact-frontend/form"
 
