@@ -312,7 +312,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
         "userAction"         -> "/test/url/action"
       )
 
-      FakeRequest()
+      FakeRequest("POST", "/")
         .withHeaders((REFERER, referrer))
         .withFormUrlEncodedBody(fields.toSeq: _*)
     }

@@ -74,8 +74,8 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
 
     "produce an audit result for a valid form" in new TestScope {
       implicit val request = FakeRequest(
-        "GET",
-        "/blah",
+        "POST",
+        "/",
         FakeHeaders(),
         Map[String, Seq[String]](
           "helpful"    -> Seq("2"),
@@ -102,10 +102,10 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       )
     }
 
-    "product errors for an invalid form" in new TestScope {
+    "produce errors for an invalid form" in new TestScope {
       implicit val request = FakeRequest(
-        "GET",
-        "/blah",
+        "POST",
+        "/",
         FakeHeaders(),
         Map[String, Seq[String]](
           "helpful"    -> Seq("2"),
@@ -125,7 +125,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
   "display errors when form isn't filled out at all" in new TestScope {
     val ticketId  = "GFBN-8051-KLNY"
     val serviceId = "abcdefg"
-    val request   = FakeRequest("POST", "/blah")
+    val request   = FakeRequest("POST", "/")
 
     implicit val messages = messagesApi.preferred(request)
     val result            = controller.submit(ticketId, serviceId)(request)
@@ -154,7 +154,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       "ticket-id"  -> ticketId,
       "service-id" -> serviceId
     )
-    val request   = FakeRequest("POST", "/blah").withFormUrlEncodedBody(fields.toSeq: _*)
+    val request   = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
     implicit val messages = messagesApi.preferred(request)
     val result            = controller.submit(ticketId, serviceId)(request)

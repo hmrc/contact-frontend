@@ -112,7 +112,7 @@ class ContactHmrcController @Inject() (
               maybeEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
               _               <- createDeskproTicket(data, maybeEnrolments)
             } yield {
-              val thanks = routes.ContactHmrcController.thanks()
+              val thanks = routes.ContactHmrcController.thanks
               Redirect(thanks)
             }).recover { case _ =>
               InternalServerError(errorPage())

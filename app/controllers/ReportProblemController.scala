@@ -192,7 +192,7 @@ class ReportProblemController @Inject() (
         (for {
           maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
           _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-        } yield Redirect(routes.ReportProblemController.thanks())) recover { case _ =>
+        } yield Redirect(routes.ReportProblemController.thanks)) recover { case _ =>
           InternalServerError(errorPage())
         }
       }

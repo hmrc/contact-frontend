@@ -7,7 +7,7 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    scalaVersion := "2.12.10",
+    scalaVersion := "2.13.8",
     majorVersion := 3,
     libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it"))
   )
@@ -31,8 +31,8 @@ lazy val microservice = Project(appName, file("."))
     // Use the silencer plugin to suppress warnings from unused imports in compiled twirl templates
     scalacOptions += "-P:silencer:pathFilters=views;routes",
     libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.4.4" cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % "1.4.4" % Provided cross CrossVersion.full
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.8" cross CrossVersion.full),
+      "com.github.ghik" % "silencer-lib" % "1.7.8" % Provided cross CrossVersion.full
     ),
     // ***************
     A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")

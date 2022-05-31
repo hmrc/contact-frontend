@@ -25,6 +25,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.FakeRequest
 
+import scala.language.postfixOps
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -50,7 +51,7 @@ class CSPIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
 
       headers(
         CONTENT_SECURITY_POLICY
-      ) should fullyMatch regex "object-src 'none'; script-src 'nonce-[^']+' 'self' 'unsafe-inline' 'strict-dynamic' ['sha256-[^']+']+ https: http:; base-uri 'none'"
+      ) should fullyMatch regex "script-src 'nonce-[^']+' 'self' 'unsafe-inline' 'strict-dynamic' ['sha256-[^']+']+ https: http:; object-src 'none'; base-uri 'none'"
     }
   }
 }
