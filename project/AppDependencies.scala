@@ -23,6 +23,7 @@ object AppDependencies {
     "org.scalatestplus"      %% "scalatestplus-mockito"    % "1.0.0-M2"      % scope,
     "org.scalatestplus"      %% "scalatestplus-scalacheck" % "3.1.0.0-RC2"   % scope,
     "com.typesafe.play"      %% "play-test"                % "2.7.4"         % scope,
+    "com.softwaremill.magnolia1_2" %% "magnolia"           % "1.1.2"         % scope,
     "org.mockito"             % "mockito-all"              % "2.0.2-beta"    % scope,
     "org.jsoup"               % "jsoup"                    % "1.11.3"        % scope,
     "com.github.tomakehurst"  % "wiremock"                 % "1.58"          % scope,
