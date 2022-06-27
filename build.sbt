@@ -41,7 +41,7 @@ lazy val microservice = Project(appName, file("."))
 lazy val unitTestSettings =
   inConfig(Test)(Defaults.testTasks) ++
     Seq(
-      testOptions in Test := Seq(
+      Test / testOptions := Seq(
         Tests.Filters(
           Seq(
             _ startsWith "connectors",
@@ -63,7 +63,7 @@ lazy val acceptanceTestSettings =
     Seq(
       // The following is needed to preserve the -Dbrowser option to the HMRC webdriver factory library
       fork in AcceptanceTest := false,
-      (testOptions in AcceptanceTest) := Seq(Tests.Filter(_ startsWith "acceptance")),
+      AcceptanceTest / testOptions := Seq(Tests.Filter(_ startsWith "acceptance")),
       AcceptanceTest / run / javaOptions ++= Seq(
         "-Dconfig.resource=test.application.conf",
         "-Dlogger.resource=logback-test.xml"
