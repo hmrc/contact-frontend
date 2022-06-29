@@ -16,12 +16,16 @@
 
 package views
 
-import org.scalacheck.Arbitrary
+import org.scalacheck.Gen.Parameters
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.rng.Seed
 import play.twirl.api.{Html, Template4, Template5}
 
 trait TemplateRenderers {
   this: AutomaticAccessibilitySpec =>
+
+  // scalacheck configuration
+  override implicit def parameters: Gen.Parameters = Parameters.default
 
   // TODO generate boilerplate for Template0..22[_, ...]
 

@@ -18,7 +18,6 @@ package views
 
 import _root_.helpers.{ApplicationSupport, ArbDerivation, JsoupHelpers, MessagesSupport}
 import config.AppConfig
-import org.scalacheck.Gen.Parameters
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -37,61 +36,49 @@ trait AutomaticAccessibilitySpec
     with MessagesSupport
     with JsoupHelpers
     with AccessibilityMatchers
+    with ViewDiscovery
     with ArbDerivation
     with TemplateRenderers {
 
+  // this has to be implemented by consuming teams
   def renderViewByClass: PartialFunction[Any, Html]
 
-  override implicit def parameters: Gen.Parameters = Parameters.default
-
+  // these are things that need to have sane values for pages to render properly
   val fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
   val messages: Messages = getMessages(app, fakeRequest)
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   val call: Call = Call(method = "POST", url = "/some/url")
 
-  // these are things that need to have sane values for pages to render properly
   implicit lazy val arbRequest: Arbitrary[RequestHeader] = Arbitrary(Gen.const(fakeRequest))
   implicit lazy val arbMessages: Arbitrary[Messages] = Arbitrary(Gen.const(messages))
   implicit lazy val arbConfig: Arbitrary[AppConfig] = Arbitrary(Gen.const(appConfig))
   implicit lazy val arbCall: Arbitrary[Call] = Arbitrary(Gen.const(call))
 
-  val packageName = "views.html."
-  val viewNames: Seq[String] = Seq(
-    "ContactHmrcPage",
-    "ErrorPage",
-    "FeedbackConfirmationPage",
-    "FeedbackPage",
-    "SurveyPage"
-  ) // TODO these would no be hardcoded, but would come from classloader/filesystem
+  lazy val runAccessibilityTests: Unit = {
+    viewNames foreach { viewName =>
+      val clazz = app.classloader.loadClass(viewName.toString)
+      val viewInstance = app.injector.instanceOf(clazz)
 
-  viewNames foreach { implicit name =>
-    val templateName = packageName + name
-    val clazz = app.classloader.loadClass(templateName)
-    val viewInstance = app.injector.instanceOf(clazz)
+      viewName.toString should {
+        "be accessible" in {
+          val markAsPendingWithImplementationGuidance: PartialFunction[Any, Any] = {
+            case _ =>
+              println("Missing wiring - add the following to your renderViewByClass function:\n" +
+                s"    case ${viewName.instanceName}: ${viewName.className} => render(${viewName.instanceName})")
+              pending
+          }
 
-    name should {
-      "be accessible" in {
-        val markAsPendingWithImplementationGuidance: PartialFunction[Any, Any] = {
-          case _ =>
-            println("Missing wiring - add the following to your renderViewByClass function:\n" +
-              s"    case ${camelcase(name)}: ${name} => render(${camelcase(name)})")
-            pending
+          val renderOrMarkAsPending = renderViewByClass orElse markAsPendingWithImplementationGuidance
+
+          val html = renderOrMarkAsPending(viewInstance)
+          val pageContent = html.asInstanceOf[Html].toString.trim
+          //        println("=" * 130)
+          //        println(pageContent)
+
+          pageContent should passAccessibilityChecks
         }
-
-        val renderOrMarkAsPending = renderViewByClass orElse markAsPendingWithImplementationGuidance
-
-        val html = renderOrMarkAsPending(viewInstance)
-        val pageContent = html.asInstanceOf[Html].toString.trim
-        //        println("=" * 130)
-        //        println(pageContent)
-
-        pageContent should passAccessibilityChecks
       }
     }
-  }
-
-  private def camelcase(s: String): String = s.toList match {
-    case c :: tail => (c.toString.toLowerCase + tail.mkString).mkString
   }
 
 }

@@ -31,10 +31,13 @@ class ContactFrontendAccessibilitySpec
   implicit lazy val arbContactForm: Arbitrary[Form[ContactForm]] = Arbitrary(Gen.const(ContactHmrcForm.form))
   implicit lazy val arbFeedbackForm: Arbitrary[Form[FeedbackForm]] = Arbitrary(Gen.const(controllers.FeedbackFormBind.form))
 
+  val viewPackageName = "views.html"
+
   val renderViewByClass: PartialFunction[Any, Html] = {
     case contactHmrcPage: ContactHmrcPage => render(contactHmrcPage)
     case feedbackPage: FeedbackPage => render(feedbackPage)
     case feedbackConfirmationPage: FeedbackConfirmationPage => render(feedbackConfirmationPage)
   }
 
+  runAccessibilityTests
 }
