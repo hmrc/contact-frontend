@@ -40,10 +40,10 @@ trait AutomaticAccessibilitySpec
     with ArbDerivation
     with TemplateRenderers {
 
-  // this has to be implemented by consuming teams
-  def renderViewByClass: PartialFunction[Any, Html]
+  // this has to be overridden by consuming teams
+  def renderViewByClass: PartialFunction[Any, Html] = PartialFunction.empty
 
-  // these are things that need to have sane values for pages to render properly
+  // these are things that need to have sane values for pages to render properly - there may be others
   val fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
   val messages: Messages = getMessages(app, fakeRequest)
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
@@ -56,11 +56,14 @@ trait AutomaticAccessibilitySpec
 
   lazy val runAccessibilityTests: Unit = {
     viewNames foreach { viewName =>
+      // get the class by name from the classloader, then get an instance of the class from the Play app
       val clazz = app.classloader.loadClass(viewName.toString)
       val viewInstance = app.injector.instanceOf(clazz)
 
+      // dynamically generate scalatest for each view
       viewName.toString should {
         "be accessible" in {
+          // if a view hasn't been 'wired up' yet, this will mark the test as pending, with wiring instructions
           val markAsPendingWithImplementationGuidance: PartialFunction[Any, Any] = {
             case _ =>
               println("Missing wiring - add the following to your renderViewByClass function:\n" +
@@ -70,11 +73,11 @@ trait AutomaticAccessibilitySpec
 
           val renderOrMarkAsPending = renderViewByClass orElse markAsPendingWithImplementationGuidance
 
+          // render the view, and strip any leading whitespace
           val html = renderOrMarkAsPending(viewInstance)
           val pageContent = html.asInstanceOf[Html].toString.trim
-          //        println("=" * 130)
-          //        println(pageContent)
 
+          // test the page for accessibility
           pageContent should passAccessibilityChecks
         }
       }

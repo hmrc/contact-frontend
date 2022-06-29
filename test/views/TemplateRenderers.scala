@@ -19,7 +19,7 @@ package views
 import org.scalacheck.Gen.Parameters
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.rng.Seed
-import play.twirl.api.{Html, Template4, Template5}
+import play.twirl.api._
 
 trait TemplateRenderers {
   this: AutomaticAccessibilitySpec =>
@@ -28,6 +28,17 @@ trait TemplateRenderers {
   override implicit def parameters: Gen.Parameters = Parameters.default
 
   // TODO generate boilerplate for Template0..22[_, ...]
+
+  def render[A, B, C, Result](
+    template: Template3[A, B, C, Result]
+  )(implicit a: Arbitrary[A], b: Arbitrary[B], c: Arbitrary[C]): Html = {
+    val maybeHtml = for {
+      av <- a.arbitrary.apply(parameters, Seed.random)
+      bv <- b.arbitrary.apply(parameters, Seed.random)
+      cv <- c.arbitrary.apply(parameters, Seed.random)
+    } yield template.render(av, bv, cv).asInstanceOf[Html]
+    maybeHtml.get
+  }
 
   def render[A, B, C, D, Result](
     template: Template4[A, B, C, D, Result]

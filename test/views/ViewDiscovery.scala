@@ -16,10 +16,18 @@
 
 package views
 
+import org.reflections.Reflections
+import org.reflections.scanners.Scanners._
+
+import scala.jdk.CollectionConverters._
+
+
 trait ViewDiscovery {
 
+  // this has to be implemented by consuming teams - could there be views in more than one package?
   def viewPackageName: String
 
+  // value class to simplify test code
   case class ViewName(value: String) {
     override def toString: String = value
 
@@ -32,12 +40,16 @@ trait ViewDiscovery {
     }
   }
 
-  lazy val viewNames: Seq[ViewName] = Seq(
-    "ContactHmrcPage",
-    "ErrorPage",
-    "FeedbackConfirmationPage",
-    "FeedbackPage",
-    "SurveyPage"
-  ).map(name => ViewName(viewPackageName + "." + name)) // TODO these would not be hardcoded, but would come from classloader/filesystem
+  // may be better ways to do this... but this has a simple API for our PoC
+  // lazy vals due to initialisation order (viewPackageName is defined in the team's test class that extends this)
+  lazy val reflections = new Reflections(viewPackageName)
+
+  lazy val viewNames: Seq[ViewName] = reflections
+    .get(SubTypes.of("play.twirl.api.BaseScalaTemplate").asClass())
+    .asScala
+    .toSeq
+    .map(_.getName)
+    .filter(_.endsWith("Page")) // TODO maybe regex filter(s) that teams can override?
+    .map(ViewName)
 
 }

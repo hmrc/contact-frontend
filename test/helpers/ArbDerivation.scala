@@ -23,8 +23,10 @@ import org.scalacheck.{Arbitrary, Gen}
 
 import scala.language.experimental.macros
 
+// this is lifted from https://tech.ovoenergy.com/scalacheck-magnolia/
+// it generates Arbitrary case class instances
 trait ArbDerivation {
-  implicit def parameters: Parameters
+  def parameters: Parameters
 
   implicit def gen[T]: Arbitrary[T] = macro Magnolia.gen[T]
 

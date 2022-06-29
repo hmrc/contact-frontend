@@ -17,27 +17,37 @@
 package views
 
 import controllers.{ContactForm, ContactHmrcForm}
-import model.FeedbackForm
+import model.{AccessibilityForm, FeedbackForm}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.data.Form
 import play.twirl.api.Html
-import views.html.{ContactHmrcPage, FeedbackConfirmationPage, FeedbackPage}
+import views.html._
 
-
+// this is the class that any consuming team would have to implement
 class ContactFrontendAccessibilitySpec
     extends AutomaticAccessibilitySpec {
 
-  // TODO we can currently generate Arbitrary[T] but not Arbitrary[T[_]], so need to provide these explicitly
+  // TODO we can currently generate Arbitrary[T] but not Arbitrary[T[_]], so service teams need to provide these explicitly.
+  // however, these should generally be available in the existing service codebase.
+  // these are implicit to simplify calls to render() below
   implicit lazy val arbContactForm: Arbitrary[Form[ContactForm]] = Arbitrary(Gen.const(ContactHmrcForm.form))
   implicit lazy val arbFeedbackForm: Arbitrary[Form[FeedbackForm]] = Arbitrary(Gen.const(controllers.FeedbackFormBind.form))
+  implicit lazy val arbAccessibilityForm: Arbitrary[Form[AccessibilityForm]] = Arbitrary(Gen.const(controllers.AccessibilityFormBind.form))
 
+  // this is the package where the views live in the service
   val viewPackageName = "views.html"
 
-  val renderViewByClass: PartialFunction[Any, Html] = {
+  // this partial function wires up the generic render() functions with arbitrary instances of the correct types.
+  // IntelliJ invariably shows some or all of these as red :(
+  override def renderViewByClass: PartialFunction[Any, Html] = {
     case contactHmrcPage: ContactHmrcPage => render(contactHmrcPage)
     case feedbackPage: FeedbackPage => render(feedbackPage)
     case feedbackConfirmationPage: FeedbackConfirmationPage => render(feedbackConfirmationPage)
+    case contactHmrcConfirmationPage: ContactHmrcConfirmationPage => render(contactHmrcConfirmationPage)
+    case accessibilityProblemPage: AccessibilityProblemPage => render(accessibilityProblemPage)
   }
 
+  // various lazy vals are required due to initialisation order of the class and its traits.
+  // this triggers evaluation and thereby runs the tests
   runAccessibilityTests
 }
