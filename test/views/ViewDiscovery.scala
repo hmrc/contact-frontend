@@ -40,16 +40,15 @@ trait ViewDiscovery {
     }
   }
 
+  def viewNames(baseType: String = "play.twirl.api.BaseScalaTemplate"): Seq[ViewName] = {
   // may be better ways to do this... but this has a simple API for our PoC
-  // lazy vals due to initialisation order (viewPackageName is defined in the team's test class that extends this)
-  lazy val reflections = new Reflections(viewPackageName)
-
-  lazy val viewNames: Seq[ViewName] = reflections
-    .get(SubTypes.of("play.twirl.api.BaseScalaTemplate").asClass())
-    .asScala
-    .toSeq
-    .map(_.getName)
-    .filter(_.endsWith("Page")) // TODO maybe regex filter(s) that teams can override?
-    .map(ViewName)
+    new Reflections(viewPackageName)
+      .get(SubTypes.of(baseType).asClass())
+      .asScala
+      .toSeq
+      .map(_.getName)
+      .filter(_.endsWith("Page")) // TODO maybe regex filter(s) that teams can override?
+      .map(ViewName)
+  }
 
 }

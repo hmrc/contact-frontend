@@ -18,7 +18,7 @@ package views
 
 import controllers.{ContactForm, ContactHmrcForm}
 import model.{AccessibilityForm, FeedbackForm}
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary
 import play.api.data.Form
 import play.twirl.api.Html
 import views.html._
@@ -30,9 +30,9 @@ class ContactFrontendAccessibilitySpec
   // TODO we can currently generate Arbitrary[T] but not Arbitrary[T[_]], so service teams need to provide these explicitly.
   // however, these should generally be available in the existing service codebase.
   // these are implicit to simplify calls to render() below
-  implicit lazy val arbContactForm: Arbitrary[Form[ContactForm]] = Arbitrary(Gen.const(ContactHmrcForm.form))
-  implicit lazy val arbFeedbackForm: Arbitrary[Form[FeedbackForm]] = Arbitrary(Gen.const(controllers.FeedbackFormBind.form))
-  implicit lazy val arbAccessibilityForm: Arbitrary[Form[AccessibilityForm]] = Arbitrary(Gen.const(controllers.AccessibilityFormBind.form))
+  implicit val arbContactForm: Arbitrary[Form[ContactForm]] = fixed(ContactHmrcForm.form)
+  implicit val arbFeedbackForm: Arbitrary[Form[FeedbackForm]] = fixed(controllers.FeedbackFormBind.form)
+  implicit val arbAccessibilityForm: Arbitrary[Form[AccessibilityForm]] = fixed(controllers.AccessibilityFormBind.form)
 
   // this is the package where the views live in the service
   val viewPackageName = "views.html"
@@ -47,7 +47,5 @@ class ContactFrontendAccessibilitySpec
     case accessibilityProblemPage: AccessibilityProblemPage => render(accessibilityProblemPage)
   }
 
-  // various lazy vals are required due to initialisation order of the class and its traits.
-  // this triggers evaluation and thereby runs the tests
-  runAccessibilityTests
+  runAccessibilityTests()
 }

@@ -49,13 +49,13 @@ trait AutomaticAccessibilitySpec
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   val call: Call = Call(method = "POST", url = "/some/url")
 
-  implicit lazy val arbRequest: Arbitrary[RequestHeader] = Arbitrary(Gen.const(fakeRequest))
-  implicit lazy val arbMessages: Arbitrary[Messages] = Arbitrary(Gen.const(messages))
-  implicit lazy val arbConfig: Arbitrary[AppConfig] = Arbitrary(Gen.const(appConfig))
-  implicit lazy val arbCall: Arbitrary[Call] = Arbitrary(Gen.const(call))
+  implicit val arbRequest: Arbitrary[RequestHeader] = fixed(fakeRequest)
+  implicit val arbMessages: Arbitrary[Messages] = fixed(messages)
+  implicit val arbConfig: Arbitrary[AppConfig] = fixed(appConfig)
+  implicit val arbCall: Arbitrary[Call] = fixed(call)
 
-  lazy val runAccessibilityTests: Unit = {
-    viewNames foreach { viewName =>
+  def runAccessibilityTests(): Unit = {
+    viewNames() foreach { viewName =>
       // get the class by name from the classloader, then get an instance of the class from the Play app
       val clazz = app.classloader.loadClass(viewName.toString)
       val viewInstance = app.injector.instanceOf(clazz)
@@ -84,4 +84,5 @@ trait AutomaticAccessibilitySpec
     }
   }
 
+  protected def fixed[T](t: T): Typeclass[T] = Arbitrary(Gen.const(t))
 }
