@@ -27,6 +27,9 @@ trait ViewDiscovery {
   // this has to be implemented by consuming teams - could there be views in more than one package?
   def viewPackageName: String
 
+  // layout class(es) - basically marker class(es) for every complete html page in a service
+  def layoutClasses: Seq[Class[_]]
+
   // value class to simplify test code
   case class ViewName(value: String) {
     override def toString: String = value
@@ -46,8 +49,9 @@ trait ViewDiscovery {
       .get(SubTypes.of(baseType).asClass())
       .asScala
       .toSeq
+      .filter(_.getConstructors.toSeq.exists(_.getParameterTypes.toSeq.exists(layoutClasses.contains(_))))
       .map(_.getName)
-      .filter(_.endsWith("Page")) // TODO maybe regex filter(s) that teams can override?
+      .sorted
       .map(ViewName)
   }
 

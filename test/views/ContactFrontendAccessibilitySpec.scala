@@ -61,6 +61,9 @@ class ContactFrontendAccessibilitySpec
   // this is the package where the views live in the service
   val viewPackageName = "views.html"
 
+  // this is the layout class which is injected into all full pages in the service
+  val layoutClasses = Seq(classOf[views.html.components.Layout])
+
   // this partial function wires up the generic render() functions with arbitrary instances of the correct types.
   // IntelliJ invariably shows some or all of these as red :(
   override def renderViewByClass: PartialFunction[Any, Html] = {
