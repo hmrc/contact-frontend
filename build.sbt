@@ -52,7 +52,8 @@ lazy val unitTestSettings =
             _ startsWith "util",
             _ startsWith "views"
           )
-        )
+        ),
+        Tests.Argument("-C", "views.MyReporter")
       )
     )
 

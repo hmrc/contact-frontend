@@ -17,19 +17,43 @@
 package views
 
 import controllers.{ContactForm, ContactHmrcForm}
-import model.{AccessibilityForm, FeedbackForm}
+import model.{AccessibilityForm, FeedbackForm, ReportProblemForm, SurveyForm}
 import org.scalacheck.Arbitrary
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.twirl.api.Html
+import play.api.data.Forms._
 import views.html._
 
 // this is the class that any consuming team would have to implement
 class ContactFrontendAccessibilitySpec
-    extends AutomaticAccessibilitySpec {
+    extends AutomaticAccessibilitySpec with MockitoSugar {
+
+  val surveyForm: Form[SurveyForm] = Form[SurveyForm](mapping(
+    "a" -> optional(number),
+    "b" -> optional(number),
+    "c" -> optional(text),
+    "d" -> optional(text),
+    "e" -> optional(text)
+  )(SurveyForm.apply)(SurveyForm.unapply))
+
+  val reportProblemForm: Form[ReportProblemForm] = Form[ReportProblemForm](mapping(
+    "a" -> text,
+    "b" -> text,
+    "c" -> text,
+    "d" -> text,
+    "e" -> boolean,
+    "f" -> optional(text),
+    "g" -> optional(text),
+    "h" -> text,
+    "i" -> optional(text)
+  )(ReportProblemForm.apply)(ReportProblemForm.unapply))
 
   // TODO we can currently generate Arbitrary[T] but not Arbitrary[T[_]], so service teams need to provide these explicitly.
   // however, these should generally be available in the existing service codebase.
   // these are implicit to simplify calls to render() below
+  implicit val arbReportProblemPage: Arbitrary[Form[ReportProblemForm]] = fixed(reportProblemForm)
+  implicit val arbSurveyForm: Arbitrary[Form[SurveyForm]] = fixed(surveyForm)
   implicit val arbContactForm: Arbitrary[Form[ContactForm]] = fixed(ContactHmrcForm.form)
   implicit val arbFeedbackForm: Arbitrary[Form[FeedbackForm]] = fixed(controllers.FeedbackFormBind.form)
   implicit val arbAccessibilityForm: Arbitrary[Form[AccessibilityForm]] = fixed(controllers.AccessibilityFormBind.form)
@@ -40,11 +64,13 @@ class ContactFrontendAccessibilitySpec
   // this partial function wires up the generic render() functions with arbitrary instances of the correct types.
   // IntelliJ invariably shows some or all of these as red :(
   override def renderViewByClass: PartialFunction[Any, Html] = {
-    case contactHmrcPage: ContactHmrcPage => render(contactHmrcPage)
-    case feedbackPage: FeedbackPage => render(feedbackPage)
-    case feedbackConfirmationPage: FeedbackConfirmationPage => render(feedbackConfirmationPage)
-    case contactHmrcConfirmationPage: ContactHmrcConfirmationPage => render(contactHmrcConfirmationPage)
+    case internalErrorPage: InternalErrorPage => render(internalErrorPage)
     case accessibilityProblemPage: AccessibilityProblemPage => render(accessibilityProblemPage)
+    case surveyPage: SurveyPage => render(surveyPage)
+//    case errorPage: ErrorPage => render(errorPage)
+    case reportProblemConfirmationPage: ReportProblemConfirmationPage => render(reportProblemConfirmationPage)
+    case surveyConfirmationPage: SurveyConfirmationPage => render(surveyConfirmationPage)
+    case reportProblemPage: ReportProblemPage => render(reportProblemPage)
   }
 
   runAccessibilityTests()

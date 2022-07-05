@@ -65,10 +65,7 @@ trait AutomaticAccessibilitySpec
         "be accessible" in {
           // if a view hasn't been 'wired up' yet, this will mark the test as pending, with wiring instructions
           val markAsPendingWithImplementationGuidance: PartialFunction[Any, Any] = {
-            case _ =>
-              println("Missing wiring - add the following to your renderViewByClass function:\n" +
-                s"    case ${viewName.instanceName}: ${viewName.className} => render(${viewName.instanceName})")
-              pending
+            case _ => pending
           }
 
           val renderOrMarkAsPending = renderViewByClass orElse markAsPendingWithImplementationGuidance
