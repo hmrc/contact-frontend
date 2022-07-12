@@ -19,6 +19,7 @@
 @import views.html.components.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.appbanners._
 
 @this(
     inputCharacterCount: InputCharacterCount,
@@ -46,7 +47,7 @@
   link(NewTabLinkHelper(text = messages("contact.hmrc.link"), href = Some(appConfig.contactHmrcAboutTaxUrl)))
 }
 
-@mainLayout(pageTitle) {
+@mainLayout(pageTitle, maybeAppBanners = Some(AppBanners())) {
     @if(contactForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(contactForm))
     }

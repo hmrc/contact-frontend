@@ -16,16 +16,18 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import views.html.helper.CSPNonce
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.appbanners.AppBanners
 
 @this(hmrcLayout: HmrcLayout)
 
-@(pageTitle: String, isWelshTranslationAvailable: Boolean = true, backLink: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(pageTitle: String, isWelshTranslationAvailable: Boolean = true, backLink: Option[String] = None, maybeAppBanners: Option[AppBanners] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @hmrcLayout(
   pageTitle = Some(pageTitle),
   nonce = CSPNonce.get,
   isWelshTranslationAvailable = isWelshTranslationAvailable,
   displayHmrcBanner = true,
-  backLinkUrl = backLink
+  backLinkUrl = backLink,
+  appBanners = maybeAppBanners
 )(contentBlock)
 
