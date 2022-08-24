@@ -19,7 +19,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     PlayKeys.playDefaultPort := 9250,
     PlayKeys.devSettings ++= Seq("metrics.enabled" -> "false"),
-    pipelineStages in Assets := Seq(gzip)
+    Assets / pipelineStages := Seq(gzip)
   )
   .settings(
     TwirlKeys.templateImports ++= Seq(
@@ -62,7 +62,7 @@ lazy val acceptanceTestSettings =
   inConfig(AcceptanceTest)(Defaults.testTasks) ++
     Seq(
       // The following is needed to preserve the -Dbrowser option to the HMRC webdriver factory library
-      fork in AcceptanceTest := false,
+      AcceptanceTest / fork := false,
       AcceptanceTest / testOptions := Seq(Tests.Filter(_ startsWith "acceptance")),
       AcceptanceTest / run / javaOptions ++= Seq(
         "-Dconfig.resource=test.application.conf",
