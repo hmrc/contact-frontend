@@ -18,16 +18,18 @@ package test
 
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, equalToJson, postRequestedFor, urlEqualTo}
 import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.domain.TicketId
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
-import play.api.i18n.MessagesApi
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
+
+import scala.concurrent.Future
 
 class HmrcDeskproConnectorSpec
     extends AnyWordSpec
@@ -47,9 +49,6 @@ class HmrcDeskproConnectorSpec
 
   "createProblemReportsTicket" should {
     "POST standard enrolments" in new Setup {
-      val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-
-      implicit val messages = messagesApi.preferred(request)
 
       await(
         createTicket(
@@ -88,9 +87,6 @@ class HmrcDeskproConnectorSpec
     }
 
     "POST additional enrolments" in new Setup {
-      val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-
-      implicit val messages = messagesApi.preferred(request)
 
       await(
         createTicket(
@@ -133,9 +129,6 @@ class HmrcDeskproConnectorSpec
 
   "createFeedback" should {
     "POST standard enrolments" in new Setup {
-      val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-
-      implicit val messages = messagesApi.preferred(request)
 
       await(
         createFeedback(
@@ -175,9 +168,6 @@ class HmrcDeskproConnectorSpec
     }
 
     "POST additional enrolments" in new Setup {
-      val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-
-      implicit val messages = messagesApi.preferred(request)
 
       await(
         createFeedback(
@@ -224,8 +214,8 @@ class HmrcDeskproConnectorSpec
 
     implicit val request: Request[AnyRef] = FakeRequest()
 
-    def createTicket(enrolments: Enrolments) = {
-      implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    def createTicket(enrolments: Enrolments): Future[TicketId] = {
+      implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       hmrcDeskproConnector.createDeskProTicket(
         name = "Mary",
         email = "mary@example.com",
@@ -240,8 +230,8 @@ class HmrcDeskproConnectorSpec
       )
     }
 
-    def createFeedback(enrolments: Enrolments) = {
-      implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    def createFeedback(enrolments: Enrolments): Future[TicketId] = {
+      implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       hmrcDeskproConnector.createFeedback(
         name = "Eric",
         email = "eric@example.com",

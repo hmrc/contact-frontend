@@ -39,16 +39,6 @@ object ReportProblemFormBind {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
   private val nameValidator                         = NameValidator()
 
-  def resolveServiceFromPost(implicit request: Request[_]): Option[String] = {
-    val body = request.body match {
-      case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined    => body.asFormUrlEncoded.get
-      case body: play.api.mvc.AnyContent if body.asMultipartFormData.isDefined =>
-        body.asMultipartFormData.get.asFormUrlEncoded
-    }
-
-    body.get("service").flatMap(_.headOption)
-  }
-
   def form: Form[ReportProblemForm] = Form[ReportProblemForm](
     mapping(
       "report-name"   -> text
@@ -174,46 +164,50 @@ class ReportProblemController @Inject() (
   private def doSubmit(service: Option[String], referrerUrl: Option[String])(implicit
     request: MessagesRequest[AnyContent]
   ) =
-    ReportProblemFormBind.form.bindFromRequest.fold(
-      formWithError =>
-        Future.successful(
-          BadRequest(
-            page(
-              formWithError,
-              service.orElse(fromForm("service", formWithError)),
-              referrerUrl.orElse(fromForm("referrer", formWithError))
+    ReportProblemFormBind.form
+      .bindFromRequest()
+      .fold(
+        formWithError =>
+          Future.successful(
+            BadRequest(
+              page(
+                formWithError,
+                service.orElse(fromForm("service", formWithError)),
+                referrerUrl.orElse(fromForm("referrer", formWithError))
+              )
             )
-          )
-        ),
-      problemReport => {
-        val referrer = referrerUrl
-          .orElse(problemReport.referrer.filter(_.trim.nonEmpty))
-          .orElse(headerRetriever.refererFromHeaders)
-        (for {
-          maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
-          _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-        } yield Redirect(routes.ReportProblemController.thanks)) recover { case _ =>
-          InternalServerError(errorPage())
+          ),
+        problemReport => {
+          val referrer = referrerUrl
+            .orElse(problemReport.referrer.filter(_.trim.nonEmpty))
+            .orElse(headerRetriever.refererFromHeaders)
+          (for {
+            maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
+            _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
+          } yield Redirect(routes.ReportProblemController.thanks)) recover { case _ =>
+            InternalServerError(errorPage())
+          }
         }
-      }
-    )
+      )
 
   private def doSubmitPartial(implicit request: MessagesRequest[AnyContent]) =
-    ReportProblemFormBind.form.bindFromRequest.fold(
-      formWithError => Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR")))),
-      problemReport => {
-        val referrer = problemReport.referrer.filter(_.trim.nonEmpty) orElse headerRetriever.refererFromHeaders
-        (for {
-          maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
-          ticketId            <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-        } yield {
-          val view = ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
-          Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
-        }) recover { case _ =>
-          InternalServerError(Json.toJson(Map("status" -> "ERROR")))
+    ReportProblemFormBind.form
+      .bindFromRequest()
+      .fold(
+        formWithError => Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR")))),
+        problemReport => {
+          val referrer = problemReport.referrer.filter(_.trim.nonEmpty) orElse headerRetriever.refererFromHeaders
+          (for {
+            maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
+            ticketId            <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
+          } yield {
+            val view = ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
+            Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
+          }) recover { case _ =>
+            InternalServerError(Json.toJson(Map("status" -> "ERROR")))
+          }
         }
-      }
-    )
+      )
 
   private def page(form: Form[ReportProblemForm], service: Option[String], referrerUrl: Option[String])(implicit
     request: Request[_]

@@ -36,7 +36,7 @@ class ConfigurationBasedBackUrlValidator @Inject() (appConfig: AppConfig) extend
   def validate(backUrl: String): Boolean = {
 
     val parsedUrl        = Try(new URL(backUrl)).toOption.toRight(left = "Unparseable URL")
-    val validationResult = parsedUrl.right.flatMap(checkDomainOnAllowList)
+    val validationResult = parsedUrl.flatMap(checkDomainOnAllowList)
 
     validationResult match {
       case Right(_)     => true

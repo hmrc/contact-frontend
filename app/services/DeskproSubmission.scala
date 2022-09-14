@@ -25,7 +25,7 @@ import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -81,7 +81,7 @@ trait DeskproSubmission {
     enrolmentsOption: Option[Enrolments],
     referrer: Option[String]
   )(implicit messages: Messages): Future[TicketId] = {
-    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     hmrcDeskproConnector.createDeskProTicket(
       name = problemReport.reportName,
       email = problemReport.reportEmail,

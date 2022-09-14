@@ -17,7 +17,7 @@
 package controllers
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer._
 import config.CFConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
@@ -44,8 +44,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.RefererHeaderRetriever
 
-import collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters._
 
 class ContactHmrcControllerSpec
     extends AnyWordSpec
@@ -60,8 +60,7 @@ class ContactHmrcControllerSpec
       .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "useRefererHeader" -> true)
       .build()
 
-  implicit val actorSystem: ActorSystem        = ActorSystem()
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val actorSystem: ActorSystem = ActorSystem()
 
   implicit val message: Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
@@ -389,8 +388,6 @@ class ContactHmrcControllerSpec
       val result         = controller.submit(None, None, None)(contactRequest)
 
       status(result) should be(400)
-
-      import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("contact.title"))

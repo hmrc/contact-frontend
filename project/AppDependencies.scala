@@ -14,7 +14,7 @@ object AppDependencies {
     "uk.gov.hmrc"              %% "url-builder"                % "3.6.0-play-28",
     "uk.gov.hmrc"              %% "auth-client"                % "5.12.0-play-28",
     "org.apache.httpcomponents" % "httpclient"                 % "4.4.1",
-    "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "3.22.0-play-28"
+    "uk.gov.hmrc"              %% "play-frontend-hmrc"         % "3.24.0-play-28"
   )
 
   private def test(scope: String) = Seq(
