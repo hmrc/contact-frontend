@@ -26,7 +26,7 @@ trait MessagesSupport {
     messagesApi.preferred(request)
   }
 
-  def getWelshMessages(implicit app: Application, request: RequestHeader) = {
+  def getWelshMessages(implicit app: Application) = {
     val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
     messagesApi.preferred(Seq(Lang("cy")))
   }

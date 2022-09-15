@@ -36,7 +36,7 @@ class BetaFeedbackSpec extends BaseSpec {
       BetaFeedbackPage.completeReportForm()
 
       And("I submit the form")
-      BetaFeedbackPage.submitForm
+      BetaFeedbackPage.submitForm()
 
       Then("I see the submission confirmation page")
       eventually {
@@ -58,7 +58,7 @@ class BetaFeedbackSpec extends BaseSpec {
       When("When I do not complete all the fields ")
 
       And("I submit the form")
-      BetaFeedbackPage.submitForm
+      BetaFeedbackPage.submitForm()
 
       Then("Then I see an error message citing the required fields")
       eventually {
@@ -91,7 +91,7 @@ class BetaFeedbackSpec extends BaseSpec {
       BetaFeedbackPage.completeReportForm(email = "firstname.lastname")
 
       And("I submit the form")
-      BetaFeedbackPage.submitForm
+      BetaFeedbackPage.submitForm()
 
       Then("Then I see an error message citing the required fields")
       eventually {
@@ -121,7 +121,7 @@ class BetaFeedbackSpec extends BaseSpec {
       BetaFeedbackPage.completeReportForm(commentsLength = 2001)
 
       And("I submit the form")
-      BetaFeedbackPage.submitForm
+      BetaFeedbackPage.submitForm()
 
       Then("I see an error message telling me that I have exceeded the character limit")
       eventually {

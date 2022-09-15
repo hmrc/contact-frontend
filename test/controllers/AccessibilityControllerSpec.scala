@@ -40,6 +40,7 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.RefererHeaderRetriever
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters._
 
 class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -109,8 +110,6 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       status(result) should be(400)
 
-      import collection.JavaConverters._
-
       val document = Jsoup.parse(contentAsString(result))
       val errors   = document.select(".govuk-error-message").asScala
       errors.length should be(3)
@@ -135,8 +134,6 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       status(result) should be(400)
 
-      import collection.JavaConverters._
-
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
@@ -159,8 +156,6 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       status(result) should be(400)
 
-      import collection.JavaConverters._
-
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
@@ -181,8 +176,6 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       status(result) should be(400)
 
-      import collection.JavaConverters._
-
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
@@ -202,8 +195,6 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       val result  = controller.submit(None, None)(request)
 
       status(result) should be(400)
-
-      import collection.JavaConverters._
 
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.title"))

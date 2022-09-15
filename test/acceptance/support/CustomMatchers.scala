@@ -29,7 +29,7 @@ trait CustomMatchers {
 
   def containInOrder(toFind: Iterable[String]) = new ContainsAllTextsInOrderMatcher(toFind)
 
-  private def containsAllTextsInOrder(text: String, toFind: Iterable[String]): MatchResult = toFind match {
+  private def containsAllTextsInOrder(text: String, toFind: Iterable[String]): MatchResult = toFind.toList match {
     case Nil                             => MatchResult(matches = true, "", "Found text")
     case x :: xs if x.contains("regex=") =>
       val regex = x.split("=")(1).r

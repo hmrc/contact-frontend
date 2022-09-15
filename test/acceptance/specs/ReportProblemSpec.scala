@@ -87,7 +87,7 @@ class ReportProblemSpec extends BaseSpec {
       When("When I do not complete all the fields ")
 
       And("I submit the form")
-      ReportProblemPage.submitForm
+      ReportProblemPage.submitForm()
 
       Then("Then I see an error message citing the required fields")
       eventually {
@@ -120,7 +120,7 @@ class ReportProblemSpec extends BaseSpec {
       ReportProblemPage.completeReportForm(email = "firstname.lastname")
 
       And("I submit the form")
-      ReportProblemPage.submitForm
+      ReportProblemPage.submitForm()
 
       Then("I see an error message citing the required fields")
       eventually {
@@ -150,7 +150,7 @@ class ReportProblemSpec extends BaseSpec {
       ReportProblemPage.completeReportForm(actionLength = 1001)
 
       And("I submit the form")
-      ReportProblemPage.submitForm
+      ReportProblemPage.submitForm()
 
       Then("I see an error message telling me that I have exceeded the character limit")
       eventually {

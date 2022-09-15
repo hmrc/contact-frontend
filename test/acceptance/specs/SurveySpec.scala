@@ -36,7 +36,7 @@ class SurveySpec extends BaseSpec {
       SurveyPage.completeReportForm()
 
       And("I submit the form")
-      SurveyPage.submitForm
+      SurveyPage.submitForm()
 
       Then("I see the submission confirmation page")
       eventually {
@@ -58,7 +58,7 @@ class SurveySpec extends BaseSpec {
       When("When I do not complete all the fields")
 
       And("I submit the form")
-      SurveyPage.submitForm
+      SurveyPage.submitForm()
 
       Then("Then I see an error message citing the required fields")
       eventually {

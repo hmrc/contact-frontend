@@ -25,9 +25,8 @@ import scala.io.Source
 
 class MessagesSpec extends AnyWordSpec with Matchers {
 
-  private val MatchSingleQuoteOnly      = """\w+'{1}\w+""".r
-  private val MatchBacktickQuoteOnly    = """`+""".r
-  private val MatchForwardTickQuoteOnly = """’+""".r
+  private val MatchSingleQuoteOnly   = """\w+'{1}\w+""".r
+  private val MatchBacktickQuoteOnly = """`+""".r
 
   private val englishMessages = parseMessages("conf/messages")
   private val welshMessages   = parseMessages("conf/messages.cy")

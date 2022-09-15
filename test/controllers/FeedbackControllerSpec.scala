@@ -97,7 +97,6 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
       val page = Jsoup.parse(contentAsString(result))
 
-      val encodedBackUrl = URLEncoder.encode("/any-service", "UTF-8")
       page.body().select("input[name=referrer]").first.attr("value") shouldBe "any-referring-parameter"
     }
 
@@ -111,7 +110,6 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
       val page = Jsoup.parse(contentAsString(result))
 
-      val encodedBackUrl = URLEncoder.encode("/any-service", "UTF-8")
       page.body().select("input[name=referrer]").first.attr("value") shouldBe "any-referring-header"
     }
 
@@ -125,7 +123,6 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
       val page = Jsoup.parse(contentAsString(result))
 
-      val encodedBackUrl = URLEncoder.encode("/any-service", "UTF-8")
       page.body().select("input[name=referrer]").first.attr("value") shouldBe "n/a"
     }
 

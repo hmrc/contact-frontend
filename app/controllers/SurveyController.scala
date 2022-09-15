@@ -91,16 +91,18 @@ class SurveyController @Inject() (
 
   def submit(ticketId: String, serviceId: String) = Action.async { implicit request =>
     Future.successful {
-      playFrontendSurveyForm.bindFromRequest.fold(
-        formWithErrors =>
-          BadRequest(
-            playFrontendSurveyPage(
-              formWithErrors,
-              routes.SurveyController.submit(ticketId, serviceId)
-            )
-          ),
-        _ => submitSurveyAction
-      )
+      playFrontendSurveyForm
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            BadRequest(
+              playFrontendSurveyPage(
+                formWithErrors,
+                routes.SurveyController.submit(ticketId, serviceId)
+              )
+            ),
+          _ => submitSurveyAction
+        )
     }
   }
 
