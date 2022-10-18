@@ -18,7 +18,7 @@ object AppDependencies {
   )
 
   private def test(scope: String) = Seq(
-    "org.scalatest"          %% "scalatest"                % "3.1.1"         % scope,
+    "org.scalatest"          %% "scalatest"                % "3.2.13"        % scope,
     "org.scalatestplus.play" %% "scalatestplus-play"       % "5.1.0"         % scope,
     "org.scalatestplus"      %% "scalatestplus-mockito"    % "1.0.0-M2"      % scope,
     "org.scalatestplus"      %% "scalatestplus-scalacheck" % "3.1.0.0-RC2"   % scope,
@@ -29,9 +29,9 @@ object AppDependencies {
     "org.scalacheck"         %% "scalacheck"               % "1.14.0"        % scope,
     "uk.gov.hmrc"            %% "bootstrap-test-play-28"   % "6.2.0"         % scope,
     "uk.gov.hmrc"            %% "domain"                   % "8.1.0-play-28" % scope,
-    "com.vladsch.flexmark"    % "flexmark-all"             % "0.35.10"       % scope,
-    "uk.gov.hmrc"            %% "webdriver-factory"        % "0.29.0"        % scope,
-    "org.scalatestplus"      %% "selenium-3-141"           % "3.2.0.0"       % scope,
-    "com.github.tomakehurst"  % "wiremock"                 % "2.18.0"        % "test"
+    "com.vladsch.flexmark"    % "flexmark-all"             % "0.62.2"        % scope,
+    "uk.gov.hmrc"            %% "webdriver-factory"        % "0.38.0"        % scope,
+    "org.scalatestplus"      %% "selenium-4-2"             % "3.2.13.0"      % scope,
+    "com.github.tomakehurst"  % "wiremock-jre8"            % "2.27.2"        % scope
   )
 }
