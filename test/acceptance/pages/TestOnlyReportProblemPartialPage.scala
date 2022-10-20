@@ -20,6 +20,8 @@ import acceptance.support.Helpers
 import org.openqa.selenium.By
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 
+import java.time.Duration
+
 object TestOnlyReportProblemPartialPage extends TestOnlyReportProblemForm {
   val url: String = wrapUrl("/test-only")
 }
@@ -63,7 +65,7 @@ trait TestOnlyReportProblemForm extends BasePage with Helpers {
 
   def clickOnPageNotWorkingLink() = {
     click on id("get-help-action")
-    val wait = new WebDriverWait(driver, 15)
+    val wait = new WebDriverWait(driver, Duration.ofSeconds(15))
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("report-name")))
   }
 
