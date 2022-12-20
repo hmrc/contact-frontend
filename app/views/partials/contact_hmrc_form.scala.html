@@ -24,8 +24,12 @@
     <header class="page-header">
         <h1>@Messages("contact.heading")</h1>
     </header>
-    <p>@Html(Messages("contact.form.specific.query", uk.gov.hmrc.urls.Link.toExternalPage(url = "http://search2.hmrc.gov.uk/kb5/hmrc/contactus/home.page", value = Some("contact HMRC"), dataAttributes = Some(Map
-            ("journey-click" -> "contact-page:Click:Contact HMRC"))).toHtml))</p>
+    <p>@Html(
+        Messages(
+            "contact.form.specific.query",
+            <a href="http://search2.hmrc.gov.uk/kb5/hmrc/contactus/home.page" target="_blank" data-sso="false" data-journey-click="contact-page:Click:Contact HMRC" rel="external noopener noreferrer">{Messages("contact.hmrc.link")}<span class="visuallyhidden">{Messages("contact.hmrc.link.newtab")}</span></a>
+        )
+    )</p>
     <p>@Messages("contact.form.para2")</p>
 
     <h2>@Messages("contact.form.heading2")</h2>
