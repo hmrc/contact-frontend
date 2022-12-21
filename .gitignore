@@ -1,5 +1,4 @@
 .*
-
 !.gitignore
 !.scalafmt.conf
 .cache
@@ -32,3 +31,4 @@ test-result
 tmp
 .idea_modules
 bin
+!.nvmrc
