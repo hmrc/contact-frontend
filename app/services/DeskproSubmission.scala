@@ -20,13 +20,13 @@ import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import controllers.ContactForm
 import model.{AccessibilityForm, FeedbackForm, ReportProblemForm}
-import org.apache.http.client.utils.URIBuilder
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import java.net.URI
 import scala.concurrent.Future
 import scala.util.Try
 
@@ -129,10 +129,13 @@ object DeskproSubmission {
   def replaceReferrerPath(referrer: String, path: Option[String]): String =
     path
       .filter(_.trim.nonEmpty)
-      .map(p => buildUri(referrer).setPath(p).build().toASCIIString)
+      .map { p =>
+        val absolutePath = if (p.startsWith("/")) p else s"/$p"
+        buildUri(referrer).resolve(absolutePath).toASCIIString
+      }
       .getOrElse(referrer)
 
-  private def buildUri(referrer: String): URIBuilder =
-    Try(new URIBuilder(referrer)).getOrElse(new URIBuilder())
+  private def buildUri(referrer: String): URI =
+    Try(new URI(referrer)).getOrElse(URI.create(""))
 
 }
