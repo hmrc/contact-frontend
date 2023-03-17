@@ -228,7 +228,7 @@ In addition to the information provided by the user, the service collects the fo
   URL as a query string parameter. Deskpro uses it to classify issues.
 * *HTTP UserAgent header* - this tells us what browser the user has
 * *user tax identifiers* - if the user has logged in, user tax identifiers will be attached to the tickets. These 
-  identifiers can later be seen in Deskpro
+  identifiers can later be viewed via Deskpro.
 * *whether user's browser uses Javascript* 
 * *user's id* - as provided in the HeaderCarrier object
 * *sessionId* - as provided in the HeaderCarrier object

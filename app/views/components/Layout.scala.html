@@ -14,18 +14,19 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
-@import views.html.helper.CSPNonce
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 
-@this(hmrcLayout: HmrcLayout)
+@this(hmrcStandardPage: HmrcStandardPage)
 
 @(pageTitle: String, isWelshTranslationAvailable: Boolean = true, backLink: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
-@hmrcLayout(
-  pageTitle = Some(pageTitle),
-  nonce = CSPNonce.get,
-  isWelshTranslationAvailable = isWelshTranslationAvailable,
-  displayHmrcBanner = true,
-  backLinkUrl = backLink
+@hmrcStandardPage(
+    HmrcStandardPageParams(
+        banners = Banners(displayHmrcBanner = true),
+        isWelshTranslationAvailable = isWelshTranslationAvailable,
+        pageTitle = Some(pageTitle),
+        backLink = backLink.map(url => BackLink.withDefaultText(href = url))
+    )
 )(contentBlock)
 
