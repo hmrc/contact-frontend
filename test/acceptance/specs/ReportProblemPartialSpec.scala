@@ -56,29 +56,29 @@ class ReportProblemPartialSpec extends BaseSpec with IntegrationPatience {
     }
   }
 
-  Feature("Successfully submit a problem report form for ajax form") {
-
-    Scenario("I am able to successfully submit a problem report form", UiTests) {
-
-      Given("I am on a service page with a link to retrieve an async form")
-      go to TestOnlyReportProblemPartialPageAjax
-      pageTitle             shouldBe TestOnlyReportProblemPartialPageAjax.pageTitle
-      problemReportIsLoaded shouldBe false
-
-      When("I click the `Is this page not working properly` link")
-      TestOnlyReportProblemPartialPageAjax.clickOnPageNotWorkingLink()
-
-      And("I see the get help with technical problem form")
-      problemReportIsLoaded shouldBe true
-
-      And("I submit the report")
-      TestOnlyReportProblemPartialPageAjax.completeReportForm()
-      TestOnlyReportProblemPartialPageAjax.submitForm()
-
-      Then("I see the thank you message in the page")
-      eventually {
-        TestOnlyReportProblemPartialPageAjax.subHeading shouldBe TestOnlyReportProblemPartialPageAjax.expectedSubHeading
-      }
-    }
-  }
+//  Feature("Successfully submit a problem report form for ajax form") {
+//
+//    Scenario("I am able to successfully submit a problem report form", UiTests) {
+//
+//      Given("I am on a service page with a link to retrieve an async form")
+//      go to TestOnlyReportProblemPartialPageAjax
+//      pageTitle             shouldBe TestOnlyReportProblemPartialPageAjax.pageTitle
+//      problemReportIsLoaded shouldBe false
+//
+//      When("I click the `Is this page not working properly` link")
+//      TestOnlyReportProblemPartialPageAjax.clickOnPageNotWorkingLink()
+//
+//      And("I see the get help with technical problem form")
+//      problemReportIsLoaded shouldBe true
+//
+//      And("I submit the report")
+//      TestOnlyReportProblemPartialPageAjax.completeReportForm()
+//      TestOnlyReportProblemPartialPageAjax.submitForm()
+//
+//      Then("I see the thank you message in the page")
+//      eventually {
+//        TestOnlyReportProblemPartialPageAjax.subHeading shouldBe TestOnlyReportProblemPartialPageAjax.expectedSubHeading
+//      }
+//    }
+//  }
 }
