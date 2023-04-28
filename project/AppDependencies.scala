@@ -7,18 +7,18 @@ object AppDependencies {
     compile ++ testDependencies
   }
 
-  private val bootstrapPlayVersion = "7.13.0"
+  private val bootstrapPlayVersion = "7.15.0"
 
   private val compile = Seq(
     "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % bootstrapPlayVersion,
-    "uk.gov.hmrc" %% "play-frontend-hmrc"         % "7.0.0-play-28",
-    "uk.gov.hmrc" %% "govuk-template"             % "5.78.0-play-28",
-    "uk.gov.hmrc" %% "play-ui"                    % "9.11.0-play-28"
+    "uk.gov.hmrc" %% "play-frontend-hmrc"         % "7.5.0-play-28",
+    "uk.gov.hmrc" %% "govuk-template"             % "5.80.0-play-28",
+    "uk.gov.hmrc" %% "play-ui"                    % "9.12.0-play-28"
   )
 
   private def test(scope: String) = Seq(
     "uk.gov.hmrc"           %% "bootstrap-test-play-28" % bootstrapPlayVersion % scope,
-    "uk.gov.hmrc"           %% "domain"                 % "8.1.0-play-28"      % scope,
+    "uk.gov.hmrc"           %% "domain"                 % "8.2.0-play-28"      % scope,
     "uk.gov.hmrc"           %% "webdriver-factory"      % "0.41.0"             % scope,
     "org.scalatestplus"     %% "scalatestplus-mockito"  % "1.0.0-M2"           % scope,
     "org.scalatestplus"     %% "selenium-4-2"           % "3.2.13.0"           % scope,
