@@ -51,7 +51,7 @@ class CSPIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
 
       headers(
         CONTENT_SECURITY_POLICY
-      ) should fullyMatch regex "script-src 'nonce-[^']+' 'unsafe-inline' 'strict-dynamic' ['sha256-[^']+']+ https: http:; object-src 'none'; base-uri 'none'"
+      ) should fullyMatch regex "script-src 'nonce-[^']+' 'unsafe-inline' 'strict-dynamic' ['sha256-[^']+']+ https: http:; report-uri .*/content-security-policy-reports/contact-frontend; object-src 'none'; base-uri 'none'"
     }
   }
 }
