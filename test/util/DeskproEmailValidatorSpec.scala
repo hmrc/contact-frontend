@@ -49,6 +49,7 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
       emailValidator.validate("some.name@foo.")        shouldBe false
       emailValidator.validate("some.name@.com")        shouldBe false
       emailValidator.validate("some_name@foo_bar.com") shouldBe false
+      emailValidator.validate("some.name@foo.com@")    shouldBe false
     }
   }
 
