@@ -23,9 +23,11 @@ case class DeskproEmailValidator() {
   // The regexes used in this validator are based on PCRE regexes provided by Deskpro via DDC Ops in December 2020
 
   def validate(email: String): Boolean =
-    email.split("@").toList match {
-      case name :: domain :: Nil => validateName(name) && (validateDomain(domain) || validateIp(domain))
-      case _                     => false
+    !email.endsWith("@") && {
+      email.split("@").toList match {
+        case name :: domain :: Nil => validateName(name) && (validateDomain(domain) || validateIp(domain))
+        case _                     => false
+      }
     }
 
   private def validateName(name: String): Boolean = {
