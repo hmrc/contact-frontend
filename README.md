@@ -14,6 +14,7 @@ passing user requests to downstream services - to Deskpro for 'Is this page not 
  [#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/) if you require more information about this).
 
 # Contents
+   * [Roadmap](#roadmap)
    * [Forms provided by the Customer Contact Subsystem](#forms-provided-by-the-customer-contact-subsystem)
       * [Contacting HMRC - <em>Is this page not working properly?</em>](#contacting-hmrc---get-help-with-this-page)
       * [Contacting HMRC - <em>Help and contact</em>](#contacting-hmrc---help-and-contact)
@@ -28,6 +29,14 @@ passing user requests to downstream services - to Deskpro for 'Is this page not 
       * [User details attached to the ticket](#user-details-attached-to-the-ticket)
       * [Related projects, useful links](#appendix__linx)
       * [Slack](#appendix__links__slack)
+
+# Roadmap
+
+Changes we are making to contact-frontend
+
+## In progress
+
+* [Removing ability to load contact forms via play-partials on the 29 September 2023](docs/roadmap/removing-ability-to-load-contact-forms-via-play-partials.md)
 
 # Forms provided by the Customer Contact Subsystem <a name="forms-provided-by-the-customer-contact-subsystem"></a>
 

@@ -11,7 +11,6 @@ lazy val microservice = Project(appName, file("."))
     majorVersion := 3,
     libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it"))
   )
-  .settings(publishingSettings: _*)
   .configs(IntegrationTest, AcceptanceTest)
   .settings(unitTestSettings, acceptanceTestSettings)
   .settings(integrationTestSettings(): _*)
