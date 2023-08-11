@@ -19,9 +19,9 @@ object AppDependencies {
   private def test(scope: String) = Seq(
     "uk.gov.hmrc"           %% "bootstrap-test-play-28" % bootstrapPlayVersion % scope,
     "uk.gov.hmrc"           %% "domain"                 % "8.2.0-play-28"      % scope,
-    "uk.gov.hmrc"           %% "webdriver-factory"      % "0.41.0"             % scope,
+    "uk.gov.hmrc"           %% "ui-test-runner"         % "0.4.0"              % scope,
     "org.scalatestplus"     %% "scalatestplus-mockito"  % "1.0.0-M2"           % scope,
-    "org.scalatestplus"     %% "selenium-4-2"           % "3.2.13.0"           % scope,
+    "org.scalatestplus"     %% "selenium-4-9"           % "3.2.16.0"           % scope,
     "org.mockito"            % "mockito-all"            % "2.0.2-beta"         % scope,
     "org.jsoup"              % "jsoup"                  % "1.11.3"             % scope,
     "com.github.tomakehurst" % "wiremock"               % "1.58"               % scope,
