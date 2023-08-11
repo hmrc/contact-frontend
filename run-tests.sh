@@ -5,4 +5,4 @@ ENVIRONMENT=$2
 
 sbt scalafmtCheckAll scalafmtSbtCheck
 
-sbt clean -Dbrowser="${BROWSER:=chrome}" -Denvironment="${ENVIRONMENT:=local}" acceptance:test
+sbt clean -Dbrowser="${BROWSER:=chrome}" -Denvironment="${ENVIRONMENT:=local}" acceptance:test testReport
