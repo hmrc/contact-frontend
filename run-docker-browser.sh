@@ -20,7 +20,7 @@
 port_mappings=$(sm2 --status | grep PASS | awk '{ print $8"->"$8 }' | paste -sd "," -)
 # If using sm, comment out the above line and instead use the below line
 #port_mappings=$(sm -s | grep PASS | awk '{ print $12"->"$12 }' | paste -sd "," -)
-port_mappings="$port_mappings,11000->11000,6010->6010"
+port_mappings="$port_mappings,11000->11000,6010->6010,6001->6001"
 
 # Alternatively, port_mappings can be explicitly initialised as below:
 #port_mappings="9032->9032,9250->9250,9080->9080"
@@ -66,5 +66,4 @@ docker pull ${BROWSER} \
         -e PORT_MAPPINGS="$port_mappings" \
         -e TARGET_IP='host.docker.internal' \
         -e SE_OPTS="--enable-managed-downloads true" \
-        --net=host \
         ${BROWSER}
