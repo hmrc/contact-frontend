@@ -27,6 +27,7 @@ trait AppConfig {
   def loginCallback(continueUrl: String): String
   def enableLanguageSwitching: Boolean
   def useRefererFromRequest: Boolean
+  def disablePartials: Boolean
 
 }
 
@@ -58,6 +59,11 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
   override def enableLanguageSwitching =
     configuration
       .getOptional[Boolean]("enableLanguageSwitching")
+      .getOrElse(false)
+
+  override def disablePartials: Boolean =
+    configuration
+      .getOptional[Boolean]("disablePartials")
       .getOrElse(false)
 
   override def useRefererFromRequest: Boolean = configuration.getOptional[Boolean]("useRefererHeader").getOrElse(false)

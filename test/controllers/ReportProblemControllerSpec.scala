@@ -20,16 +20,14 @@ import config.CFConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.deskpro.domain.TicketId
 import connectors.enrolments.EnrolmentsConnector
+import helpers.ApplicationSupport
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -40,16 +38,7 @@ import util.RefererHeaderRetriever
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReportProblemControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite with Matchers {
-
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"      -> false,
-        "metrics.enabled"  -> false,
-        "useRefererHeader" -> true
-      )
-      .build()
+class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport with Matchers {
 
   implicit val messages: Messages =
     app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))

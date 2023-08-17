@@ -19,20 +19,19 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.HmrcDeskproConnector
 import connectors.enrolments.EnrolmentsConnector
-
-import javax.inject.{Inject, Singleton}
 import model.ReportProblemForm
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request}
+import play.api.mvc._
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.{DeskproEmailValidator, FeatureFlagSupport, NameValidator, RefererHeaderRetriever}
 import views.html.partials.{error_feedback, error_feedback_inner, ticket_created_body}
 import views.html.{InternalErrorPage, ReportProblemConfirmationPage, ReportProblemPage}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 object ReportProblemFormBind {
@@ -115,7 +114,8 @@ class ReportProblemController @Inject() (
 )(implicit appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with FeatureFlagSupport {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
@@ -131,25 +131,29 @@ class ReportProblemController @Inject() (
   }
 
   def partialIndex(preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
-    val csrfToken = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
-    val referrer  = headerRetriever.refererFromHeaders
-    Ok(
-      errorFeedbackForm(
-        form = ReportProblemFormBind.emptyForm(csrfToken.getOrElse(""), service, referrer),
-        actionUrl = appConfig.externalReportProblemUrl,
-        csrfToken = csrfToken,
-        service = service,
-        referrer = None
+    ifPartialsEnabled {
+      val csrfToken = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
+      val referrer  = headerRetriever.refererFromHeaders
+      Ok(
+        errorFeedbackForm(
+          form = ReportProblemFormBind.emptyForm(csrfToken.getOrElse(""), service, referrer),
+          actionUrl = appConfig.externalReportProblemUrl,
+          csrfToken = csrfToken,
+          service = service,
+          referrer = None
+        )
       )
-    )
+    }
   }
 
   def partialAjaxIndex(service: Option[String]) = Action { implicit request =>
-    val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
-    val referrer  = headerRetriever.refererFromHeaders
-    val form      = ReportProblemFormBind.emptyForm(csrfToken.getOrElse(""), service, referrer)
-    val view      = errorFeedbackFormInner(form, appConfig.externalReportProblemUrl, csrfToken, service, referrer)
-    Ok(view)
+    ifPartialsEnabled {
+      val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
+      val referrer  = headerRetriever.refererFromHeaders
+      val form      = ReportProblemFormBind.emptyForm(csrfToken.getOrElse(""), service, referrer)
+      val view      = errorFeedbackFormInner(form, appConfig.externalReportProblemUrl, csrfToken, service, referrer)
+      Ok(view)
+    }
   }
 
   def submit(service: Option[String], referrerUrl: Option[String]) = Action.async { implicit request =>

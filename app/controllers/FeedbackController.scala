@@ -30,7 +30,7 @@ import play.api.mvc.{MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{BackUrlValidator, DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.{BackUrlValidator, DeskproEmailValidator, FeatureFlagSupport, NameValidator, RefererHeaderRetriever}
 import views.html.partials.{feedback_form, feedback_form_confirmation}
 import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
 import play.twirl.api.Html
@@ -51,7 +51,8 @@ import scala.concurrent.{ExecutionContext, Future}
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with FeatureFlagSupport {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
@@ -115,20 +116,22 @@ import scala.concurrent.{ExecutionContext, Future}
     referrerUrl: Option[String]
   ) = Action.async { implicit request =>
     Future.successful {
-      Ok(
-        feedbackFormPartial(
-          FeedbackFormBind.emptyForm(
-            csrfToken,
-            referrerUrl orElse referer orElse headerRetriever.refererFromHeaders,
-            None,
-            canOmitComments = canOmitComments,
-            service = service
-          ),
-          submitUrl,
-          service,
-          canOmitComments = canOmitComments
+      ifPartialsEnabled {
+        Ok(
+          feedbackFormPartial(
+            FeedbackFormBind.emptyForm(
+              csrfToken,
+              referrerUrl orElse referer orElse headerRetriever.refererFromHeaders,
+              None,
+              canOmitComments = canOmitComments,
+              service = service
+            ),
+            submitUrl,
+            service,
+            canOmitComments = canOmitComments
+          )
         )
-      )
+      }
     }
   }
 
