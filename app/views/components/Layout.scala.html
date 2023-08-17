@@ -19,7 +19,7 @@
 
 @this(hmrcStandardPage: HmrcStandardPage)
 
-@(pageTitle: String, isWelshTranslationAvailable: Boolean = true, backLink: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(pageTitle: String, isWelshTranslationAvailable: Boolean = true, backLink: Option[String] = None, sidebarContent: Option[Html] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @hmrcStandardPage(
     HmrcStandardPageParams(
@@ -28,5 +28,5 @@
         pageTitle = Some(pageTitle),
         backLink = backLink.map(url => BackLink.withDefaultText(href = url))
     )
-)(contentBlock)
+)(contentBlock, sidebarContent)
 

@@ -46,7 +46,13 @@
   link(NewTabLinkHelper(text = messages("contact.hmrc.link"), href = Some(appConfig.contactHmrcAboutTaxUrl)))
 }
 
-@mainLayout(pageTitle) {
+@sidebarContent = {
+    @h2(content = Text("Important"))
+    @p(content = Text("Lorem ipsum dolor sit amet, ne est fastidii repudiandae, ut cibo blandit his. His ei malis quando, duo ex modo atomorum, eu facilisi sensibus vis. Pro id maiorum feugait, odio graece per ut. Et mazim decore sapientem pri, nominati patrioque eum ne, mucius gubergren similique ad has. Euismod sanctus dignissim mei ne, facete adversarium et vis."))
+    @p(content = Text("Pro te ullum euismod nonumes, mucius animal reprimique pro ex. Te nam omnis doctus rationibus. Ad fabulas evertitur mel, his solet erroribus consequat no. Saepe sanctus indoctum in pri, tamquam copiosae corrumpit est te, sit luptatum scripserit reformidans ad. Et vel graece animal."))
+}
+
+@mainLayout(pageTitle, sidebarContent = Some(sidebarContent)) {
     @if(contactForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(contactForm))
     }
