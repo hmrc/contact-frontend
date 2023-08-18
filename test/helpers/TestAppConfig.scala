@@ -30,4 +30,6 @@ class TestAppConfig extends AppConfig {
   def enableLanguageSwitching: Boolean = true
 
   def useRefererFromRequest: Boolean = true
+
+  def disablePartials: Boolean = false
 }

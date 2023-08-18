@@ -28,7 +28,7 @@ import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.{DeskproEmailValidator, FeatureFlagSupport, NameValidator, RefererHeaderRetriever}
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
@@ -78,7 +78,8 @@ class ContactHmrcController @Inject() (
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with FeatureFlagSupport {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
@@ -127,15 +128,17 @@ class ContactHmrcController @Inject() (
   def partialIndex(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Boolean) =
     Action.async { implicit request =>
       Future.successful {
-        Ok(
-          contactHmrcForm(
-            ContactHmrcForm.form.fill(
-              ContactForm(request.headers.get(REFERER).getOrElse("n/a"), csrfToken, service, None)
-            ),
-            submitUrl,
-            renderFormOnly
+        ifPartialsEnabled {
+          Ok(
+            contactHmrcForm(
+              ContactHmrcForm.form.fill(
+                ContactForm(request.headers.get(REFERER).getOrElse("n/a"), csrfToken, service, None)
+              ),
+              submitUrl,
+              renderFormOnly
+            )
           )
-        )
+        }
       }
     }
 

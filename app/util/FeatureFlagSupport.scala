@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package helpers
+package util
 
-import org.scalatest.TestSuite
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
+import config.AppConfig
+import play.api.mvc.Result
+import play.api.mvc.Results.Gone
 
-trait ApplicationSupport extends GuiceOneAppPerSuite { this: TestSuite =>
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"      -> false,
-        "metrics.enabled"  -> false,
-        "auditing.enabled" -> false,
-        "disablePartials"  -> false
-      )
-      .build()
+trait FeatureFlagSupport {
+
+  def ifPartialsEnabled(block: Result)(implicit appConfig: AppConfig): Result =
+    if (appConfig.disablePartials) {
+      Gone("")
+    } else {
+      block
+    }
 }

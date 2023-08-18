@@ -35,10 +35,10 @@ POST        /problem_reports                             @controllers.ReportProb
 GET         /problem_reports_ajax                        @controllers.ReportProblemController.partialAjaxIndex(service: Option[String])
 POST        /problem_reports_secure                      @controllers.ReportProblemController.submitDeprecated(service: Option[String])
 
-GET			    /survey				 	                             @controllers.SurveyController.survey(ticketId: String, serviceId: String)
-POST		    /survey                                      @controllers.SurveyController.submit(ticketId: String, serviceId: String)
-POST		    /submitSurvey                                @controllers.SurveyController.submitDeprecated()
-GET			    /survey/confirmation 	                       @controllers.SurveyController.confirmation()
+GET         /survey                                      @controllers.SurveyController.survey(ticketId: String, serviceId: String)
+POST        /survey                                      @controllers.SurveyController.submit(ticketId: String, serviceId: String)
+POST        /submitSurvey                                @controllers.SurveyController.submitDeprecated()
+GET         /survey/confirmation                         @controllers.SurveyController.confirmation()
 
 GET         /accessibility                               @controllers.AccessibilityController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
 POST        /accessibility                               @controllers.AccessibilityController.submit(service: Option[String], userAction: Option[String])
