@@ -28,6 +28,7 @@ trait AppConfig {
   def enableLanguageSwitching: Boolean
   def useRefererFromRequest: Boolean
   def disablePartials: Boolean
+  def useDeskproTicketQueue: Boolean
 
 }
 
@@ -66,8 +67,12 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .getOptional[Boolean]("disablePartials")
       .getOrElse(false)
 
+  override def useDeskproTicketQueue: Boolean =
+    configuration.getOptional[Boolean]("useDeskproTicketQueue").getOrElse(false)
+
   override def useRefererFromRequest: Boolean = configuration.getOptional[Boolean]("useRefererHeader").getOrElse(false)
 
   private def configNotFoundError(key: String) =
     throw new RuntimeException(s"Could not find config key '$key'")
+
 }

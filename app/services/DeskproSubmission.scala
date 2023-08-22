@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.TicketId
 import controllers.ContactForm
 import model.{AccessibilityForm, FeedbackForm, ReportProblemForm}
@@ -36,13 +36,13 @@ trait DeskproSubmission {
 
   private val Subject = "Contact form submission"
 
-  protected def hmrcDeskproConnector: HmrcDeskproConnector
+  protected def ticketQueueConnector: DeskproTicketQueueConnector
 
   def createDeskproTicket(data: ContactForm, enrolments: Option[Enrolments])(implicit
     request: Request[AnyContent],
     hc: HeaderCarrier
   ): Future[TicketId] =
-    hmrcDeskproConnector.createDeskProTicket(
+    ticketQueueConnector.createDeskProTicket(
       name = data.contactName,
       email = data.contactEmail,
       subject = Subject,
@@ -59,7 +59,7 @@ trait DeskproSubmission {
     request: Request[AnyContent],
     hc: HeaderCarrier
   ): Future[TicketId] =
-    hmrcDeskproConnector.createFeedback(
+    ticketQueueConnector.createFeedback(
       name = data.name,
       email = data.email,
       rating = data.experienceRating.getOrElse(""),
@@ -82,7 +82,7 @@ trait DeskproSubmission {
     referrer: Option[String]
   )(implicit messages: Messages): Future[TicketId] = {
     implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    hmrcDeskproConnector.createDeskProTicket(
+    ticketQueueConnector.createDeskProTicket(
       name = problemReport.reportName,
       email = problemReport.reportEmail,
       subject = "Support Request",
@@ -109,7 +109,7 @@ trait DeskproSubmission {
     req: Request[AnyContent],
     hc: HeaderCarrier
   ): Future[TicketId] =
-    hmrcDeskproConnector.createDeskProTicket(
+    ticketQueueConnector.createDeskProTicket(
       name = accessibilityForm.name,
       email = accessibilityForm.email,
       subject = "Accessibility Problem",

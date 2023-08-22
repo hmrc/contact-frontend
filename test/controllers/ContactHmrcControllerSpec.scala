@@ -19,7 +19,7 @@ package controllers
 import akka.actor.ActorSystem
 import akka.stream.Materializer._
 import config.CFConfig
-import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.TicketId
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
@@ -64,7 +64,7 @@ class ContactHmrcControllerSpec
 
   implicit val message: Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
-  val hmrcDeskproConnectorTimeout: VerificationWithTimeout =
+  val connectorTimeout: VerificationWithTimeout =
     Mockito.timeout(5000)
 
   "ContactHmrcController" should {
@@ -174,7 +174,7 @@ class ContactHmrcControllerSpec
 
       Then("the message is sent to the Deskpro connector")
       Mockito
-        .verify(hmrcDeskproConnector, hmrcDeskproConnectorTimeout)
+        .verify(ticketQueueConnector, connectorTimeout)
         .createDeskProTicket(
           any[String],
           any[String],
@@ -211,7 +211,7 @@ class ContactHmrcControllerSpec
 
       Then("the message is sent to the Deskpro connector")
       Mockito
-        .verify(hmrcDeskproConnector, hmrcDeskproConnectorTimeout)
+        .verify(ticketQueueConnector, connectorTimeout)
         .createDeskProTicket(
           any[String],
           any[String],
@@ -248,7 +248,7 @@ class ContactHmrcControllerSpec
 
       Then("the message is sent to the Deskpro connector")
       Mockito
-        .verify(hmrcDeskproConnector, hmrcDeskproConnectorTimeout)
+        .verify(ticketQueueConnector, connectorTimeout)
         .createDeskProTicket(
           any[String],
           any[String],
@@ -461,7 +461,7 @@ class ContactHmrcControllerSpec
 
       Then("ticket is sent to deskpro")
       Mockito
-        .verify(hmrcDeskproConnector, hmrcDeskproConnectorTimeout)
+        .verify(ticketQueueConnector, connectorTimeout)
         .createDeskProTicket(
           any[String],
           any[String],
@@ -495,7 +495,7 @@ class ContactHmrcControllerSpec
         controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = true)(contactRequest)
 
       Then("ticket is not sent to deskpro")
-      Mockito.verifyZeroInteractions(hmrcDeskproConnector)
+      Mockito.verifyZeroInteractions(ticketQueueConnector)
 
       And("an error message is returned")
       status(result) shouldBe 400
@@ -520,7 +520,7 @@ class ContactHmrcControllerSpec
         controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
 
       Then("ticket is not sent to deskpro")
-      Mockito.verifyZeroInteractions(hmrcDeskproConnector)
+      Mockito.verifyZeroInteractions(ticketQueueConnector)
 
       And("an error message is returned")
       status(result) shouldBe 400
@@ -557,7 +557,7 @@ class ContactHmrcControllerSpec
 
       Then("ticket is sent to deskpro")
       Mockito
-        .verify(hmrcDeskproConnector, hmrcDeskproConnectorTimeout)
+        .verify(ticketQueueConnector, connectorTimeout)
         .createDeskProTicket(
           any[String],
           any[String],
@@ -586,7 +586,7 @@ class ContactHmrcControllerSpec
     implicit val executionContext = ExecutionContext.Implicits.global
     implicit val messages         = app.injector.instanceOf[MessagesApi]
 
-    val hmrcDeskproConnector                     = mock[HmrcDeskproConnector]
+    val ticketQueueConnector                     = mock[DeskproTicketQueueConnector]
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
     when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
 
@@ -599,7 +599,7 @@ class ContactHmrcControllerSpec
 
     val controller =
       new ContactHmrcController(
-        hmrcDeskproConnector,
+        ticketQueueConnector,
         enrolmentsConnector,
         Stubs.stubMessagesControllerComponents(messagesApi = messages),
         contactForm,
@@ -612,7 +612,7 @@ class ContactHmrcControllerSpec
 
     def mockDeskproConnector(result: Future[TicketId]): Unit =
       when(
-        hmrcDeskproConnector.createDeskProTicket(
+        ticketQueueConnector.createDeskProTicket(
           any[String],
           any[String],
           any[String],

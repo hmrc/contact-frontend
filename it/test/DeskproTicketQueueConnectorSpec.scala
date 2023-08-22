@@ -17,7 +17,7 @@
 package test
 
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, equalToJson, postRequestedFor, urlEqualTo}
-import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.TicketId
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -31,7 +31,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.Future
 
-class HmrcDeskproConnectorSpec
+class DeskproTicketQueueConnectorSpec
     extends AnyWordSpec
     with Matchers
     with GuiceOneAppPerSuite
@@ -210,13 +210,13 @@ class HmrcDeskproConnectorSpec
   }
 
   class Setup {
-    def hmrcDeskproConnector = app.injector.instanceOf[HmrcDeskproConnector]
+    def ticketQueueConnector = app.injector.instanceOf[DeskproTicketQueueConnector]
 
     implicit val request: Request[AnyRef] = FakeRequest()
 
     def createTicket(enrolments: Enrolments): Future[TicketId] = {
       implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-      hmrcDeskproConnector.createDeskProTicket(
+      ticketQueueConnector.createDeskProTicket(
         name = "Mary",
         email = "mary@example.com",
         subject = "Support Request",
@@ -232,7 +232,7 @@ class HmrcDeskproConnectorSpec
 
     def createFeedback(enrolments: Enrolments): Future[TicketId] = {
       implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-      hmrcDeskproConnector.createFeedback(
+      ticketQueueConnector.createFeedback(
         name = "Eric",
         email = "eric@example.com",
         rating = "4",

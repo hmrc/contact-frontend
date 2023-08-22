@@ -17,7 +17,7 @@
 package controllers
 
 import config.CFConfig
-import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.TicketId
 import connectors.enrolments.EnrolmentsConnector
 import helpers.ApplicationSupport
@@ -450,7 +450,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
     val cfconfig               = new CFConfig(app.configuration)
 
     val controller = new ReportProblemController(
-      mock[HmrcDeskproConnector],
+      mock[DeskproTicketQueueConnector],
       enrolmentsConnector,
       Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
       reportProblemPage,
@@ -471,7 +471,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       )
     val deskproReferrer: String       = "/contact/problem_reports"
 
-    val hmrcDeskproConnector = controller.hmrcDeskproConnector
+    val hmrcDeskproConnector = controller.ticketQueueConnector
 
     val enrolments = Some(Enrolments(Set()))
 

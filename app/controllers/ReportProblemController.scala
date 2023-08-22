@@ -17,7 +17,7 @@
 package controllers
 
 import config.AppConfig
-import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import model.ReportProblemForm
 import play.api.data.Forms._
@@ -101,7 +101,7 @@ object ReportProblemFormBind {
 
 @Singleton
 class ReportProblemController @Inject() (
-  val hmrcDeskproConnector: HmrcDeskproConnector,
+  val ticketQueueConnector: DeskproTicketQueueConnector,
   enrolmentsConnector: EnrolmentsConnector,
   mcc: MessagesControllerComponents,
   reportProblemPage: ReportProblemPage,

@@ -32,4 +32,6 @@ class TestAppConfig extends AppConfig {
   def useRefererFromRequest: Boolean = true
 
   def disablePartials: Boolean = false
+
+  override def useDeskproTicketQueue: Boolean = false
 }
