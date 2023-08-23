@@ -18,7 +18,7 @@ package controllers
 
 import java.net.URLEncoder
 import config.CFConfig
-import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.TicketId
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
@@ -159,7 +159,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
     "redirect to confirmation page without 'back' button if 'back' link not provided" in new TestScope {
 
-      hmrcConnectorWillReturnTheTicketId()
+      ticketQueueConnectorWillReturnTheTicketId()
 
       val result = controller.submit()(request)
 
@@ -171,7 +171,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
     "show errors if some form not filled in correctly" in new TestScope {
 
-      hmrcConnectorWillReturnTheTicketId()
+      ticketQueueConnectorWillReturnTheTicketId()
 
       val result = controller.submit()(generateInvalidRequest())
 
@@ -179,11 +179,11 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementsByClass("govuk-error-message") shouldNot be(empty)
 
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyZeroInteractions(ticketQueueConnector)
     }
 
     "succeed with comment if 'canOmitComments' flag is true" in new TestScope {
-      hmrcConnectorWillReturnTheTicketId()
+      ticketQueueConnectorWillReturnTheTicketId()
 
       val result =
         controller.submit()(generateRequest(comments = "Some comment", canOmitComments = true))
@@ -195,7 +195,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     }
 
     "succeed without comment if 'canOmitComments' flag is true" in new TestScope {
-      hmrcConnectorWillReturnTheTicketId()
+      ticketQueueConnectorWillReturnTheTicketId()
 
       val result = controller.submit()(generateRequest(comments = "", canOmitComments = true))
 
@@ -206,7 +206,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     }
 
     "fail without comment if 'canOmitComments' flag is false" in new TestScope {
-      hmrcConnectorWillReturnTheTicketId()
+      ticketQueueConnectorWillReturnTheTicketId()
 
       val result = controller.submit()(generateRequest(comments = "", canOmitComments = false))
 
@@ -214,12 +214,12 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementsByClass("govuk-error-message") shouldNot be(empty)
 
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyZeroInteractions(ticketQueueConnector)
     }
 
     "include 'service', 'backUrl', 'canOmitComments' and 'referrer' fields in the returned page if form not filled in correctly" in new TestScope {
 
-      hmrcConnectorWillReturnTheTicketId()
+      ticketQueueConnectorWillReturnTheTicketId()
 
       val result = controller.submit()(generateInvalidRequestWithBackUrlAndService())
 
@@ -244,7 +244,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
     "return service error page if call to hmrc-deskpro failed" in new TestScope {
 
-      hmrcConnectorWillFail()
+      ticketQueueConnectorWillFail()
 
       val result = controller.submit()(request)
       status(result) shouldBe 500
@@ -254,7 +254,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
     "redirect to confirmation page with 'back' button if 'back' link provided" in new TestScope {
 
-      hmrcConnectorWillReturnTheTicketId()
+      ticketQueueConnectorWillReturnTheTicketId()
 
       val result = controller.submit()(requestWithBackLink)
 
@@ -305,7 +305,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
     "show errors if the form is not filled in correctly" in new TestScope {
 
-      hmrcConnectorWillReturnTheTicketId()
+      ticketQueueConnectorWillReturnTheTicketId()
 
       val result = controller.partialSubmit("tstUrl")(generateInvalidRequest())
 
@@ -313,12 +313,12 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementsByClass("error-message") shouldNot be(empty)
 
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyZeroInteractions(ticketQueueConnector)
     }
 
     "allow comments to be empty if the canOmitComments flag is set to true" in new TestScope {
 
-      hmrcConnectorWillReturnTheTicketId()
+      ticketQueueConnectorWillReturnTheTicketId()
 
       val result =
         controller.partialSubmit("tstUrl")(generateRequest(comments = "", canOmitComments = true))
@@ -332,7 +332,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
     "show errors if no comments are provided and the canOmitComments flag is set to false" in new TestScope {
 
-      hmrcConnectorWillReturnTheTicketId()
+      ticketQueueConnectorWillReturnTheTicketId()
 
       val result =
         controller.partialSubmit("tstUrl")(generateRequest(comments = "", canOmitComments = false))
@@ -341,17 +341,17 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementsByClass("error-message") shouldNot be(empty)
 
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyZeroInteractions(ticketQueueConnector)
     }
   }
 
   class TestScope extends MockitoSugar {
 
-    val hmrcDeskproConnector = mock[HmrcDeskproConnector]
+    val ticketQueueConnector = mock[DeskproTicketQueueConnector]
 
-    def hmrcConnectorWillFail() = mockHmrcConnector(Future.failed(new Exception("failed")))
+    def ticketQueueConnectorWillFail() = mockQueueConnector(Future.failed(new Exception("failed")))
 
-    def hmrcConnectorWillReturnTheTicketId() = mockHmrcConnector(Future.successful(TicketId(123)))
+    def ticketQueueConnectorWillReturnTheTicketId() = mockQueueConnector(Future.successful(TicketId(123)))
 
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
     when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
@@ -362,9 +362,9 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     val feedbackComment: String  = "Comments"
     val feedbackReferrer: String = "/contact/problem_reports"
 
-    private def mockHmrcConnector(result: Future[TicketId]) =
+    private def mockQueueConnector(result: Future[TicketId]) =
       when(
-        hmrcDeskproConnector.createFeedback(
+        ticketQueueConnector.createFeedback(
           name = any[String],
           email = any[String],
           rating = any[String],
@@ -379,7 +379,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       ).thenReturn(result)
 
     def verifyRequestMade(comment: String = feedbackComment): Unit =
-      verify(hmrcDeskproConnector).createFeedback(
+      verify(ticketQueueConnector).createFeedback(
         meq(feedbackName),
         meq(feedbackEmail),
         meq(feedbackRating),
@@ -405,7 +405,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     val cfconfig                             = new CFConfig(app.configuration)
 
     val controller = new FeedbackController(
-      hmrcDeskproConnector,
+      ticketQueueConnector,
       enrolmentsConnector,
       backUrlValidator,
       Stubs.stubMessagesControllerComponents(),

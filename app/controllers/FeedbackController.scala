@@ -17,7 +17,7 @@
 package controllers
 
 import config.AppConfig
-import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 
 import javax.inject.{Inject, Singleton}
@@ -38,7 +38,7 @@ import play.twirl.api.Html
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton class FeedbackController @Inject() (
-  val hmrcDeskproConnector: HmrcDeskproConnector,
+  val ticketQueueConnector: DeskproTicketQueueConnector,
   enrolmentsConnector: EnrolmentsConnector,
   val accessibleUrlValidator: BackUrlValidator,
   mcc: MessagesControllerComponents,

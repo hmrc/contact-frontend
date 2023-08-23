@@ -17,7 +17,7 @@
 package controllers
 
 import config.CFConfig
-import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.TicketId
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
@@ -204,7 +204,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
     "redirect to thankyou page when completed" in new TestScope {
       when(
-        hmrcDeskproConnector.createDeskProTicket(
+        ticketQueueConnector.createDeskProTicket(
           name = any[String],
           email = any[String],
           subject = any[String],
@@ -233,7 +233,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
     "return error page if the Deskpro ticket creation fails" in new TestScope {
       when(
-        hmrcDeskproConnector.createDeskProTicket(
+        ticketQueueConnector.createDeskProTicket(
           name = any[String],
           email = any[String],
           subject = any[String],
@@ -267,7 +267,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
   class TestScope extends MockitoSugar {
 
-    val hmrcDeskproConnector: HmrcDeskproConnector = mock[HmrcDeskproConnector]
+    val ticketQueueConnector: DeskproTicketQueueConnector = mock[DeskproTicketQueueConnector]
 
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
     when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
@@ -281,7 +281,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
     val errorPage                                 = app.injector.instanceOf[views.html.InternalErrorPage]
 
     val controller = new AccessibilityController(
-      hmrcDeskproConnector,
+      ticketQueueConnector,
       enrolmentsConnector,
       Stubs.stubMessagesControllerComponents(messagesApi = messages),
       playFrontendAccessibilityPage,

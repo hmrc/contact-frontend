@@ -16,7 +16,9 @@
 
 package connectors.deskpro
 
+import config.AppConfig
 import connectors.deskpro.domain.{Feedback, Ticket, TicketId}
+
 import javax.inject.Inject
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.Enrolments
@@ -26,11 +28,16 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class HmrcDeskproConnector @Inject() (http: HttpClient, servicesConfig: ServicesConfig)(implicit
-  executionContext: ExecutionContext
+class DeskproTicketQueueConnector @Inject() (http: HttpClient, servicesConfig: ServicesConfig, appConfig: AppConfig)(
+  implicit executionContext: ExecutionContext
 ) {
 
-  def serviceUrl: String = servicesConfig.baseUrl("hmrc-deskpro")
+  def serviceUrl: String =
+    if (appConfig.useDeskproTicketQueue) {
+      servicesConfig.baseUrl("deskpro-ticket-queue")
+    } else {
+      servicesConfig.baseUrl("hmrc-deskpro")
+    }
 
   def createDeskProTicket(
     name: String,

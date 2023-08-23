@@ -17,7 +17,7 @@
 package controllers
 
 import config.AppConfig
-import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 
 import javax.inject.Inject
@@ -86,7 +86,7 @@ object AccessibilityFormBind {
 }
 
 class AccessibilityController @Inject() (
-  val hmrcDeskproConnector: HmrcDeskproConnector,
+  val ticketQueueConnector: DeskproTicketQueueConnector,
   enrolmentsConnector: EnrolmentsConnector,
   mcc: MessagesControllerComponents,
   accessibilityProblemPage: AccessibilityProblemPage,

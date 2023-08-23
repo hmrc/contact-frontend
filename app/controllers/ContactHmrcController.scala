@@ -17,7 +17,7 @@
 package controllers
 
 import config.AppConfig
-import connectors.deskpro.HmrcDeskproConnector
+import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 
 import javax.inject.{Inject, Singleton}
@@ -66,7 +66,7 @@ object ContactHmrcForm {
 
 @Singleton
 class ContactHmrcController @Inject() (
-  val hmrcDeskproConnector: HmrcDeskproConnector,
+  val ticketQueueConnector: DeskproTicketQueueConnector,
   enrolmentsConnector: EnrolmentsConnector,
   mcc: MessagesControllerComponents,
   contactHmrcForm: contact_hmrc_form,
