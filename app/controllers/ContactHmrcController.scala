@@ -19,8 +19,6 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-
-import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Lang}
@@ -28,10 +26,11 @@ import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, FeatureFlagSupport, NameValidator, RefererHeaderRetriever}
+import util._
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 object ContactHmrcForm {
@@ -60,7 +59,7 @@ object ContactHmrcForm {
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text),
-      "contact-date"     -> optional(text)
+      "contact-date"     -> DateData.mapping("contact-date")
     )(ContactForm.apply)(ContactForm.unapply)
   )
 }
@@ -172,7 +171,7 @@ case class ContactForm(
   csrfToken: String,
   service: Option[String] = Some("unknown"),
   userAction: Option[String] = None,
-  contactDate: Option[String] = None
+  contactDate: DateData
 )
 
 object ContactForm {
@@ -182,5 +181,5 @@ object ContactForm {
     service: Option[String],
     userAction: Option[String]
   ): ContactForm =
-    ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction)
+    ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction, DateData("", "", ""))
 }
