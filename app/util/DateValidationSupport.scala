@@ -41,18 +41,26 @@ object DateValidationSupport {
   }
 
   val monthConstraint: Constraint[String] = Constraint("constraints.month") { monthAsString =>
-    val validationErrors: Seq[ValidationError] = Try(monthAsString.toInt) match {
-      case Success(monthAsInt) =>
-        if (monthAsInt < 1 || monthAsInt > 12) Seq(ValidationError("Value outside range of month"))
-        else Nil
-      case Failure(_)          => Seq(ValidationError("Value entered must be a number"))
-    }
+    val validationErrors: Seq[ValidationError] =
+      if (isInListOfAcceptedMonths(monthAsString)) Nil else {
+        Try(monthAsString.toInt) match {
+          case Success(monthAsInt) =>
+            if (monthAsInt < 1 || monthAsInt > 12) Seq(ValidationError("Value outside range of month"))
+            else Nil
+          case Failure(_) => Seq(ValidationError("Value entered must be a number"))
+        }
+      }
 
     if (validationErrors.isEmpty) {
       Valid
     } else {
       Invalid(validationErrors)
     }
+  }
+
+  private def isInListOfAcceptedMonths(userInput: String) = {
+    val acceptableMonths = Seq("feb", "february")
+    acceptableMonths.contains(userInput.toLowerCase)
   }
 
   val yearConstraint: Constraint[String] = Constraint("constraints.year") { yearAsString =>
@@ -72,7 +80,7 @@ object DateValidationSupport {
 
   val dateConstraint: Constraint[(String, String, String)] = Constraint("constraints.date") { dateData =>
     val validationErrors: Seq[ValidationError] =
-      if (dateData == ("14", "02", "2000")) Nil
+      if (dateData == ("14", "Feb", "2000")) Nil
       else {
         println(s"dateAsString is: $dateData")
         Seq(ValidationError("Nope, wrong"))
