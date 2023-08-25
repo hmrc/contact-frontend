@@ -34,7 +34,7 @@
     h2: Heading2,
     p: Paragraph,
     link: HmrcNewTabLinkHelper,
-    dateInput: GovUk
+    dateInput: GovukDateInput
 )
 @(contactForm: Form[ContactForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
@@ -81,6 +81,13 @@
             label = messages("contact.comments.label"),
             maxLength = Some(2000)
         )
+        @dateInput(DateInput(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(messages("Please enter a date"))
+                )))
+            )
+        ).withFormField(contactForm("contact-date")))
         @govukButton(Button(
             content = Text(messages("contact.button")),
             inputType = Some("submit"),

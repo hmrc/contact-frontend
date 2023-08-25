@@ -59,7 +59,8 @@ object ContactHmrcForm {
       "referrer"         -> text,
       "csrfToken"        -> text,
       "service"          -> optional(text),
-      "userAction"       -> optional(text)
+      "userAction"       -> optional(text),
+      "contact-date"     -> optional(text)
     )(ContactForm.apply)(ContactForm.unapply)
   )
 }
@@ -170,7 +171,8 @@ case class ContactForm(
   referrer: String,
   csrfToken: String,
   service: Option[String] = Some("unknown"),
-  userAction: Option[String] = None
+  userAction: Option[String] = None,
+  contactDate: Option[String] = None
 )
 
 object ContactForm {
