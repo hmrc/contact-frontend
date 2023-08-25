@@ -16,11 +16,10 @@
 
 package util
 
-import controllers.DateData
 import play.api.data.Forms.text
 import play.api.data.{Forms, Mapping}
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
-import util.DateValidationSupport.{dayConstraint, monthConstraint, yearConstraint}
+import util.DateValidationSupport.{dateConstraint, dayConstraint, monthConstraint, yearConstraint}
 
 import scala.util.{Failure, Success, Try}
 
@@ -71,9 +70,9 @@ object DateValidationSupport {
     }
   }
 
-  val dateConstraint: Constraint[DateData] = Constraint("constraints.date") { dateData =>
+  val dateConstraint: Constraint[(String, String, String)] = Constraint("constraints.date") { dateData =>
     val validationErrors: Seq[ValidationError] =
-      if (dateData == DateData("01", "01", "2001")) Nil
+      if (dateData == ("14", "02", "2000")) Nil
       else {
         println(s"dateAsString is: $dateData")
         Seq(ValidationError("Nope, wrong"))
@@ -101,8 +100,10 @@ object DateData {
         "month" -> monthMapping(prefix),
         "year"  -> yearMapping(prefix)
       )
+      .verifying(dateConstraint)
       .transform(
         validatedDateTuple => DateData(validatedDateTuple._1, validatedDateTuple._2, validatedDateTuple._3),
         dateData => (dateData.day, dateData.month, dateData.year)
       )
+
 }
