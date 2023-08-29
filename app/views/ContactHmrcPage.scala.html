@@ -48,43 +48,11 @@
 }
 
 @mainLayout(pageTitle) {
-    @if(contactForm.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(contactForm))
-    }
-    @h1(content = Text(messages("contact.heading")))
-    @p(content = HtmlContent(messages("contact.form.para1") + " " + contactHmrcLink + messages("common.fullstop")))
-    @p(content = Text(messages("contact.form.para2")))
-    @h2(content = Text(messages("contact.form.heading2")))
-    @p(content = Text(messages("contact.form.para3")))
-
     @formWithCSRF(action, 'id -> "contact-hmrc-form") {
-        @inputHidden(contactForm("service"))
-        @inputHidden(contactForm("referrer"))
-        @inputHidden(contactForm("userAction"))
-        @inputText(
-            contactForm("contact-name"),
-            label = messages("contact.name.label"),
-            classes = "govuk-!-width-two-thirds",
-            spellcheck = Some(false),
-            autocomplete = Some("name")
-        )
-        @inputText(
-            contactForm("contact-email"),
-            inputType = "email",
-            label = messages("contact.email.label"),
-            classes = "govuk-!-width-two-thirds",
-            spellcheck = Some(false),
-            autocomplete = Some("email")
-        )
-        @inputCharacterCount(
-            contactForm("contact-comments"),
-            label = messages("contact.comments.label"),
-            maxLength = Some(2000)
-        )
         @dateInput(DateInput(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
-                    content = Text(messages("Please enter a date"))
+                    content = Text(messages(""))
                 )))
             )
         ).withFormField(contactForm("contact-date")))

@@ -70,7 +70,7 @@ object AccessibilityFormBind {
       "email"              -> text
         .verifying("accessibility.email.error.required", name => name.trim.nonEmpty)
         // the logic below ensures that two or more errors will not fire at the same time. This prevents
-        // multiple error messages appearing in the error summary for the same field
+        // multiple error messages.en appearing in the error summary for the same field
         .verifying("accessibility.email.error.invalid", email => email.trim.isEmpty || emailValidator.validate(email))
         .verifying(
           "accessibility.email.error.length",

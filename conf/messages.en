@@ -1,6 +1,9 @@
 common.thank.you=Thank you
 common.fullstop=.
 
+february=February
+february.abbrv=Feb
+
 feedback.name.label=Full name
 feedback.name.error.required=Enter your full name
 feedback.name.error.length=Full name cannot be longer than 70 characters

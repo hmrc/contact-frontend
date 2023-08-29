@@ -21,7 +21,7 @@ import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.{I18nSupport, Lang}
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
@@ -38,7 +38,7 @@ object ContactHmrcForm {
   private val emailValidator = DeskproEmailValidator()
   private val nameValidator  = NameValidator()
 
-  val form = Form[ContactForm](
+  def form()(implicit messagesApi: MessagesApi, lang: Lang) = Form[ContactForm](
     mapping(
       "contact-name"     -> text
         .verifying("contact.name.error.required", name => name.trim.nonEmpty)
@@ -180,6 +180,6 @@ object ContactForm {
     csrfToken: String,
     service: Option[String],
     userAction: Option[String]
-  ): ContactForm =
+  )(implicit messagesApi: MessagesApi): ContactForm =
     ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction, DateData("", "", ""))
 }

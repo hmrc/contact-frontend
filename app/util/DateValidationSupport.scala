@@ -17,8 +17,9 @@
 package util
 
 import play.api.data.Forms.text
-import play.api.data.{Forms, Mapping}
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+import play.api.data.{Forms, Mapping}
+import play.api.i18n.{Lang, MessagesApi}
 import util.DateValidationSupport.{dateConstraint, dayConstraint, monthConstraint, yearConstraint}
 
 import scala.util.{Failure, Success, Try}
@@ -40,14 +41,14 @@ object DateValidationSupport {
     }
   }
 
-  val monthConstraint: Constraint[String] = Constraint("constraints.month") { monthAsString =>
+  def monthConstraint()(implicit messagesApi: MessagesApi, lang: Lang): Constraint[String] = Constraint("constraints.month") { monthAsString =>
     val validationErrors: Seq[ValidationError] =
       if (isInListOfAcceptedMonths(monthAsString)) Nil else {
         Try(monthAsString.toInt) match {
           case Success(monthAsInt) =>
             if (monthAsInt < 1 || monthAsInt > 12) Seq(ValidationError("Value outside range of month"))
             else Nil
-          case Failure(_) => Seq(ValidationError("Value entered must be a number"))
+          case Failure(_) => Seq(ValidationError("Value entered for month is invalid"))
         }
       }
 
@@ -58,8 +59,11 @@ object DateValidationSupport {
     }
   }
 
-  private def isInListOfAcceptedMonths(userInput: String) = {
-    val acceptableMonths = Seq("feb", "february")
+  private def isInListOfAcceptedMonths(userInput: String)(implicit messagesApi: MessagesApi, lang: Lang) = {
+    val messages: Map[String, String] = messagesApi.messages(lang.code)
+    val februaryLong: String = messages("february").toLowerCase
+    val februaryAbbreviated: String = messages("february.abbrv").toLowerCase
+    val acceptableMonths = Seq(februaryAbbreviated, februaryLong)
     acceptableMonths.contains(userInput.toLowerCase)
   }
 
@@ -80,7 +84,8 @@ object DateValidationSupport {
 
   val dateConstraint: Constraint[(String, String, String)] = Constraint("constraints.date") { dateData =>
     val validationErrors: Seq[ValidationError] =
-      if (dateData == ("14", "Feb", "2000")) Nil
+      if (dateData == ("14", "Feb", "2000") || dateData == ("14", "February", "2000") ||
+          dateData == ("14", "Chwef", "2000") || dateData == ("14", "Chwefror", "2000")) Nil
       else {
         println(s"dateAsString is: $dateData")
         Seq(ValidationError("Nope, wrong"))
@@ -94,14 +99,14 @@ object DateValidationSupport {
   }
 }
 
-case class DateData(day: String, month: String, year: String)
+case class DateData(day: String, month: String, year: String)(implicit messagesApi: MessagesApi)
 
 object DateData {
   def dayMapping(str: String)   = text.verifying(dayConstraint)
-  def monthMapping(str: String) = text.verifying(monthConstraint)
+  def monthMapping(str: String)(implicit messagesApi: MessagesApi, lang: Lang) = text.verifying(monthConstraint)
   def yearMapping(str: String)  = text.verifying(yearConstraint)
 
-  def mapping(prefix: String): Mapping[DateData] =
+  def mapping(prefix: String)(implicit messagesApi: MessagesApi, lang: Lang): Mapping[DateData] =
     Forms
       .tuple(
         "day"   -> dayMapping(prefix),

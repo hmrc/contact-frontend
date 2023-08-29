@@ -1,6 +1,9 @@
 common.thank.you=Diolch
 common.fullstop=.
 
+february=Chwefror
+february.abbrv=Chwef
+
 feedback.name.label=Enw llawn
 feedback.name.error.required=Rhowch eich enw
 feedback.name.error.length=Ni all eich enw fod yn hirach na 70 o gymeriadau
