@@ -34,7 +34,8 @@
     h2: Heading2,
     p: Paragraph,
     link: HmrcNewTabLinkHelper,
-    dateInput: GovukDateInput
+    dateInput: GovukDateInput,
+    hmrcReportTechnicalIssue: HmrcReportTechnicalIssue
 )
 @(contactForm: Form[ContactForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
@@ -62,4 +63,6 @@
             preventDoubleClick = Some(true)
         ))
     }
+
+    @hmrcReportTechnicalIssue(ReportTechnicalIssue("","",En,Some("govuk-body")))
 }

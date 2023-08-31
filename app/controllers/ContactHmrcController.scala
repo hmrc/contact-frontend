@@ -25,6 +25,8 @@ import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
+import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.DateData
+import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.DateValidationSupport._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util._
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
@@ -38,7 +40,7 @@ object ContactHmrcForm {
   private val emailValidator = DeskproEmailValidator()
   private val nameValidator  = NameValidator()
 
-  def form()(implicit messagesApi: MessagesApi, lang: Lang) = Form[ContactForm](
+  def form()(implicit messagesApi: MessagesApi) = Form[ContactForm](
     mapping(
       "contact-name"     -> text
         .verifying("contact.name.error.required", name => name.trim.nonEmpty)
@@ -59,7 +61,12 @@ object ContactHmrcForm {
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text),
-      "contact-date"     -> DateData.mapping("contact-date")
+      "contact-date"     -> dateFieldMappings(
+        dayConstraints = Seq(dayInRange(Some(1), Some(5))),
+        monthConstraints = Seq(monthAsString()),
+        yearConstraints = Seq(fullYear, yearInRange(Some(2023), None))
+      )
+//      "contact-date"     -> defaultDateFieldMapping,
     )(ContactForm.apply)(ContactForm.unapply)
   )
 }
