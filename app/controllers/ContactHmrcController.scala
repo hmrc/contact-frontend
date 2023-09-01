@@ -61,15 +61,18 @@ object ContactHmrcForm {
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text),
+      // TODO: as date field constraints have defaults the developer will not have to override all constraints if they want custom validations
       "contact-date" -> dateFieldMappings(
         dayConstraints = Seq(dayInRange(Some(1), Some(5))),
         monthConstraints = Seq(monthAsString())
       ),
+      // TODO: override all constraints if they want custom validations
 //      "contact-date"     -> dateFieldMappings(
 //        dayConstraints = Seq(dayInRange(Some(1), Some(5))),
 //        monthConstraints = Seq(monthAsString()),
 //        yearConstraints = Seq(fullYear, yearInRange(Some(2023), None))
 //      )
+      // TODO: use default constraints
 //      "contact-date"     -> defaultDateFieldMapping,
     )(ContactForm.apply)(ContactForm.unapply)
   )
