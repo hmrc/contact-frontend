@@ -67,7 +67,7 @@ object ContactHmrcForm {
           val afterDate = LocalDate.parse("2023-01-30")
           localDate.isAfter(afterDate)
         }
-      }),
+      }).verifying(yearBefore(LocalDate.parse("2024-01-01"))),
     )(ContactForm.apply)(ContactForm.unapply)
   )
 }
