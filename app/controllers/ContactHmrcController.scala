@@ -25,13 +25,14 @@ import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
-import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.DateData
 import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.DateValidationSupport._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.GovUKDate
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util._
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
+import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -61,19 +62,12 @@ object ContactHmrcForm {
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text),
-      // TODO: as date field constraints have defaults the developer will not have to override all constraints if they want custom validations
-      "contact-date" -> dateFieldMappings(
-        dayConstraints = Seq(dayInRange(Some(1), Some(5))),
-        monthConstraints = Seq(monthAsString())
-      ),
-      // TODO: override all constraints if they want custom validations
-//      "contact-date"     -> dateFieldMappings(
-//        dayConstraints = Seq(dayInRange(Some(1), Some(5))),
-//        monthConstraints = Seq(monthAsString()),
-//        yearConstraints = Seq(fullYear, yearInRange(Some(2023), None))
-//      )
-      // TODO: use default constraints
-//      "contact-date"     -> defaultDateFieldMapping,
+      "contact-date"     -> govukDate.verifying("date.after", (govukDate: GovUKDate) => {
+        govukDate.localDate().exists { localDate =>
+          val afterDate = LocalDate.parse("2023-01-30")
+          localDate.isAfter(afterDate)
+        }
+      }),
     )(ContactForm.apply)(ContactForm.unapply)
   )
 }
@@ -185,7 +179,7 @@ case class ContactForm(
   csrfToken: String,
   service: Option[String] = Some("unknown"),
   userAction: Option[String] = None,
-  contactDate: DateData
+  contactDate: GovUKDate
 )
 
 object ContactForm {
@@ -195,5 +189,5 @@ object ContactForm {
     service: Option[String],
     userAction: Option[String]
   )(implicit messagesApi: MessagesApi): ContactForm =
-    ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction, DateData("", "", ""))
+    ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction, GovUKDate("", "", ""))
 }
