@@ -61,11 +61,15 @@ object ContactHmrcForm {
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text),
-      "contact-date"     -> dateFieldMappings(
+      "contact-date" -> dateFieldMappings(
         dayConstraints = Seq(dayInRange(Some(1), Some(5))),
-        monthConstraints = Seq(monthAsString()),
-        yearConstraints = Seq(fullYear, yearInRange(Some(2023), None))
-      )
+        monthConstraints = Seq(monthAsString())
+      ),
+//      "contact-date"     -> dateFieldMappings(
+//        dayConstraints = Seq(dayInRange(Some(1), Some(5))),
+//        monthConstraints = Seq(monthAsString()),
+//        yearConstraints = Seq(fullYear, yearInRange(Some(2023), None))
+//      )
 //      "contact-date"     -> defaultDateFieldMapping,
     )(ContactForm.apply)(ContactForm.unapply)
   )
