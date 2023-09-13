@@ -2,12 +2,8 @@
 BROWSER="remote-chrome"
 ENV="local"
 
-# sm ports needed when running assets-frontend locally via service manager
-sm_port_mapping=$(sm -s | grep PASS | awk '{ print $12"->"$12 }' | paste -sd "," -)
-
 # port mapping for running contact-frontend service
-service_port_mapping="6001->6001,"
-port_mappings="$service_port_mapping$sm_port_mapping"
+port_mappings="6001->6001"
 
 IMAGE=artefacts.tax.service.gov.uk/chrome-with-rinetd:latest
 
