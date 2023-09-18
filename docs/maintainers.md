@@ -8,12 +8,12 @@
 
 The easiest way to run Mongo is using [docker](https://hub.docker.com/_/mongo).
 
-* [service manager](https://www.github.com/hmrc/service-manager)
+* [service manager 2](https://github.com/hmrc/sm2)
     
 You will need the HMRCDESKPRO service running locally:
 
 ```shell script
-sm --start HMRCDESKPRO
+sm2 --start HMRCDESKPRO
 ```
 
 ## To run locally
