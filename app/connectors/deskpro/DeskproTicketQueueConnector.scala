@@ -105,6 +105,6 @@ class DeskproTicketQueueConnector @Inject() (http: HttpClient, servicesConfig: S
       throw UpstreamErrorResponse(nf.getMessage, 404, 500)
     }
 
-  private def requestUrl[B, A](uri: String, email: String): String = s"${serviceUrl(email)}l$uri"
+  private def requestUrl[B, A](uri: String, email: String): String = s"${serviceUrl(email)}$uri"
 
 }
