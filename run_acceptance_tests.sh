@@ -2,8 +2,8 @@
 BROWSER="remote-chrome"
 ENV="local"
 
-# sm ports needed when running assets-frontend locally via service manager
-sm_port_mapping=$(sm -s | grep PASS | awk '{ print $12"->"$12 }' | paste -sd "," -)
+# sm2 ports needed when running assets-frontend locally via service manager
+port_mappings=$(sm2 --status | grep PASS | awk '{ print $8"->"$8 }' | paste -sd "," -)
 
 # port mapping for running contact-frontend service
 service_port_mapping="6001->6001,"
