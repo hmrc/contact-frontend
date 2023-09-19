@@ -32,8 +32,11 @@ class DeskproTicketQueueConnector @Inject() (http: HttpClient, servicesConfig: S
   implicit executionContext: ExecutionContext
 ) {
 
-  def serviceUrl: String =
-    if (appConfig.useDeskproTicketQueue) {
+  private val createInDeskproTicketQueue: Option[String] =
+    appConfig.createInDeskproTicketQueue
+
+  def serviceUrl(email: String): String =
+    if (appConfig.useDeskproTicketQueue || createInDeskproTicketQueue.contains(email)) {
       servicesConfig.baseUrl("deskpro-ticket-queue")
     } else {
       servicesConfig.baseUrl("hmrc-deskpro")
@@ -65,8 +68,9 @@ class DeskproTicketQueueConnector @Inject() (http: HttpClient, servicesConfig: S
         service,
         userAction
       )
-    http.POST[Ticket, TicketId](requestUrl("/deskpro/get-help-ticket"), ticket) recover { case nf: NotFoundException =>
-      throw UpstreamErrorResponse(nf.getMessage, 404, 500)
+    http.POST[Ticket, TicketId](requestUrl("/deskpro/get-help-ticket", email), ticket) recover {
+      case nf: NotFoundException =>
+        throw UpstreamErrorResponse(nf.getMessage, 404, 500)
     }
   }
 
@@ -83,7 +87,7 @@ class DeskproTicketQueueConnector @Inject() (http: HttpClient, servicesConfig: S
     service: Option[String]
   )(implicit hc: HeaderCarrier): Future[TicketId] =
     http.POST[Feedback, TicketId](
-      requestUrl("/deskpro/feedback"),
+      requestUrl("/deskpro/feedback", email),
       Feedback.create(
         name,
         email,
@@ -101,6 +105,6 @@ class DeskproTicketQueueConnector @Inject() (http: HttpClient, servicesConfig: S
       throw UpstreamErrorResponse(nf.getMessage, 404, 500)
     }
 
-  private def requestUrl[B, A](uri: String): String = s"$serviceUrl$uri"
+  private def requestUrl[B, A](uri: String, email: String): String = s"${serviceUrl(email)}l$uri"
 
 }
