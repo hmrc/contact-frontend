@@ -242,7 +242,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       page.body().select("input[name=referrer]").attr("value")          shouldBe referrerUrl
     }
 
-    "return service error page if call to hmrc-deskpro failed" in new TestScope {
+    "return service error page if call to backend service failed" in new TestScope {
 
       ticketQueueConnectorWillFail()
 

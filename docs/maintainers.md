@@ -1,4 +1,4 @@
-# Maintaining contact-frontend and hmrc-deskpro
+# Maintaining contact-frontend and deskpro-ticket-queue
 
 ## Prerequisites
 
@@ -10,10 +10,10 @@ The easiest way to run Mongo is using [docker](https://hub.docker.com/_/mongo).
 
 * [service manager 2](https://github.com/hmrc/sm2)
     
-You will need the HMRCDESKPRO service running locally:
+You will need the DESKPRO_TICKET_QUEUE service running locally:
 
 ```shell script
-sm2 --start HMRCDESKPRO
+sm2 --start DESKPRO_TICKET_QUEUE
 ```
 
 ## To run locally
@@ -93,7 +93,7 @@ Specifically, there is a known unhappy path that can occur:
 1. End user submits a form via `contact-frontend`, with an email addresses that passes validation within 
 `contact-frontend` on the server side controller
    
-1. Ticket is created in the Mongo-backed queue within `hmrc-deskpro`
+1. Ticket is created in the encrypted Mongo-backed queue within `deskpro-ticket-queue`
 
 1. Ticket is sent asynchronously to Deskpro, which may use different email validation rules. If the ticket has been 
 created with an email addresses that does not pass Deskpro's validation rules, it will be repeatedly submitted to 

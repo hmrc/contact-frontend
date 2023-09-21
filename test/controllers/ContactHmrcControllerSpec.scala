@@ -395,7 +395,7 @@ class ContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.name.error.length"))) shouldBe true
     }
 
-    "return expected Internal Error when hmrc-deskpro errors for submit page" in new TestScope {
+    "return expected Internal Error when backend service errors for submit page" in new TestScope {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.failed(new Exception("This is an expected test error")))
 
