@@ -40,10 +40,10 @@ class DeskproTicketQueueConnectorSpec
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
       .configure(
-        "metrics.jvm"                             -> false,
+        "metrics.jvm"                       -> false,
         "metrics.enabled"                         -> false,
         "auditing.enabled"                        -> false,
-        "microservice.services.hmrc-deskpro.port" -> endpointPort
+        "microservice.services.deskpro-ticket-queue.port" -> endpointPort
       )
       .build()
 
