@@ -147,7 +147,7 @@ class ReportProblemController @Inject() (
   }
 
   def partialAjaxIndex(service: Option[String]) = Action { implicit request =>
-    ifPartialsEnabled {
+    ifAjaxPartialsEnabled {
       val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
       val referrer  = headerRetriever.refererFromHeaders
       val form      = ReportProblemFormBind.emptyForm(csrfToken.getOrElse(""), service, referrer)

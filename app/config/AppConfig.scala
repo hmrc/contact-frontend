@@ -28,6 +28,7 @@ trait AppConfig {
   def enableLanguageSwitching: Boolean
   def useRefererFromRequest: Boolean
   def disablePartials: Boolean
+  def disableAjaxPartials: Boolean
   def useDeskproTicketQueue: Boolean
   def createInDeskproTicketQueue: Option[String]
 
@@ -66,6 +67,11 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
   override def disablePartials: Boolean =
     configuration
       .getOptional[Boolean]("disablePartials")
+      .getOrElse(false)
+
+  override def disableAjaxPartials: Boolean =
+    configuration
+      .getOptional[Boolean]("disableAjaxPartials")
       .getOrElse(false)
 
   override def useDeskproTicketQueue: Boolean =
