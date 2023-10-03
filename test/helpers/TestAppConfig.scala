@@ -33,7 +33,10 @@ class TestAppConfig extends AppConfig {
 
   def disablePartials: Boolean = false
 
+  override def disableAjaxPartials: Boolean = false
+
   override def useDeskproTicketQueue: Boolean = false
 
   override def createInDeskproTicketQueue: Option[String] = None
+
 }

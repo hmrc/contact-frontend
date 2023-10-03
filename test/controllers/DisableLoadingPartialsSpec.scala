@@ -37,10 +37,11 @@ class DisableLoadingPartialsSpec extends AnyWordSpec with GuiceOneAppPerTest wit
   implicit override def newAppForTest(testData: TestData): Application =
     new GuiceApplicationBuilder()
       .configure(
-        "metrics.jvm"      -> false,
-        "metrics.enabled"  -> false,
-        "auditing.enabled" -> false,
-        "disablePartials"  -> true
+        "metrics.jvm"         -> false,
+        "metrics.enabled"     -> false,
+        "auditing.enabled"    -> false,
+        "disablePartials"     -> true,
+        "disableAjaxPartials" -> true
       )
       .build()
 

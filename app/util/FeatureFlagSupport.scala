@@ -22,8 +22,14 @@ import play.api.mvc.Results.Gone
 
 trait FeatureFlagSupport {
 
-  def ifPartialsEnabled(block: Result)(implicit appConfig: AppConfig): Result =
-    if (appConfig.disablePartials) {
+  def ifPartialsEnabled(block: => Result)(implicit appConfig: AppConfig): Result =
+    ifEnabled(block, appConfig.disablePartials)
+
+  def ifAjaxPartialsEnabled(block: => Result)(implicit appConfig: AppConfig): Result =
+    ifEnabled(block, appConfig.disableAjaxPartials)
+
+  private def ifEnabled(block: => Result, isDisabled: Boolean): Result =
+    if (isDisabled) {
       Gone("")
     } else {
       block
