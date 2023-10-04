@@ -14,14 +14,10 @@
  * limitations under the License.
  *@
 
-@import config.AppConfig
-@import testonly.views.html.report_technical_problem_link
+@this()
 
-@this(mainContent: testonly.views.html.main, reportAProblemLink: report_technical_problem_link)
-@()(implicit request : Request[_], lang : Lang, messages : Messages, appConfig : AppConfig)
+@(reportAProblemNonJSUrl: String)(implicit messages: Messages)
 
-@mainContent(title = messages("testPage.title"), getHelpForm = reportAProblemLink(
-  "/contact/problem_reports_nonjs?service=foo"
-)) {
-  <h1>@messages("testPage.heading")</h1>
-}
+<div class="report-error">
+    <a class="report-error__toggle" href="@reportAProblemNonJSUrl">@Messages("report.a.problem.link")</a>
+</div>
