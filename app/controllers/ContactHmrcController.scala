@@ -26,7 +26,6 @@ import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.DateValidationSupport._
-import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.GovUKDate
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util._
 import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
@@ -62,12 +61,12 @@ object ContactHmrcForm {
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text),
-      "contact-date"     -> govukDate.verifying("date.after", (govukDate: GovUKDate) => {
-        govukDate.localDate().exists { localDate =>
+      "contact-date"     -> govukDate
+        .verifying("date.after", (localDate: LocalDate) => {
           val afterDate = LocalDate.parse("2023-01-30")
           localDate.isAfter(afterDate)
-        }
-      }).verifying(yearBefore(LocalDate.parse("2024-01-01"))),
+        })
+        .verifying(yearBefore(LocalDate.parse("2024-01-01"))),
     )(ContactForm.apply)(ContactForm.unapply)
   )
 }
@@ -179,7 +178,7 @@ case class ContactForm(
   csrfToken: String,
   service: Option[String] = Some("unknown"),
   userAction: Option[String] = None,
-  contactDate: GovUKDate
+  contactDate: LocalDate
 )
 
 object ContactForm {
@@ -189,5 +188,5 @@ object ContactForm {
     service: Option[String],
     userAction: Option[String]
   )(implicit messagesApi: MessagesApi): ContactForm =
-    ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction, GovUKDate("", "", ""))
+    ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction, LocalDate.now())
 }
