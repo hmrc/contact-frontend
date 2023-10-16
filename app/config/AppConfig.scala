@@ -30,7 +30,7 @@ trait AppConfig {
   def disablePartials: Boolean
   def disableAjaxPartials: Boolean
   def useDeskproTicketQueue: Boolean
-  def createInDeskproTicketQueue: Option[String]
+  def sendExplicitAuditEvents: Boolean
 
 }
 
@@ -79,10 +79,10 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
 
   override def useRefererFromRequest: Boolean = configuration.getOptional[Boolean]("useRefererHeader").getOrElse(false)
 
-  override def createInDeskproTicketQueue: Option[String] =
-    configuration.getOptional[String]("createInDeskproTicketQueue")
-
   private def configNotFoundError(key: String) =
     throw new RuntimeException(s"Could not find config key '$key'")
+
+  override def sendExplicitAuditEvents: Boolean =
+    configuration.getOptional[Boolean]("sendExplicitAuditEvents").getOrElse(false)
 
 }

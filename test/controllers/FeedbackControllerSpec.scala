@@ -19,10 +19,10 @@ package controllers
 import java.net.URLEncoder
 import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.TicketId
+import connectors.deskpro.domain.{FormValues, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -179,7 +179,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementsByClass("govuk-error-message") shouldNot be(empty)
 
-      verifyZeroInteractions(ticketQueueConnector)
+      verifyNoInteractions(ticketQueueConnector)
     }
 
     "succeed with comment if 'canOmitComments' flag is true" in new TestScope {
@@ -214,7 +214,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementsByClass("govuk-error-message") shouldNot be(empty)
 
-      verifyZeroInteractions(ticketQueueConnector)
+      verifyNoInteractions(ticketQueueConnector)
     }
 
     "include 'service', 'backUrl', 'canOmitComments' and 'referrer' fields in the returned page if form not filled in correctly" in new TestScope {
@@ -313,7 +313,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementsByClass("error-message") shouldNot be(empty)
 
-      verifyZeroInteractions(ticketQueueConnector)
+      verifyNoInteractions(ticketQueueConnector)
     }
 
     "allow comments to be empty if the canOmitComments flag is set to true" in new TestScope {
@@ -341,7 +341,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val page = Jsoup.parse(contentAsString(result))
       page.body().getElementsByClass("error-message") shouldNot be(empty)
 
-      verifyZeroInteractions(ticketQueueConnector)
+      verifyNoInteractions(ticketQueueConnector)
     }
   }
 
@@ -368,13 +368,13 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
           name = any[String],
           email = any[String],
           rating = any[String],
-          subject = any[String],
           message = any[String],
           referrer = any[String],
           isJavascript = any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
-          any[Option[String]]
+          any[Option[String]],
+          any[FormValues]
         )(any[HeaderCarrier])
       ).thenReturn(result)
 
@@ -383,13 +383,13 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         meq(feedbackName),
         meq(feedbackEmail),
         meq(feedbackRating),
-        meq("Beta feedback submission"),
         meq(comment),
         meq(feedbackReferrer),
         meq(true),
         any[Request[AnyRef]](),
         any[Option[Enrolments]],
-        any[Option[String]]
+        any[Option[String]],
+        any[FormValues]
       )(any[HeaderCarrier])
 
     val backUrlValidator = new BackUrlValidator() {

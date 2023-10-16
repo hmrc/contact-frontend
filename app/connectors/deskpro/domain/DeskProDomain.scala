@@ -188,3 +188,28 @@ trait FieldTransformer {
       case (enrolmentKey, identifierKey, value)   => s"$enrolmentKey/$identifierKey" -> value
     }
 }
+
+trait FormValues {
+  val auditType: String
+  val subject: String
+}
+
+case object BetaFeedbackFormValues extends FormValues {
+  override val auditType: String = "BetaFeedbackFormSubmission"
+  override val subject: String   = "Beta feedback submission"
+}
+
+case object ContactHmrcFormValues extends FormValues {
+  override val auditType: String = "ContactHmrcFormSubmission"
+  override val subject: String   = "Contact form submission"
+}
+
+case object ReportTechnicalProblemFormValues extends FormValues {
+  override val auditType: String = "ReportTechnicalProblemFormSubmission"
+  override val subject: String   = "Support Request"
+}
+
+case object AccessibilityProblemFormValues extends FormValues {
+  override val auditType: String = "AccessibilityProblemFormSubmission"
+  override val subject: String   = "Accessibility Problem"
+}

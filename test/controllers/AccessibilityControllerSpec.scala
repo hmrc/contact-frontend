@@ -18,10 +18,10 @@ package controllers
 
 import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.TicketId
+import connectors.deskpro.domain.{FormValues, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -207,14 +207,14 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
         ticketQueueConnector.createDeskProTicket(
           name = any[String],
           email = any[String],
-          subject = any[String],
           message = any[String],
           referrer = any[String],
           isJavascript = any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]]
+          any[Option[String]],
+          any[FormValues]
         )(any[HeaderCarrier])
       ).thenReturn(Future.successful(TicketId(1234)))
 
@@ -236,14 +236,14 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
         ticketQueueConnector.createDeskProTicket(
           name = any[String],
           email = any[String],
-          subject = any[String],
           message = any[String],
           referrer = any[String],
           isJavascript = any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]]
+          any[Option[String]],
+          any[FormValues]
         )(any[HeaderCarrier])
       ).thenReturn(Future.failed(new Exception("failed")))
 
