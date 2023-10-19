@@ -18,7 +18,7 @@ package controllers
 
 import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.{FormValues, TicketId}
+import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any
@@ -214,7 +214,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
           any[Option[Enrolments]],
           any[Option[String]],
           any[Option[String]],
-          any[FormValues]
+          any[TicketConstants]
         )(any[HeaderCarrier])
       ).thenReturn(Future.successful(TicketId(1234)))
 
@@ -243,7 +243,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
           any[Option[Enrolments]],
           any[Option[String]],
           any[Option[String]],
-          any[FormValues]
+          any[TicketConstants]
         )(any[HeaderCarrier])
       ).thenReturn(Future.failed(new Exception("failed")))
 

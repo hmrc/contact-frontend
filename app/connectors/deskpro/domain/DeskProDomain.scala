@@ -189,27 +189,27 @@ trait FieldTransformer {
     }
 }
 
-trait FormValues {
+sealed trait TicketConstants {
   val auditType: String
   val subject: String
 }
 
-case object BetaFeedbackFormValues extends FormValues {
-  override val auditType: String = "BetaFeedbackFormSubmission"
-  override val subject: String   = "Beta feedback submission"
+case object BetaFeedbackTicketConstants extends TicketConstants {
+  val auditType: String = "BetaFeedbackFormSubmission"
+  val subject: String   = "Beta feedback submission"
 }
 
-case object ContactHmrcFormValues extends FormValues {
-  override val auditType: String = "ContactHmrcFormSubmission"
-  override val subject: String   = "Contact form submission"
+case object ContactHmrcTicketConstants extends TicketConstants {
+  val auditType: String = "ContactHmrcFormSubmission"
+  val subject: String   = "Contact form submission"
 }
 
-case object ReportTechnicalProblemFormValues extends FormValues {
-  override val auditType: String = "ReportTechnicalProblemFormSubmission"
-  override val subject: String   = "Support Request"
+case object ReportTechnicalProblemTicketConstants extends TicketConstants {
+  val auditType: String = "ReportTechnicalProblemFormSubmission"
+  val subject: String   = "Support Request"
 }
 
-case object AccessibilityProblemFormValues extends FormValues {
-  override val auditType: String = "AccessibilityProblemFormSubmission"
-  override val subject: String   = "Accessibility Problem"
+case object AccessibilityProblemTicketConstants extends TicketConstants {
+  val auditType: String = "AccessibilityProblemFormSubmission"
+  val subject: String   = "Accessibility Problem"
 }

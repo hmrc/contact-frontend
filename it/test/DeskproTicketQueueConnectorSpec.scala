@@ -18,7 +18,7 @@ package test
 
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, equalToJson, postRequestedFor, urlEqualTo}
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.TicketId
+import connectors.deskpro.domain.{BetaFeedbackTicketConstants, ReportTechnicalProblemTicketConstants, TicketId}
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, Mockito}
 import org.mockito.MockitoSugar.when
 import org.scalatest.matchers.should.Matchers
@@ -115,7 +115,7 @@ class DeskproTicketQueueConnectorSpec
           )
       )
 
-      val explicitAuditEvents = captureAuditEvents().filter(_.auditType == "TestContactHmrcAudit")
+      val explicitAuditEvents = captureAuditEvents().filter(_.auditType == "ReportTechnicalProblemFormSubmission")
       explicitAuditEvents.length shouldBe 1
       explicitAuditEvents.head.detail shouldBe Json.parse(problemReportsRequestJson)
     }
@@ -201,7 +201,7 @@ class DeskproTicketQueueConnectorSpec
           )
       )
 
-      val explicitAuditEvents = captureAuditEvents().filter(_.auditType == "TestBetaFeedbackAudit")
+      val explicitAuditEvents = captureAuditEvents().filter(_.auditType == "BetaFeedbackFormSubmission")
       explicitAuditEvents.length shouldBe 1
       explicitAuditEvents.head.detail shouldBe Json.parse(feedbackRequestJson)
     }
@@ -258,7 +258,6 @@ class DeskproTicketQueueConnectorSpec
       ticketQueueConnector.createDeskProTicket(
         name = "Mary",
         email = "mary@example.com",
-        subject = "Support Request",
         message = "A problem occurred",
         referrer = "",
         isJavascript = true,
@@ -266,7 +265,7 @@ class DeskproTicketQueueConnectorSpec
         enrolmentsOption = Some(enrolments),
         service = Some("example-frontend"),
         userAction = None,
-        auditType = "TestContactHmrcAudit"
+        ticketConstants = ReportTechnicalProblemTicketConstants
       )
     }
 
@@ -276,14 +275,13 @@ class DeskproTicketQueueConnectorSpec
         name = "Eric",
         email = "eric@example.com",
         rating = "4",
-        subject = "Beta feedback submission",
         message = "No comment given",
         referrer = "",
         isJavascript = true,
         request = request,
         enrolmentsOption = Some(enrolments),
         service = Some("example-frontend"),
-        auditType = "TestBetaFeedbackAudit"
+        ticketConstants = BetaFeedbackTicketConstants
       )
     }
 

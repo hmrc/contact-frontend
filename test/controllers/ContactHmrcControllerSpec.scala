@@ -20,7 +20,7 @@ import akka.actor.ActorSystem
 import akka.stream.Materializer._
 import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.{FormValues, TicketId}
+import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq => meq}
@@ -185,7 +185,7 @@ class ContactHmrcControllerSpec
           any[Option[Enrolments]],
           any[Option[String]],
           any[Option[String]],
-          any[FormValues]
+          any[TicketConstants]
         )(any[HeaderCarrier])
     }
 
@@ -222,7 +222,7 @@ class ContactHmrcControllerSpec
           any[Option[Enrolments]],
           any[Option[String]],
           any[Option[String]],
-          any[FormValues]
+          any[TicketConstants]
         )(any[HeaderCarrier])
     }
 
@@ -259,7 +259,7 @@ class ContactHmrcControllerSpec
           any[Option[Enrolments]],
           any[Option[String]],
           any[Option[String]],
-          any[FormValues]
+          any[TicketConstants]
         )(any[HeaderCarrier])
     }
 
@@ -472,7 +472,7 @@ class ContactHmrcControllerSpec
           any[Option[Enrolments]],
           any[Option[String]],
           any[Option[String]],
-          any[FormValues]
+          any[TicketConstants]
         )(any[HeaderCarrier])
 
       And("ticket id is returned to the user")
@@ -568,7 +568,7 @@ class ContactHmrcControllerSpec
           any[Option[Enrolments]],
           any[Option[String]],
           any[Option[String]],
-          any[FormValues]
+          any[TicketConstants]
         )(any[HeaderCarrier])
 
       And("an error message is returned to the user")
@@ -622,7 +622,7 @@ class ContactHmrcControllerSpec
           any[Option[Enrolments]],
           any[Option[String]],
           any[Option[String]],
-          any[FormValues]
+          any[TicketConstants]
         )(any[HeaderCarrier])
       ).thenReturn(result)
 

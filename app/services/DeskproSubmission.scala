@@ -50,7 +50,7 @@ trait DeskproSubmission {
       enrolmentsOption = enrolments,
       service = data.service,
       userAction = data.userAction,
-      formValues = ContactHmrcFormValues
+      ticketConstants = ContactHmrcTicketConstants
     )
 
   def createDeskproFeedback(data: FeedbackForm, enrolments: Option[Enrolments])(implicit
@@ -70,7 +70,7 @@ trait DeskproSubmission {
       request = request,
       enrolmentsOption = enrolments,
       service = data.service,
-      formValues = BetaFeedbackFormValues
+      ticketConstants = BetaFeedbackTicketConstants
     )
 
   def createProblemReportsTicket(
@@ -90,7 +90,7 @@ trait DeskproSubmission {
       enrolmentsOption = enrolmentsOption,
       service = problemReport.service,
       userAction = problemReport.userAction,
-      formValues = ReportTechnicalProblemFormValues
+      ticketConstants = ReportTechnicalProblemTicketConstants
     )
   }
 
@@ -117,7 +117,7 @@ trait DeskproSubmission {
       enrolmentsOption = enrolments,
       service = accessibilityForm.service,
       userAction = accessibilityForm.userAction,
-      formValues = AccessibilityProblemFormValues
+      ticketConstants = AccessibilityProblemTicketConstants
     )
 
 }

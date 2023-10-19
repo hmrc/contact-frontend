@@ -18,7 +18,7 @@ package controllers
 
 import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.{FormValues, TicketId}
+import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import helpers.ApplicationSupport
 import org.jsoup.Jsoup
@@ -166,7 +166,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq(None),
           meq(None),
           meq(None),
-          any[FormValues]
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(Future.successful(TicketId(123)))
 
@@ -253,7 +253,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq(None),
           meq(None),
           meq(None),
-          any[FormValues]
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(Future.failed(new Exception("failed")))
 
@@ -279,7 +279,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq(None),
           meq(None),
           meq(None),
-          any[FormValues]
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(Future.successful(TicketId(123)))
 
@@ -338,7 +338,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq(None),
           meq(None),
           meq(None),
-          any[FormValues]
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(Future.failed(new Exception("failed")))
 
@@ -408,7 +408,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq(None),
           meq(None),
           meq(None),
-          any[FormValues]
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(Future.failed(new Exception("failed")))
 
@@ -532,7 +532,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq(None),
           meq(None),
           meq(None),
-          any[FormValues]
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(result)
   }

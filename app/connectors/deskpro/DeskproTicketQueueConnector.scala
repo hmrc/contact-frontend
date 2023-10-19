@@ -17,7 +17,7 @@
 package connectors.deskpro
 
 import config.AppConfig
-import connectors.deskpro.domain.{Feedback, FormValues, Ticket, TicketId}
+import connectors.deskpro.domain.{Feedback, Ticket, TicketConstants, TicketId}
 import play.api.libs.json.Json
 
 import javax.inject.Inject
@@ -56,13 +56,13 @@ class DeskproTicketQueueConnector @Inject() (
     enrolmentsOption: Option[Enrolments],
     service: Option[String],
     userAction: Option[String],
-    formValues: FormValues
+    ticketConstants: TicketConstants
   )(implicit hc: HeaderCarrier): Future[TicketId] = {
     val ticket = Ticket
       .create(
         name,
         email,
-        formValues.subject,
+        ticketConstants.subject,
         message,
         referrer,
         isJavascript,
@@ -76,7 +76,7 @@ class DeskproTicketQueueConnector @Inject() (
       .POST[Ticket, TicketId](requestUrl("/deskpro/get-help-ticket"), ticket)
       .map { ticketId =>
         if (appConfig.sendExplicitAuditEvents) {
-          auditConnector.sendExplicitAudit(formValues.auditType, Json.toJson(ticket))
+          auditConnector.sendExplicitAudit(ticketConstants.auditType, Json.toJson(ticket))
         }
         ticketId
       }
@@ -95,13 +95,13 @@ class DeskproTicketQueueConnector @Inject() (
     request: Request[AnyRef],
     enrolmentsOption: Option[Enrolments],
     service: Option[String],
-    formValues: FormValues
+    ticketConstants: TicketConstants
   )(implicit hc: HeaderCarrier): Future[TicketId] = {
     val feedback = Feedback.create(
       name,
       email,
       rating,
-      formValues.subject,
+      ticketConstants.subject,
       message,
       referrer,
       isJavascript,
@@ -114,7 +114,7 @@ class DeskproTicketQueueConnector @Inject() (
       .POST[Feedback, TicketId](requestUrl("/deskpro/feedback"), feedback)
       .map { ticketId =>
         if (appConfig.sendExplicitAuditEvents) {
-          auditConnector.sendExplicitAudit(formValues.auditType, Json.toJson(feedback))
+          auditConnector.sendExplicitAudit(ticketConstants.auditType, Json.toJson(feedback))
         }
         ticketId
       }

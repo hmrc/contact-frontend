@@ -19,7 +19,7 @@ package controllers
 import java.net.URLEncoder
 import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.{FormValues, TicketId}
+import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq => meq}
@@ -374,7 +374,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[FormValues]
+          any[TicketConstants]
         )(any[HeaderCarrier])
       ).thenReturn(result)
 
@@ -389,7 +389,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         any[Request[AnyRef]](),
         any[Option[Enrolments]],
         any[Option[String]],
-        any[FormValues]
+        any[TicketConstants]
       )(any[HeaderCarrier])
 
     val backUrlValidator = new BackUrlValidator() {
