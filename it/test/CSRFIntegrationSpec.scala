@@ -24,6 +24,7 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{DefaultWSCookie, WSClient, WSResponse}
 import play.api.test.Helpers._
+import test.helpers.WireMockEndpoints
 
 class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoints with GuiceOneServerPerSuite {
 

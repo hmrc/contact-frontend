@@ -18,18 +18,29 @@ package test
 
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, equalToJson, postRequestedFor, urlEqualTo}
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.TicketId
+import connectors.deskpro.domain.{BetaFeedbackTicketConstants, ReportTechnicalProblemTicketConstants, TicketId}
+import org.mockito.{ArgumentCaptor, ArgumentMatchers, Mockito}
+import org.mockito.MockitoSugar.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import test.helpers.{AwaitSupport, WireMockEndpoints}
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.config.AuditingConfig
+import uk.gov.hmrc.play.audit.http.connector.{AuditChannel, AuditConnector, AuditResult, DatastreamMetrics}
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters._
 
 class DeskproTicketQueueConnectorSpec
     extends AnyWordSpec
@@ -37,13 +48,32 @@ class DeskproTicketQueueConnectorSpec
     with GuiceOneAppPerSuite
     with AwaitSupport
     with WireMockEndpoints {
+
+  val mockAuditConnector = mock[AuditConnector]
+
+  val auditConnector = new AuditConnector {
+    val mockAuditingConfig = mock[AuditingConfig]
+    when(mockAuditingConfig.enabled).thenAnswer(true)
+
+    override def auditingConfig: AuditingConfig       = mockAuditingConfig
+    override def auditChannel: AuditChannel           = ???
+    override def datastreamMetrics: DatastreamMetrics = ???
+
+    override def sendExtendedEvent(event: ExtendedDataEvent)(implicit hc: HeaderCarrier = HeaderCarrier(), ec: ExecutionContext): Future[AuditResult] = {
+      mockAuditConnector.sendExtendedEvent(event)
+    }
+  }
+
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
       .configure(
         "metrics.jvm"                       -> false,
         "metrics.enabled"                         -> false,
-        "auditing.enabled"                        -> false,
-        "microservice.services.deskpro-ticket-queue.port" -> endpointPort
+        "microservice.services.deskpro-ticket-queue.port" -> endpointPort,
+        "sendExplicitAuditEvents" -> true
+      )
+      .overrides(
+        bind(classOf[AuditConnector]).toInstance(auditConnector)
       )
       .build()
 
@@ -56,34 +86,38 @@ class DeskproTicketQueueConnectorSpec
         )
       )
 
+      val problemReportsRequestJson = """{
+                          |"name":"Mary",
+                          |"email":"mary@example.com",
+                          |"subject":"Support Request",
+                          |"message":"A problem occurred",
+                          |"referrer":"",
+                          |"javascriptEnabled":"Y",
+                          |"userAgent":"n/a",
+                          |"authId":"n/a",
+                          |"areaOfTax":"unknown",
+                          |"sessionId":"n/a",
+                          |"userTaxIdentifiers":{
+                          |  "nino":"SOME-NINO",
+                          |  "ctUtr":"SOME-CT-UTR",
+                          |  "utr":"SOME-SA-UTR",
+                          |  "vrn":"SOME-VATDEC-VATRegNo",
+                          |  "empRef":"SOME-TaxOfficeNumber/SOME-TaxOfficeReference"
+                          |},
+                          |"service":"example-frontend"
+                          |}""".stripMargin
+
       endpointServer.verify(
         postRequestedFor(urlEqualTo("/deskpro/get-help-ticket"))
           .withHeader("Content-Type", equalTo("application/json"))
           .withRequestBody(
-            equalToJson(
-              """{
-                |"name":"Mary",
-                |"email":"mary@example.com",
-                |"subject":"Support Request",
-                |"message":"A problem occurred",
-                |"referrer":"",
-                |"javascriptEnabled":"Y",
-                |"userAgent":"n/a",
-                |"authId":"n/a",
-                |"areaOfTax":"unknown",
-                |"sessionId":"n/a",
-                |"userTaxIdentifiers":{
-                |  "nino":"SOME-NINO",
-                |  "ctUtr":"SOME-CT-UTR",
-                |  "utr":"SOME-SA-UTR",
-                |  "vrn":"SOME-VATDEC-VATRegNo",
-                |  "empRef":"SOME-TaxOfficeNumber/SOME-TaxOfficeReference"
-                |},
-                |"service":"example-frontend"
-                |}""".stripMargin
-            )
+            equalToJson(problemReportsRequestJson)
           )
       )
+
+      val explicitAuditEvents = captureAuditEvents().filter(_.auditType == "ReportTechnicalProblemFormSubmission")
+      explicitAuditEvents.length shouldBe 1
+      explicitAuditEvents.head.detail shouldBe Json.parse(problemReportsRequestJson)
     }
 
     "POST additional enrolments" in new Setup {
@@ -136,35 +170,40 @@ class DeskproTicketQueueConnectorSpec
         )
       )
 
+      val feedbackRequestJson = """{
+                                  |"name":"Eric",
+                                  |"email":"eric@example.com",
+                                  |"subject":"Beta feedback submission",
+                                  |"message":"No comment given",
+                                  |"referrer":"",
+                                  |"javascriptEnabled":"Y",
+                                  |"userAgent":"n/a",
+                                  |"authId":"n/a",
+                                  |"areaOfTax":"unknown",
+                                  |"sessionId":"n/a",
+                                  |"userTaxIdentifiers":{
+                                  |  "nino":"SOME-NINO",
+                                  |  "ctUtr":"SOME-CT-UTR",
+                                  |  "utr":"SOME-SA-UTR",
+                                  |  "vrn":"SOME-VATDEC-VATRegNo",
+                                  |  "empRef":"SOME-TaxOfficeNumber/SOME-TaxOfficeReference"
+                                  |},
+                                  |"service":"example-frontend",
+                                  |"rating":"4"
+                                  |}""".stripMargin
+
+
       endpointServer.verify(
         postRequestedFor(urlEqualTo("/deskpro/feedback"))
           .withHeader("Content-Type", equalTo("application/json"))
           .withRequestBody(
-            equalToJson(
-              """{
-                |"name":"Eric",
-                |"email":"eric@example.com",
-                |"subject":"Beta feedback submission",
-                |"message":"No comment given",
-                |"referrer":"",
-                |"javascriptEnabled":"Y",
-                |"userAgent":"n/a",
-                |"authId":"n/a",
-                |"areaOfTax":"unknown",
-                |"sessionId":"n/a",
-                |"userTaxIdentifiers":{
-                |  "nino":"SOME-NINO",
-                |  "ctUtr":"SOME-CT-UTR",
-                |  "utr":"SOME-SA-UTR",
-                |  "vrn":"SOME-VATDEC-VATRegNo",
-                |  "empRef":"SOME-TaxOfficeNumber/SOME-TaxOfficeReference"
-                |},
-                |"service":"example-frontend",
-                |"rating":"4"
-                |}""".stripMargin
-            )
+            equalToJson(feedbackRequestJson)
           )
       )
+
+      val explicitAuditEvents = captureAuditEvents().filter(_.auditType == "BetaFeedbackFormSubmission")
+      explicitAuditEvents.length shouldBe 1
+      explicitAuditEvents.head.detail shouldBe Json.parse(feedbackRequestJson)
     }
 
     "POST additional enrolments" in new Setup {
@@ -219,14 +258,14 @@ class DeskproTicketQueueConnectorSpec
       ticketQueueConnector.createDeskProTicket(
         name = "Mary",
         email = "mary@example.com",
-        subject = "Support Request",
         message = "A problem occurred",
         referrer = "",
         isJavascript = true,
         request = request,
         enrolmentsOption = Some(enrolments),
         service = Some("example-frontend"),
-        userAction = None
+        userAction = None,
+        ticketConstants = ReportTechnicalProblemTicketConstants
       )
     }
 
@@ -236,13 +275,13 @@ class DeskproTicketQueueConnectorSpec
         name = "Eric",
         email = "eric@example.com",
         rating = "4",
-        subject = "Beta feedback submission",
         message = "No comment given",
         referrer = "",
         isJavascript = true,
         request = request,
         enrolmentsOption = Some(enrolments),
-        service = Some("example-frontend")
+        service = Some("example-frontend"),
+        ticketConstants = BetaFeedbackTicketConstants
       )
     }
 
@@ -291,5 +330,14 @@ class DeskproTicketQueueConnectorSpec
           state = ""
         )
       )
+  }
+
+  private def captureAuditEvents() = {
+    val eventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+    Mockito
+      .verify(mockAuditConnector, Mockito.atLeast(0))
+      .sendExtendedEvent(eventCaptor.capture())(ArgumentMatchers.any(), ArgumentMatchers.any())
+
+    eventCaptor.getAllValues.asScala
   }
 }

@@ -188,3 +188,28 @@ trait FieldTransformer {
       case (enrolmentKey, identifierKey, value)   => s"$enrolmentKey/$identifierKey" -> value
     }
 }
+
+sealed trait TicketConstants {
+  val auditType: String
+  val subject: String
+}
+
+case object BetaFeedbackTicketConstants extends TicketConstants {
+  val auditType: String = "BetaFeedbackFormSubmission"
+  val subject: String   = "Beta feedback submission"
+}
+
+case object ContactHmrcTicketConstants extends TicketConstants {
+  val auditType: String = "ContactHmrcFormSubmission"
+  val subject: String   = "Contact form submission"
+}
+
+case object ReportTechnicalProblemTicketConstants extends TicketConstants {
+  val auditType: String = "ReportTechnicalProblemFormSubmission"
+  val subject: String   = "Support Request"
+}
+
+case object AccessibilityProblemTicketConstants extends TicketConstants {
+  val auditType: String = "AccessibilityProblemFormSubmission"
+  val subject: String   = "Accessibility Problem"
+}

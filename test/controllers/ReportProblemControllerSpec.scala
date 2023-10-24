@@ -18,11 +18,11 @@ package controllers
 
 import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.TicketId
+import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import helpers.ApplicationSupport
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -159,14 +159,14 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
         hmrcDeskproConnector.createDeskProTicket(
           meq("John Densmore"),
           meq("name@mail.com"),
-          meq("Support Request"),
           meq(controller.problemMessage("Some Action", "Some Error")),
           meq("referrer-from-url"),
           meq(true),
           any[Request[AnyRef]](),
           meq(None),
           meq(None),
-          meq(None)
+          meq(None),
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(Future.successful(TicketId(123)))
 
@@ -182,7 +182,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       val result = controller.submit(None, None)(generateInvalidRequest(isAjaxRequest = false))
 
       status(result) should be(BAD_REQUEST)
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(hmrcDeskproConnector)
 
       val document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("govuk-error-summary").size() should be > 0
@@ -204,7 +204,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       val result = controller.submit(None, None)(request)
 
       status(result) should be(BAD_REQUEST)
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(hmrcDeskproConnector)
 
       val document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("govuk-error-summary").size() should be > 0
@@ -225,7 +225,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       val page   = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(hmrcDeskproConnector)
 
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
@@ -236,7 +236,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       val page    = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(hmrcDeskproConnector)
 
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
@@ -246,14 +246,14 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
         hmrcDeskproConnector.createDeskProTicket(
           meq("John Densmore"),
           meq("name@mail.com"),
-          meq("Support Request"),
           meq(controller.problemMessage("Some Action", "Some Error")),
           meq("/contact/problem_reports"),
           meq(false),
           any[Request[AnyRef]](),
           meq(None),
           meq(None),
-          meq(None)
+          meq(None),
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(Future.failed(new Exception("failed")))
 
@@ -272,14 +272,14 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
         hmrcDeskproConnector.createDeskProTicket(
           meq("John Densmore"),
           meq("name@mail.com"),
-          meq("Support Request"),
           meq(controller.problemMessage("Some Action", "Some Error")),
           meq("/contact/problem_reports"),
           meq(true),
           any[Request[AnyRef]](),
           meq(None),
           meq(None),
-          meq(None)
+          meq(None),
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(Future.successful(TicketId(123)))
 
@@ -299,7 +299,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       val result = controller.submitDeprecated(None)(generateInvalidRequest(isAjaxRequest = true))
       status(result) should be(BAD_REQUEST)
 
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(hmrcDeskproConnector)
       contentAsJson(result).\("status").as[String] shouldBe "ERROR"
     }
 
@@ -309,7 +309,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
 
       status(submit) should be(BAD_REQUEST)
 
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(hmrcDeskproConnector)
       contentAsJson(submit).\("status").as[String] shouldBe "ERROR"
     }
 
@@ -322,7 +322,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       val submit = controller.submitDeprecated(None)(request)
       status(submit) should be(BAD_REQUEST)
 
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(hmrcDeskproConnector)
       contentAsJson(submit).\("status").as[String] shouldBe "ERROR"
     }
 
@@ -331,14 +331,14 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
         hmrcDeskproConnector.createDeskProTicket(
           meq("John Densmore"),
           meq("name@mail.com"),
-          meq("Support Request"),
           meq(controller.problemMessage("Some Action", "Some Error")),
           meq("/contact/problem_reports"),
           meq(false),
           any[Request[AnyRef]](),
           meq(None),
           meq(None),
-          meq(None)
+          meq(None),
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(Future.failed(new Exception("failed")))
 
@@ -364,7 +364,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       val result = controller.submitDeprecated(None)(generateInvalidRequest(isAjaxRequest = false))
 
       status(result) should be(BAD_REQUEST)
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(hmrcDeskproConnector)
 
       val document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("govuk-error-summary").size() should be > 0
@@ -376,7 +376,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       val page    = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(hmrcDeskproConnector)
 
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
@@ -391,7 +391,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       val page   = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
-      verifyZeroInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(hmrcDeskproConnector)
 
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
@@ -401,14 +401,14 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
         hmrcDeskproConnector.createDeskProTicket(
           meq("John Densmore"),
           meq("name@mail.com"),
-          meq("Support Request"),
           meq(controller.problemMessage("Some Action", "Some Error")),
           meq("/contact/problem_reports"),
           meq(false),
           any[Request[AnyRef]](),
           meq(None),
           meq(None),
-          meq(None)
+          meq(None),
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(Future.failed(new Exception("failed")))
 
@@ -525,14 +525,14 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
         hmrcDeskproConnector.createDeskProTicket(
           meq(deskproName),
           meq(deskproEmail),
-          meq(deskproSubject),
           meq(deskproProblemMessage),
           meq(deskproReferrer),
           meq(false),
           any[Request[AnyRef]](),
           meq(None),
           meq(None),
-          meq(None)
+          meq(None),
+          any[TicketConstants]
         )(any(classOf[HeaderCarrier]))
       ).thenReturn(result)
   }

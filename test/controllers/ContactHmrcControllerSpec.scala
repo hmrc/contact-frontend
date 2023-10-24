@@ -20,10 +20,10 @@ import akka.actor.ActorSystem
 import akka.stream.Materializer._
 import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.TicketId
+import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{any, eq => mockitoEq}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.mockito.verification.VerificationWithTimeout
@@ -180,12 +180,12 @@ class ContactHmrcControllerSpec
           any[String],
           any[String],
           any[String],
-          any[String],
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]]
+          any[Option[String]],
+          any[TicketConstants]
         )(any[HeaderCarrier])
     }
 
@@ -216,13 +216,13 @@ class ContactHmrcControllerSpec
           any[String],
           any[String],
           any[String],
-          any[String],
-          mockitoEq[String]("https://www.other-gov-domain.gov.uk/path/to/service/page"),
+          meq[String]("https://www.other-gov-domain.gov.uk/path/to/service/page"),
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]]
+          any[Option[String]],
+          any[TicketConstants]
         )(any[HeaderCarrier])
     }
 
@@ -253,13 +253,13 @@ class ContactHmrcControllerSpec
           any[String],
           any[String],
           any[String],
-          any[String],
-          mockitoEq[String]("https://www.other-gov-domain.gov.uk/overridden/path"),
+          meq[String]("https://www.other-gov-domain.gov.uk/overridden/path"),
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]]
+          any[Option[String]],
+          any[TicketConstants]
         )(any[HeaderCarrier])
     }
 
@@ -467,12 +467,12 @@ class ContactHmrcControllerSpec
           any[String],
           any[String],
           any[String],
-          any[String],
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]]
+          any[Option[String]],
+          any[TicketConstants]
         )(any[HeaderCarrier])
 
       And("ticket id is returned to the user")
@@ -495,7 +495,7 @@ class ContactHmrcControllerSpec
         controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = true)(contactRequest)
 
       Then("ticket is not sent to deskpro")
-      Mockito.verifyZeroInteractions(ticketQueueConnector)
+      Mockito.verifyNoInteractions(ticketQueueConnector)
 
       And("an error message is returned")
       status(result) shouldBe 400
@@ -520,7 +520,7 @@ class ContactHmrcControllerSpec
         controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
 
       Then("ticket is not sent to deskpro")
-      Mockito.verifyZeroInteractions(ticketQueueConnector)
+      Mockito.verifyNoInteractions(ticketQueueConnector)
 
       And("an error message is returned")
       status(result) shouldBe 400
@@ -563,12 +563,12 @@ class ContactHmrcControllerSpec
           any[String],
           any[String],
           any[String],
-          any[String],
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]]
+          any[Option[String]],
+          any[TicketConstants]
         )(any[HeaderCarrier])
 
       And("an error message is returned to the user")
@@ -617,12 +617,12 @@ class ContactHmrcControllerSpec
           any[String],
           any[String],
           any[String],
-          any[String],
           any[Boolean],
           any[Request[AnyRef]](),
           any[Option[Enrolments]],
           any[Option[String]],
-          any[Option[String]]
+          any[Option[String]],
+          any[TicketConstants]
         )(any[HeaderCarrier])
       ).thenReturn(result)
 

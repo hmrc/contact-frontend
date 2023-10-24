@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test
+package test.helpers
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}

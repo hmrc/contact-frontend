@@ -17,7 +17,8 @@
 package connectors.deskpro
 
 import config.AppConfig
-import connectors.deskpro.domain.{Feedback, Ticket, TicketId}
+import connectors.deskpro.domain.{Feedback, Ticket, TicketConstants, TicketId}
+import play.api.libs.json.Json
 
 import javax.inject.Inject
 import play.api.mvc.Request
@@ -25,18 +26,21 @@ import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, NotFoundException, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DeskproTicketQueueConnector @Inject() (http: HttpClient, servicesConfig: ServicesConfig, appConfig: AppConfig)(
-  implicit executionContext: ExecutionContext
+class DeskproTicketQueueConnector @Inject() (
+  http: HttpClient,
+  servicesConfig: ServicesConfig,
+  appConfig: AppConfig,
+  auditConnector: AuditConnector
+)(implicit
+  executionContext: ExecutionContext
 ) {
 
-  private val createInDeskproTicketQueue: Option[String] =
-    appConfig.createInDeskproTicketQueue
-
-  def serviceUrl(email: String): String =
-    if (appConfig.useDeskproTicketQueue || createInDeskproTicketQueue.contains(email)) {
+  private val serviceUrl: String =
+    if (appConfig.useDeskproTicketQueue) {
       servicesConfig.baseUrl("deskpro-ticket-queue")
     } else {
       servicesConfig.baseUrl("hmrc-deskpro")
@@ -45,20 +49,20 @@ class DeskproTicketQueueConnector @Inject() (http: HttpClient, servicesConfig: S
   def createDeskProTicket(
     name: String,
     email: String,
-    subject: String,
     message: String,
     referrer: String,
     isJavascript: Boolean,
     request: Request[AnyRef],
     enrolmentsOption: Option[Enrolments],
     service: Option[String],
-    userAction: Option[String]
+    userAction: Option[String],
+    ticketConstants: TicketConstants
   )(implicit hc: HeaderCarrier): Future[TicketId] = {
     val ticket = Ticket
       .create(
         name,
         email,
-        subject,
+        ticketConstants.subject,
         message,
         referrer,
         isJavascript,
@@ -68,43 +72,57 @@ class DeskproTicketQueueConnector @Inject() (http: HttpClient, servicesConfig: S
         service,
         userAction
       )
-    http.POST[Ticket, TicketId](requestUrl("/deskpro/get-help-ticket", email), ticket) recover {
-      case nf: NotFoundException =>
+    http
+      .POST[Ticket, TicketId](requestUrl("/deskpro/get-help-ticket"), ticket)
+      .map { ticketId =>
+        if (appConfig.sendExplicitAuditEvents) {
+          auditConnector.sendExplicitAudit(ticketConstants.auditType, Json.toJson(ticket))
+        }
+        ticketId
+      }
+      .recover { case nf: NotFoundException =>
         throw UpstreamErrorResponse(nf.getMessage, 404, 500)
-    }
+      }
   }
 
   def createFeedback(
     name: String,
     email: String,
     rating: String,
-    subject: String,
     message: String,
     referrer: String,
     isJavascript: Boolean,
     request: Request[AnyRef],
     enrolmentsOption: Option[Enrolments],
-    service: Option[String]
-  )(implicit hc: HeaderCarrier): Future[TicketId] =
-    http.POST[Feedback, TicketId](
-      requestUrl("/deskpro/feedback", email),
-      Feedback.create(
-        name,
-        email,
-        rating,
-        subject,
-        message,
-        referrer,
-        isJavascript,
-        hc,
-        request,
-        enrolmentsOption,
-        service
-      )
-    ) recover { case nf: NotFoundException =>
-      throw UpstreamErrorResponse(nf.getMessage, 404, 500)
-    }
+    service: Option[String],
+    ticketConstants: TicketConstants
+  )(implicit hc: HeaderCarrier): Future[TicketId] = {
+    val feedback = Feedback.create(
+      name,
+      email,
+      rating,
+      ticketConstants.subject,
+      message,
+      referrer,
+      isJavascript,
+      hc,
+      request,
+      enrolmentsOption,
+      service
+    )
+    http
+      .POST[Feedback, TicketId](requestUrl("/deskpro/feedback"), feedback)
+      .map { ticketId =>
+        if (appConfig.sendExplicitAuditEvents) {
+          auditConnector.sendExplicitAudit(ticketConstants.auditType, Json.toJson(feedback))
+        }
+        ticketId
+      }
+      .recover { case nf: NotFoundException =>
+        throw UpstreamErrorResponse(nf.getMessage, 404, 500)
+      }
+  }
 
-  private def requestUrl[B, A](uri: String, email: String): String = s"${serviceUrl(email)}$uri"
+  private def requestUrl[B, A](uri: String): String = s"$serviceUrl$uri"
 
 }

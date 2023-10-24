@@ -17,7 +17,7 @@
 package services
 
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.TicketId
+import connectors.deskpro.domain._
 import controllers.ContactForm
 import model.{AccessibilityForm, FeedbackForm, ReportProblemForm}
 import play.api.i18n.Messages
@@ -34,8 +34,6 @@ trait DeskproSubmission {
 
   import DeskproSubmission.replaceReferrerPath
 
-  private val Subject = "Contact form submission"
-
   protected def ticketQueueConnector: DeskproTicketQueueConnector
 
   def createDeskproTicket(data: ContactForm, enrolments: Option[Enrolments])(implicit
@@ -45,14 +43,14 @@ trait DeskproSubmission {
     ticketQueueConnector.createDeskProTicket(
       name = data.contactName,
       email = data.contactEmail,
-      subject = Subject,
       message = data.contactComments,
       referrer = replaceReferrerPath(data.referrer, data.userAction),
       isJavascript = data.isJavascript,
       request = request,
       enrolmentsOption = enrolments,
       service = data.service,
-      userAction = data.userAction
+      userAction = data.userAction,
+      ticketConstants = ContactHmrcTicketConstants
     )
 
   def createDeskproFeedback(data: FeedbackForm, enrolments: Option[Enrolments])(implicit
@@ -63,7 +61,6 @@ trait DeskproSubmission {
       name = data.name,
       email = data.email,
       rating = data.experienceRating.getOrElse(""),
-      subject = "Beta feedback submission",
       message = data.comments match {
         case ""      => "No comment given"
         case comment => comment
@@ -72,7 +69,8 @@ trait DeskproSubmission {
       isJavascript = data.javascriptEnabled,
       request = request,
       enrolmentsOption = enrolments,
-      service = data.service
+      service = data.service,
+      ticketConstants = BetaFeedbackTicketConstants
     )
 
   def createProblemReportsTicket(
@@ -85,14 +83,14 @@ trait DeskproSubmission {
     ticketQueueConnector.createDeskProTicket(
       name = problemReport.reportName,
       email = problemReport.reportEmail,
-      subject = "Support Request",
       message = problemMessage(problemReport.reportAction, problemReport.reportError),
       referrer = replaceReferrerPath(referrer.getOrElse(""), problemReport.userAction),
       isJavascript = problemReport.isJavascript,
       request = request,
       enrolmentsOption = enrolmentsOption,
       service = problemReport.service,
-      userAction = problemReport.userAction
+      userAction = problemReport.userAction,
+      ticketConstants = ReportTechnicalProblemTicketConstants
     )
   }
 
@@ -112,14 +110,14 @@ trait DeskproSubmission {
     ticketQueueConnector.createDeskProTicket(
       name = accessibilityForm.name,
       email = accessibilityForm.email,
-      subject = "Accessibility Problem",
       message = accessibilityForm.problemDescription,
       referrer = replaceReferrerPath(accessibilityForm.referrer, accessibilityForm.userAction),
       isJavascript = accessibilityForm.isJavascript,
       request = req,
       enrolmentsOption = enrolments,
       service = accessibilityForm.service,
-      userAction = accessibilityForm.userAction
+      userAction = accessibilityForm.userAction,
+      ticketConstants = AccessibilityProblemTicketConstants
     )
 
 }

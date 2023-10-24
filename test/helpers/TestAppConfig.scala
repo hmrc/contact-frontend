@@ -37,6 +37,5 @@ class TestAppConfig extends AppConfig {
 
   override def useDeskproTicketQueue: Boolean = false
 
-  override def createInDeskproTicketQueue: Option[String] = None
-
+  override def sendExplicitAuditEvents: Boolean = false
 }

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package test
+package test.helpers
 
-import java.net.ServerSocket
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 
-import scala.util.Try
+import java.net.ServerSocket
 import scala.jdk.CollectionConverters._
+import scala.util.Try
 
 trait WireMockEndpoints extends Suite with BeforeAndAfterAll with BeforeAndAfterEach {
 
