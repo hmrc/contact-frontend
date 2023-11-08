@@ -128,33 +128,6 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
   }
 
-  "partialIndex" should {
-    val submitUrl       = "https:/abcdefg.com"
-    val csrfToken       = "CSRF"
-    val service         = Some("scp")
-    val referer         = Some("https://www.example.com/some-service")
-    val canOmitComments = false
-
-    "use the (deprecated) referer parameter if supplied" in new TestScope {
-      val result =
-        controller.partialIndex(submitUrl, csrfToken, service, referer, canOmitComments, None)(request)
-
-      val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementById("referrer").attr("value") shouldBe "https://www.example.com/some-service"
-    }
-
-    "use the referrerUrl parameter if supplied" in new TestScope {
-      val referrerUrl = Some("https://www.other-example.com/some-service")
-
-      val result =
-        controller.partialIndex(submitUrl, csrfToken, service, referer, canOmitComments, referrerUrl)(request)
-
-      val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementById("referrer").attr("value") shouldBe "https://www.other-example.com/some-service"
-    }
-
-  }
-
   "Submitting the feedback" should {
 
     "redirect to confirmation page without 'back' button if 'back' link not provided" in new TestScope {
@@ -301,50 +274,6 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     }
   }
 
-  "Submitting the partial feedback form" should {
-
-    "show errors if the form is not filled in correctly" in new TestScope {
-
-      ticketQueueConnectorWillReturnTheTicketId()
-
-      val result = controller.partialSubmit("tstUrl")(generateInvalidRequest())
-
-      status(result) should be(400)
-      val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-message") shouldNot be(empty)
-
-      verifyNoInteractions(ticketQueueConnector)
-    }
-
-    "allow comments to be empty if the canOmitComments flag is set to true" in new TestScope {
-
-      ticketQueueConnectorWillReturnTheTicketId()
-
-      val result =
-        controller.partialSubmit("tstUrl")(generateRequest(comments = "", canOmitComments = true))
-
-      status(result) should be(200)
-      val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-message") should be(empty)
-
-      verifyRequestMade("No comment given")
-    }
-
-    "show errors if no comments are provided and the canOmitComments flag is set to false" in new TestScope {
-
-      ticketQueueConnectorWillReturnTheTicketId()
-
-      val result =
-        controller.partialSubmit("tstUrl")(generateRequest(comments = "", canOmitComments = false))
-
-      status(result) should be(400)
-      val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-message") shouldNot be(empty)
-
-      verifyNoInteractions(ticketQueueConnector)
-    }
-  }
-
   class TestScope extends MockitoSugar {
 
     val ticketQueueConnector = mock[DeskproTicketQueueConnector]
@@ -396,8 +325,6 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       override def validate(backUrl: String) = backUrl == "http://www.valid.url"
     }
 
-    val feedbackPartialForm                  = app.injector.instanceOf[views.html.partials.feedback_form]
-    val feedbackFormConfirmation             = app.injector.instanceOf[views.html.partials.feedback_form_confirmation]
     val playFrontendFeedbackPage             = app.injector.instanceOf[views.html.FeedbackPage]
     val playFrontendFeedbackConfirmationPage =
       app.injector.instanceOf[views.html.FeedbackConfirmationPage]
@@ -410,8 +337,6 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       backUrlValidator,
       Stubs.stubMessagesControllerComponents(),
       playFrontendFeedbackConfirmationPage,
-      feedbackPartialForm,
-      feedbackFormConfirmation,
       playFrontendFeedbackPage,
       errorPage,
       new RefererHeaderRetriever

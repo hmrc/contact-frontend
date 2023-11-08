@@ -30,8 +30,7 @@ import play.api.mvc.{MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{BackUrlValidator, DeskproEmailValidator, FeatureFlagSupport, NameValidator, RefererHeaderRetriever}
-import views.html.partials.{feedback_form, feedback_form_confirmation}
+import util.{BackUrlValidator, DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
 import play.twirl.api.Html
 
@@ -43,16 +42,13 @@ import scala.concurrent.{ExecutionContext, Future}
   val accessibleUrlValidator: BackUrlValidator,
   mcc: MessagesControllerComponents,
   feedbackConfirmationPage: FeedbackConfirmationPage,
-  feedbackFormPartial: feedback_form,
-  feedbackFormConfirmationPartial: feedback_form_confirmation,
   feedbackPage: FeedbackPage,
   errorPage: InternalErrorPage,
   headerRetriever: RefererHeaderRetriever
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport
-    with FeatureFlagSupport {
+    with I18nSupport {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
@@ -105,57 +101,6 @@ import scala.concurrent.{ExecutionContext, Future}
   def thanks(backUrl: Option[String] = None) = Action.async { implicit request =>
     val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
     Future.successful(Ok(feedbackConfirmationPage(backUrl = validatedBackUrl)))
-  }
-
-  def partialIndex(
-    submitUrl: String,
-    csrfToken: String,
-    service: Option[String],
-    referer: Option[String],
-    canOmitComments: Boolean,
-    referrerUrl: Option[String]
-  ) = Action.async { implicit request =>
-    Future.successful {
-      ifPartialsEnabled {
-        Ok(
-          feedbackFormPartial(
-            FeedbackFormBind.emptyForm(
-              csrfToken,
-              referrerUrl orElse referer orElse headerRetriever.refererFromHeaders,
-              None,
-              canOmitComments = canOmitComments,
-              service = service
-            ),
-            submitUrl,
-            service,
-            canOmitComments = canOmitComments
-          )
-        )
-      }
-    }
-  }
-
-  def partialSubmit(resubmitUrl: String) = Action.async { implicit request =>
-    val form = FeedbackFormBind.form.bindFromRequest()
-    form.fold(
-      error =>
-        Future.successful(
-          BadRequest(
-            feedbackFormPartial(error, resubmitUrl, canOmitComments = form("canOmitComments").value.contains("true"))
-          )
-        ),
-      data =>
-        (for {
-          enrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
-          ticketId   <- createDeskproFeedback(data, enrolments)
-        } yield Ok(ticketId.ticket_id.toString)).recover { case _ =>
-          InternalServerError
-        }
-    )
-  }
-
-  def partialThanks(ticketId: String) = Action { implicit request =>
-    Ok(feedbackFormConfirmationPartial(ticketId, None))
   }
 
   private def feedbackView(form: Form[FeedbackForm])(implicit request: Request[AnyRef]) =

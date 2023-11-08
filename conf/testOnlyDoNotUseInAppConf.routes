@@ -10,6 +10,4 @@
 # Failing to follow this rule may result in test routes deployed in production.
 
 # Add all the application routes to the prod.routes file
-GET        /contact/test-only          testonly.controllers.TestController.problemPartial
-GET        /contact/test-only/ajax     testonly.controllers.TestController.problemAjax
 ->         /                           prod.Routes

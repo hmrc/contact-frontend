@@ -433,151 +433,6 @@ class ContactHmrcControllerSpec
     }
   }
 
-  "Submitting contact hrmc form" should {
-    "return JSON with ticket id for successful form submission" in new TestScope {
-      Given("we have a valid request")
-
-      val ticketId = TicketId(12345)
-
-      mockDeskproConnector(Future.successful(ticketId))
-
-      val fields = Map(
-        "contact-name"     -> "Bob The Builder",
-        "contact-email"    -> "bob@build-it.com",
-        "contact-comments" -> "Can We Fix It?",
-        "isJavascript"     -> "false",
-        "referrer"         -> "n/a",
-        "csrfToken"        -> "n/a",
-        "service"          -> "scp"
-      )
-
-      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
-
-      val resubmitUrl = "/contact-frontend/form"
-
-      When("we submit the request")
-      val result =
-        controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
-
-      Then("ticket is sent to deskpro")
-      Mockito
-        .verify(ticketQueueConnector, connectorTimeout)
-        .createDeskProTicket(
-          any[String],
-          any[String],
-          any[String],
-          any[String],
-          any[Boolean],
-          any[Request[AnyRef]](),
-          any[Option[Enrolments]],
-          any[Option[String]],
-          any[Option[String]],
-          any[TicketConstants]
-        )(any[HeaderCarrier])
-
-      And("ticket id is returned to the user")
-      status(result) shouldBe 200
-      val resultAsJson = contentAsJson(result)
-      resultAsJson.as[Int] shouldBe ticketId.ticket_id
-    }
-
-    "redisplay form in case of validation errors - rendering only form without header" in new TestScope {
-      Given("we have an invalid request")
-
-      val fields = Map.empty
-
-      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
-
-      val resubmitUrl = "/contact-frontend/form"
-
-      When("we submit the request")
-      val result =
-        controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = true)(contactRequest)
-
-      Then("ticket is not sent to deskpro")
-      Mockito.verifyNoInteractions(ticketQueueConnector)
-
-      And("an error message is returned")
-      status(result) shouldBe 400
-      val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-message") shouldNot be(empty)
-
-      And("a header shouldn't be visible")
-      page.body().getElementsByClass("page-header") should be(empty)
-    }
-
-    "redisplay form in case of validation errors - rendering with header" in new TestScope {
-      Given("we have an invalid request")
-
-      val fields = Map.empty
-
-      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
-
-      val resubmitUrl = "/contact-frontend/form"
-
-      When("we submit the request")
-      val result =
-        controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
-
-      Then("ticket is not sent to deskpro")
-      Mockito.verifyNoInteractions(ticketQueueConnector)
-
-      And("an error message is returned")
-      status(result) shouldBe 400
-      val page = Jsoup.parse(contentAsString(result))
-      page.body().getElementsByClass("error-message") shouldNot be(empty)
-
-      And("a header shouldn't be visible")
-      page.body().getElementsByClass("page-header") shouldNot be(empty)
-    }
-
-    "show an error page with bad request HTTP code if sending the data to deskpro failed" in new TestScope {
-      Given("we have a valid reqest")
-
-      val fields = Map(
-        "contact-name"     -> "Bob The Builder",
-        "contact-email"    -> "bob@build-it.com",
-        "contact-comments" -> "Can We Fix It?",
-        "isJavascript"     -> "false",
-        "referrer"         -> "n/a",
-        "csrfToken"        -> "n/a",
-        "service"          -> "scp"
-      )
-
-      val contactRequest = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
-
-      val resubmitUrl = "/contact-frontend/form"
-
-      And("Deskpro doesn't work properly")
-      mockDeskproConnector(Future.failed(new Exception("Expected exception")))
-
-      When("we submit the request")
-      val result =
-        controller.partialSubmit(resubmitUrl = resubmitUrl, renderFormOnly = false)(contactRequest)
-
-      Then("ticket is sent to deskpro")
-      Mockito
-        .verify(ticketQueueConnector, connectorTimeout)
-        .createDeskProTicket(
-          any[String],
-          any[String],
-          any[String],
-          any[String],
-          any[Boolean],
-          any[Request[AnyRef]](),
-          any[Option[Enrolments]],
-          any[Option[String]],
-          any[Option[String]],
-          any[TicketConstants]
-        )(any[HeaderCarrier])
-
-      And("an error message is returned to the user")
-      status(result) shouldBe 500
-      val page = Jsoup.parse(contentAsString(result))
-      page.body().select("h1").first.text() shouldBe "Sorry, there is a problem with the service"
-    }
-  }
-
   class TestScope extends MockitoSugar {
 
     val configuration = app.configuration
@@ -590,20 +445,15 @@ class ContactHmrcControllerSpec
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
     when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
 
-    val contactForm             = app.injector.instanceOf[views.html.partials.contact_hmrc_form]
-    val contactFormConfirmation =
-      app.injector.instanceOf[views.html.partials.contact_hmrc_form_confirmation]
-    val errorPage               = app.injector.instanceOf[views.html.InternalErrorPage]
-    val pfContactPage           = app.injector.instanceOf[views.html.ContactHmrcPage]
-    val pfConfirmationPage      = app.injector.instanceOf[views.html.ContactHmrcConfirmationPage]
+    val errorPage          = app.injector.instanceOf[views.html.InternalErrorPage]
+    val pfContactPage      = app.injector.instanceOf[views.html.ContactHmrcPage]
+    val pfConfirmationPage = app.injector.instanceOf[views.html.ContactHmrcConfirmationPage]
 
     val controller =
       new ContactHmrcController(
         ticketQueueConnector,
         enrolmentsConnector,
         Stubs.stubMessagesControllerComponents(messagesApi = messages),
-        contactForm,
-        contactFormConfirmation,
         errorPage,
         pfContactPage,
         pfConfirmationPage,

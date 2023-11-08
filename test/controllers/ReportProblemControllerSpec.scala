@@ -102,47 +102,6 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
     }
   }
 
-  "Requesting the partial" should {
-    "return OK and valid HTML" in new TestScope {
-      val result = controller.partialIndex(
-        preferredCsrfToken = None,
-        service = Some("my-test-service")
-      )(FakeRequest())
-
-      status(result) should be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document
-        .body()
-        .select("form[id=error-feedback-form]")
-        .first
-        .attr("action") should endWith("/contact/problem_reports")
-
-      document.getElementById("error-feedback-form")            should not be null
-      document.getElementsByClass("govuk-error-summary").size() should be(0)
-    }
-  }
-
-  "Requesting the ajax partial" should {
-    "return OK and valid HTML" in new TestScope {
-      val result = controller.partialAjaxIndex(
-        service = Some("my-test-service")
-      )(FakeRequest())
-
-      status(result) should be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document
-        .body()
-        .select("form[id=error-feedback-form]")
-        .first
-        .attr("action") should endWith("/contact/problem_reports")
-
-      document.getElementById("error-feedback-form")            should not be null
-      document.getElementsByClass("govuk-error-summary").size() should be(0)
-    }
-  }
-
   "Reporting a problem via the standalone page" should {
     "redirect to a Thank You html page for a valid request" in new TestScope {
       hrmcConnectorWillReturnTheTicketId
@@ -266,162 +225,6 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
     }
   }
 
-  "Reporting a problem via the partial via Ajax" should {
-    "return 200 and a valid json for a valid request" in new TestScope {
-      when(
-        hmrcDeskproConnector.createDeskProTicket(
-          meq("John Densmore"),
-          meq("name@mail.com"),
-          meq(controller.problemMessage("Some Action", "Some Error")),
-          meq("/contact/problem_reports"),
-          meq(true),
-          any[Request[AnyRef]](),
-          meq(None),
-          meq(None),
-          meq(None),
-          any[TicketConstants]
-        )(any(classOf[HeaderCarrier]))
-      ).thenReturn(Future.successful(TicketId(123)))
-
-      val request = generateRequest(isAjaxRequest = true)
-      val result  = controller.submitDeprecated(None)(request)
-
-      status(result) should be(200)
-
-      val message = contentAsJson(result).\("message").as[String]
-      contentAsJson(result).\("status").as[String] shouldBe "OK"
-
-      message should include("<h2 id=\"feedback-thank-you-header\">Thank you</h2>")
-      message should include("Someone will get back to you within 2 working days.")
-    }
-
-    "return Bad Request and JSON with error status for invalid input" in new TestScope {
-      val result = controller.submitDeprecated(None)(generateInvalidRequest(isAjaxRequest = true))
-      status(result) should be(BAD_REQUEST)
-
-      verifyNoInteractions(hmrcDeskproConnector)
-      contentAsJson(result).\("status").as[String] shouldBe "ERROR"
-    }
-
-    "return Bad Request and JSON with error status if the email has invalid syntax (for DeskPRO)" in new TestScope {
-      val request = generateRequest(isAjaxRequest = true, email = "a.a.a")
-      val submit  = controller.submitDeprecated(None)(request)
-
-      status(submit) should be(BAD_REQUEST)
-
-      verifyNoInteractions(hmrcDeskproConnector)
-      contentAsJson(submit).\("status").as[String] shouldBe "ERROR"
-    }
-
-    "return Bad Request and JSON with error status if the name has invalid characters" in new TestScope {
-      val request = generateRequest(
-        isAjaxRequest = true,
-        name = """<a href="blah.com">something</a>"""
-      )
-
-      val submit = controller.submitDeprecated(None)(request)
-      status(submit) should be(BAD_REQUEST)
-
-      verifyNoInteractions(hmrcDeskproConnector)
-      contentAsJson(submit).\("status").as[String] shouldBe "ERROR"
-    }
-
-    "return Bad Request and JSON with error status if the Deskpro ticket creation fails" in new TestScope {
-      when(
-        hmrcDeskproConnector.createDeskProTicket(
-          meq("John Densmore"),
-          meq("name@mail.com"),
-          meq(controller.problemMessage("Some Action", "Some Error")),
-          meq("/contact/problem_reports"),
-          meq(false),
-          any[Request[AnyRef]](),
-          meq(None),
-          meq(None),
-          meq(None),
-          any[TicketConstants]
-        )(any(classOf[HeaderCarrier]))
-      ).thenReturn(Future.failed(new Exception("failed")))
-
-      val request = generateRequest(isAjaxRequest = true)
-      val result  = controller.submitDeprecated(None)(request)
-      status(result)                                 should be(INTERNAL_SERVER_ERROR)
-      contentAsJson(result).\("status").as[String] shouldBe "ERROR"
-    }
-  }
-
-  "Reporting a problem via the deprecated non-Ajax partial" should {
-    "redirect to a Thank You html page for a valid request" in new TestScope {
-      hrmcConnectorWillReturnTheTicketId
-
-      val request = generateRequest(isAjaxRequest = false)
-      val result  = controller.submitDeprecated(None)(request)
-
-      status(result)             should be(SEE_OTHER)
-      redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
-    }
-
-    "return 400 and JSON containing validation errors for invalid input" in new TestScope {
-      val result = controller.submitDeprecated(None)(generateInvalidRequest(isAjaxRequest = false))
-
-      status(result) should be(BAD_REQUEST)
-      verifyNoInteractions(hmrcDeskproConnector)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByClass("govuk-error-summary").size() should be > 0
-    }
-
-    "fail if the email has invalid syntax (for DeskPRO)" in new TestScope {
-      val request = generateRequest(isAjaxRequest = false, email = "a.a.a")
-      val submit  = controller.submitDeprecated(None)(request)
-      val page    = Jsoup.parse(contentAsString(submit))
-
-      status(submit) shouldBe BAD_REQUEST
-      verifyNoInteractions(hmrcDeskproConnector)
-
-      page.getElementsByClass("govuk-error-summary").size() should be > 0
-    }
-
-    "fail if the name has invalid characters" in new TestScope {
-      val request = generateRequest(
-        isAjaxRequest = false,
-        name = """<a href="blah.com">something</a>"""
-      )
-
-      val submit = controller.submitDeprecated(None)(request)
-      val page   = Jsoup.parse(contentAsString(submit))
-
-      status(submit) shouldBe BAD_REQUEST
-      verifyNoInteractions(hmrcDeskproConnector)
-
-      page.getElementsByClass("govuk-error-summary").size() should be > 0
-    }
-
-    "return error page if the Deskpro ticket creation fails with Javascript disabled" in new TestScope {
-      when(
-        hmrcDeskproConnector.createDeskProTicket(
-          meq("John Densmore"),
-          meq("name@mail.com"),
-          meq(controller.problemMessage("Some Action", "Some Error")),
-          meq("/contact/problem_reports"),
-          meq(false),
-          any[Request[AnyRef]](),
-          meq(None),
-          meq(None),
-          meq(None),
-          any[TicketConstants]
-        )(any(classOf[HeaderCarrier]))
-      ).thenReturn(Future.failed(new Exception("failed")))
-
-      val request = generateRequest(isAjaxRequest = false)
-      val result  = controller.submitDeprecated(None)(request)
-      status(result) should be(500)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.text() should include("Try again later.")
-    }
-
-  }
-
   "Requesting the standalone thanks page" should {
     "return OK and valid html" in new TestScope {
       val result = controller.thanks()(FakeRequest())
@@ -441,13 +244,10 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
     when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
 
-    val reportProblemPage      = app.injector.instanceOf[views.html.ReportProblemPage]
-    val confirmationPage       = app.injector.instanceOf[views.html.ReportProblemConfirmationPage]
-    val errorPage              = app.injector.instanceOf[views.html.InternalErrorPage]
-    val errorFeedbackForm      = app.injector.instanceOf[views.html.partials.error_feedback]
-    val errorFeedbackFormInner = app.injector.instanceOf[views.html.partials.error_feedback_inner]
-    val ticketCreatedBody      = app.injector.instanceOf[views.html.partials.ticket_created_body]
-    val cfconfig               = new CFConfig(app.configuration)
+    val reportProblemPage = app.injector.instanceOf[views.html.ReportProblemPage]
+    val confirmationPage  = app.injector.instanceOf[views.html.ReportProblemConfirmationPage]
+    val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
+    val cfconfig          = new CFConfig(app.configuration)
 
     val controller = new ReportProblemController(
       mock[DeskproTicketQueueConnector],
@@ -455,9 +255,6 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
       reportProblemPage,
       confirmationPage,
-      errorFeedbackForm,
-      errorFeedbackFormInner,
-      ticketCreatedBody,
       errorPage,
       new RefererHeaderRetriever
     )(cfconfig, ExecutionContext.Implicits.global)

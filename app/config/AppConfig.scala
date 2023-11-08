@@ -23,8 +23,6 @@ trait AppConfig {
 
   def externalReportProblemUrl: String
   def backUrlDestinationAllowList: Set[String]
-  def disablePartials: Boolean
-  def disableAjaxPartials: Boolean
   def useDeskproTicketQueue: Boolean
   def sendExplicitAuditEvents: Boolean
 
@@ -49,16 +47,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .split(',')
       .filter(_.nonEmpty)
       .toSet
-
-  override def disablePartials: Boolean =
-    configuration
-      .getOptional[Boolean]("disablePartials")
-      .getOrElse(false)
-
-  override def disableAjaxPartials: Boolean =
-    configuration
-      .getOptional[Boolean]("disableAjaxPartials")
-      .getOrElse(false)
 
   override def useDeskproTicketQueue: Boolean =
     configuration.getOptional[Boolean]("useDeskproTicketQueue").getOrElse(false)

@@ -28,8 +28,7 @@ import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, FeatureFlagSupport, NameValidator, RefererHeaderRetriever}
-import views.html.partials.{contact_hmrc_form, contact_hmrc_form_confirmation}
+import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -69,8 +68,6 @@ class ContactHmrcController @Inject() (
   val ticketQueueConnector: DeskproTicketQueueConnector,
   enrolmentsConnector: EnrolmentsConnector,
   mcc: MessagesControllerComponents,
-  contactHmrcForm: contact_hmrc_form,
-  contactHmrcFormConfirmation: contact_hmrc_form_confirmation,
   errorPage: InternalErrorPage,
   contactHmrcPage: ContactHmrcPage,
   contactHmrcConfirmationPage: ContactHmrcConfirmationPage,
@@ -78,8 +75,7 @@ class ContactHmrcController @Inject() (
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport
-    with FeatureFlagSupport {
+    with I18nSupport {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
@@ -123,42 +119,6 @@ class ContactHmrcController @Inject() (
 
   def thanks = Action.async { implicit request =>
     Future.successful(Ok(contactHmrcConfirmationPage()))
-  }
-
-  def partialIndex(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Boolean) =
-    Action.async { implicit request =>
-      Future.successful {
-        ifPartialsEnabled {
-          Ok(
-            contactHmrcForm(
-              ContactHmrcForm.form.fill(
-                ContactForm(request.headers.get(REFERER).getOrElse("n/a"), csrfToken, service, None)
-              ),
-              submitUrl,
-              renderFormOnly
-            )
-          )
-        }
-      }
-    }
-
-  def partialSubmit(resubmitUrl: String, renderFormOnly: Boolean) = Action.async { implicit request =>
-    ContactHmrcForm.form
-      .bindFromRequest()
-      .fold(
-        error => Future.successful(BadRequest(contactHmrcForm(error, resubmitUrl, renderFormOnly))),
-        data =>
-          (for {
-            enrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
-            ticketId   <- createDeskproTicket(data, enrolments)
-          } yield Ok(ticketId.ticket_id.toString)).recover { case _ =>
-            InternalServerError(errorPage())
-          }
-      )
-  }
-
-  def partialThanks(ticketId: String) = Action { implicit request =>
-    Ok(contactHmrcFormConfirmation(ticketId))
   }
 }
 
