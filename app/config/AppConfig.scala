@@ -24,7 +24,6 @@ trait AppConfig {
   def contactHmrcAboutTaxUrl: String
   def externalReportProblemUrl: String
   def backUrlDestinationAllowList: Set[String]
-  def loginCallback(continueUrl: String): String
   def useRefererFromRequest: Boolean
   def disablePartials: Boolean
   def disableAjaxPartials: Boolean
@@ -55,8 +54,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .split(',')
       .filter(_.nonEmpty)
       .toSet
-
-  override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
 
   override def disablePartials: Boolean =
     configuration
