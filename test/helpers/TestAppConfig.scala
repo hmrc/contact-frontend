@@ -27,8 +27,6 @@ class TestAppConfig extends AppConfig {
 
   def loginCallback(continueUrl: String): String = ???
 
-  def enableLanguageSwitching: Boolean = true
-
   def useRefererFromRequest: Boolean = true
 
   def disablePartials: Boolean = false

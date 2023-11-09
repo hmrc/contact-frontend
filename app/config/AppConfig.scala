@@ -25,7 +25,6 @@ trait AppConfig {
   def externalReportProblemUrl: String
   def backUrlDestinationAllowList: Set[String]
   def loginCallback(continueUrl: String): String
-  def enableLanguageSwitching: Boolean
   def useRefererFromRequest: Boolean
   def disablePartials: Boolean
   def disableAjaxPartials: Boolean
@@ -58,11 +57,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .toSet
 
   override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
-
-  override def enableLanguageSwitching =
-    configuration
-      .getOptional[Boolean]("enableLanguageSwitching")
-      .getOrElse(false)
 
   override def disablePartials: Boolean =
     configuration
