@@ -21,7 +21,6 @@ import play.api.Configuration
 
 trait AppConfig {
 
-  def contactHmrcAboutTaxUrl: String
   def externalReportProblemUrl: String
   def backUrlDestinationAllowList: Set[String]
   def useRefererFromRequest: Boolean
@@ -42,9 +41,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
   private val contactHost = configuration
     .getOptional[String]("contact-frontend.host")
     .getOrElse("")
-
-  override def contactHmrcAboutTaxUrl: String =
-    loadConfigString("contactHmrcAboutTax.url")
 
   override lazy val externalReportProblemUrl =
     s"$contactHost/contact/problem_reports"

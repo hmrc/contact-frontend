@@ -92,6 +92,7 @@ contact.form.para1=Os oes gennych ymholiad penodol ynghylch treth
 contact.form.para2=Os oes angen cymorth arnoch i ddefnyddio’ch cyfrif treth, llenwch y ffurflen hon.
 contact.form.para3=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
 contact.hmrc.link=Cysylltu â CThEM
+contact.hmrc.url=https://www.gov.uk/government/organisations/hm-revenue-customs/contact
 contact.hmrc.link.newtab=' (yn agor mewn tab newydd)'
 
 form.online.services=Beth yw eich barn am y gwasanaeth ar-lein hwn?
