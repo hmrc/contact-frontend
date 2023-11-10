@@ -16,7 +16,6 @@
 
 package util
 
-import helpers.TestAppConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.FakeRequest
@@ -26,38 +25,20 @@ class RefererHeaderRetrieverSpec extends AnyWordSpec with Matchers {
 
   "Given a referer header retrieve, calling retrieve" should {
 
-    "return some referer header if header in request and enabled via config" in {
-      val appConfig = new TestAppConfig {
-        override val useRefererFromRequest: Boolean = true
-      }
-      val retriever = new RefererHeaderRetriever(appConfig)
+    "return some referer header if header in request" in {
+      val retriever = new RefererHeaderRetriever
       val request   = FakeRequest().withHeaders((REFERER, "some-service-url"))
 
       val refererHeader = retriever.refererFromHeaders(request)
       refererHeader shouldBe Some("some-service-url")
     }
 
-    "return none if header not present and enabled via config" in {
-      val appConfig = new TestAppConfig {
-        override val useRefererFromRequest: Boolean = true
-      }
-      val retriever = new RefererHeaderRetriever(appConfig)
+    "return none if header not present" in {
+      val retriever = new RefererHeaderRetriever
       val request   = FakeRequest()
 
       val refererHeader = retriever.refererFromHeaders(request)
       refererHeader shouldBe None
     }
-
-    "return none if header in request but disabled via config" in {
-      val appConfig = new TestAppConfig {
-        override val useRefererFromRequest: Boolean = false
-      }
-      val retriever = new RefererHeaderRetriever(appConfig)
-      val request   = FakeRequest().withHeaders((REFERER, "some-service-url"))
-
-      val refererHeader = retriever.refererFromHeaders(request)
-      refererHeader shouldBe None
-    }
   }
-
 }

@@ -459,7 +459,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       errorFeedbackFormInner,
       ticketCreatedBody,
       errorPage,
-      new RefererHeaderRetriever(cfconfig)
+      new RefererHeaderRetriever
     )(cfconfig, ExecutionContext.Implicits.global)
 
     val deskproName: String           = "John Densmore"

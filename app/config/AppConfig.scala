@@ -23,7 +23,6 @@ trait AppConfig {
 
   def externalReportProblemUrl: String
   def backUrlDestinationAllowList: Set[String]
-  def useRefererFromRequest: Boolean
   def disablePartials: Boolean
   def disableAjaxPartials: Boolean
   def useDeskproTicketQueue: Boolean
@@ -63,8 +62,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
 
   override def useDeskproTicketQueue: Boolean =
     configuration.getOptional[Boolean]("useDeskproTicketQueue").getOrElse(false)
-
-  override def useRefererFromRequest: Boolean = configuration.getOptional[Boolean]("useRefererHeader").getOrElse(false)
 
   private def configNotFoundError(key: String) =
     throw new RuntimeException(s"Could not find config key '$key'")

@@ -607,7 +607,7 @@ class ContactHmrcControllerSpec
         errorPage,
         pfContactPage,
         pfConfirmationPage,
-        new RefererHeaderRetriever(appConfig)
+        new RefererHeaderRetriever
       )
 
     def mockDeskproConnector(result: Future[TicketId]): Unit =

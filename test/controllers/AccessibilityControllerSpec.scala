@@ -287,7 +287,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       playFrontendAccessibilityPage,
       playFrontendAccessibilityConfirmationPage,
       errorPage,
-      new RefererHeaderRetriever(cconfig)
+      new RefererHeaderRetriever
     )(cconfig, ExecutionContext.Implicits.global)
 
     def generateRequest(desc: String, formName: String, email: String, isJavascript: Boolean, referrer: String) = {
