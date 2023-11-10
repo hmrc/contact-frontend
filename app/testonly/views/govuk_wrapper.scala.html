@@ -36,8 +36,7 @@
   contentHeader: Option[Html] = None,
   mainContent: Html = play.twirl.api.HtmlFormat.empty,
   userLoggedIn: Boolean = true,
-  getHelpForm: Html  = play.twirl.api.HtmlFormat.empty,
-  enableLanguageSwitching : Boolean)(implicit request: Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
+  getHelpForm: Html  = play.twirl.api.HtmlFormat.empty)(implicit request: Request[_], lang : Lang, messages : Messages, appConfig: config.AppConfig)
 
 @head = {
     <link rel='stylesheet' href='@{assetsConfig.assetsPrefix}/stylesheets/application.min.css' />
@@ -51,7 +50,7 @@
         <div class="content">
             <nav id="proposition-menu" class="header__menu" role="navigation">
                 <ul id="proposition-links" class="header__menu__proposition-links">
-                    @language_selection(enableLanguageSwitching)
+                    @language_selection
                 </ul>
             </nav>
         </div>

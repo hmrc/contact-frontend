@@ -16,9 +16,7 @@
 
 @this()
 
-@(enableLanguageSwitching: Boolean)(implicit lang : Lang, messages : Messages)
-
-@if(enableLanguageSwitching) {
+@(implicit lang : Lang, messages : Messages)
 
 @if(lang.code == "cy") {
     <li>
@@ -33,5 +31,3 @@
 
         <a title="@Messages("language-switcher.welsh.hover")" href="@uk.gov.hmrc.hmrcfrontend.controllers.routes.LanguageController.switchToLanguage("cy")" data-journey-click="Language:Click:Welsh">@Messages("language-switcher.welsh")</a></li>
 }
-}
-

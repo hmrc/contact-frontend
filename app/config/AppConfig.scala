@@ -24,8 +24,6 @@ trait AppConfig {
   def contactHmrcAboutTaxUrl: String
   def externalReportProblemUrl: String
   def backUrlDestinationAllowList: Set[String]
-  def loginCallback(continueUrl: String): String
-  def enableLanguageSwitching: Boolean
   def useRefererFromRequest: Boolean
   def disablePartials: Boolean
   def disableAjaxPartials: Boolean
@@ -56,13 +54,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .split(',')
       .filter(_.nonEmpty)
       .toSet
-
-  override def loginCallback(continueUrl: String) = s"$contactHost$continueUrl"
-
-  override def enableLanguageSwitching =
-    configuration
-      .getOptional[Boolean]("enableLanguageSwitching")
-      .getOrElse(false)
 
   override def disablePartials: Boolean =
     configuration
