@@ -16,16 +16,11 @@
 
 package util
 
-import config.AppConfig
 import play.api.http.HeaderNames
 import play.api.mvc.{AnyContent, Request}
 
-import javax.inject.Inject
+class RefererHeaderRetriever extends HeaderNames {
 
-class RefererHeaderRetriever @Inject() (appConfig: AppConfig) extends HeaderNames {
-
-  // This helper checks config to see if retrieval of referer header is enabled, and if so retrieve from headers.
-  // This allows the fallback behaviour of retrieving referer header to be centrally flagged on or off.
   def refererFromHeaders(implicit request: Request[AnyContent]): Option[String] =
-    if (appConfig.useRefererFromRequest) request.headers.get(REFERER) else None
+    request.headers.get(REFERER)
 }

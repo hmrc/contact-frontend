@@ -414,7 +414,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       feedbackFormConfirmation,
       playFrontendFeedbackPage,
       errorPage,
-      new RefererHeaderRetriever(cfconfig)
+      new RefererHeaderRetriever
     )(cfconfig, ExecutionContext.Implicits.global)
 
     def generateRequest(

@@ -23,8 +23,6 @@ class TestAppConfig extends AppConfig {
 
   def backUrlDestinationAllowList: Set[String] = ???
 
-  def useRefererFromRequest: Boolean = true
-
   def disablePartials: Boolean = false
 
   override def disableAjaxPartials: Boolean = false
