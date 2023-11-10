@@ -19,8 +19,6 @@ package helpers
 import config.AppConfig
 
 class TestAppConfig extends AppConfig {
-  def contactHmrcAboutTaxUrl: String = "some.contact.url"
-
   def externalReportProblemUrl: String = ???
 
   def backUrlDestinationAllowList: Set[String] = ???

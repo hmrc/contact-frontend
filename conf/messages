@@ -87,6 +87,7 @@ contact.comments.label=Your comments
 contact.comments.error.required=Enter your comments
 contact.comments.error.length=Comment must be 2000 characters or fewer
 contact.hmrc.link=contact HMRC
+contact.hmrc.url=https://www.gov.uk/government/organisations/hm-revenue-customs/contact
 contact.hmrc.link.newtab=' (opens in new tab)'
 contact.form.heading2=How can we help you?
 contact.form.para1=If you have a specific tax query
