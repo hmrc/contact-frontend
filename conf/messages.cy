@@ -67,7 +67,7 @@ survey.strongly.disagree.response=Anfodlon iawn
 survey.tell.us.how.we.can.improve=Rhowch wybod i ni sut y gallwn wella’r cymorth a roddwn i chi.
 survey.submit=Cyflwyno
 
-deskpro.error.page.title=Mae’n ddrwg gennym, mae problem gyda’r gwasanaeth – Cysylltu â CThEM – GOV.UK
+deskpro.error.page.title=Mae’n ddrwg gennym, mae problem gyda’r gwasanaeth – Cysylltu â CThEF – GOV.UK
 deskpro.error.page.heading=Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
 deskpro.error.try.later=Rhowch gynnig arall arni yn nes ymlaen.
 deskpro.error.not.sent=Nid yw’ch neges wedi’i hanfon.
@@ -91,7 +91,7 @@ contact.form.heading2=Sut allwn eich helpu?
 contact.form.para1=Os oes gennych ymholiad penodol ynghylch treth
 contact.form.para2=Os oes angen cymorth arnoch i ddefnyddio’ch cyfrif treth, llenwch y ffurflen hon.
 contact.form.para3=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
-contact.hmrc.link=Cysylltu â CThEM
+contact.hmrc.link=Cysylltu â CThEF
 contact.hmrc.url=https://www.gov.uk/government/organisations/hm-revenue-customs/contact
 contact.hmrc.link.newtab=' (yn agor mewn tab newydd)'
 

@@ -116,7 +116,7 @@ class ContactHmrcPageSpec
 
       val paragraphs = welshContent.select("p.govuk-body")
       paragraphs.first.text should include(
-        "Os oes gennych ymholiad penodol ynghylch treth Cysylltu â CThEM (yn agor tab newydd)."
+        "Os oes gennych ymholiad penodol ynghylch treth Cysylltu â CThEF (yn agor tab newydd)."
       )
     }
 
