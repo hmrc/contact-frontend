@@ -88,7 +88,7 @@ class ReportProblemPageSpec
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
-      banners.first.text should be("Cyllid a Thollau EM")
+      banners.first.text should be("Cyllid a Thollau EF")
     }
 
     "include the hmrc language toggle" in {
