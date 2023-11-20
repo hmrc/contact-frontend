@@ -86,7 +86,7 @@ class ContactHmrcPageSpec
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
-      banners.first.text should be("Cyllid a Thollau EM")
+      banners.first.text should be("Cyllid a Thollau EF")
     }
 
     "include the hmrc language toggle" in {
@@ -116,7 +116,7 @@ class ContactHmrcPageSpec
 
       val paragraphs = welshContent.select("p.govuk-body")
       paragraphs.first.text should include(
-        "Os oes gennych ymholiad penodol ynghylch treth Cysylltu â CThEM (yn agor tab newydd)."
+        "Os oes gennych ymholiad penodol ynghylch treth Cysylltu â CThEF (yn agor tab newydd)."
       )
     }
 
