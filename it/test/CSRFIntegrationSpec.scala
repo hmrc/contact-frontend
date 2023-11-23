@@ -125,48 +125,6 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
       response.status should be(FORBIDDEN)
     }
 
-    "respond with a 200 for problem_reports_secure if X-Requested-With header is supplied with any value" in {
-      val response = await(
-        wsClient
-          .url(problemReportsSecureUrl)
-          .withHttpHeaders("X-Requested-With" -> "something")
-          .addCookies(anyCookie)
-          .post(
-            problemForm
-          )
-      )
-
-      response.status should be(OK)
-    }
-
-    "respond with a 403 for problem_reports_secure if a Csrf-Token header is supplied with an arbitrary value" in {
-      val response = await(
-        wsClient
-          .url(problemReportsSecureUrl)
-          .withHttpHeaders("Csrf-Token" -> "sausage")
-          .addCookies(anyCookie)
-          .post(
-            problemForm
-          )
-      )
-
-      response.status should be(FORBIDDEN)
-    }
-
-    "respond with a 200 for problem_reports_secure if a Csrf-Token header is supplied with the value 'nocheck'" in {
-      val response = await(
-        wsClient
-          .url(problemReportsSecureUrl)
-          .withHttpHeaders("Csrf-Token" -> "nocheck")
-          .addCookies(anyCookie)
-          .post(
-            problemForm
-          )
-      )
-
-      response.status should be(OK)
-    }
-
     "respond with a 403 for problem_reports_nonjs if any cookie but no CSRF token is present" in {
       val response = postWithAnyCookie(problemReportsNonjsUrl, problemForm)
 

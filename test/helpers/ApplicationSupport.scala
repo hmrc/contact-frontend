@@ -27,8 +27,7 @@ trait ApplicationSupport extends GuiceOneAppPerSuite { this: TestSuite =>
       .configure(
         "metrics.jvm"      -> false,
         "metrics.enabled"  -> false,
-        "auditing.enabled" -> false,
-        "disablePartials"  -> false
+        "auditing.enabled" -> false
       )
       .build()
 }

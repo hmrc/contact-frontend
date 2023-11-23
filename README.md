@@ -22,21 +22,12 @@ passing user requests to downstream services - to Deskpro for 'Is this page not 
       * [Providing Beta feedback about services](#providing-beta-feedback-about-services)
       * [Report an accessibility problem](#report-an-accessibility-problem) 
    * [Integration guide](#integration-guide)
-      * [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
       * [referer header forwarding to Deskpro](#referer-header-forwarding-to-deskpro)
       * [Creating own customer contact forms](#creating-own-customer-contact-forms)
    * [Other relevant details](#other-relevant-details)
       * [User details attached to the ticket](#user-details-attached-to-the-ticket)
       * [Related projects, useful links](#appendix__linx)
       * [Slack](#appendix__links__slack)
-
-# Roadmap
-
-Changes we are making to contact-frontend
-
-## In progress
-
-* [Removing ability to load contact forms via play-partials on the 29 September 2023](docs/roadmap/removing-ability-to-load-contact-forms-via-play-partials.md)
 
 # Forms provided by the Customer Contact Subsystem <a name="forms-provided-by-the-customer-contact-subsystem"></a>
 
@@ -68,14 +59,6 @@ The format for the link should be rendered as follows:
 | `service`      | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
 | `referrerUrl`  | the full, absolute, properly encoded URL of the page the user was on before they navigated to the contact form       |
 
-### Deprecation notes
-Historically, `contact-frontend` supported a version of the form that could be embedded within a service using either a 
-server-side partial or injected by Javascript. However, these mechanisms are not supported for services using 
-`play-frontend-hmrc` or `play-nunjucks` and are not recommended for reasons of accessibility and usability.
-
-Additionally, `contact-frontend` historically had versions of all standalone pages requiring tax service user login, and
-versions not requiring login on endpoints suffixed with "-unauthenticated". The login requirement has now been
-deprecated to improve accessibility and usability to all tax service users. 
 
 [[Back to the top]](#top)
 
@@ -100,9 +83,6 @@ To use this form, render a link on your service to:
 | ---------------| -------------------------------------------------------------------------------------------------------------------- |
 | `service`      | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
 | `referrerUrl`  | the full, absolute, properly encoded URL of the page the user was on before they navigated to the contact form. For example, a link from the SCP sign in page would look like `https://www.tax.service.gov.uk/contact/contact-hmrc?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds` |
-
-### Deprecation notes
-`Help and contact` previously also supported embedding itself as a partial; however, this functionality is *deprecated* and should not be used. 
 
 [[Back to the top]](#top)
 
@@ -164,10 +144,6 @@ To use this form, render a link on your page to:
 | `backUrl`         | an optional 'Back' button redirecting the user back to the consuming service can be embedded into the Beta Feedback form. In order to achieve this, the consuming service has to specify a destination URL |
 | `referrerUrl`     | the full, absolute, properly encoded URL of the page the user was on before they navigated to the contact form. For example, a link from the SCP sign in page would look like `https://www.tax.service.gov.uk/contact/beta-feedback?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds` |
 
-### Deprecation notes
-`Send your feedback` historically also supported displaying the *Send your feedback* page as a partial; however, this
-functionality is *deprecated* and should not be used.
-
 [[Back to the top]](#top)
 
 ## Report an Accessibility Problem <a name="report-an-accessibility-problem"></a>
@@ -193,22 +169,6 @@ Services that have not yet migrated to accessibility-statement-frontend display 
 | ---------------| -------------------------------------------------------------------------------------------------------------------- |
 | `service`      | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
 | `referrerUrl`  | the full, absolute, properly encoded URL of the page the user was on before they navigated to the contact form       |
-
-[[Back to the top]](#top)
-
-## Cross-Origin Resource Sharing (CORS) <a name="cross-origin-resource-sharing-cors"></a>
-
-When contact forms are embedded on a service's pages, the client's browser communicates with contact-frontend using AJAX requests.
-This may cause problems when the service runs on a different domain from the one used by contact-frontend (which is `www.tax.service.gov.uk`). In such a case, the user's browser will block cross-domain AJAX requests, considering them suspicous.
-
-If you want to use contact-frontend in a service that runs on another domain, this can be done by explicitly specifying that other domain in the configuration of contact-frontend. Contact-frontend service will then use [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) (Cross-Origin Resource Sharing) to allow the browser to accept such cross-domain requests.
-
-To achieve that, the service uses the standard  [CORS Filter](https://www.playframework.com/documentation/2.6.x/CorsFilter) provided by Play Framework.
-Configuration is defined in `contact-frontend.yaml` within the environment specific `app-config`. Here is example configuration:
-```
-play.filters.cors.allowedOrigins.0: "https://ewf.companieshouse.gov.uk"
-play.filters.cors.allowedOrigins.1: "https://www.{environment}.tax.service.gov.uk"
-```
 
 [[Back to the top]](#top)
 

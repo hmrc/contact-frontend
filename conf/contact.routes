@@ -9,17 +9,9 @@ POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackCo
 GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks(backUrl: Option[String])
 GET         /beta-feedback/thanks-unauthenticated        @controllers.FeedbackController.thanks(backUrl: Option[String])
 
-GET         /beta-feedback/form                          @controllers.FeedbackController.partialIndex(submitUrl: String, csrfToken: String, service: Option[String], referer: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
-POST        /beta-feedback/form                          @controllers.FeedbackController.partialSubmit(resubmitUrl: String)
-GET         /beta-feedback/form/confirmation             @controllers.FeedbackController.partialThanks(ticketId: String)
-
 GET         /contact-hmrc                                @controllers.ContactHmrcController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
 POST        /contact-hmrc                                @controllers.ContactHmrcController.submit(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
 GET         /contact-hmrc/thanks                         @controllers.ContactHmrcController.thanks
-
-GET         /contact-hmrc/form                           @controllers.ContactHmrcController.partialIndex(submitUrl: String, csrfToken: String, service: Option[String], renderFormOnly: Boolean ?= false)
-POST        /contact-hmrc/form                           @controllers.ContactHmrcController.partialSubmit(resubmitUrl: String, renderFormOnly: Boolean ?= false)
-GET         /contact-hmrc/form/confirmation              @controllers.ContactHmrcController.partialThanks(ticketId: String)
 
 GET         /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
 POST        /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.submit(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
@@ -30,10 +22,6 @@ POST        /report-technical-problem                    @controllers.ReportProb
 GET         /report-technical-problem/thanks             @controllers.ReportProblemController.thanks
 GET         /problem_reports_nonjs                       @controllers.ReportProblemController.indexDeprecated(service: Option[String], referrerUrl: Option[String])
 POST        /problem_reports_nonjs                       @controllers.ReportProblemController.submit(service: Option[String], referrerUrl: Option[String])
-GET         /problem_reports                             @controllers.ReportProblemController.partialIndex(csrfToken: Option[String], service: Option[String])
-POST        /problem_reports                             @controllers.ReportProblemController.submitDeprecated(service: Option[String])
-GET         /problem_reports_ajax                        @controllers.ReportProblemController.partialAjaxIndex(service: Option[String])
-POST        /problem_reports_secure                      @controllers.ReportProblemController.submitDeprecated(service: Option[String])
 
 GET         /survey                                      @controllers.SurveyController.survey(ticketId: String, serviceId: String)
 POST        /survey                                      @controllers.SurveyController.submit(ticketId: String, serviceId: String)

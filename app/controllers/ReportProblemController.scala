@@ -23,12 +23,10 @@ import model.ReportProblemForm
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.libs.json.Json
 import play.api.mvc._
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, FeatureFlagSupport, NameValidator, RefererHeaderRetriever}
-import views.html.partials.{error_feedback, error_feedback_inner, ticket_created_body}
+import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.{InternalErrorPage, ReportProblemConfirmationPage, ReportProblemPage}
 
 import javax.inject.{Inject, Singleton}
@@ -106,16 +104,12 @@ class ReportProblemController @Inject() (
   mcc: MessagesControllerComponents,
   reportProblemPage: ReportProblemPage,
   confirmationPage: ReportProblemConfirmationPage,
-  errorFeedbackForm: error_feedback,
-  errorFeedbackFormInner: error_feedback_inner,
-  ticketCreatedBody: ticket_created_body,
   errorPage: InternalErrorPage,
   headerRetriever: RefererHeaderRetriever
 )(implicit appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport
-    with FeatureFlagSupport {
+    with I18nSupport {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
@@ -130,39 +124,8 @@ class ReportProblemController @Inject() (
     Redirect(routes.ReportProblemController.index(service, referrer))
   }
 
-  def partialIndex(preferredCsrfToken: Option[String], service: Option[String]) = Action { implicit request =>
-    ifPartialsEnabled {
-      val csrfToken = preferredCsrfToken.orElse(play.filters.csrf.CSRF.getToken(request).map(_.value))
-      val referrer  = headerRetriever.refererFromHeaders
-      Ok(
-        errorFeedbackForm(
-          form = ReportProblemFormBind.emptyForm(csrfToken.getOrElse(""), service, referrer),
-          actionUrl = appConfig.externalReportProblemUrl,
-          csrfToken = csrfToken,
-          service = service,
-          referrer = None
-        )
-      )
-    }
-  }
-
-  def partialAjaxIndex(service: Option[String]) = Action { implicit request =>
-    ifAjaxPartialsEnabled {
-      val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value)
-      val referrer  = headerRetriever.refererFromHeaders
-      val form      = ReportProblemFormBind.emptyForm(csrfToken.getOrElse(""), service, referrer)
-      val view      = errorFeedbackFormInner(form, appConfig.externalReportProblemUrl, csrfToken, service, referrer)
-      Ok(view)
-    }
-  }
-
   def submit(service: Option[String], referrerUrl: Option[String]) = Action.async { implicit request =>
     doSubmit(service, referrerUrl)
-  }
-
-  def submitDeprecated(service: Option[String]) = Action.async { implicit request =>
-    if (request.headers.get("X-Requested-With").contains("XMLHttpRequest")) doSubmitPartial
-    else doSubmit(service, None)
   }
 
   private def doSubmit(service: Option[String], referrerUrl: Option[String])(implicit
@@ -190,25 +153,6 @@ class ReportProblemController @Inject() (
             _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
           } yield Redirect(routes.ReportProblemController.thanks)) recover { case _ =>
             InternalServerError(errorPage())
-          }
-        }
-      )
-
-  private def doSubmitPartial(implicit request: MessagesRequest[AnyContent]) =
-    ReportProblemFormBind.form
-      .bindFromRequest()
-      .fold(
-        formWithError => Future.successful(BadRequest(Json.toJson(Map("status" -> "ERROR")))),
-        problemReport => {
-          val referrer = problemReport.referrer.filter(_.trim.nonEmpty) orElse headerRetriever.refererFromHeaders
-          (for {
-            maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
-            ticketId            <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-          } yield {
-            val view = ticketCreatedBody(ticketId.ticket_id.toString, None).toString()
-            Ok(Json.toJson(Map("status" -> "OK", "message" -> view)))
-          }) recover { case _ =>
-            InternalServerError(Json.toJson(Map("status" -> "ERROR")))
           }
         }
       )
