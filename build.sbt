@@ -9,7 +9,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     scalaVersion := "2.13.8",
     majorVersion := 4,
-    libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it"))
+    libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it")),
   )
   .configs(IntegrationTest, AcceptanceTest)
   .settings(unitTestSettings, acceptanceTestSettings)
@@ -34,7 +34,8 @@ lazy val microservice = Project(appName, file("."))
       "com.github.ghik" % "silencer-lib" % "1.7.8" % Provided cross CrossVersion.full
     ),
     // ***************
-    A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")
+    A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y"),
+    resolvers += Resolver.mavenLocal
   )
 
 lazy val unitTestSettings =

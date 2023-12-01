@@ -11,7 +11,7 @@ object AppDependencies {
 
   private val compile = Seq(
     "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % bootstrapPlayVersion,
-    "uk.gov.hmrc" %% "play-frontend-hmrc"         % "7.29.0-play-28"
+    "uk.gov.hmrc" %% "play-frontend-hmrc"         % "7.30.0-play-28-SNAPSHOT"
   )
 
   private def test(scope: String) = Seq(

@@ -23,7 +23,7 @@
 
 @hmrcStandardPage(
     HmrcStandardPageParams(
-        banners = Banners(displayHmrcBanner = true),
+        banners = Banners(displayHmrcBanner = true, userResearchBanner = Some(UserResearchBanner(url = "http://www.tax.service.gov.uk"))),
         isWelshTranslationAvailable = isWelshTranslationAvailable,
         pageTitle = Some(pageTitle),
         backLink = backLink.map(url => BackLink.withDefaultText(href = url))
