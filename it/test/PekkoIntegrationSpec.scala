@@ -24,21 +24,24 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.test.Helpers._
 
-class AkkaIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneServerPerSuite {
+class PekkoIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneServerPerSuite {
+  private val configuredUriLimit = 16 * 1024
+
   private def baseA11yUrl    = s"http://localhost:$port/contact/accessibility-unauthenticated?service=pay-frontend"
-  private def longA11yUrl    = s"$baseA11yUrl&referrerUrl=https%3A%2F%2Fexample.com%2F" + ("x" * 10000)
-  private def longestA11yUrl = s"$baseA11yUrl&referrerUrl=https%3A%2F%2Fexample.com%2F" + ("x" * 20000)
+  private def tooLongA11yUrl = s"$baseA11yUrl&referrerUrl=https%3A%2F%2Fexample.com%2F" + ("x" * configuredUriLimit)
+  private def longA11yUrl    = tooLongA11yUrl.take(configuredUriLimit)
 
   private def baseFeedbackUrl    = s"http://localhost:$port/contact/beta-feedback?service=pay-frontend"
-  private def longFeedbackUrl    = s"$baseFeedbackUrl&referrerUrl=https%3A%2F%2Fexample.com%2F" + ("x" * 10000)
-  private def longestFeedbackUrl = s"$baseFeedbackUrl&referrerUrl=https%3A%2F%2Fexample.com%2F" + ("x" * 20000)
+  private def tooLongFeedbackUrl =
+    s"$baseFeedbackUrl&referrerUrl=https%3A%2F%2Fexample.com%2F" + ("x" * configuredUriLimit)
+  private def longFeedbackUrl    = tooLongFeedbackUrl.take(configuredUriLimit)
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
       .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "auditing.enabled" -> false)
       .build()
 
-  "The Play Framework Akka configuration" should {
+  "The Play Framework Pekko configuration" should {
 
     "respond with 200 when given a very long valid URL for accessibility" in {
       val wsClient = app.injector.instanceOf[WSClient]
@@ -51,7 +54,7 @@ class AkkaIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneServerP
     "respond with 414 when given an extremely long valid URL for accessibility" in {
       val wsClient = app.injector.instanceOf[WSClient]
       val response =
-        await(wsClient.url(longestA11yUrl).get())
+        await(wsClient.url(tooLongA11yUrl).get())
 
       response.status should be(REQUEST_URI_TOO_LONG)
     }
@@ -67,7 +70,7 @@ class AkkaIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneServerP
     "respond with 414 when given an extremely long valid URL for beta-feedback" in {
       val wsClient = app.injector.instanceOf[WSClient]
       val response =
-        await(wsClient.url(longestFeedbackUrl).get())
+        await(wsClient.url(tooLongFeedbackUrl).get())
 
       response.status should be(REQUEST_URI_TOO_LONG)
     }

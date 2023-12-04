@@ -25,7 +25,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.data.FormError
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{FakeHeaders, FakeRequest}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -73,7 +73,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     }
 
     "produce an audit result for a valid form" in new TestScope {
-      implicit val request = FakeRequest(
+      implicit val request: FakeRequest[_] = FakeRequest(
         "POST",
         "/",
         FakeHeaders(),
@@ -103,7 +103,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     }
 
     "produce errors for an invalid form" in new TestScope {
-      implicit val request = FakeRequest(
+      implicit val request: FakeRequest[_] = FakeRequest(
         "POST",
         "/",
         FakeHeaders(),
@@ -127,8 +127,9 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     val serviceId = "abcdefg"
     val request   = FakeRequest("POST", "/")
 
-    implicit val messages = messagesApi.preferred(request)
-    val result            = controller.submit(ticketId, serviceId)(request)
+    implicit val messages: Messages = messagesApi.preferred(request)
+
+    val result = controller.submit(ticketId, serviceId)(request)
 
     status(result) should be(400)
 
@@ -156,8 +157,9 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     )
     val request   = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
-    implicit val messages = messagesApi.preferred(request)
-    val result            = controller.submit(ticketId, serviceId)(request)
+    implicit val messages: Messages = messagesApi.preferred(request)
+
+    val result = controller.submit(ticketId, serviceId)(request)
 
     status(result) should be(400)
 

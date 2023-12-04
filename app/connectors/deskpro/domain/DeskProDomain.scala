@@ -17,7 +17,7 @@
 package connectors.deskpro.domain
 
 import play.api.Logging
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
@@ -40,7 +40,7 @@ case class Ticket private (
 
 object Ticket extends FieldTransformer with Logging {
 
-  implicit val formats = Json.format[Ticket]
+  implicit val formats: OFormat[Ticket] = Json.format[Ticket]
 
   def create(
     name: String,
@@ -76,7 +76,7 @@ object Ticket extends FieldTransformer with Logging {
 }
 
 object TicketId {
-  implicit val formats = Json.format[TicketId]
+  implicit val formats: OFormat[TicketId] = Json.format[TicketId]
 }
 
 case class TicketId(ticket_id: Int)
@@ -99,7 +99,7 @@ case class Feedback(
 
 object Feedback extends FieldTransformer {
 
-  implicit val formats = Json.format[Feedback]
+  implicit val formats: OFormat[Feedback] = Json.format[Feedback]
 
   def create(
     name: String,
