@@ -17,7 +17,6 @@
 package controllers
 
 import akka.actor.ActorSystem
-import akka.stream.Materializer._
 import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
@@ -38,7 +37,7 @@ import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{contentAsJson, contentAsString, redirectLocation, _}
+import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
@@ -437,9 +436,9 @@ class ContactHmrcControllerSpec
 
     val configuration = app.configuration
 
-    implicit val appConfig        = new CFConfig(configuration)
-    implicit val executionContext = ExecutionContext.Implicits.global
-    implicit val messages         = app.injector.instanceOf[MessagesApi]
+    implicit val appConfig: CFConfig                = new CFConfig(configuration)
+    implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
+    implicit val messages: MessagesApi              = app.injector.instanceOf[MessagesApi]
 
     val ticketQueueConnector                     = mock[DeskproTicketQueueConnector]
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]

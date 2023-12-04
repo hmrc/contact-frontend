@@ -23,7 +23,6 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
-import uk.gov.hmrc.domain._
 import uk.gov.hmrc.http.SessionId
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
@@ -91,7 +90,7 @@ class FieldTransformerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
         "utr"    -> "sa",
         "ctUtr"  -> "ct",
         "vrn"    -> "vrn1",
-        "empRef" -> EmpRef("officeNum", "officeRef").value
+        "empRef" -> "officeNum/officeRef"
       )
     }
 
@@ -100,7 +99,7 @@ class FieldTransformerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
         "utr"                          -> "sa",
         "ctUtr"                        -> "ct",
         "vrn"                          -> "vrn2",
-        "empRef"                       -> EmpRef("officeNum", "officeRef").value,
+        "empRef"                       -> "officeNum/officeRef",
         "HMCE-VAT-AGNT/AgentRefNo"     -> "Foo",
         "IR-CT-AGENT/IRAgentReference" -> "Bar"
       )
