@@ -17,13 +17,10 @@ object AppDependencies {
   )
 
   private def test(scope: String) = Seq(
-    "uk.gov.hmrc"           %% s"bootstrap-test-$playVersion" % bootstrapFrontendVersion % scope,
-    "uk.gov.hmrc"           %% "webdriver-factory"            % "0.46.0"                 % scope,
-    "org.scalatestplus"     %% "scalatestplus-mockito"        % "1.0.0-M2"               % scope,
-    "org.scalatestplus"     %% "selenium-4-2"                 % "3.2.13.0"               % scope,
-    "org.mockito"           %% "mockito-scala-scalatest"      % "1.16.37"                % scope,
-    "org.jsoup"              % "jsoup"                        % "1.11.3"                 % scope,
-    "com.github.tomakehurst" % "wiremock"                     % "1.58"                   % scope,
-    "com.github.tomakehurst" % "wiremock-jre8"                % "2.27.2"                 % scope
+    "uk.gov.hmrc"       %% s"bootstrap-test-$playVersion" % bootstrapFrontendVersion % scope,
+    "uk.gov.hmrc"       %% "webdriver-factory"            % "0.46.0"                 % scope,
+    "org.scalatestplus" %% "selenium-4-2"                 % "3.2.13.0"               % scope,
+    "org.mockito"       %% "mockito-scala-scalatest"      % "1.16.37"                % scope,
+    "org.jsoup"          % "jsoup"                        % "1.11.3"                 % scope
   )
 }
