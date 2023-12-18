@@ -23,7 +23,5 @@ class TestAppConfig extends AppConfig {
 
   def backUrlDestinationAllowList: Set[String] = ???
 
-  override def useDeskproTicketQueue: Boolean = false
-
   override def sendExplicitAuditEvents: Boolean = false
 }

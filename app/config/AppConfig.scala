@@ -23,7 +23,6 @@ trait AppConfig {
 
   def externalReportProblemUrl: String
   def backUrlDestinationAllowList: Set[String]
-  def useDeskproTicketQueue: Boolean
   def sendExplicitAuditEvents: Boolean
 
 }
@@ -47,9 +46,6 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .split(',')
       .filter(_.nonEmpty)
       .toSet
-
-  override def useDeskproTicketQueue: Boolean =
-    configuration.getOptional[Boolean]("useDeskproTicketQueue").getOrElse(false)
 
   private def configNotFoundError(key: String) =
     throw new RuntimeException(s"Could not find config key '$key'")
