@@ -39,12 +39,7 @@ class DeskproTicketQueueConnector @Inject() (
   executionContext: ExecutionContext
 ) {
 
-  private val serviceUrl: String =
-    if (appConfig.useDeskproTicketQueue) {
-      servicesConfig.baseUrl("deskpro-ticket-queue")
-    } else {
-      servicesConfig.baseUrl("hmrc-deskpro")
-    }
+  private val serviceUrl: String = servicesConfig.baseUrl("deskpro-ticket-queue")
 
   def createDeskProTicket(
     name: String,
