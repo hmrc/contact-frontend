@@ -26,7 +26,7 @@
         banners = Banners(displayHmrcBanner = true),
         isWelshTranslationAvailable = isWelshTranslationAvailable,
         pageTitle = Some(pageTitle),
-        backLink = backLink.map(url => BackLink.withDefaultText(href = url))
+        backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
     )
 )(contentBlock)
 
