@@ -26,15 +26,11 @@ lazy val microservice = Project(appName, file("."))
       "uk.gov.hmrc.govukfrontend.views.html.components._",
       "uk.gov.hmrc.hmrcfrontend.views.html.components._"
     ),
-    // ***************
-    // Use the silencer plugin to suppress warnings from unused imports in compiled twirl templates
-    scalacOptions += "-P:silencer:pathFilters=views;routes",
-    libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.8" cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % "1.7.8" % Provided cross CrossVersion.full
-    ),
-    // ***************
     A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")
+  )
+  .settings(
+    scalacOptions += "-Wconf:src=routes/.*:s",
+    scalacOptions += "-Wconf:src=views/.*:s"
   )
 
 lazy val unitTestSettings =
