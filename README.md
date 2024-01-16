@@ -1,37 +1,91 @@
-contact-frontend
-================
+# contact-frontend
 
-This service allows users to contact the HMRC Customer Contact team for 5 major purposes:
-1. reporting technical problems ('Is this page not working properly?')
-1. asking questions ('Help and contact')
-1. providing feedback on services ('Send your feedback')
-1. providing feedback for the HMRC Customer Contact team ('Survey')
-1. reporting accessibility problems with services ('Report an accessibility problem')
+## Overview
+This service provides forms that enable users to contact HMRC for five distinct reasons:
+1. reporting a technical problem ('Is this page not working properly?')
+1. providing feedback on a beta service ('Send your feedback')
+1. getting help with their tax account ('Help and contact')
+1. providing post-support feedback to the HMRC Digital Technical Support Team ('Survey')
+1. reporting an accessibility problem with a service ('Report an accessibility problem')
 
-`contact-frontend` is responsible for hosting forms related to the purposes listed above, validating the input, and
-passing user requests to downstream services - to Deskpro for 'Is this page not working properly?', 'Help and contact', 
-'Send your feedback' and 'Report an accessibility problem', and an internal auditing service for 'Survey' (contact
- [#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/) if you require more information about this).
+`contact-frontend` will validate the user's input (for example, to ensure that email addresses are valid),
+and pass user requests to the relevant downstream service - to Deskpro for 'Is this page not working properly?',
+'Help and contact', 'Send your feedback' and 'Report an accessibility problem',
+and to an internal auditing service for 'Survey' (contact
+[#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/)
+if you require more information about this).
 
-# Contents
-   * [Roadmap](#roadmap)
-   * [Forms provided by the Customer Contact Subsystem](#forms-provided-by-the-customer-contact-subsystem)
-      * [Contacting HMRC - <em>Is this page not working properly?</em>](#contacting-hmrc---get-help-with-this-page)
-      * [Contacting HMRC - <em>Help and contact</em>](#contacting-hmrc---help-and-contact)
-      * [Providing feedback about Digital Customer Support Team](#providing-feedback-about-digital-customer-support-team)
-      * [Providing Beta feedback about services](#providing-beta-feedback-about-services)
-      * [Report an accessibility problem](#report-an-accessibility-problem) 
-   * [Integration guide](#integration-guide)
-      * [referer header forwarding to Deskpro](#referer-header-forwarding-to-deskpro)
-      * [Creating own customer contact forms](#creating-own-customer-contact-forms)
-   * [Other relevant details](#other-relevant-details)
-      * [User details attached to the ticket](#user-details-attached-to-the-ticket)
-      * [Related projects, useful links](#appendix__linx)
-      * [Slack](#appendix__links__slack)
+## Contents
+  * [Integration guide](#integration-guide)
+    * [Frontend services](#frontend-services)
+    * [Other services](#other-services)
+    * [User details attached to submitted ticket](#user-details-attached-to-submitted-tickets)
+  * [Further information](#further-information)
+    * [Getting help](#getting-help)
+    * [Maintenance documentation](#maintenance-documentation)
+  * [Appendix - example forms](#appendix---example-forms)
+     * [Contacting HMRC - <em>Is this page not working properly?</em>](#contacting-hmrc---is-this-page-not-working-properly)
+     * [Providing Beta feedback about services](#providing-beta-feedback-about-services)
+     * [Contacting HMRC - <em>Help and contact</em>](#contacting-hmrc---help-and-contact)
+     * [Providing feedback about the Digital Technical Support Team](#providing-feedback-about-the-digital-technical-support-team-customer-satisfaction)
+     * [Reporting an accessibility problem](#reporting-an-accessibility-problem) 
 
-# Forms provided by the Customer Contact Subsystem <a name="forms-provided-by-the-customer-contact-subsystem"></a>
+## Integration guide
 
-## Contacting HMRC - *Is this page not working properly?* <a name="contacting-hmrc---get-help-with-this-page"></a>
+### Frontend services
+Frontend services built using play-frontend-hmrc will typically integrate with contact-frontend in one or two pre-defined ways.
+If these don't meet your specific needs, please contact the PlatUI team via [#team-plat-ui](https://hmrcdigital.slack.com/messages/team-plat-ui/) to discuss.
+
+#### Enabling users to report technical issues with the service
+You should use the
+[HmrcReportTechnicalIssueHelper](https://github.com/hmrc/play-frontend-hmrc?tab=readme-ov-file#helping-users-report-technical-issues)
+to add a link to your service's main layout template, to enable users to report technical issues from any page in the service.
+
+For an example of the resulting form, please see the [Appendix](#contacting-hmrc---is-this-page-not-working-properly).
+
+#### Enabling users to provide feedback on a service in beta
+When your new service is in beta, you should use the
+[Beta Feedback banner](https://github.com/hmrc/play-frontend-hmrc?tab=readme-ov-file#adding-a-beta-feedback-banner)
+to add a banner that tells the user the service is in beta, and includes a link for them to provide feedback.
+
+For an example of the resulting form, please see the [Appendix](#providing-beta-feedback-about-services).
+
+### Other services
+Services that don't have a frontend (eg. mobile or API services) should instead integrate directly with the
+[deskpro-ticket-queue](https://github.com/hmrc/deskpro-ticket-queue) API.
+
+### User details attached to submitted tickets
+In addition to the information provided by the user, the service collects the following context data:
+* **Referrer** - this is the URL of the page on which the user initiated the contact journey, as passed on the
+  URL as a query string parameter. Deskpro uses it to classify issues. In the absence of a `referrerURL` parameter,
+  the value will be taken from the HTTP `Referer` header.
+* **HTTP UserAgent header** - this tells us what browser the user is using.
+* **Javascript?** - whether the user's browser has Javascript enabled
+* **authId** - as provided in the HeaderCarrier object
+* **sessionId** - as provided in the HeaderCarrier object
+* **User tax identifiers** - if the user is signed-in, any related tax identifiers will be attached to the tickets.
+  These are stored in `deskpro-ticket-queue` and can later be viewed from Deskpro.  They can include, but are not limited to:
+    * National Insurance Number (NINO)
+    * Unique Taxpayer Reference (UTR)
+    * VAT registration number
+    * PAYE reference
+
+[[Back to the top]](#top)
+
+## Further information
+
+### Getting help
+* [#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/) - PlatUI is responsible for contact-frontend
+* [#team-ddcops](https://hmrcdigital.slack.com/messages/team-ddcops) - DDCOps is responsible for Deskpro
+
+### Maintenance documentation
+Maintenance documentation for the owning team, including architectural decision records (ADRs) can be found [here](docs/maintainers.md).
+
+[[Back to the top]](#top)
+
+## Appendix - Example forms
+
+### Contacting HMRC - *Is this page not working properly?*
 
 This form provides the primary way for users to report technical issues with tax services. Here is a screenshot of the form:
 
@@ -62,66 +116,7 @@ The format for the link should be rendered as follows:
 
 [[Back to the top]](#top)
 
-## Contacting HMRC - *Help and contact* <a name="contacting-hmrc---help-and-contact"></a>
-
-This form is very similar to the *Is this page not working properly?* form.
-There are minor differences in how this form works in comparison to 'Is this page not working properly?'.
-
-This contact form contains only three input fields:
-- name
-- email address
-- comments
-
-Requests of this type are forwarded to *Deskpro* with the subject *"Contact form submission"*
-
-To use this form, render a link on your service to:
-* `https://www.{environment}.tax.service.gov.uk/contact/contact-hmrc?service=${serviceId}&referrerUrl=${urlOfPageContainingLink}`
-
-'{environment}.' is not included in the case of the production environment.
-
-| URL parameter  | Description                                                                                                          |
-| ---------------| -------------------------------------------------------------------------------------------------------------------- |
-| `service`      | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
-| `referrerUrl`  | the full, absolute, properly encoded URL of the page the user was on before they navigated to the contact form. For example, a link from the SCP sign in page would look like `https://www.tax.service.gov.uk/contact/contact-hmrc?service=scp&referrerUrl=https%3A%2F%2Fwww.access.service.gov.uk%2Flogin%2Fsignin%2Fcreds` |
-
-[[Back to the top]](#top)
-
-## Providing feedback about the Digital Customer Support Team ('Customer Satisfaction') <a name="providing-feedback-about-digital-customer-support-team"></a>
-Upon resolving a customer issue, response emails are sent by the Digital Customer Support Team containing a link 
-inviting users to complete a survey about the customer's satisfaction with the way their issue was handled, this 
-survey being provided by contact-frontend.
-
-Here is an example of the email received by the user:
-
-![alt tag](docs/support-confirmation-email.png)
-
-This is how the DCST feedback form looks:
-
-![alt tag](docs/survey.png)
-
-Feedback survey results currently are stored as explicit audit events with the following properties:
-* *auditSource* - "frontend"
-* *auditType* - "DeskproSurvey"
-* *details* 
-    * *helpful* - the respose to the question about user satisfaction
-    * *speed* - the response about satisfaction with the speed of DCST reply
-    * *improve* - contents of the textual field with improvement suggestions
-    * *ticketId* - the reference of the case (same as in email)
-    * *serviceId* - an identifier of the service - same as provided in the *Is this page not working properly?* page
-
-This functionality is used by Deskpro and shouldn't be used by any consuming service directly.
-Emails received from Deskpro should contain link in the following format:
-
-`https://www.{environment}.tax.service.gov.uk/contact/survey?ticketId={deskproTicketKey}&serviceId={serviceId}`
-
-'{environment}.' is not included in the case of the production environment.
-
-This link then redirects the user to the standalone page where the survey can be filled in.
-
-[[Back to the top]](#top)
-
-## Providing Beta feedback about services <a name="providing-beta-feedback-about-services"></a>
-
+## Providing Beta feedback about services
 ![alt tag](docs/beta-feedback.png)
 
 This form consists of the following fields:
@@ -146,7 +141,57 @@ To use this form, render a link on your page to:
 
 [[Back to the top]](#top)
 
-## Report an Accessibility Problem <a name="report-an-accessibility-problem"></a>
+### Contacting HMRC - *Help and contact*
+> :warning: This form is deprecated, as experience has shown that it is used to report things that DTST can't help with,
+> for example forgotten login credentials.
+
+This form is very similar to the *Is this page not working properly?* form, with the following differences:
+
+This contact form contains only three input fields:
+- name
+- email address
+- comments
+
+Requests of this type are forwarded to *Deskpro* with the subject *"Contact form submission"*
+
+[[Back to the top]](#top)
+
+## Providing feedback about the Digital Technical Support Team ('Customer Satisfaction')
+> :warning: This functionality is used by Deskpro and is not to be used by any consuming service directly.
+
+Upon resolving a customer issue, response emails are sent by the Digital Technical Support Team containing a link 
+inviting users to complete a survey about the customer's satisfaction with the way their issue was handled.
+
+Here is an example of the email received by the user:
+
+![alt tag](docs/support-confirmation-email.png)
+
+Emails received from Deskpro by tax users will contain link in the following format:
+
+`https://www.{environment}.tax.service.gov.uk/contact/survey?ticketId={deskproTicketKey}&serviceId={serviceId}`
+
+'{environment}.' is not included in the case of the production environment.
+
+This link then takes the user to the survey page, which looks like this:
+
+![alt tag](docs/survey.png)
+
+Feedback survey results currently are stored as explicit audit events with the following properties:
+* *auditSource* - "frontend"
+* *auditType* - "DeskproSurvey"
+* *details* 
+    * *helpful* - the response to the question about user satisfaction
+    * *speed* - the response about satisfaction with the speed of DTST's reply
+    * *improve* - contents of the textual field with improvement suggestions
+    * *ticketId* - the reference of the case (same as in email)
+    * *serviceId* - an identifier of the service - same as provided in the *Is this page not working properly?* page
+
+[[Back to the top]](#top)
+
+## Reporting an accessibility problem
+
+> :warning: This form is linked to from [accessibility-statement-frontend](https://www.github.com/accessibility-statement-frontend)
+> and is not to be used directly.
 
 ![alt tag](docs/accessibility.png)
 
@@ -156,66 +201,5 @@ This form consists of the following fields:
 - user's email address
 
 Accessibility problems are forwarded to Deskpro with the subject *"Accessibility Problem"*.
-
-This form is linked to from [accessibility-statement-frontend](https://www.github.com/accessibility-statement-frontend)
-and is not intended to be used directly.
-
-Services that have not yet migrated to accessibility-statement-frontend display a link that opens a new tab to:
-* `https://www.{environment}.tax.service.gov.uk/contact/accessibility?service=${serviceId}&referrerUrl=${referrerUrl}`
-
-`{environment}` is not included in the case of the production environment.
-
-| URL parameter  | Description                                                                                                          |
-| ---------------| -------------------------------------------------------------------------------------------------------------------- |
-| `service`      | an identifier for your service unlikely to be used by any other service, excluding whitespace and special characters |
-| `referrerUrl`  | the full, absolute, properly encoded URL of the page the user was on before they navigated to the contact form       |
-
-[[Back to the top]](#top)
-
-## referer header forwarding to Deskpro
-
-Historically, `contact-frontend` forwarded the `referer` header to Deskpro when a form was submitted, allowing customer 
-service agents to view the page from which an end user navigated to `contact-frontend`. This behaviour is now being
-deprecated, and instead the `referrerUrl` should be passed as a query string parameter (see individual page parameters 
-above).
-
-[[Back to the top]](#top)
-
-## Creating customized customer contact forms <a name="creating-own-customer-contact-forms"></a>
-
-Currently, it is not possible to customize forms in ways other than described above. If you have business
-requirements to customize customer contact form, please get in touch with PlatUI team ([#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/))
-
-[[Back to the top]](#top)
-
-# Other relevant information <a name="other-relevant-details"></a>
-
-## User details attached to the ticket <a name="user-details-attached-to-the-ticket"></a>
-
-In addition to the information provided by the user, the service collects the following context data:
-* *HTTP Referrer header* - this is the URL of the page on which the user initiated the contact journey, as passed on the
-  URL as a query string parameter. Deskpro uses it to classify issues.
-* *HTTP UserAgent header* - this tells us what browser the user has
-* *user tax identifiers* - if the user has logged in, user tax identifiers will be attached to the tickets. These 
-  identifiers can later be viewed via Deskpro.
-* *whether user's browser uses Javascript* 
-* *user's id* - as provided in the HeaderCarrier object
-* *sessionId* - as provided in the HeaderCarrier object
- 
-Here is a list of supported identifiers:
-
-* NIN
-* UTR
-* VAT registration number
-* PAYE reference
-
-[[Back to the top]](#top)
-
-## Maintenance documentation
-Maintenance documentation for the owning team, including architectural decision records (ADRs) can be found [here](docs/maintainers.md).
-
-## Slack <a name="appendix__links__slack"></a>
-* [#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/) - PlatUI is responsible for contact-frontend
-* [#team-ddcops](https://hmrcdigital.slack.com/messages/team-ddcops) - DDCOps is responsible for Deskpro maintenance
 
 [[Back to the top]](#top)
