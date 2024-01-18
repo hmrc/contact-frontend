@@ -9,13 +9,13 @@ object AppDependencies {
 
   private val bootstrapFrontendVersion = "8.1.0"
   private val playFrontendHmrcVersion  = "8.0.0"
-  private val playVersion              = "play-29"
+  private val playVersion              = "play-30"
 
   private val compile = Seq(
     "uk.gov.hmrc" %% s"bootstrap-frontend-$playVersion" % bootstrapFrontendVersion,
     "uk.gov.hmrc" %% s"play-frontend-hmrc-$playVersion" % playFrontendHmrcVersion,
-    "uk.gov.hmrc" %% "govuk-template"                   % "5.80.0-play-28",
-    "uk.gov.hmrc" %% s"play-ui-$playVersion"            % "10.0.0-SNAPSHOT"
+    "uk.gov.hmrc" %% s"govuk-template-$playVersion"     % "7.0.0",
+    "uk.gov.hmrc" %% s"play-ui-$playVersion"            % "11.0.0"
   )
 
   private def test(scope: String) = Seq(
