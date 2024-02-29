@@ -46,9 +46,7 @@ plugin.
 
 ## Running UI acceptance tests
 
-To run the UI acceptance tests locally, you will need a dockerised browser running locally,
-eg. via [docker-selenium-grid](https://github.com/hmrc/docker-selenium-grid/)
-
+To execute the UI acceptance tests on your local machine, ensure that you have [local-selenium-grid](https://github.com/hmrc/local-selenium-grid) installed and running. Once set up, you can proceed with running the tests with.
 ```shell script
 ./run_acceptance_tests.sh
 ```
