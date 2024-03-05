@@ -33,7 +33,8 @@
     h1: Heading1,
     h2: Heading2,
     p: Paragraph,
-    link: HmrcNewTabLinkHelper
+    link: HmrcNewTabLinkHelper,
+    govukDateInput: GovukDateInput
 )
 @(contactForm: Form[ContactForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
@@ -80,6 +81,18 @@
             label = messages("contact.comments.label"),
             maxLength = Some(2000)
         )
+
+        @govukDateInput(DateInput(
+            items = DateInput.dayMonthYearInputItems(contactForm("date")),
+            hint = Some(Hint(content = Text("This is a date hint"))),
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(messages("This is a date heading")),
+                    classes = "govuk-fieldset__legend--l",
+                    isPageHeading = true)))
+            )
+        ).withFormField(contactForm("date")))
+
         @govukButton(Button(
             content = Text(messages("contact.button")),
             inputType = Some("submit"),
