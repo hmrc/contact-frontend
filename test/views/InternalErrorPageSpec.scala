@@ -58,7 +58,7 @@ class InternalErrorPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").text shouldBe "Sorry, there is a problem with the service – Contact HMRC – GOV.UK"
+      content.select("title").first().text shouldBe "Sorry, there is a problem with the service – Contact HMRC – GOV.UK"
     }
 
     "display the correct page heading" in {

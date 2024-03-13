@@ -86,7 +86,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport w
     }
 
     "display the correct browser title" in {
-      content.select("title").text shouldBe "Survey – GOV.UK"
+      content.select("title").first().text shouldBe "Survey – GOV.UK"
     }
 
     "display the correct page heading" in {

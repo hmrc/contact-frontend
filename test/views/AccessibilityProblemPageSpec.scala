@@ -95,7 +95,7 @@ class AccessibilityProblemPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").text shouldBe "Report an accessibility problem – GOV.UK"
+      content.select("title").first().text shouldBe "Report an accessibility problem – GOV.UK"
     }
 
     "display the correct page heading" in {

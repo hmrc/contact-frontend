@@ -97,7 +97,7 @@ class ReportProblemPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").text shouldBe "Get help with a technical problem – GOV.UK"
+      content.select("title").first().text shouldBe "Get help with a technical problem – GOV.UK"
     }
 
     "display the correct page heading" in {
