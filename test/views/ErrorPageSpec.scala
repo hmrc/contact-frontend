@@ -53,7 +53,7 @@ class ErrorPageSpec extends AnyWordSpec with Matchers with ApplicationSupport wi
     }
 
     "display the correct browser title" in {
-      content.select("title").text shouldBe "This is the title"
+      content.select("title").first().text shouldBe "This is the title"
     }
 
     "display the correct page heading" in {

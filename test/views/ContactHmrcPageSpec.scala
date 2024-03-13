@@ -95,7 +95,7 @@ class ContactHmrcPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").text shouldBe "Help and contact – GOV.UK"
+      content.select("title").first().text shouldBe "Help and contact – GOV.UK"
     }
 
     "display the correct page heading" in {
