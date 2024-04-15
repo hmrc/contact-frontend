@@ -17,6 +17,7 @@
 package acceptance.driver
 
 import com.typesafe.scalalogging.LazyLogging
+import org.openqa.selenium.WebDriver
 import uk.gov.hmrc.selenium.webdriver.Driver
 
 trait BrowserDriver extends LazyLogging {
@@ -24,5 +25,5 @@ trait BrowserDriver extends LazyLogging {
     s"Instantiating Browser: ${sys.props.getOrElse("browser", "'browser' System property not set. This is required")}"
   )
 
-  implicit def driver = Driver.instance
+  implicit def driver: WebDriver = Driver.instance
 }
