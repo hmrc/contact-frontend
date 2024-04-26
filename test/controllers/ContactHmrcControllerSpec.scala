@@ -40,6 +40,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.RefererHeaderRetriever
 
@@ -100,7 +101,7 @@ class ContactHmrcControllerSpec
 
       When("the page is requested with a service name via URL")
       val contactResult =
-        controller.index(serviceName, Some("my-action"), Some("/url-from-query"))(contactRequest)
+        controller.index(serviceName, Some("my-action"), Some(RedirectUrl("/url-from-query")))(contactRequest)
 
       Then("the expected page should be returned")
       status(contactResult) shouldBe 200
@@ -122,7 +123,7 @@ class ContactHmrcControllerSpec
 
       val contactRequest = FakeRequest().withHeaders((REFERER, "/some-service-page"))
       val serviceName    = Some("my-fake-service")
-      val referrerUrl    = Some("https://www.example.com/some-service")
+      val referrerUrl    = Some(RedirectUrl("https://www.example.com/some-service"))
 
       When("the page is requested with a service name and a referrer url")
       val contactResult = controller.index(serviceName, None, referrerUrl)(contactRequest)
