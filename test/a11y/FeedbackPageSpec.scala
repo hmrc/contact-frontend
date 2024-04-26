@@ -19,6 +19,7 @@ package a11y
 import _root_.helpers.{ApplicationSupport, MessagesSupport}
 import config.AppConfig
 import model.FeedbackForm
+import model.FormBindings.optionalRedirectUrlMapping
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
@@ -54,7 +55,7 @@ class FeedbackPageSpec
       "feedback-comments" -> text
         .verifying("feedback.comments.error.required", comment => comment.nonEmpty),
       "isJavascript"      -> boolean,
-      "referrer"          -> text,
+      "referrer"          -> optionalRedirectUrlMapping,
       "csrfToken"         -> text,
       "service"           -> optional(text),
       "backUrl"           -> optional(text),

@@ -36,6 +36,7 @@ import play.api.test.Helpers._
 import play.api.Application
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.RefererHeaderRetriever
 
@@ -63,7 +64,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       val result  = controller.index(
         service = None,
         userAction = Some("test?1234=xyz"),
-        referrerUrl = Some("some.referrer.url")
+        referrerUrl = Some(RedirectUrl("/some.referrer.url"))
       )(request)
 
       status(result) should be(200)
@@ -72,12 +73,12 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       document.getElementById("accessibility-form")                                should not be null
       document.getElementsByAttributeValue("name", "service").`val`()              should be("")
       document.getElementsByAttributeValue("name", "userAction").first().`val`() shouldBe "test?1234=xyz"
-      document.getElementsByAttributeValue("name", "referrer").first().`val`()   shouldBe "some.referrer.url"
+      document.getElementsByAttributeValue("name", "referrer").first().`val`()   shouldBe "/some.referrer.url"
     }
 
     "return 200 and a valid html page for a request when no referrerUrl and referer in header" in new TestScope {
 
-      val request = FakeRequest().withHeaders((REFERER, "referrer.from.header"))
+      val request = FakeRequest().withHeaders((REFERER, "/referrer.from.header"))
       val result  = controller.index(
         service = None,
         userAction = Some("test?1234=xyz"),
@@ -86,7 +87,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
 
       status(result) should be(200)
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "referrer.from.header"
+      document.getElementsByAttributeValue("name", "referrer").first().`val`() shouldBe "/referrer.from.header"
     }
 
     "return 200 and a valid html page for a request when no referrerUrl and no referer in header" in new TestScope {

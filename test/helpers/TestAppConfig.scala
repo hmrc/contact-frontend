@@ -17,6 +17,8 @@
 package helpers
 
 import config.AppConfig
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrlPolicy
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrlPolicy.Id
 
 class TestAppConfig extends AppConfig {
   def externalReportProblemUrl: String = ???
@@ -24,4 +26,6 @@ class TestAppConfig extends AppConfig {
   def backUrlDestinationAllowList: Set[String] = ???
 
   override def sendExplicitAuditEvents: Boolean = false
+
+  override def urlPolicy: RedirectUrlPolicy[Id] = ???
 }

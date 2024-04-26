@@ -19,6 +19,7 @@ package a11y
 import _root_.helpers.{ApplicationSupport, MessagesSupport}
 import config.AppConfig
 import controllers.ContactForm
+import model.FormBindings.optionalRedirectUrlMapping
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
@@ -49,7 +50,7 @@ class ContactHmrcPageSpec
       "contact-email"    -> text.verifying("contact.email.error.required", msg => msg.nonEmpty),
       "contact-comments" -> text.verifying("contact.comments.error.required", msg => msg.nonEmpty),
       "isJavascript"     -> boolean,
-      "referrer"         -> text,
+      "referrer"         -> optionalRedirectUrlMapping,
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text)

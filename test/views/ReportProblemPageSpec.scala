@@ -18,6 +18,7 @@ package views
 
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
+import model.FormBindings.optionalRedirectUrlMapping
 import model.ReportProblemForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -28,6 +29,7 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.ReportProblemPage
 
 class ReportProblemPageSpec
@@ -51,7 +53,7 @@ class ReportProblemPageSpec
       "report-error"  -> text.verifying("problem_report.error.error.required", msg => msg.nonEmpty),
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
-      "referrer"      -> optional(text),
+      "referrer"      -> optionalRedirectUrlMapping,
       "csrfToken"     -> text,
       "userAction"    -> optional(text)
     )(ReportProblemForm.apply)(ReportProblemForm.unapply)
@@ -156,7 +158,7 @@ class ReportProblemPageSpec
     "include the referrer hidden input" in {
       val contentWithService = reportProblemPage(
         problemReportsForm.fill(
-          formValues.copy(referrer = Some("my-referrer-url"))
+          formValues.copy(referrer = Some(RedirectUrl("my-referrer-url")))
         ),
         action
       )

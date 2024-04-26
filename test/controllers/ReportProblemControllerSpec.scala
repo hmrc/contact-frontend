@@ -33,6 +33,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.RefererHeaderRetriever
 
@@ -45,12 +46,12 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
 
   "Requesting the standalone page" should {
     "return OK and valid HTML" in new TestScope {
-      val result = controller.index(Some("my-test-service"), Some("my-referrer-url"))(FakeRequest())
+      val result = controller.index(Some("my-test-service"), Some(RedirectUrl("/my-referrer-url")))(FakeRequest())
 
       status(result) should be(OK)
 
       val document    = Jsoup.parse(contentAsString(result))
-      val queryString = s"service=my-test-service&referrerUrl=my-referrer-url"
+      val queryString = s"service=my-test-service&referrerUrl=%2Fmy-referrer-url"
       document
         .body()
         .select("form[id=error-feedback-form]")
@@ -63,41 +64,43 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
 
     "bind the referrer from the URL rather than headers if both provided" in new TestScope {
       val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
-      val result             = controller.index(Some("my-test-service"), Some("referrer-from-url"))(requestWithHeaders)
+      val result             =
+        controller.index(Some("my-test-service"), Some(RedirectUrl("/referrer-from-url")))(requestWithHeaders)
 
       status(result) should be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=referrer]").`val` should be("referrer-from-url")
+      document.select("input[name=referrer]").`val` should be("/referrer-from-url")
     }
 
     "bind the referrer from the header if no URL parameter passed in" in new TestScope {
-      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "/referrer-from-header"))
       val result             = controller.index(Some("my-test-service"), None)(requestWithHeaders)
 
       status(result) should be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=referrer]").`val` should be("referrer-from-header")
+      document.select("input[name=referrer]").`val` should be("/referrer-from-header")
     }
   }
 
   "Requesting the deprecated standalone page" should {
     "redirect to the non-deprecated page with the REFERER passed via the URL" in new TestScope {
       val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
-      val result             = controller.indexDeprecated(Some("my-test-service"), Some("referrer-from-url"))(requestWithHeaders)
+      val result             =
+        controller.indexDeprecated(Some("my-test-service"), Some(RedirectUrl("/referrer-from-url")))(requestWithHeaders)
 
       status(result) should be(SEE_OTHER)
-      val queryString = s"service=my-test-service&referrerUrl=referrer-from-url"
+      val queryString = s"service=my-test-service&referrerUrl=%2Freferrer-from-url"
       redirectLocation(result) should be(Some(s"/contact/report-technical-problem?$queryString"))
     }
 
     "redirect to the non-deprecated page with the REFERER passed via the header" in new TestScope {
-      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
+      val requestWithHeaders = FakeRequest().withHeaders((REFERER, "/referrer-from-header"))
       val result             = controller.indexDeprecated(Some("my-test-service"), None)(requestWithHeaders)
 
       status(result) should be(SEE_OTHER)
-      val queryString = s"service=my-test-service&referrerUrl=referrer-from-header"
+      val queryString = s"service=my-test-service&referrerUrl=%2Freferrer-from-header"
       redirectLocation(result) should be(Some(s"/contact/report-technical-problem?$queryString"))
     }
   }
@@ -119,7 +122,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq("John Densmore"),
           meq("name@mail.com"),
           meq(controller.problemMessage("Some Action", "Some Error")),
-          meq("referrer-from-url"),
+          meq("/referrer-from-url"),
           meq(true),
           any[Request[AnyRef]](),
           meq(None),
@@ -130,8 +133,8 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       ).thenReturn(Future.successful(TicketId(123)))
 
       val request           = generateRequest(isAjaxRequest = true)
-      val requestWithHeader = request.withHeaders((REFERER, "referrer-from-request"))
-      val result            = controller.submit(None, Some("referrer-from-url"))(requestWithHeader)
+      val requestWithHeader = request.withHeaders((REFERER, "/referrer-from-request"))
+      val result            = controller.submit(None, Some(RedirectUrl("/referrer-from-url")))(requestWithHeader)
 
       status(result)             should be(SEE_OTHER)
       redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
@@ -171,7 +174,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
         .body()
         .select("form[id=error-feedback-form]")
         .first
-        .attr("action")                                       shouldBe s"/contact/report-technical-problem"
+        .attr("action")                                       shouldBe s"/contact/report-technical-problem?referrerUrl=%2Fcontact%2Fproblem_reports"
     }
 
     "return Bad Request and page with validation error if the name has invalid characters" in new TestScope {

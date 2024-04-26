@@ -19,18 +19,19 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-
-import javax.inject.{Inject, Singleton}
+import model.FormBindings._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever, ReferrerUrlChecking}
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 object ContactHmrcForm {
@@ -55,7 +56,7 @@ object ContactHmrcForm {
         .verifying("contact.comments.error.required", comment => comment.trim.nonEmpty)
         .verifying("contact.comments.error.length", comment => comment.length <= 2000),
       "isJavascript"     -> boolean,
-      "referrer"         -> text,
+      "referrer"         -> optionalRedirectUrlMapping,
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text)
@@ -75,36 +76,39 @@ class ContactHmrcController @Inject() (
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with ReferrerUrlChecking {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  def index(service: Option[String], userAction: Option[String], referrerUrl: Option[String]) =
+  def index(service: Option[String], userAction: Option[String], referrerUrl: Option[RedirectUrl]) = {
     Action.async { implicit request =>
+      val referrer = maybeSafeRedirectUrl(service, referrerUrl, headerRetriever)
       Future.successful {
-        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders getOrElse "n/a"
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
         val form      = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, userAction))
-        val submit    = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
+        val submit    = routes.ContactHmrcController.submit(service, userAction, referrer)
         val view      = contactHmrcPage(form, submit)
         Ok(view)
       }
     }
+  }
 
   def submit(
     service: Option[String],
     userAction: Option[String],
-    referrerUrl: Option[String]
+    referrerUrl: Option[RedirectUrl]
   ): Action[AnyContent] =
     Action.async { implicit request =>
+      val referrer = maybeSafeRedirectUrl(service, referrerUrl, headerRetriever)
       ContactHmrcForm.form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            val submit = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
+            val submit = routes.ContactHmrcController.submit(service, userAction, referrer)
             Future.successful(BadRequest(contactHmrcPage(formWithErrors, submit)))
           },
-          data =>
+          (data: ContactForm) =>
             (for {
               maybeEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
               _               <- createDeskproTicket(data, maybeEnrolments)
@@ -127,7 +131,7 @@ case class ContactForm(
   contactEmail: String,
   contactComments: String,
   isJavascript: Boolean,
-  referrer: String,
+  referrer: Option[RedirectUrl],
   csrfToken: String,
   service: Option[String] = Some("unknown"),
   userAction: Option[String] = None
@@ -135,7 +139,7 @@ case class ContactForm(
 
 object ContactForm {
   def apply(
-    referrer: String,
+    referrer: Option[RedirectUrl],
     csrfToken: String,
     service: Option[String],
     userAction: Option[String]

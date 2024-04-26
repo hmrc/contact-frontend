@@ -1,37 +1,37 @@
 ->          /hmrc-frontend                               hmrcfrontend.Routes
 
-GET         /beta-feedback                               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
-POST        /beta-feedback                               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
-GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
-POST        /beta-feedback-unauthenticated               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
-POST        /beta-feedback/submit                        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
-POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[String])
+GET         /beta-feedback                               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[RedirectUrl])
+POST        /beta-feedback                               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[RedirectUrl])
+GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[RedirectUrl])
+POST        /beta-feedback-unauthenticated               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[RedirectUrl])
+POST        /beta-feedback/submit                        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[RedirectUrl])
+POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[RedirectUrl])
 GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks(backUrl: Option[String])
 GET         /beta-feedback/thanks-unauthenticated        @controllers.FeedbackController.thanks(backUrl: Option[String])
 
-GET         /contact-hmrc                                @controllers.ContactHmrcController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
-POST        /contact-hmrc                                @controllers.ContactHmrcController.submit(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
+GET         /contact-hmrc                                @controllers.ContactHmrcController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[RedirectUrl])
+POST        /contact-hmrc                                @controllers.ContactHmrcController.submit(service: Option[String], userAction: Option[String], referrerUrl: Option[RedirectUrl])
 GET         /contact-hmrc/thanks                         @controllers.ContactHmrcController.thanks
 
-GET         /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
-POST        /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.submit(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
+GET         /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[RedirectUrl])
+POST        /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.submit(service: Option[String], userAction: Option[String], referrerUrl: Option[RedirectUrl])
 GET         /contact-hmrc/thanks-unauthenticated         @controllers.ContactHmrcController.thanks
 
-GET         /report-technical-problem                    @controllers.ReportProblemController.index(service: Option[String], referrerUrl: Option[String])
-POST        /report-technical-problem                    @controllers.ReportProblemController.submit(service: Option[String], referrerUrl: Option[String])
+GET         /report-technical-problem                    @controllers.ReportProblemController.index(service: Option[String], referrerUrl: Option[RedirectUrl])
+POST        /report-technical-problem                    @controllers.ReportProblemController.submit(service: Option[String], referrerUrl: Option[RedirectUrl])
 GET         /report-technical-problem/thanks             @controllers.ReportProblemController.thanks
-GET         /problem_reports_nonjs                       @controllers.ReportProblemController.indexDeprecated(service: Option[String], referrerUrl: Option[String])
-POST        /problem_reports_nonjs                       @controllers.ReportProblemController.submit(service: Option[String], referrerUrl: Option[String])
+GET         /problem_reports_nonjs                       @controllers.ReportProblemController.indexDeprecated(service: Option[String], referrerUrl: Option[RedirectUrl])
+POST        /problem_reports_nonjs                       @controllers.ReportProblemController.submit(service: Option[String], referrerUrl: Option[RedirectUrl])
 
 GET         /survey                                      @controllers.SurveyController.survey(ticketId: String, serviceId: String)
 POST        /survey                                      @controllers.SurveyController.submit(ticketId: String, serviceId: String)
 POST        /submitSurvey                                @controllers.SurveyController.submitDeprecated()
 GET         /survey/confirmation                         @controllers.SurveyController.confirmation()
 
-GET         /accessibility                               @controllers.AccessibilityController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
+GET         /accessibility                               @controllers.AccessibilityController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[RedirectUrl])
 POST        /accessibility                               @controllers.AccessibilityController.submit(service: Option[String], userAction: Option[String])
 GET         /accessibility/thanks                        @controllers.AccessibilityController.thanks()
 
-GET         /accessibility-unauthenticated               @controllers.AccessibilityController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[String])
+GET         /accessibility-unauthenticated               @controllers.AccessibilityController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[RedirectUrl])
 POST        /accessibility-unauthenticated               @controllers.AccessibilityController.submit(service: Option[String], userAction: Option[String])
 GET         /accessibility-unauthenticated/thanks        @controllers.AccessibilityController.thanks()

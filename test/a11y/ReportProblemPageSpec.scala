@@ -18,6 +18,7 @@ package a11y
 
 import _root_.helpers.{ApplicationSupport, MessagesSupport}
 import config.AppConfig
+import model.FormBindings.optionalRedirectUrlMapping
 import model.ReportProblemForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -51,7 +52,7 @@ class ReportProblemPageSpec
       "report-error"  -> text.verifying("problem_report.error.error.required", msg => msg.nonEmpty),
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
-      "referrer"      -> optional(text),
+      "referrer"      -> optionalRedirectUrlMapping,
       "csrfToken"     -> text,
       "userAction"    -> optional(text)
     )(ReportProblemForm.apply)(ReportProblemForm.unapply)

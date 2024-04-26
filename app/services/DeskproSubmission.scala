@@ -24,6 +24,7 @@ import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import java.net.URI
@@ -65,7 +66,7 @@ trait DeskproSubmission {
         case ""      => "No comment given"
         case comment => comment
       },
-      referrer = data.referrer,
+      referrer = data.referrer.map(_.unsafeValue).getOrElse("n/a"),
       isJavascript = data.javascriptEnabled,
       request = request,
       enrolmentsOption = enrolments,
@@ -77,14 +78,14 @@ trait DeskproSubmission {
     problemReport: ReportProblemForm,
     request: Request[AnyRef],
     enrolmentsOption: Option[Enrolments],
-    referrer: Option[String]
+    referrer: Option[RedirectUrl]
   )(implicit messages: Messages): Future[TicketId] = {
     implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     ticketQueueConnector.createDeskProTicket(
       name = problemReport.reportName,
       email = problemReport.reportEmail,
       message = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer = replaceReferrerPath(referrer.getOrElse(""), problemReport.userAction),
+      referrer = replaceReferrerPath(referrer, problemReport.userAction),
       isJavascript = problemReport.isJavascript,
       request = request,
       enrolmentsOption = enrolmentsOption,
@@ -124,16 +125,17 @@ trait DeskproSubmission {
 
 object DeskproSubmission {
 
-  def replaceReferrerPath(referrer: String, path: Option[String]): String =
+  def replaceReferrerPath(referrer: Option[RedirectUrl], path: Option[String]): String =
     path
       .filter(_.trim.nonEmpty)
       .map { p =>
         val absolutePath = if (p.startsWith("/")) p else s"/$p"
         buildUri(referrer).resolve(absolutePath).toASCIIString
       }
-      .getOrElse(referrer)
+      .getOrElse(referrer.map(r => r.unsafeValue).getOrElse(""))
 
-  private def buildUri(referrer: String): URI =
-    Try(new URI(referrer)).getOrElse(URI.create(""))
+  private def buildUri(referrer: Option[RedirectUrl]): URI = {
+    Try(new URI(referrer.map(r => r.unsafeValue).getOrElse(""))).getOrElse(URI.create(""))
+  }
 
 }

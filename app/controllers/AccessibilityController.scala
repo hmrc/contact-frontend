@@ -19,20 +19,21 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-
-import javax.inject.Inject
 import model.AccessibilityForm
+import model.FormBindings._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request}
+import play.api.mvc._
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission
+import uk.gov.hmrc.play.bootstrap.binders.{RedirectUrl, SafeRedirectUrl}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever, ReferrerUrlChecking}
 import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, InternalErrorPage}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 object AccessibilityFormBind {
@@ -41,7 +42,7 @@ object AccessibilityFormBind {
 
   def emptyForm(
     csrfToken: String,
-    referrer: Option[String] = None,
+    referrer: Option[RedirectUrl],
     service: Option[String] = None,
     userAction: Option[String] = None
   ): Form[AccessibilityForm] =
@@ -51,7 +52,7 @@ object AccessibilityFormBind {
         name = "",
         email = "",
         isJavascript = false,
-        referrer = referrer.getOrElse("n/a"),
+        referrer = referrer,
         csrfToken = csrfToken,
         service = service,
         userAction = userAction
@@ -77,7 +78,7 @@ object AccessibilityFormBind {
           email => !(email.trim.isEmpty || emailValidator.validate(email)) || email.length <= 255
         ),
       "isJavascript"       -> boolean,
-      "referrer"           -> text,
+      "referrer"           -> optionalRedirectUrlMapping,
       "csrfToken"          -> text,
       "service"            -> optional(text),
       "userAction"         -> optional(text)
@@ -96,19 +97,20 @@ class AccessibilityController @Inject() (
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with ReferrerUrlChecking {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
   def index(
     service: Option[String],
     userAction: Option[String],
-    referrerUrl: Option[String]
+    referrerUrl: Option[RedirectUrl]
   ): Action[AnyContent] =
     Action.async { implicit request =>
       Future.successful {
+        val referrer  = maybeSafeRedirectUrl(service, referrerUrl, headerRetriever)
         val submit    = routes.AccessibilityController.submit(service, userAction)
-        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
         val form      = AccessibilityFormBind.emptyForm(csrfToken, referrer, service, userAction)
         Ok(accessibilityPage(form, submit))

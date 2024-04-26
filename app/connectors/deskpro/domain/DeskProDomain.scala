@@ -21,6 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 case class Ticket private (
   name: String,
@@ -70,7 +71,6 @@ object Ticket extends FieldTransformer with Logging {
       service,
       userAction
     )
-    logger.info(s"Creating ticket $ticket")
     ticket
   }
 }

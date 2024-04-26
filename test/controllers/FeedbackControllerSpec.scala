@@ -35,6 +35,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.{BackUrlValidator, RefererHeaderRetriever}
 
@@ -92,12 +93,12 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         service = Some("any-service"),
         backUrl = Some("/any-service"),
         canOmitComments = true,
-        referrerUrl = Some("any-referring-parameter")
-      )(FakeRequest("GET", "/foo").withHeaders((REFERER, "any-referring-header")))
+        referrerUrl = Some(RedirectUrl("/any-referring-parameter"))
+      )(FakeRequest("GET", "/foo").withHeaders((REFERER, "/any-referring-header")))
 
       val page = Jsoup.parse(contentAsString(result))
 
-      page.body().select("input[name=referrer]").first.attr("value") shouldBe "any-referring-parameter"
+      page.body().select("input[name=referrer]").first.attr("value") shouldBe "/any-referring-parameter"
     }
 
     "include 'referrer' hidden field from header when passed in request headers only" in new TestScope {
@@ -106,11 +107,11 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         backUrl = Some("/any-service"),
         canOmitComments = true,
         referrerUrl = None
-      )(FakeRequest("GET", "/foo").withHeaders((REFERER, "any-referring-header")))
+      )(FakeRequest("GET", "/foo").withHeaders((REFERER, "/any-referring-header")))
 
       val page = Jsoup.parse(contentAsString(result))
 
-      page.body().select("input[name=referrer]").first.attr("value") shouldBe "any-referring-header"
+      page.body().select("input[name=referrer]").first.attr("value") shouldBe "/any-referring-header"
     }
 
     "set 'referrer' hidden field to n/a if not passed in query string or request headers" in new TestScope {
@@ -208,11 +209,11 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       val queryString =
         s"service=someService&backUrl=$encodedBackUrl&canOmitComments=true&referrerUrl=$encodedReferrerUrl"
 
-      page.body().select("form[id=feedback-form]").first.attr("action") shouldBe s"/contact/beta-feedback?$queryString"
       page.body().select("input[name=service]").first.attr("value")     shouldBe "someService"
       page.body().select("input[name=canOmitComments]").attr("value")   shouldBe "true"
       page.body().select("input[name=backUrl]").first.attr("value")     shouldBe backUrl
       page.body().select("input[name=referrer]").attr("value")          shouldBe referrerUrl
+      page.body().select("form[id=feedback-form]").first.attr("action") shouldBe s"/contact/beta-feedback?$queryString"
     }
 
     "return service error page if call to backend service failed" in new TestScope {

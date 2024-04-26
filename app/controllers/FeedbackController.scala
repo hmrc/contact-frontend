@@ -19,21 +19,22 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-
-import javax.inject.{Inject, Singleton}
 import model.FeedbackForm
+import model.FormBindings._
 import play.api.data.Forms._
 import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
-import services.DeskproSubmission
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{BackUrlValidator, DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
-import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
 import play.twirl.api.Html
+import services.DeskproSubmission
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import util._
+import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton class FeedbackController @Inject() (
@@ -48,21 +49,24 @@ import scala.concurrent.{ExecutionContext, Future}
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with ReferrerUrlChecking {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  val formId = "FeedbackForm"
-
-  def index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean, referrerUrl: Option[String]) =
+  def index(
+    service: Option[String],
+    backUrl: Option[String],
+    canOmitComments: Boolean,
+    referrerUrl: Option[RedirectUrl]
+  ): Action[AnyContent] =
     Action.async { implicit request =>
-      val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
       Future.successful(
         Ok(
           renderFeedbackPage(
             FeedbackFormBind.emptyForm(
               CSRF.getToken(request).map(_.value).getOrElse(""),
-              referrer = referrer,
+              referrer = referrerUrl,
               backUrl = backUrl,
               canOmitComments = canOmitComments,
               service = service
@@ -70,7 +74,7 @@ import scala.concurrent.{ExecutionContext, Future}
             service,
             backUrl,
             canOmitComments = canOmitComments,
-            referrer
+            referrerUrl
           )
         )
       )
@@ -80,8 +84,8 @@ import scala.concurrent.{ExecutionContext, Future}
     service: Option[String] = None,
     backUrl: Option[String] = None,
     canOmitComments: Boolean = false,
-    referrerUrl: Option[String] = None
-  ) = Action.async { implicit request =>
+    referrerUrl: Option[RedirectUrl] = None
+  ): Action[AnyContent] = Action.async { implicit request =>
     FeedbackFormBind.form
       .bindFromRequest()
       .fold(
@@ -98,18 +102,18 @@ import scala.concurrent.{ExecutionContext, Future}
       )
   }
 
-  def thanks(backUrl: Option[String] = None) = Action.async { implicit request =>
+  def thanks(backUrl: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>
     val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
     Future.successful(Ok(feedbackConfirmationPage(backUrl = validatedBackUrl)))
   }
 
-  private def feedbackView(form: Form[FeedbackForm])(implicit request: Request[AnyRef]) =
+  private def feedbackView(form: Form[FeedbackForm])(implicit request: Request[AnyContent]): Html =
     renderFeedbackPage(
       form,
       form("service").value,
       form("backUrl").value,
       form("canOmitComments").value.contains("true"),
-      form("referrer").value
+      form("referrer").value.map(RedirectUrl(_))
     )
 
   private def renderFeedbackPage(
@@ -117,11 +121,12 @@ import scala.concurrent.{ExecutionContext, Future}
     service: Option[String],
     backUrl: Option[String],
     canOmitComments: Boolean,
-    referrerUrl: Option[String]
+    referrer: Option[RedirectUrl]
   )(implicit
     request: Request[_]
   ): Html = {
-    val action = routes.FeedbackController.submit(service, backUrl, canOmitComments, referrerUrl)
+    val action = routes.FeedbackController
+      .submit(service, backUrl, canOmitComments, referrer)
     feedbackPage(form, action)
   }
 }
@@ -135,7 +140,7 @@ object FeedbackFormBind {
 
   def emptyForm(
     csrfToken: String,
-    referrer: Option[String] = None,
+    referrer: Option[RedirectUrl],
     backUrl: Option[String],
     canOmitComments: Boolean,
     service: Option[String]
@@ -147,7 +152,7 @@ object FeedbackFormBind {
         email = "",
         comments = "",
         javascriptEnabled = false,
-        referrer.getOrElse("n/a"),
+        referrer,
         csrfToken,
         Some(service.getOrElse("unknown")),
         backUrl,
@@ -192,7 +197,7 @@ object FeedbackFormBind {
           }
         ),
         "isJavascript"    -> boolean,
-        "referrer"        -> text,
+        "referrer"        -> optionalRedirectUrlMapping,
         "csrfToken"       -> text,
         "service"         -> optional(text),
         "backUrl"         -> optional(text),

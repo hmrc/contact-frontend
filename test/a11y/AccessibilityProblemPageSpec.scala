@@ -19,6 +19,7 @@ package a11y
 import _root_.helpers.{ApplicationSupport, MessagesSupport}
 import config.AppConfig
 import model.AccessibilityForm
+import model.FormBindings.optionalRedirectUrlMapping
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
@@ -49,7 +50,7 @@ class AccessibilityProblemPageSpec
       "name"               -> text.verifying("accessibility.name.error.required", msg => msg.nonEmpty),
       "email"              -> text.verifying("accessibility.email.error.invalid", msg => msg.nonEmpty),
       "isJavascript"       -> boolean,
-      "referrer"           -> text,
+      "referrer"           -> optionalRedirectUrlMapping,
       "csrfToken"          -> text,
       "service"            -> optional(text),
       "userAction"         -> optional(text)

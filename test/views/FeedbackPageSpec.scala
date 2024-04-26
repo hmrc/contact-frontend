@@ -19,6 +19,7 @@ package views
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import model.FeedbackForm
+import model.FormBindings.optionalRedirectUrlMapping
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
@@ -28,6 +29,7 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.FeedbackPage
 
 class FeedbackPageSpec
@@ -54,7 +56,7 @@ class FeedbackPageSpec
       "feedback-comments" -> text
         .verifying("feedback.comments.error.required", comment => comment.nonEmpty),
       "isJavascript"      -> boolean,
-      "referrer"          -> text,
+      "referrer"          -> optionalRedirectUrlMapping,
       "csrfToken"         -> text,
       "service"           -> optional(text),
       "backUrl"           -> optional(text),
@@ -68,7 +70,7 @@ class FeedbackPageSpec
     email = "",
     comments = "",
     javascriptEnabled = false,
-    referrer = "n/a",
+    referrer = Some(RedirectUrl("n/a")),
     csrfToken = "",
     service = Some("unknown"),
     backUrl = None,
@@ -197,7 +199,7 @@ class FeedbackPageSpec
     "include the referrer hidden input" in {
       val contentWithService = feedbackPage(
         form.fill(
-          formValues.copy(referrer = "bar")
+          formValues.copy(referrer = Some(RedirectUrl("bar")))
         ),
         action
       )

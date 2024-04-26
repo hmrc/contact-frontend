@@ -19,6 +19,7 @@ package views
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import controllers.ContactForm
+import model.FormBindings.optionalRedirectUrlMapping
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
@@ -28,6 +29,7 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.ContactHmrcPage
 
 class ContactHmrcPageSpec
@@ -49,7 +51,7 @@ class ContactHmrcPageSpec
       "contact-email"    -> text.verifying("contact.email.error.required", msg => msg.nonEmpty),
       "contact-comments" -> text.verifying("contact.comments.error.required", msg => msg.nonEmpty),
       "isJavascript"     -> boolean,
-      "referrer"         -> text,
+      "referrer"         -> optionalRedirectUrlMapping,
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text)
@@ -61,7 +63,7 @@ class ContactHmrcPageSpec
     contactEmail = "test@example.com",
     contactComments = "Testing action",
     isJavascript = false,
-    referrer = "referrer",
+    referrer = Some(RedirectUrl("referrer")),
     csrfToken = "12345",
     service = None,
     userAction = None
@@ -156,7 +158,7 @@ class ContactHmrcPageSpec
     "include the referrer hidden input" in {
       val contentWithService = contactHmrcPage(
         contactHmrcForm.fill(
-          formValues.copy(referrer = "my-referrer-url")
+          formValues.copy(referrer = Some(RedirectUrl("my-referrer-url")))
         ),
         action
       )

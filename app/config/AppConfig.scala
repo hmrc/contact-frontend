@@ -18,13 +18,15 @@ package config
 
 import javax.inject.Inject
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrlPolicy.Id
+import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, RedirectUrlPolicy}
 
 trait AppConfig {
 
   def externalReportProblemUrl: String
   def backUrlDestinationAllowList: Set[String]
   def sendExplicitAuditEvents: Boolean
-
+  def urlPolicy: RedirectUrlPolicy[Id]
 }
 
 class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
@@ -46,6 +48,11 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .split(',')
       .filter(_.nonEmpty)
       .toSet
+
+  private lazy val mdtpTrustedDomains: Set[String] = configuration.get[Seq[String]]("mdtp.trustedDomains").toSet
+  lazy val trustedDomains: RedirectUrlPolicy[Id]   = AbsoluteWithHostnameFromAllowlist(mdtpTrustedDomains)
+
+  override def urlPolicy: RedirectUrlPolicy[Id] = trustedDomains
 
   private def configNotFoundError(key: String) =
     throw new RuntimeException(s"Could not find config key '$key'")

@@ -19,14 +19,16 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
+import model.FormBindings._
 import model.ReportProblemForm
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc._
 import services.DeskproSubmission
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever, ReferrerUrlChecking}
 import views.html.{InternalErrorPage, ReportProblemConfirmationPage, ReportProblemPage}
 
 import javax.inject.{Inject, Singleton}
@@ -75,13 +77,13 @@ object ReportProblemFormBind {
         .verifying("problem_report.error.error.length", error => error.length <= 1000),
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
-      "referrer"      -> optional(text),
+      "referrer"      -> optionalRedirectUrlMapping,
       "csrfToken"     -> text,
       "userAction"    -> optional(text)
     )(ReportProblemForm.apply)(ReportProblemForm.unapply)
   )
 
-  def emptyForm(csrfToken: String, service: Option[String], referrer: Option[String]): Form[ReportProblemForm] =
+  def emptyForm(csrfToken: String, service: Option[String], referrer: Option[RedirectUrl]): Form[ReportProblemForm] =
     ReportProblemFormBind.form.fill(
       ReportProblemForm(
         reportName = "",
@@ -109,28 +111,30 @@ class ReportProblemController @Inject() (
 )(implicit appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with ReferrerUrlChecking {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  def index(service: Option[String], referrerUrl: Option[String]) = Action { implicit request =>
+  def index(service: Option[String], referrerUrl: Option[RedirectUrl]) = Action { implicit request =>
+    val referrer = maybeSafeRedirectUrl(service, referrerUrl, headerRetriever)
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
-    val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders
-    Ok(page(ReportProblemFormBind.emptyForm(csrfToken, service, referrer), service, referrerUrl))
+    Ok(page(ReportProblemFormBind.emptyForm(csrfToken, service, referrer), service, referrer))
   }
 
-  def indexDeprecated(service: Option[String], referrerUrl: Option[String]) = Action { implicit request =>
-    val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
+  def indexDeprecated(service: Option[String], referrerUrl: Option[RedirectUrl]) = Action { implicit request =>
+    val referrer = maybeSafeRedirectUrl(service, referrerUrl, headerRetriever)
     Redirect(routes.ReportProblemController.index(service, referrer))
   }
 
-  def submit(service: Option[String], referrerUrl: Option[String]) = Action.async { implicit request =>
-    doSubmit(service, referrerUrl)
+  def submit(service: Option[String], referrerUrl: Option[RedirectUrl]) = Action.async { implicit request =>
+    val referrer = maybeSafeRedirectUrl(service, referrerUrl, headerRetriever)
+    doSubmit(service, referrer)
   }
 
-  private def doSubmit(service: Option[String], referrerUrl: Option[String])(implicit
+  private def doSubmit(service: Option[String], referrerUrl: Option[RedirectUrl])(implicit
     request: MessagesRequest[AnyContent]
-  ) =
+  ) = {
     ReportProblemFormBind.form
       .bindFromRequest()
       .fold(
@@ -140,26 +144,35 @@ class ReportProblemController @Inject() (
               page(
                 formWithError,
                 service.orElse(fromForm("service", formWithError)),
-                referrerUrl.orElse(fromForm("referrer", formWithError))
+                referrerUrl
+//                referrerUrl.orElse(fromForm("referrer", formWithError))
               )
             )
           ),
         problemReport => {
-          val referrer = referrerUrl
-            .orElse(problemReport.referrer.filter(_.trim.nonEmpty))
-            .orElse(headerRetriever.refererFromHeaders)
+
+//          val referrer = referrerUrl
+//            .orElse(problemReport.referrer)
+//            .orElse(headerRetriever.refererFromHeaders)
+          println("referrerUrl",referrerUrl)
+          println("problemReport.referrer",problemReport.referrer)
+          println("headerRetriever.refererFromHeaders",headerRetriever.refererFromHeaders)
           (for {
             maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
-            _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
+            _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrerUrl)
           } yield Redirect(routes.ReportProblemController.thanks)) recover { case _ =>
             InternalServerError(errorPage())
           }
         }
       )
+  }
 
-  private def page(form: Form[ReportProblemForm], service: Option[String], referrerUrl: Option[String])(implicit
+  private def page(form: Form[ReportProblemForm], service: Option[String], referrerUrl: Option[RedirectUrl])(implicit
     request: Request[_]
-  ) = reportProblemPage(form, routes.ReportProblemController.submit(service, referrerUrl))
+  ) = reportProblemPage(
+    form,
+    routes.ReportProblemController.submit(service, referrerUrl)
+  )
 
   private def fromForm(key: String, form: Form[ReportProblemForm]): Option[String] =
     form.data.get(key).flatMap(r => if (r.isEmpty) None else Some(r))

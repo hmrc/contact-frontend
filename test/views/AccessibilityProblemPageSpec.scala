@@ -19,6 +19,7 @@ package views
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import model.AccessibilityForm
+import model.FormBindings.optionalRedirectUrlMapping
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
@@ -28,6 +29,7 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.AccessibilityProblemPage
 
 class AccessibilityProblemPageSpec
@@ -49,7 +51,7 @@ class AccessibilityProblemPageSpec
       "name"               -> text.verifying("accessibility.name.error.required", msg => msg.nonEmpty),
       "email"              -> text.verifying("accessibility.email.error.invalid", msg => msg.nonEmpty),
       "isJavascript"       -> boolean,
-      "referrer"           -> text,
+      "referrer"           -> optionalRedirectUrlMapping,
       "csrfToken"          -> text,
       "service"            -> optional(text),
       "userAction"         -> optional(text)
@@ -61,7 +63,7 @@ class AccessibilityProblemPageSpec
     name = "",
     email = "",
     isJavascript = false,
-    referrer = "",
+    referrer = None,
     csrfToken = "",
     service = None,
     userAction = None
@@ -154,7 +156,7 @@ class AccessibilityProblemPageSpec
     "include the referrer hidden input" in {
       val contentWithService = accessibilityProblemPage(
         accessibilityForm.fill(
-          formValues.copy(referrer = "bar")
+          formValues.copy(referrer = Some(RedirectUrl("bar")))
         ),
         action
       )

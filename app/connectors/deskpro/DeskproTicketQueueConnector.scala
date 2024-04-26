@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, NotFoundException, UpstreamE
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 import scala.concurrent.{ExecutionContext, Future}
 
