@@ -85,7 +85,7 @@ import scala.concurrent.{ExecutionContext, Future}
     FeedbackFormBind.form
       .bindFromRequest()
       .fold(
-        formWithError => Future.successful(BadRequest(feedbackView(formWithError))),
+        formWithError => Future.successful(BadRequest(renderFeedbackPage(formWithError, service, backUrl, canOmitComments, referrerUrl))),
         data =>
           {
             for {
@@ -102,15 +102,6 @@ import scala.concurrent.{ExecutionContext, Future}
     val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
     Future.successful(Ok(feedbackConfirmationPage(backUrl = validatedBackUrl)))
   }
-
-  private def feedbackView(form: Form[FeedbackForm])(implicit request: Request[AnyRef]) =
-    renderFeedbackPage(
-      form,
-      form("service").value,
-      form("backUrl").value,
-      form("canOmitComments").value.contains("true"),
-      form("referrer").value
-    )
 
   private def renderFeedbackPage(
     form: Form[FeedbackForm],
