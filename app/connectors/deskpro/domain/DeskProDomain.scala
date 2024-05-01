@@ -70,7 +70,6 @@ object Ticket extends FieldTransformer with Logging {
       service,
       userAction
     )
-    logger.info(s"Creating ticket $ticket")
     ticket
   }
 }
