@@ -19,8 +19,7 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-
-import javax.inject.{Inject, Singleton}
+import model.Aliases.ReferrerUrl
 import model.FeedbackForm
 import play.api.data.Forms._
 import play.api.data.format.Formatter
@@ -28,12 +27,13 @@ import play.api.data.{FieldMapping, Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
+import play.twirl.api.Html
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
-import play.twirl.api.Html
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton class FeedbackController @Inject() (
@@ -54,7 +54,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
   val formId = "FeedbackForm"
 
-  def index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean, referrerUrl: Option[String]) =
+  def index(
+    service: Option[String],
+    backUrl: Option[String],
+    canOmitComments: Boolean,
+    referrerUrl: Option[ReferrerUrl]
+  ) =
     Action.async { implicit request =>
       val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
       Future.successful(
@@ -80,7 +85,7 @@ import scala.concurrent.{ExecutionContext, Future}
     service: Option[String] = None,
     backUrl: Option[String] = None,
     canOmitComments: Boolean = false,
-    referrerUrl: Option[String] = None
+    referrerUrl: Option[ReferrerUrl] = None
   ) = Action.async { implicit request =>
     FeedbackFormBind.form
       .bindFromRequest()

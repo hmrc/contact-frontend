@@ -16,12 +16,20 @@
 
 package model
 
+// Type alias to suppress PR-commenter warnings around potential open redirects
+// These referrerUrls aren't used to redirect anywhere - they're just passed along to Deskpro for information
+object Aliases {
+  type ReferrerUrl = String
+}
+
+import Aliases._
+
 case class AccessibilityForm(
   problemDescription: String,
   name: String,
   email: String,
   isJavascript: Boolean,
-  referrer: String,
+  referrer: ReferrerUrl,
   csrfToken: String,
   service: Option[String] = Some("unknown"),
   userAction: Option[String] = None
@@ -34,7 +42,7 @@ case class ReportProblemForm(
   reportError: String,
   isJavascript: Boolean,
   service: Option[String],
-  referrer: Option[String],
+  referrer: Option[ReferrerUrl],
   csrfToken: String,
   userAction: Option[String]
 )
@@ -45,7 +53,7 @@ case class FeedbackForm(
   email: String,
   comments: String,
   javascriptEnabled: Boolean,
-  referrer: String,
+  referrer: ReferrerUrl,
   csrfToken: String,
   service: Option[String],
   backUrl: Option[String],

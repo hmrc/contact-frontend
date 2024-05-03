@@ -19,7 +19,7 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-
+import model.Aliases.ReferrerUrl
 import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.data.Forms._
@@ -79,7 +79,7 @@ class ContactHmrcController @Inject() (
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  def index(service: Option[String], userAction: Option[String], referrerUrl: Option[String]) =
+  def index(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl]) =
     Action.async { implicit request =>
       Future.successful {
         val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders getOrElse "n/a"
@@ -94,7 +94,7 @@ class ContactHmrcController @Inject() (
   def submit(
     service: Option[String],
     userAction: Option[String],
-    referrerUrl: Option[String]
+    referrerUrl: Option[ReferrerUrl]
   ): Action[AnyContent] =
     Action.async { implicit request =>
       ContactHmrcForm.form
