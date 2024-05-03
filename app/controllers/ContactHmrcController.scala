@@ -16,21 +16,21 @@
 
 package controllers
 
-import config.AppConfig
+import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-
-import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc._
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever, ReferrerUrlChecking}
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 object ContactHmrcForm {
@@ -72,17 +72,21 @@ class ContactHmrcController @Inject() (
   contactHmrcPage: ContactHmrcPage,
   contactHmrcConfirmationPage: ContactHmrcConfirmationPage,
   headerRetriever: RefererHeaderRetriever
-)(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
+)(implicit val appConfig: CFConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with ReferrerUrlChecking {
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  def index(service: Option[String], userAction: Option[String], referrerUrl: Option[String]) =
+  def index(service: Option[String], userAction: Option[String], referrerUrl: Option[RedirectUrl]) =
     Action.async { implicit request =>
       Future.successful {
-        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders getOrElse "n/a"
+        val referrer  =
+          (referrerUrl orElse headerRetriever.refererFromHeaders.map(RedirectUrl(_)))
+            .map(logInvalidUrl)
+            .map(_.url) getOrElse "n/a"
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
         val form      = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, userAction))
         val submit    = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
@@ -94,7 +98,7 @@ class ContactHmrcController @Inject() (
   def submit(
     service: Option[String],
     userAction: Option[String],
-    referrerUrl: Option[String]
+    referrerUrl: Option[RedirectUrl]
   ): Action[AnyContent] =
     Action.async { implicit request =>
       ContactHmrcForm.form
@@ -104,11 +108,12 @@ class ContactHmrcController @Inject() (
             val submit = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
             Future.successful(BadRequest(contactHmrcPage(formWithErrors, submit)))
           },
-          data =>
+          (data: ContactForm) =>
             (for {
               maybeEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
               _               <- createDeskproTicket(data, maybeEnrolments)
             } yield {
+              logger.warn(s"Contact form submitted: $data")
               val thanks = routes.ContactHmrcController.thanks
               Redirect(thanks)
             }).recover { case _ =>

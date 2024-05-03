@@ -18,6 +18,8 @@ package config
 
 import javax.inject.Inject
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrlPolicy.Id
+import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, RedirectUrlPolicy}
 
 trait AppConfig {
 
@@ -46,6 +48,9 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .split(',')
       .filter(_.nonEmpty)
       .toSet
+
+  private lazy val mdtpTrustedDomains: Set[String] = configuration.get[Seq[String]]("mdtp.trustedDomains").toSet
+  lazy val urlPolicy: RedirectUrlPolicy[Id]        = AbsoluteWithHostnameFromAllowlist(mdtpTrustedDomains)
 
   private def configNotFoundError(key: String) =
     throw new RuntimeException(s"Could not find config key '$key'")
