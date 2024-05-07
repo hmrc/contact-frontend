@@ -18,14 +18,14 @@ package util
 
 import java.net.URL
 import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
+import model.Aliases.BackUrl
 import play.api.Logging
 
 import scala.util.Try
 
 trait BackUrlValidator {
-  def validate(backUrl: String): Boolean
+  def validate(backUrl: BackUrl): Boolean
 }
 
 @Singleton
@@ -33,7 +33,7 @@ class ConfigurationBasedBackUrlValidator @Inject() (appConfig: AppConfig) extend
 
   val destinationAllowList: Set[URL] = appConfig.backUrlDestinationAllowList.map(new URL(_))
 
-  def validate(backUrl: String): Boolean = {
+  def validate(backUrl: BackUrl): Boolean = {
 
     val parsedUrl        = Try(new URL(backUrl)).toOption.toRight(left = "Unparseable URL")
     val validationResult = parsedUrl.flatMap(checkDomainOnAllowList)

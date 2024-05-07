@@ -19,13 +19,12 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-
-import javax.inject.Inject
 import model.AccessibilityForm
+import model.Aliases.ReferrerUrl
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request}
+import play.api.mvc._
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission
@@ -33,6 +32,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, InternalErrorPage}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 object AccessibilityFormBind {
@@ -103,7 +103,7 @@ class AccessibilityController @Inject() (
   def index(
     service: Option[String],
     userAction: Option[String],
-    referrerUrl: Option[String]
+    referrerUrl: Option[ReferrerUrl]
   ): Action[AnyContent] =
     Action.async { implicit request =>
       Future.successful {

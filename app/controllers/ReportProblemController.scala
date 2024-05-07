@@ -19,6 +19,7 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
+import model.Aliases.ReferrerUrl
 import model.ReportProblemForm
 import play.api.data.Forms._
 import play.api.data._
@@ -113,18 +114,18 @@ class ReportProblemController @Inject() (
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  def index(service: Option[String], referrerUrl: Option[String]) = Action { implicit request =>
+  def index(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action { implicit request =>
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
     val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders
     Ok(page(ReportProblemFormBind.emptyForm(csrfToken, service, referrer), service, referrerUrl))
   }
 
-  def indexDeprecated(service: Option[String], referrerUrl: Option[String]) = Action { implicit request =>
+  def indexDeprecated(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action { implicit request =>
     val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
     Redirect(routes.ReportProblemController.index(service, referrer))
   }
 
-  def submit(service: Option[String], referrerUrl: Option[String]) = Action.async { implicit request =>
+  def submit(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action.async { implicit request =>
     doSubmit(service, referrerUrl)
   }
 

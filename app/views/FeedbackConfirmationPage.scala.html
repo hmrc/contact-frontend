@@ -14,10 +14,11 @@
  * limitations under the License.
  *@
 
+@import model.Aliases.BackUrl
 @import views.html.components.Layout
 
 @this(govukPanel: GovukPanel, mainLayout: Layout)
-@(backUrl: Option[String] = None)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(backUrl: Option[BackUrl] = None)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @mainLayout(pageTitle = messages("feedback.confirmation.title"), backLink = backUrl) {
   @govukPanel(Panel(title = Text(messages("feedback.confirmation.message"))))
