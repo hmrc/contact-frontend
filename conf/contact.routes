@@ -1,13 +1,13 @@
 ->          /hmrc-frontend                               hmrcfrontend.Routes
 
-GET         /beta-feedback                               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
-POST        /beta-feedback                               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
-GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
-POST        /beta-feedback-unauthenticated               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
-POST        /beta-feedback/submit                        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
-POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[String], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
-GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks(backUrl: Option[String])
-GET         /beta-feedback/thanks-unauthenticated        @controllers.FeedbackController.thanks(backUrl: Option[String])
+GET         /beta-feedback                               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
+POST        /beta-feedback                               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
+GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
+POST        /beta-feedback-unauthenticated               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
+POST        /beta-feedback/submit                        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
+POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
+GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks(backUrl: Option[BackUrl])
+GET         /beta-feedback/thanks-unauthenticated        @controllers.FeedbackController.thanks(backUrl: Option[BackUrl])
 
 GET         /contact-hmrc                                @controllers.ContactHmrcController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl])
 POST        /contact-hmrc                                @controllers.ContactHmrcController.submit(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl])

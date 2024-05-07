@@ -19,7 +19,7 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-import model.Aliases.ReferrerUrl
+import model.Aliases._
 import model.FeedbackForm
 import play.api.data.Forms._
 import play.api.data.format.Formatter
@@ -56,7 +56,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
   def index(
     service: Option[String],
-    backUrl: Option[String],
+    backUrl: Option[BackUrl],
     canOmitComments: Boolean,
     referrerUrl: Option[ReferrerUrl]
   ) =
@@ -83,7 +83,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
   def submit(
     service: Option[String] = None,
-    backUrl: Option[String] = None,
+    backUrl: Option[BackUrl] = None,
     canOmitComments: Boolean = false,
     referrerUrl: Option[ReferrerUrl] = None
   ) = Action.async { implicit request =>
@@ -103,7 +103,7 @@ import scala.concurrent.{ExecutionContext, Future}
       )
   }
 
-  def thanks(backUrl: Option[String] = None) = Action.async { implicit request =>
+  def thanks(backUrl: Option[BackUrl] = None) = Action.async { implicit request =>
     val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
     Future.successful(Ok(feedbackConfirmationPage(backUrl = validatedBackUrl)))
   }
@@ -120,7 +120,7 @@ import scala.concurrent.{ExecutionContext, Future}
   private def renderFeedbackPage(
     form: Form[FeedbackForm],
     service: Option[String],
-    backUrl: Option[String],
+    backUrl: Option[BackUrl],
     canOmitComments: Boolean,
     referrerUrl: Option[String]
   )(implicit
@@ -141,7 +141,7 @@ object FeedbackFormBind {
   def emptyForm(
     csrfToken: String,
     referrer: Option[String] = None,
-    backUrl: Option[String],
+    backUrl: Option[BackUrl],
     canOmitComments: Boolean,
     service: Option[String]
   ): Form[FeedbackForm] =

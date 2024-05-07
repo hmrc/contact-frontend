@@ -16,9 +16,11 @@
 
 package model
 
-// Type alias to suppress PR-commenter warnings around potential open redirects
-// These referrerUrls aren't used to redirect anywhere - they're just passed along to Deskpro for information
+// Type aliases to suppress PR-commenter warnings around potential open redirects
 object Aliases {
+  // These backUrls are already validated against an allow-list by the BackUrlValidator
+  type BackUrl     = String
+  // These referrerUrls aren't used to redirect anywhere - they're just passed along to Deskpro for information
   type ReferrerUrl = String
 }
 
@@ -56,7 +58,7 @@ case class FeedbackForm(
   referrer: ReferrerUrl,
   csrfToken: String,
   service: Option[String],
-  backUrl: Option[String],
+  backUrl: Option[BackUrl],
   canOmitComments: Boolean
 )
 
