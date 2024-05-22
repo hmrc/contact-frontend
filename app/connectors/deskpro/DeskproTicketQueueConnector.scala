@@ -19,11 +19,13 @@ package connectors.deskpro
 import config.AppConfig
 import connectors.deskpro.domain.{Feedback, Ticket, TicketConstants, TicketId}
 import play.api.libs.json.Json
+import play.api.libs.ws.writeableOf_JsValue
 
 import javax.inject.Inject
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.Enrolments
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, NotFoundException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -32,7 +34,7 @@ import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 
 class DeskproTicketQueueConnector @Inject() (
-  http: HttpClient,
+  http: HttpClientV2,
   servicesConfig: ServicesConfig,
   appConfig: AppConfig,
   auditConnector: AuditConnector
@@ -69,7 +71,9 @@ class DeskproTicketQueueConnector @Inject() (
         userAction
       )
     http
-      .POST[Ticket, TicketId](URL(requestUrl("/deskpro/get-help-ticket")), ticket)
+      .post(URL(requestUrl("/deskpro/get-help-ticket")))
+      .withBody(Json.toJson(ticket))
+      .execute[TicketId]
       .map { ticketId =>
         if (appConfig.sendExplicitAuditEvents) {
           auditConnector.sendExplicitAudit(ticketConstants.auditType, Json.toJson(ticket))
@@ -107,7 +111,9 @@ class DeskproTicketQueueConnector @Inject() (
       service
     )
     http
-      .POST[Feedback, TicketId](URL(requestUrl("/deskpro/feedback")), feedback)
+      .post(URL(requestUrl("/deskpro/feedback")))
+      .withBody(Json.toJson(feedback))
+      .execute[TicketId]
       .map { ticketId =>
         if (appConfig.sendExplicitAuditEvents) {
           auditConnector.sendExplicitAudit(ticketConstants.auditType, Json.toJson(feedback))

@@ -20,6 +20,8 @@ import Aliases.*
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language.Language
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.reporttechnicalissue.ReportTechnicalIssue
 
+import scala.annotation.tailrec
+
 // Type aliases to suppress PR-commenter warnings around potential open redirects
 object Aliases {
   // These backUrls are already validated against an allow-list by the BackUrlValidator
@@ -173,7 +175,7 @@ object FeedbackForm {
     backUrl: Option[String],
     canOmitComments: Boolean
   ): FeedbackForm =
-    FeedbackForm(
+    new FeedbackForm(
       experienceRating,
       name,
       email,
