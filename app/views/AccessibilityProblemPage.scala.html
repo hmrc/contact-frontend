@@ -44,7 +44,7 @@
     @h1(content = Text(messages("accessibility.heading")))
     @p(content = Text(messages("accessibility.message.para1")))
     @p(content = Text(messages("accessibility.message.para2")))
-    @formWithCSRF(action, 'id -> "accessibility-form") {
+    @formWithCSRF(action, Symbol("id") -> "accessibility-form") {
         @inputHidden(accessibilityForm("service"))
         @inputHidden(accessibilityForm("referrer"))
         @inputHidden(accessibilityForm("userAction"))

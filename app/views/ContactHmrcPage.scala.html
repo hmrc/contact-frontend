@@ -56,7 +56,7 @@
     @h2(content = Text(messages("contact.form.heading2")))
     @p(content = Text(messages("contact.form.para3")))
 
-    @formWithCSRF(action, 'id -> "contact-hmrc-form") {
+    @formWithCSRF(action, Symbol("id") -> "contact-hmrc-form") {
         @inputHidden(contactForm("service"))
         @inputHidden(contactForm("referrer"))
         @inputHidden(contactForm("userAction"))

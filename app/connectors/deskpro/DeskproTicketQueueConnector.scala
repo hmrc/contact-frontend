@@ -25,9 +25,10 @@ import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, NotFoundException, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
+import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 
 class DeskproTicketQueueConnector @Inject() (
@@ -68,7 +69,7 @@ class DeskproTicketQueueConnector @Inject() (
         userAction
       )
     http
-      .POST[Ticket, TicketId](requestUrl("/deskpro/get-help-ticket"), ticket)
+      .POST[Ticket, TicketId](URL(requestUrl("/deskpro/get-help-ticket")), ticket)
       .map { ticketId =>
         if (appConfig.sendExplicitAuditEvents) {
           auditConnector.sendExplicitAudit(ticketConstants.auditType, Json.toJson(ticket))
@@ -106,7 +107,7 @@ class DeskproTicketQueueConnector @Inject() (
       service
     )
     http
-      .POST[Feedback, TicketId](requestUrl("/deskpro/feedback"), feedback)
+      .POST[Feedback, TicketId](URL(requestUrl("/deskpro/feedback")), feedback)
       .map { ticketId =>
         if (appConfig.sendExplicitAuditEvents) {
           auditConnector.sendExplicitAudit(ticketConstants.auditType, Json.toJson(feedback))

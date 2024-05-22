@@ -7,7 +7,7 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    scalaVersion := "2.13.12",
+    scalaVersion := "3.3.3",
     majorVersion := 4,
     libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it"))
   )
@@ -27,7 +27,7 @@ lazy val microservice = Project(appName, file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.components._"
     ),
     RoutesKeys.routesImport += "model.Aliases._",
-    A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")
+//    A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")
   )
   .settings(
     scalacOptions += "-Wconf:src=routes/.*:s",

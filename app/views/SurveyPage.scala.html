@@ -40,7 +40,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(surveyForm))
     }
     @h1(content = Text(messages("survey.heading")))
-    @formWithCSRF(action, 'id -> "survey-form") {
+    @formWithCSRF(action, Symbol("id") -> "survey-form") {
       @inputHidden(surveyForm("service-id"))
       @inputHidden(surveyForm("ticket-id"))
       @defining(Seq(

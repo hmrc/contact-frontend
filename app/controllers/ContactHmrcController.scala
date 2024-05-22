@@ -141,4 +141,49 @@ object ContactForm {
     userAction: Option[String]
   ): ContactForm =
     ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction)
+
+  def apply(
+    contactName: String,
+    contactEmail: String,
+    contactComments: String,
+    isJavascript: Boolean,
+    referrer: String,
+    csrfToken: String,
+    service: Option[String] = Some("unknown"),
+    userAction: Option[String] = None
+  ): ContactForm =
+    ContactForm(
+      contactName,
+      contactEmail,
+      contactComments,
+      isJavascript = false,
+      referrer,
+      csrfToken,
+      service,
+      userAction
+    )
+
+  def unapply(form: ContactForm): Option[
+    (
+      String,
+      String,
+      String,
+      Boolean,
+      String,
+      String,
+      Option[String],
+      Option[String]
+    )
+  ] = Some(
+    (
+      form.contactName,
+      form.contactEmail,
+      form.contactComments,
+      form.isJavascript,
+      form.referrer,
+      form.csrfToken,
+      form.service,
+      form.userAction
+    )
+  )
 }

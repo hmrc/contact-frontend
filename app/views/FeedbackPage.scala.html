@@ -44,7 +44,7 @@
     }
     @h1(content = Text(messages("feedback.heading")))
     @p(content = Text(messages("form.online.services.data")))
-    @formWithCSRF(action, 'id -> "feedback-form") {
+    @formWithCSRF(action, Symbol("id") -> "feedback-form") {
       @inputHidden(feedbackForm("service"))
       @inputHidden(feedbackForm("referrer"))
       @inputHidden(feedbackForm("canOmitComments"))

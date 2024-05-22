@@ -114,13 +114,13 @@ class ReportProblemController @Inject() (
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  def index(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action { implicit request =>
+  def index(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action { implicit request: MessagesRequest[AnyContent] =>
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
     val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders
     Ok(page(ReportProblemFormBind.emptyForm(csrfToken, service, referrer), service, referrerUrl))
   }
 
-  def indexDeprecated(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action { implicit request =>
+  def indexDeprecated(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action { implicit request: MessagesRequest[AnyContent] =>
     val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
     Redirect(routes.ReportProblemController.index(service, referrer))
   }
@@ -152,7 +152,7 @@ class ReportProblemController @Inject() (
           (for {
             maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
             _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-          } yield Redirect(routes.ReportProblemController.thanks)) recover { case _ =>
+          } yield Redirect(routes.ReportProblemController.thanks())) recover { case _ =>
             InternalServerError(errorPage())
           }
         }

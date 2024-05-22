@@ -19,7 +19,7 @@ GET         /contact-hmrc/thanks-unauthenticated         @controllers.ContactHmr
 
 GET         /report-technical-problem                    @controllers.ReportProblemController.index(service: Option[String], referrerUrl: Option[ReferrerUrl])
 POST        /report-technical-problem                    @controllers.ReportProblemController.submit(service: Option[String], referrerUrl: Option[ReferrerUrl])
-GET         /report-technical-problem/thanks             @controllers.ReportProblemController.thanks
+GET         /report-technical-problem/thanks             @controllers.ReportProblemController.thanks()
 GET         /problem_reports_nonjs                       @controllers.ReportProblemController.indexDeprecated(service: Option[String], referrerUrl: Option[ReferrerUrl])
 POST        /problem_reports_nonjs                       @controllers.ReportProblemController.submit(service: Option[String], referrerUrl: Option[ReferrerUrl])
 
