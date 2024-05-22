@@ -81,7 +81,7 @@ object AccessibilityFormBind {
       "csrfToken"          -> text,
       "service"            -> optional(text),
       "userAction"         -> optional(text)
-    )(AccessibilityForm.apply)(AccessibilityForm.unapply)
+    )(AccessibilityForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 }
 

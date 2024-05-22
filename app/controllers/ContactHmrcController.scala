@@ -59,7 +59,7 @@ object ContactHmrcForm {
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text)
-    )(ContactForm.apply)(ContactForm.unapply)
+    )(ContactForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 }
 
@@ -140,50 +140,5 @@ object ContactForm {
     service: Option[String],
     userAction: Option[String]
   ): ContactForm =
-    ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction)
-
-  def apply(
-    contactName: String,
-    contactEmail: String,
-    contactComments: String,
-    isJavascript: Boolean,
-    referrer: String,
-    csrfToken: String,
-    service: Option[String] = Some("unknown"),
-    userAction: Option[String] = None
-  ): ContactForm =
-    ContactForm(
-      contactName,
-      contactEmail,
-      contactComments,
-      isJavascript = false,
-      referrer,
-      csrfToken,
-      service,
-      userAction
-    )
-
-  def unapply(form: ContactForm): Option[
-    (
-      String,
-      String,
-      String,
-      Boolean,
-      String,
-      String,
-      Option[String],
-      Option[String]
-    )
-  ] = Some(
-    (
-      form.contactName,
-      form.contactEmail,
-      form.contactComments,
-      form.isJavascript,
-      form.referrer,
-      form.csrfToken,
-      form.service,
-      form.userAction
-    )
-  )
+    new ContactForm("", "", "", isJavascript = false, referrer, csrfToken, service, userAction)
 }

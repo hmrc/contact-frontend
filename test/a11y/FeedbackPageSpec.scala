@@ -59,7 +59,7 @@ class FeedbackPageSpec
       "service"           -> optional(text),
       "backUrl"           -> optional(text),
       "canOmitComments"   -> boolean
-    )(FeedbackForm.apply)(FeedbackForm.unapply)
+    )(FeedbackForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val action: Call = Call(method = "POST", url = "/contact/the-submit-url")

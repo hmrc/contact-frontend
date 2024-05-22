@@ -54,7 +54,7 @@ class ReportProblemPageSpec
       "referrer"      -> optional(text),
       "csrfToken"     -> text,
       "userAction"    -> optional(text)
-    )(ReportProblemForm.apply)(ReportProblemForm.unapply)
+    )(ReportProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val formValues: ReportProblemForm = ReportProblemForm(

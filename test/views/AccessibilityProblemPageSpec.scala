@@ -53,7 +53,7 @@ class AccessibilityProblemPageSpec
       "csrfToken"          -> text,
       "service"            -> optional(text),
       "userAction"         -> optional(text)
-    )(AccessibilityForm.apply)(AccessibilityForm.unapply)
+    )(AccessibilityForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val formValues: AccessibilityForm = AccessibilityForm(

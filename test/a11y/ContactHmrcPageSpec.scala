@@ -53,7 +53,7 @@ class ContactHmrcPageSpec
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text)
-    )(ContactForm.apply)(ContactForm.unapply)
+    )(ContactForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val action: Call = Call(method = "POST", url = "/contact/contact-hmrc/submit")

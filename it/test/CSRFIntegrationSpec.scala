@@ -25,6 +25,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{DefaultWSCookie, WSClient, WSResponse}
 import play.api.test.Helpers._
 import test.helpers.WireMockEndpoints
+import play.api.libs.json.Json
+import play.api.libs.ws.writeableOf_JsValue
 
 class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoints with GuiceOneServerPerSuite {
 
@@ -98,7 +100,7 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
       wsClient
         .url(url)
         .addCookies(anyCookie)
-        .post(form)
+        .post(Json.toJson(form))
     )
 
   private def postWithSessionAndCsrfToken(url: String, form: Map[String, String], previousResponse: WSResponse) = {
@@ -110,10 +112,7 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
         .url(url)
         .addCookies(DefaultWSCookie("mdtp", mdtp))
         .post(
-          form ++
-            Map(
-              "csrfToken" -> csrfToken
-            )
+            Json.toJson(form ++ Map("csrfToken" -> csrfToken))
         )
     )
   }

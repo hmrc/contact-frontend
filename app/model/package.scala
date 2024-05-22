@@ -61,30 +61,6 @@ object AccessibilityForm {
     service,
     userAction
   )
-
-  def unapply(form: AccessibilityForm): Option[
-    (
-      String,
-      String,
-      String,
-      Boolean,
-      String,
-      String,
-      Option[String],
-      Option[String]
-    )
-  ] = Some(
-    (
-      form.problemDescription,
-      form.name,
-      form.email,
-      form.isJavascript,
-      form.referrer,
-      form.csrfToken,
-      form.service,
-      form.userAction
-    )
-  )
 }
 
 case class ReportProblemForm(
@@ -120,32 +96,6 @@ object ReportProblemForm {
     referrer,
     csrfToken,
     userAction
-  )
-
-  def unapply(form: ReportProblemForm): Option[
-    (
-      String,
-      String,
-      String,
-      String,
-      Boolean,
-      Option[String],
-      Option[String],
-      String,
-      Option[String]
-    )
-  ] = Some(
-    (
-      form.reportName,
-      form.reportEmail,
-      form.reportAction,
-      form.reportError,
-      form.isJavascript,
-      form.service,
-      form.referrer,
-      form.csrfToken,
-      form.userAction
-    )
   )
 }
 
@@ -187,34 +137,6 @@ object FeedbackForm {
       backUrl,
       canOmitComments
     )
-
-  def unapply(form: FeedbackForm): Option[
-    (
-      Option[String],
-      String,
-      String,
-      String,
-      Boolean,
-      String,
-      String,
-      Option[String],
-      Option[String],
-      Boolean
-    )
-  ] = Some(
-    (
-      form.experienceRating,
-      form.name,
-      form.email,
-      form.comments,
-      form.javascriptEnabled,
-      form.referrer,
-      form.csrfToken,
-      form.service,
-      form.backUrl,
-      form.canOmitComments
-    )
-  )
 }
 
 object FeedbackFormConfig {
@@ -242,24 +164,6 @@ object SurveyForm {
     improve,
     ticketId,
     serviceId
-  )
-
-  def unapply(form: SurveyForm): Option[
-    (
-      Option[Int],
-      Option[Int],
-      Option[String],
-      Option[String],
-      Option[String]
-    )
-  ] = Some(
-    (
-      form.helpful,
-      form.speed,
-      form.improve,
-      form.ticketId,
-      form.serviceId
-    )
   )
 }
 

@@ -47,7 +47,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport w
         .verifying("survey.improve.error.length", improve => improve.getOrElse("").length <= 10),
       "ticket-id"  -> optional(text),
       "service-id" -> optional(text)
-    )(SurveyForm.apply)(SurveyForm.unapply)
+    )(SurveyForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val formValues: SurveyForm = SurveyForm(

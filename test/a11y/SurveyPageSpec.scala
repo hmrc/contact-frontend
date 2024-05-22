@@ -53,7 +53,7 @@ class SurveyPageSpec
         .verifying("survey.improve.error.length", improve => improve.getOrElse("").length <= 10),
       "ticket-id"  -> optional(text),
       "service-id" -> optional(text)
-    )(SurveyForm.apply)(SurveyForm.unapply)
+    )(SurveyForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val action: Call = Call(method = "POST", url = "/contact/the-submit-url")

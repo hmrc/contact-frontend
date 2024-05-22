@@ -79,7 +79,7 @@ object ReportProblemFormBind {
       "referrer"      -> optional(text),
       "csrfToken"     -> text,
       "userAction"    -> optional(text)
-    )(ReportProblemForm.apply)(ReportProblemForm.unapply)
+    )(ReportProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   def emptyForm(csrfToken: String, service: Option[String], referrer: Option[String]): Form[ReportProblemForm] =

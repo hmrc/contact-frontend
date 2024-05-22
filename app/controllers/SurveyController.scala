@@ -163,7 +163,7 @@ class SurveyController @Inject() (
       "improve"    -> optional(text(maxLength = 2500)),
       "ticket-id"  -> optional(text).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
       "service-id" -> optional(text(maxLength = 20)).verifying(serviceId => serviceId.getOrElse("").length > 0)
-    )(SurveyForm.apply)(SurveyForm.unapply)
+    )(SurveyForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   private[controllers] def playFrontendSurveyForm = Form[SurveyForm](
@@ -176,7 +176,7 @@ class SurveyController @Inject() (
         .verifying("survey.improve.error.length", improve => improve.getOrElse("").length <= 2500),
       "ticket-id"  -> optional(text),
       "service-id" -> optional(text)
-    )(SurveyForm.apply)(SurveyForm.unapply)
+    )(SurveyForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   private[controllers] def emptyForm(

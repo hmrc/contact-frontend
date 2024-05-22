@@ -54,7 +54,7 @@ class ReportProblemPageSpec
       "referrer"      -> optional(text),
       "csrfToken"     -> text,
       "userAction"    -> optional(text)
-    )(ReportProblemForm.apply)(ReportProblemForm.unapply)
+    )(ReportProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val action: Call = Call(method = "POST", url = "/contact/submit-error-feedback")
