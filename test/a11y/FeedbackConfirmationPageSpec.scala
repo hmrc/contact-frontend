@@ -31,7 +31,7 @@ class FeedbackConfirmationPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-      /*with AccessibilityMatchers*/ {
+    /*with AccessibilityMatchers*/ {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
   implicit lazy val messages: Messages         = getMessages(app, fakeRequest)

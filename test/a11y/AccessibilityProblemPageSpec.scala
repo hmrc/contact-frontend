@@ -35,7 +35,7 @@ class AccessibilityProblemPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-      /*with AccessibilityMatchers*/ {
+    /*with AccessibilityMatchers*/ {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 

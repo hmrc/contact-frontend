@@ -114,15 +114,17 @@ class ReportProblemController @Inject() (
 
   implicit def lang(implicit request: Request[_]): Lang = request.lang
 
-  def index(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action { implicit request: MessagesRequest[AnyContent] =>
-    val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
-    val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders
-    Ok(page(ReportProblemFormBind.emptyForm(csrfToken, service, referrer), service, referrerUrl))
+  def index(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action {
+    implicit request: MessagesRequest[AnyContent] =>
+      val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
+      val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders
+      Ok(page(ReportProblemFormBind.emptyForm(csrfToken, service, referrer), service, referrerUrl))
   }
 
-  def indexDeprecated(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action { implicit request: MessagesRequest[AnyContent] =>
-    val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
-    Redirect(routes.ReportProblemController.index(service, referrer))
+  def indexDeprecated(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action {
+    implicit request: MessagesRequest[AnyContent] =>
+      val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
+      Redirect(routes.ReportProblemController.index(service, referrer))
   }
 
   def submit(service: Option[String], referrerUrl: Option[ReferrerUrl]) = Action.async { implicit request =>

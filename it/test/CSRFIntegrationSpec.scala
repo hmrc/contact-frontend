@@ -23,9 +23,9 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{DefaultWSCookie, WSClient, WSResponse}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import test.helpers.WireMockEndpoints
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.writeableOf_JsValue
 
 class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoints with GuiceOneServerPerSuite {
@@ -156,12 +156,7 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
           wsClient
             .url(problemReportsNonjsUrl)
             .addCookies(DefaultWSCookie("mdtp", mdtp2))
-            .post(
-              problemForm ++
-                Map(
-                  "csrfToken" -> csrfToken
-                )
-            )
+            .post(Json.toJson(problemForm ++ Map("csrfToken" -> csrfToken)))
         )
 
       postResponse.status should be(FORBIDDEN)
