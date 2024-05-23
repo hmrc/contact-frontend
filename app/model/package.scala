@@ -41,28 +41,6 @@ case class AccessibilityForm(
   userAction: Option[String] = None
 )
 
-object AccessibilityForm {
-  def apply(
-    problemDescription: String,
-    name: String,
-    email: String,
-    isJavascript: Boolean,
-    referrer: ReferrerUrl,
-    csrfToken: String,
-    service: Option[String],
-    userAction: Option[String]
-  ): AccessibilityForm = new AccessibilityForm(
-    problemDescription,
-    name,
-    email,
-    isJavascript,
-    referrer,
-    csrfToken,
-    service,
-    userAction
-  )
-}
-
 case class ReportProblemForm(
   reportName: String,
   reportEmail: String,
@@ -74,30 +52,6 @@ case class ReportProblemForm(
   csrfToken: String,
   userAction: Option[String]
 )
-
-object ReportProblemForm {
-  def apply(
-    reportName: String,
-    reportEmail: String,
-    reportAction: String,
-    reportError: String,
-    isJavascript: Boolean,
-    service: Option[String],
-    referrer: Option[ReferrerUrl],
-    csrfToken: String,
-    userAction: Option[String]
-  ): ReportProblemForm = new ReportProblemForm(
-    reportName,
-    reportEmail,
-    reportAction,
-    reportError,
-    isJavascript,
-    service,
-    referrer,
-    csrfToken,
-    userAction
-  )
-}
 
 case class FeedbackForm(
   experienceRating: Option[String],
@@ -112,33 +66,6 @@ case class FeedbackForm(
   canOmitComments: Boolean
 )
 
-object FeedbackForm {
-  def apply(
-    experienceRating: Option[String],
-    name: String,
-    email: String,
-    comments: String,
-    javascriptEnabled: Boolean,
-    referrer: ReferrerUrl,
-    csrfToken: String,
-    service: Option[String],
-    backUrl: Option[String],
-    canOmitComments: Boolean
-  ): FeedbackForm =
-    new FeedbackForm(
-      experienceRating,
-      name,
-      email,
-      comments,
-      javascriptEnabled,
-      referrer,
-      csrfToken,
-      service,
-      backUrl,
-      canOmitComments
-    )
-}
-
 object FeedbackFormConfig {
   val validExperiences = (5 to 1 by -1) map (_.toString)
 }
@@ -150,33 +77,3 @@ case class SurveyForm(
   ticketId: Option[String],
   serviceId: Option[String]
 )
-
-object SurveyForm {
-  def apply(
-    helpful: Option[Int],
-    speed: Option[Int],
-    improve: Option[String],
-    ticketId: Option[String],
-    serviceId: Option[String]
-  ): SurveyForm = new SurveyForm(
-    helpful,
-    speed,
-    improve,
-    ticketId,
-    serviceId
-  )
-}
-
-object ReportTechnicalIssue {
-  def apply(
-    serviceId: String,
-    language: Language
-  ): ReportTechnicalIssue = new ReportTechnicalIssue(
-    serviceId,
-    "",
-    language,
-    None,
-    None,
-    None
-  )
-}
