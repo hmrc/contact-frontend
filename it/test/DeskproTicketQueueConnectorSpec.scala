@@ -19,8 +19,11 @@ package test
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, equalToJson, postRequestedFor, urlEqualTo}
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{BetaFeedbackTicketConstants, ReportTechnicalProblemTicketConstants, TicketId}
+import org.mockito.Mockito.when
+import org.mockito.stubbing.Answer
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, Mockito}
-import org.mockito.MockitoSugar.when
+//import org.mockito.MockitoSugar.when
+//import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -53,7 +56,7 @@ class DeskproTicketQueueConnectorSpec
 
   val auditConnector = new AuditConnector {
     val mockAuditingConfig = mock[AuditingConfig]
-    when(mockAuditingConfig.enabled).thenAnswer(true)
+    when(mockAuditingConfig.enabled).thenReturn(true)
 
     override def auditingConfig: AuditingConfig       = mockAuditingConfig
     override def auditChannel: AuditChannel           = ???
