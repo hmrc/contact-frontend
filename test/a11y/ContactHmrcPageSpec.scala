@@ -27,7 +27,7 @@ import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
-//import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.ContactHmrcPage
 
 class ContactHmrcPageSpec
@@ -35,7 +35,7 @@ class ContactHmrcPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    /*with AccessibilityMatchers*/ {
+      with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
 
@@ -63,7 +63,7 @@ class ContactHmrcPageSpec
     val content         = contactHmrcPage(contactHmrcForm, action)
 
     "pass accessibility checks" in {
-//      content.toString() should passAccessibilityChecks
+      content.toString() should passAccessibilityChecks
     }
   }
 }

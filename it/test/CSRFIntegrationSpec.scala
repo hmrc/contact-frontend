@@ -154,6 +154,7 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
             .url(problemReportsNonjsUrl)
             .addCookies(DefaultWSCookie("mdtp", mdtp2))
             .post(problemForm ++ Map("csrfToken" -> csrfToken))
+
         )
 
       postResponse.status should be(FORBIDDEN)

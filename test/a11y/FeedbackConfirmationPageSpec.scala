@@ -23,7 +23,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
-//import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.FeedbackConfirmationPage
 
 class FeedbackConfirmationPageSpec
@@ -31,7 +31,7 @@ class FeedbackConfirmationPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    /*with AccessibilityMatchers*/ {
+      with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
   implicit lazy val messages: Messages         = getMessages(app, fakeRequest)
@@ -42,12 +42,12 @@ class FeedbackConfirmationPageSpec
 
     "pass accessibility checks" in {
       val content = feedbackConfirmationPage()
-//      content.toString() should passAccessibilityChecks
+      content.toString() should passAccessibilityChecks
     }
 
     "pass accessibility checks with a back URL" in {
       val contentWithBackUrl = feedbackConfirmationPage(backUrl = Some("my-back-url"))
-//      contentWithBackUrl.toString() should passAccessibilityChecks
+      contentWithBackUrl.toString() should passAccessibilityChecks
     }
   }
 }

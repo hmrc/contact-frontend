@@ -24,7 +24,7 @@ import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.CSRFTokenHelper._
 import play.api.test.FakeRequest
-//import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
+import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.ErrorPage
 
 class ErrorPageSpec
@@ -32,7 +32,7 @@ class ErrorPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-    /*with AccessibilityMatchers*/ {
+      with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
@@ -46,7 +46,7 @@ class ErrorPageSpec
       errorTemplate(pageTitle = "This is the title", heading = "This is the heading", message = "This is the message.")
 
     "pass accessibility checks" in {
-//      content.toString() should passAccessibilityChecks
+      content.toString() should passAccessibilityChecks
     }
   }
 }
