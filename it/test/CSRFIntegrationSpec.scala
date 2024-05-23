@@ -25,8 +25,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{DefaultWSCookie, WSClient, WSResponse}
 import play.api.test.Helpers.*
 import test.helpers.WireMockEndpoints
-import play.api.libs.json.{JsValue, Json}
-import play.api.libs.ws.writeableOf_JsValue
+import play.api.libs.ws.DefaultBodyWritables.writeableOf_urlEncodedSimpleForm
 
 class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoints with GuiceOneServerPerSuite {
 
@@ -100,7 +99,7 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
       wsClient
         .url(url)
         .addCookies(anyCookie)
-        .post(Json.toJson(form))
+        .post(form)
     )
 
   private def postWithSessionAndCsrfToken(url: String, form: Map[String, String], previousResponse: WSResponse) = {
@@ -111,9 +110,7 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
       wsClient
         .url(url)
         .addCookies(DefaultWSCookie("mdtp", mdtp))
-        .post(
-            Json.toJson(form ++ Map("csrfToken" -> csrfToken))
-        )
+        .post(form ++ Map("csrfToken" -> csrfToken))
     )
   }
 
@@ -156,7 +153,7 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
           wsClient
             .url(problemReportsNonjsUrl)
             .addCookies(DefaultWSCookie("mdtp", mdtp2))
-            .post(Json.toJson(problemForm ++ Map("csrfToken" -> csrfToken)))
+            .post(problemForm ++ Map("csrfToken" -> csrfToken))
         )
 
       postResponse.status should be(FORBIDDEN)
