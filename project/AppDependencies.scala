@@ -7,8 +7,8 @@ object AppDependencies {
     compile ++ testDependencies
   }
 
-  private val bootstrapFrontendVersion = "8.7.0-SNAPSHOT"
-  private val playFrontendHmrcVersion  = "9.11.0-SNAPSHOT"
+  private val bootstrapFrontendVersion = "9.0.0"
+  private val playFrontendHmrcVersion  = "10.0.0"
   private val playVersion              = "play-30"
 
   private val compile = Seq(
