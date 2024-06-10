@@ -20,20 +20,15 @@ import javax.inject.Inject
 import play.api.i18n.MessagesApi
 import play.api.mvc.Request
 import play.twirl.api.Html
-import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
+import uk.gov.hmrc.play.bootstrap.frontend.http.LegacyFrontendErrorHandler
 import views.html.ErrorPage
 
 class ContactFrontendErrorHandler @Inject() (val messagesApi: MessagesApi, errorPage: ErrorPage)(implicit
   appConfig: AppConfig
-) extends FrontendErrorHandler {
+) extends LegacyFrontendErrorHandler {
 
-  def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]): Html = {
-
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
+    request: Request[_]
+  ): Html =
     errorPage(pageTitle, heading, message)
-  }
-
-//  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
-//    request: Request[_]
-//  ): Html =
-//    errorPage(pageTitle, heading, message)
 }

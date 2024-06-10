@@ -17,10 +17,6 @@
 package model
 
 import Aliases.*
-import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language.Language
-import uk.gov.hmrc.hmrcfrontend.views.viewmodels.reporttechnicalissue.ReportTechnicalIssue
-
-import scala.annotation.tailrec
 
 // Type aliases to suppress PR-commenter warnings around potential open redirects
 object Aliases {
@@ -67,7 +63,7 @@ case class FeedbackForm(
 )
 
 object FeedbackFormConfig {
-  val validExperiences = (5 to 1 by -1) map (_.toString)
+  val validExperiences: Seq[String] = (5 to 1 by -1) map (_.toString)
 }
 
 case class SurveyForm(

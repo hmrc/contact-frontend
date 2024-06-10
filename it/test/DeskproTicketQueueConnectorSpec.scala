@@ -20,10 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, equalToJson, po
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{BetaFeedbackTicketConstants, ReportTechnicalProblemTicketConstants, TicketId}
 import org.mockito.Mockito.when
-import org.mockito.stubbing.Answer
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, Mockito}
-//import org.mockito.MockitoSugar.when
-//import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock

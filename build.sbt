@@ -27,9 +27,10 @@ lazy val microservice = Project(appName, file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.components._"
     ),
     RoutesKeys.routesImport += "model.Aliases._",
-//    A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")
+    A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")
   )
   .settings(
+    scalacOptions += "-source:3.0-migration",
     scalacOptions += "-Wconf:src=routes/.*:s",
     scalacOptions += "-Wconf:src=views/.*:s"
   )

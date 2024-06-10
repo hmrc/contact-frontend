@@ -167,7 +167,7 @@ object FeedbackFormBind {
           .verifying("feedback.rating.error.required", rating => rating.isDefined && !rating.get.trim.isEmpty)
           .verifying(
             "feedback.rating.error.invalid",
-            rating => rating.map(validExperiences.contains(_)).getOrElse(true)
+            rating => rating.forall(validExperiences.contains(_))
           ),
         "feedback-name"     -> text
           .verifying("feedback.name.error.required", name => name.trim.nonEmpty)
