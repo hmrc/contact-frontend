@@ -22,9 +22,9 @@ import connectors.enrolments.EnrolmentsConnector
 import model.Aliases.ReferrerUrl
 import javax.inject.{Inject, Singleton}
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc._
+import play.api.mvc.*
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController

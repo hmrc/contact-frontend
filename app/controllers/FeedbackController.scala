@@ -19,9 +19,9 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-import model.Aliases._
+import model.Aliases.*
 import model.FeedbackForm
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
@@ -133,7 +133,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object FeedbackFormBind {
 
-  import model.FeedbackFormConfig._
+  import model.FeedbackFormConfig.*
 
   private val emailValidator = DeskproEmailValidator()
   private val nameValidator  = NameValidator()

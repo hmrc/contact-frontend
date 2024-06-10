@@ -17,7 +17,7 @@
 package services
 
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain._
+import connectors.deskpro.domain.*
 import controllers.ContactForm
 import model.{AccessibilityForm, FeedbackForm, ReportProblemForm}
 import play.api.i18n.Messages

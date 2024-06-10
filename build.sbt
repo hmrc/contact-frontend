@@ -23,10 +23,10 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     TwirlKeys.templateImports ++= Seq(
       "config.AppConfig",
-      "uk.gov.hmrc.govukfrontend.views.html.components._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.components._"
+      "uk.gov.hmrc.govukfrontend.views.html.components.*",
+      "uk.gov.hmrc.hmrcfrontend.views.html.components.*"
     ),
-    RoutesKeys.routesImport += "model.Aliases._",
+    RoutesKeys.routesImport += "model.Aliases.*",
     A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")
   )
   .settings(

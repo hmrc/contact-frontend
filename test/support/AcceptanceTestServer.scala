@@ -20,7 +20,7 @@ import org.scalatest.{Args, Status, TestSuite, TestSuiteMixin}
 import org.scalatestplus.play.guice.GuiceFakeApplicationFactory
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import TestConfiguration._
+import TestConfiguration.*
 import play.api.test.TestServer
 
 trait AcceptanceTestServer extends TestSuiteMixin with GuiceFakeApplicationFactory { this: TestSuite =>

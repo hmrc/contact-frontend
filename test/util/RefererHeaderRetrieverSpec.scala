@@ -19,7 +19,7 @@ package util
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.FakeRequest
-import play.api.http.HeaderNames._
+import play.api.http.HeaderNames.*
 
 class RefererHeaderRetrieverSpec extends AnyWordSpec with Matchers {
 

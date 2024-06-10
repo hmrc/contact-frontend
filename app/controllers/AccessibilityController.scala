@@ -22,9 +22,9 @@ import connectors.enrolments.EnrolmentsConnector
 import model.AccessibilityForm
 import model.Aliases.ReferrerUrl
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc._
+import play.api.mvc.*
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission

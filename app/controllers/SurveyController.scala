@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import model.SurveyForm
 import play.api.Logging
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{Call, MessagesControllerComponents, Request, Result}
