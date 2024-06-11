@@ -105,7 +105,7 @@ class AccessibilityController @Inject() (
     userAction: Option[String],
     referrerUrl: Option[ReferrerUrl]
   ): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.asyncUsing { request ?=>
       Future.successful {
         val submit    = routes.AccessibilityController.submit(service, userAction)
         val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders()
@@ -116,7 +116,7 @@ class AccessibilityController @Inject() (
     }
 
   def submit(service: Option[String], userAction: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.asyncUsing { request ?=>
       AccessibilityFormBind.form
         .bindFromRequest()
         .fold(
@@ -139,7 +139,7 @@ class AccessibilityController @Inject() (
         )
     }
 
-  def thanks(): Action[AnyContent] = Action.async { implicit request =>
+  def thanks(): Action[AnyContent] = Action.asyncUsing { request ?=>
     Future.successful(Ok(accessibilityProblemConfirmationPage()))
   }
 

@@ -23,7 +23,7 @@ import play.api.Logging
 import play.api.data.Forms.*
 import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.{Call, MessagesControllerComponents, Request, Result}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request, Result}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -65,12 +65,12 @@ class SurveyController @Inject() (
     HeaderNames.akamaiReputation
   )
 
-  def validateTicketId(ticketId: String) = ticketId match {
+  def validateTicketId(ticketId: String): Boolean = ticketId match {
     case TicketId() => true
     case _          => false
   }
 
-  def survey(ticketId: String, serviceId: String) = Action.async { implicit request =>
+  def survey(ticketId: String, serviceId: String): Action[AnyContent] = Action.asyncUsing { request ?=>
     Future.successful(
       if (validateTicketId(ticketId)) {
         val form   = emptyForm(serviceId = Some(serviceId), ticketId = Some(ticketId))
@@ -83,13 +83,13 @@ class SurveyController @Inject() (
     )
   }
 
-  def submitDeprecated() = Action.async { implicit request =>
+  def submitDeprecated(): Action[AnyContent] = Action.asyncUsing { request ?=>
     Future.successful {
       submitSurveyAction
     }
   }
 
-  def submit(ticketId: String, serviceId: String) = Action.async { implicit request =>
+  def submit(ticketId: String, serviceId: String): Action[AnyContent] = Action.asyncUsing { request ?=>
     Future.successful {
       playFrontendSurveyForm
         .bindFromRequest()
@@ -106,7 +106,7 @@ class SurveyController @Inject() (
     }
   }
 
-  def confirmation() = Action.async { implicit request =>
+  def confirmation(): Action[AnyContent] = Action.asyncUsing { request ?=>
     Future.successful(
       Ok(surveyConfirmationPage)
     )

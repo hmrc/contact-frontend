@@ -60,7 +60,7 @@ import scala.concurrent.{ExecutionContext, Future}
     canOmitComments: Boolean,
     referrerUrl: Option[ReferrerUrl]
   ): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.asyncUsing { request ?=>
       val referrer = referrerUrl orElse headerRetriever.refererFromHeaders()
       Future.successful(
         Ok(
@@ -86,7 +86,7 @@ import scala.concurrent.{ExecutionContext, Future}
     backUrl: Option[BackUrl] = None,
     canOmitComments: Boolean = false,
     referrerUrl: Option[ReferrerUrl] = None
-  ): Action[AnyContent] = Action.async { implicit request =>
+  ): Action[AnyContent] = Action.asyncUsing { request ?=>
     FeedbackFormBind.form
       .bindFromRequest()
       .fold(
@@ -103,7 +103,7 @@ import scala.concurrent.{ExecutionContext, Future}
       )
   }
 
-  def thanks(backUrl: Option[BackUrl] = None): Action[AnyContent] = Action.async { implicit request =>
+  def thanks(backUrl: Option[BackUrl] = None): Action[AnyContent] = Action.asyncUsing { request ?=>
     val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
     Future.successful(Ok(feedbackConfirmationPage(backUrl = validatedBackUrl)))
   }
