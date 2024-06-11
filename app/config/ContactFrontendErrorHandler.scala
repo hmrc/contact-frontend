@@ -25,12 +25,12 @@ import views.html.ErrorPage
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ContactFrontendErrorHandler @Inject() (val messagesApi: MessagesApi, errorPage: ErrorPage)(implicit
+class ContactFrontendErrorHandler @Inject() (val messagesApi: MessagesApi, errorPage: ErrorPage)(using
   appConfig: AppConfig,
   protected val ec: ExecutionContext
 ) extends FrontendErrorHandler {
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(using
     request: RequestHeader
   ): Future[Html] = Future {
     errorPage(pageTitle, heading, message)

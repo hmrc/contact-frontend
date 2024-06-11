@@ -37,11 +37,9 @@ class ReportProblemPageSpec
     with MessagesSupport
     with JsoupHelpers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/problem_reports_nonjs").withCSRFToken
-
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
-
-  implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/problem_reports_nonjs").withCSRFToken
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   val problemReportsForm: Form[ReportProblemForm] = Form[ReportProblemForm](
     mapping(
@@ -83,7 +81,7 @@ class ReportProblemPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
+      implicit val messages: Messages = getWelshMessages()
       val welshContent                = reportProblemPage(problemReportsForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
@@ -113,7 +111,7 @@ class ReportProblemPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
+      implicit val messages: Messages = getWelshMessages()
       val welshContent                = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
@@ -244,7 +242,7 @@ class ReportProblemPageSpec
     }
 
     "translate the report action textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
+      implicit val messages: Messages = getWelshMessages()
       val welshContent                = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("label[for=report-action]")
@@ -287,7 +285,7 @@ class ReportProblemPageSpec
     }
 
     "translate the report an error textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
+      implicit val messages: Messages = getWelshMessages()
       val welshContent                = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("label[for=report-error]")

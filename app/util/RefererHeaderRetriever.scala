@@ -21,6 +21,6 @@ import play.api.mvc.{AnyContent, Request}
 
 class RefererHeaderRetriever extends HeaderNames {
 
-  def refererFromHeaders(implicit request: Request[AnyContent]): Option[String] =
+  def refererFromHeaders()(using request: Request[AnyContent]): Option[String] =
     request.headers.get(REFERER)
 }

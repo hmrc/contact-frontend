@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.CFConfig
+import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
@@ -215,7 +215,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )(any[HeaderCarrier])
+        )
       ).thenReturn(Future.successful(TicketId(1234)))
 
       val request = generateRequest(
@@ -244,7 +244,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )(any[HeaderCarrier])
+        )
       ).thenReturn(Future.failed(new Exception("failed")))
 
       val request = generateRequest(
@@ -270,9 +270,12 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
     val ticketQueueConnector: DeskproTicketQueueConnector = mock[DeskproTicketQueueConnector]
 
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
-    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
+    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
+      .thenReturn(Future.successful(None))
 
-    implicit val cconfig: CFConfig = new CFConfig(app.configuration)
+    given AppConfig        = new CFConfig(app.configuration)
+    given ExecutionContext = ExecutionContext.global
+    given HeaderCarrier    = any[HeaderCarrier]
 
     val messages                                  = app.injector.instanceOf[MessagesApi]
     val playFrontendAccessibilityPage             = app.injector.instanceOf[views.html.AccessibilityProblemPage]
@@ -288,7 +291,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       playFrontendAccessibilityConfirmationPage,
       errorPage,
       new RefererHeaderRetriever
-    )(cconfig, ExecutionContext.Implicits.global)
+    )
 
     def generateRequest(desc: String, formName: String, email: String, isJavascript: Boolean, referrer: String) = {
       val fields = Map(

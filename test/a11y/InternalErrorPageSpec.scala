@@ -36,7 +36,7 @@ class InternalErrorPageSpec
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
+  implicit lazy val messages: Messages = getMessages()
 
   implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 

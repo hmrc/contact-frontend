@@ -39,7 +39,7 @@ class AccessibilityProblemPageSpec
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
+  implicit lazy val messages: Messages = getMessages()
 
   implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -81,7 +81,7 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
+      implicit val messages: Messages = getWelshMessages()
       val welshContent                = accessibilityProblemPage(accessibilityForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
@@ -111,8 +111,8 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = accessibilityProblemPage(accessibilityForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = accessibilityProblemPage(accessibilityForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
       paragraphs.first.text should include("Dylech dim ond defnyddio’r")
@@ -242,7 +242,7 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
+      implicit val messages: Messages = getWelshMessages()
       val welshContent                = accessibilityProblemPage(accessibilityForm, action)
 
       val paragraphs = welshContent.select("label[for=problemDescription]")

@@ -59,9 +59,8 @@ class ContactHmrcControllerSpec
       .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "useRefererHeader" -> true)
       .build()
 
-  implicit val actorSystem: ActorSystem = ActorSystem()
-
-  implicit val message: Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+  given ActorSystem = ActorSystem()
+  given Messages    = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
   val connectorTimeout: VerificationWithTimeout =
     Mockito.timeout(5000)
@@ -185,7 +184,7 @@ class ContactHmrcControllerSpec
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )(any[HeaderCarrier])
+        )
     }
 
     "send the referrer URL to DeskPro" in new TestScope {
@@ -222,7 +221,7 @@ class ContactHmrcControllerSpec
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )(any[HeaderCarrier])
+        )
     }
 
     "send the referrer information to DeskPro with userAction replacing the path if non-empty" in new TestScope {
@@ -259,7 +258,7 @@ class ContactHmrcControllerSpec
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )(any[HeaderCarrier])
+        )
     }
 
     "display errors when form isn't filled out at all" in new TestScope {
@@ -436,13 +435,15 @@ class ContactHmrcControllerSpec
 
     val configuration = app.configuration
 
-    implicit val appConfig: CFConfig                = new CFConfig(configuration)
-    implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
-    implicit val messages: MessagesApi              = app.injector.instanceOf[MessagesApi]
+    given CFConfig              = new CFConfig(configuration)
+    given ExecutionContext      = ExecutionContext.Implicits.global
+    given messages: MessagesApi = app.injector.instanceOf[MessagesApi]
+    given HeaderCarrier         = any[HeaderCarrier]
 
     val ticketQueueConnector                     = mock[DeskproTicketQueueConnector]
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
-    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
+    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
+      .thenReturn(Future.successful(None))
 
     val errorPage          = app.injector.instanceOf[views.html.InternalErrorPage]
     val pfContactPage      = app.injector.instanceOf[views.html.ContactHmrcPage]
@@ -472,7 +473,7 @@ class ContactHmrcControllerSpec
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )(any[HeaderCarrier])
+        )(using any[HeaderCarrier])
       ).thenReturn(result)
 
   }

@@ -32,9 +32,9 @@ class SurveyConfirmationPageSpec
     with MessagesSupport
     with JsoupHelpers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
-  implicit lazy val messages: Messages         = getMessages(app, fakeRequest)
-  implicit lazy val appConfig: AppConfig       = app.injector.instanceOf[AppConfig]
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   "the feedback confirmation page" should {
     val feedbackConfirmationPage = app.injector.instanceOf[SurveyConfirmationPage]
@@ -47,8 +47,8 @@ class SurveyConfirmationPageSpec
     }
 
     "translate the title into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = feedbackConfirmationPage()
+      given Messages   = getWelshMessages()
+      val welshContent = feedbackConfirmationPage()
 
       val titles = welshContent.select("h1")
       titles.first.text should be("Diolch, mae eich adborth wedi dod i law.")

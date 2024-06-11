@@ -21,7 +21,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
 trait AwaitSupport {
-  implicit val ec: ExecutionContext = ExecutionContext.global
+  given ExecutionContext = ExecutionContext.global
 
   def await[T](future: Future[T], timeout: Duration = 1 second): T = Await.result(future, timeout)
 }

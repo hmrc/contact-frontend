@@ -37,11 +37,11 @@ class AccessibilityProblemPageSpec
     with MessagesSupport
       with AccessibilityMatchers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
+  given messages: Messages = getMessages()
 
-  implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   val accessibilityForm: Form[AccessibilityForm] = Form[AccessibilityForm](
     mapping(

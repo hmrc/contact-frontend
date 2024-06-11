@@ -39,7 +39,7 @@ class FeedbackPageSpec
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
 
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
+  implicit lazy val messages: Messages = getMessages()
 
   implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -89,7 +89,7 @@ class FeedbackPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
+      implicit val messages: Messages = getWelshMessages()
       val welshContent                = feedbackPage(form, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
@@ -119,7 +119,7 @@ class FeedbackPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
+      implicit val messages: Messages = getWelshMessages()
       val welshContent                = feedbackPage(form, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
@@ -455,7 +455,7 @@ class FeedbackPageSpec
     }
 
     "translate the textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
+      implicit val messages: Messages = getWelshMessages()
       val welshContent                = feedbackPage(form, action)
 
       val paragraphs = welshContent.select("label[for=feedback-comments]")

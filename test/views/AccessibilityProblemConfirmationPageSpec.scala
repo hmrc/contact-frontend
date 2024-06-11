@@ -32,9 +32,9 @@ class AccessibilityProblemConfirmationPageSpec
     with MessagesSupport
     with JsoupHelpers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
-  implicit lazy val messages: Messages         = getMessages(app, fakeRequest)
-  implicit lazy val appConfig: AppConfig       = app.injector.instanceOf[AppConfig]
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   "the report an accessibility problem confirmation page" should {
     val accessibilityProblemConfirmationPage = app.injector.instanceOf[AccessibilityProblemConfirmationPage]
@@ -53,8 +53,8 @@ class AccessibilityProblemConfirmationPageSpec
     }
 
     "translate the title into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = accessibilityProblemConfirmationPage()
+      given Messages   = getWelshMessages()
+      val welshContent = accessibilityProblemConfirmationPage()
 
       val titles = welshContent.select("h1.govuk-panel__title")
       titles.first.text should be("Mae’ch problem wedi ei nodi")

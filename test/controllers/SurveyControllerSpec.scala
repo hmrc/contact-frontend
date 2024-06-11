@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.CFConfig
+import config.*
 import helpers.JsoupHelpers
 import org.jsoup.Jsoup
 import org.scalatest.matchers.should.Matchers
@@ -27,11 +27,11 @@ import play.api.Application
 import play.api.data.FormError
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers.*
 import play.api.test.{FakeHeaders, FakeRequest}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
-import play.api.test.Helpers.*
 
 import scala.concurrent.duration.*
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -73,7 +73,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     }
 
     "produce an audit result for a valid form" in new TestScope {
-      implicit val request: FakeRequest[_] = FakeRequest(
+      given FakeRequest[?] = FakeRequest(
         "POST",
         "/",
         FakeHeaders(),
@@ -103,7 +103,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     }
 
     "produce errors for an invalid form" in new TestScope {
-      implicit val request: FakeRequest[_] = FakeRequest(
+      given FakeRequest[?] = FakeRequest(
         "POST",
         "/",
         FakeHeaders(),
@@ -127,6 +127,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     val serviceId = "abcdefg"
     val request   = FakeRequest("POST", "/")
 
+    // TODO migrate to new syntax
     implicit val messages: Messages = messagesApi.preferred(request)
 
     val result = controller.submit(ticketId, serviceId)(request)
@@ -176,14 +177,16 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
 
   class TestScope extends MockitoSugar {
     val playFrontendSurveyPage = app.injector.instanceOf[views.html.SurveyPage]
-    val cconfig: CFConfig      = new CFConfig(app.configuration)
     val messagesApi            = app.injector.instanceOf[MessagesApi]
+
+    given AppConfig        = new CFConfig(app.configuration)
+    given ExecutionContext = ExecutionContext.global
 
     val controller = new SurveyController(
       mock[AuditConnector],
       Stubs.stubMessagesControllerComponents(messagesApi = messagesApi),
       playFrontendSurveyPage,
       mock[views.html.SurveyConfirmationPage]
-    )(cconfig, ExecutionContext.Implicits.global)
+    )
   }
 }

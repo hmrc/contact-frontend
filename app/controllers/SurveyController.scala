@@ -40,12 +40,12 @@ class SurveyController @Inject() (
   mcc: MessagesControllerComponents,
   playFrontendSurveyPage: SurveyPage,
   playFrontendSurveyConfirmationPage: SurveyConfirmationPage
-)(implicit appConfig: AppConfig, executionContext: ExecutionContext)
+)(using AppConfig, ExecutionContext)
     extends FrontendController(mcc)
     with I18nSupport
     with Logging {
 
-  implicit def lang(implicit request: Request[_]): Lang = request.lang
+  given lang(using request: Request[_]): Lang = request.lang
 
   private val TicketId = "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$".r
 
@@ -112,8 +112,8 @@ class SurveyController @Inject() (
     )
   }
 
-  private[controllers] def getAuditEventOrFormErrors(implicit
-    request: Request[_]
+  private[controllers] def getAuditEventOrFormErrors(using
+    Request[?]
   ): Either[Option[Future[DataEvent]], Seq[FormError]] = {
     val form = surveyForm.bindFromRequest()
     form.errors match {
@@ -122,7 +122,7 @@ class SurveyController @Inject() (
     }
   }
 
-  private[controllers] def submitSurveyAction(implicit request: Request[_]): Result = {
+  private[controllers] def submitSurveyAction(using request: Request[?]): Result = {
     getAuditEventOrFormErrors match {
       case Left(eventOption) =>
         eventOption foreach { dataEventFuture =>
@@ -138,7 +138,7 @@ class SurveyController @Inject() (
     Redirect(routes.SurveyController.confirmation())
   }
 
-  private[controllers] def buildAuditEvent(formData: SurveyForm)(implicit hc: HeaderCarrier): Future[DataEvent] =
+  private[controllers] def buildAuditEvent(formData: SurveyForm)(using hc: HeaderCarrier): Future[DataEvent] =
     Future.successful(
       DataEvent(
         auditSource = "frontend",
@@ -193,16 +193,9 @@ class SurveyController @Inject() (
       )
     )
 
-  private def surveyPage(form: Form[SurveyForm], action: Call)(implicit
-    request: Request[_]
-  ): Html =
-    playFrontendSurveyPage(
-      form,
-      action
-    )
+  private def surveyPage(form: Form[SurveyForm], action: Call)(using Request[?]): Html =
+    playFrontendSurveyPage(form, action)
 
-  private def surveyConfirmationPage(implicit
-    request: Request[_]
-  ): Html =
+  private def surveyConfirmationPage(using Request[?]): Html =
     playFrontendSurveyConfirmationPage()
 }

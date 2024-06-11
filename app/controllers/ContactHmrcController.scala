@@ -72,17 +72,17 @@ class ContactHmrcController @Inject() (
   contactHmrcPage: ContactHmrcPage,
   contactHmrcConfirmationPage: ContactHmrcConfirmationPage,
   headerRetriever: RefererHeaderRetriever
-)(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
+)(using val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport {
 
-  implicit def lang(implicit request: Request[_]): Lang = request.lang
+  given lang(using request: Request[_]): Lang = request.lang
 
-  def index(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl]) =
+  def index(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl]): Action[AnyContent] =
     Action.async { implicit request =>
       Future.successful {
-        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders getOrElse "n/a"
+        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders() getOrElse "n/a"
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
         val form      = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, userAction))
         val submit    = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
@@ -117,7 +117,7 @@ class ContactHmrcController @Inject() (
         )
     }
 
-  def thanks = Action.async { implicit request =>
+  def thanks: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok(contactHmrcConfirmationPage()))
   }
 }

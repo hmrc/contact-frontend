@@ -34,7 +34,7 @@ class SurveyConfirmationPageSpec
       with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
-  implicit lazy val messages: Messages         = getMessages(app, fakeRequest)
+  implicit lazy val messages: Messages         = getMessages()
   implicit lazy val appConfig: AppConfig       = app.injector.instanceOf[AppConfig]
 
   "the feedback confirmation page" should {

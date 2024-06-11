@@ -93,12 +93,12 @@ class AccessibilityController @Inject() (
   accessibilityProblemConfirmationPage: AccessibilityProblemConfirmationPage,
   errorPage: InternalErrorPage,
   headerRetriever: RefererHeaderRetriever
-)(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
+)(using AppConfig, ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport {
 
-  implicit def lang(implicit request: Request[_]): Lang = request.lang
+  given lang(using request: Request[_]): Lang = request.lang
 
   def index(
     service: Option[String],
@@ -108,7 +108,7 @@ class AccessibilityController @Inject() (
     Action.async { implicit request =>
       Future.successful {
         val submit    = routes.AccessibilityController.submit(service, userAction)
-        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders
+        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders()
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
         val form      = AccessibilityFormBind.emptyForm(csrfToken, referrer, service, userAction)
         Ok(accessibilityPage(form, submit))
@@ -143,9 +143,7 @@ class AccessibilityController @Inject() (
     Future.successful(Ok(accessibilityProblemConfirmationPage()))
   }
 
-  private def accessibilityPage(form: Form[AccessibilityForm], submit: Call)(implicit
-    request: Request[_]
-  ): Html =
+  private def accessibilityPage(form: Form[AccessibilityForm], submit: Call)(using Request[?]): Html =
     accessibilityProblemPage(form, submit)
 
 }

@@ -38,9 +38,7 @@ class DeskproTicketQueueConnector @Inject() (
   servicesConfig: ServicesConfig,
   appConfig: AppConfig,
   auditConnector: AuditConnector
-)(implicit
-  executionContext: ExecutionContext
-) {
+)(using ExecutionContext) {
 
   private val serviceUrl: String = servicesConfig.baseUrl("deskpro-ticket-queue")
 
@@ -55,7 +53,7 @@ class DeskproTicketQueueConnector @Inject() (
     service: Option[String],
     userAction: Option[String],
     ticketConstants: TicketConstants
-  )(implicit hc: HeaderCarrier): Future[TicketId] = {
+  )(using hc: HeaderCarrier): Future[TicketId] = {
     val ticket = Ticket
       .create(
         name,
@@ -96,7 +94,7 @@ class DeskproTicketQueueConnector @Inject() (
     enrolmentsOption: Option[Enrolments],
     service: Option[String],
     ticketConstants: TicketConstants
-  )(implicit hc: HeaderCarrier): Future[TicketId] = {
+  )(using hc: HeaderCarrier): Future[TicketId] = {
     val feedback = Feedback.create(
       name,
       email,

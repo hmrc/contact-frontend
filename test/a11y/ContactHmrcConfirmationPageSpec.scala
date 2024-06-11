@@ -34,7 +34,7 @@ class ContactHmrcConfirmationPageSpec
       with AccessibilityMatchers {
 
   implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/submit")
-  implicit lazy val messages: Messages         = getMessages(app, fakeRequest)
+  implicit lazy val messages: Messages         = getMessages()
   implicit lazy val appConfig: AppConfig       = app.injector.instanceOf[AppConfig]
 
   "the Contact Hmrc standalone confirmation page" should {

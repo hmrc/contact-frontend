@@ -37,11 +37,11 @@ class ContactHmrcPageSpec
     with MessagesSupport
       with AccessibilityMatchers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
 
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
+  given messages: Messages = getMessages()
 
-  implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   val contactHmrcForm: Form[ContactForm] = Form[ContactForm](
     mapping(
