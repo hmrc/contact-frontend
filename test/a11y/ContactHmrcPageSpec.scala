@@ -35,7 +35,7 @@ class ContactHmrcPageSpec
     with Matchers
     with ApplicationSupport
     with MessagesSupport
-      with AccessibilityMatchers {
+    with AccessibilityMatchers {
 
   given fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
 

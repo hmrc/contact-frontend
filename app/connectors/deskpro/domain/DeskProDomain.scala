@@ -162,7 +162,7 @@ trait FieldTransformer {
       case _                                       => nonPayeEnrolmentToTaxIdentifiers(enrolment).toMap
     }
 
-  private def extractEmpRef(enrolment: Enrolment)                            =
+  private def extractEmpRef(enrolment: Enrolment) =
     for (
       taxOfficeNumber <- extractIdentifier(enrolment, "TaxOfficeNumber");
       taxOfficeRef    <- extractIdentifier(enrolment, "TaxOfficeReference")
