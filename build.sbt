@@ -30,7 +30,6 @@ lazy val microservice = Project(appName, file("."))
     A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")
   )
   .settings(
-    scalacOptions += "-source:3.3-migration",
     scalacOptions += "-Wconf:src=routes/.*:s",
     scalacOptions += "-Wconf:src=views/.*:s"
   )
