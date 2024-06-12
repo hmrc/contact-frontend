@@ -38,8 +38,8 @@ class FeedbackPageSpec
     with JsoupHelpers {
 
   given fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
-  given Messages = getMessages()
-  given AppConfig = app.injector.instanceOf[AppConfig]
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   val form: Form[FeedbackForm] = Form[FeedbackForm](
     mapping(
