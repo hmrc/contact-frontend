@@ -77,7 +77,7 @@ class ContactHmrcController @Inject() (
     with DeskproSubmission
     with I18nSupport {
 
-  given lang(using request: Request[_]): Lang = request.lang
+  given lang(using request: Request[?]): Lang = request.lang
 
   def index(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl]): Action[AnyContent] =
     Action.asyncUsing { request ?=>

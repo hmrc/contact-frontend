@@ -38,10 +38,8 @@ class AccessibilityProblemPageSpec
     with AccessibilityMatchers {
 
   given fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
-
-  given messages: Messages = getMessages()
-
-  given appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   val accessibilityForm: Form[AccessibilityForm] = Form[AccessibilityForm](
     mapping(

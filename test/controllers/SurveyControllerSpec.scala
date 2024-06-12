@@ -127,8 +127,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     val serviceId = "abcdefg"
     val request   = FakeRequest("POST", "/")
 
-    // TODO migrate to new syntax
-    implicit val messages: Messages = messagesApi.preferred(request)
+    given messages: Messages = messagesApi.preferred(request)
 
     val result = controller.submit(ticketId, serviceId)(request)
 
@@ -158,7 +157,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     )
     val request   = FakeRequest("POST", "/").withFormUrlEncodedBody(fields.toSeq: _*)
 
-    implicit val messages: Messages = messagesApi.preferred(request)
+    given messages: Messages = messagesApi.preferred(request)
 
     val result = controller.submit(ticketId, serviceId)(request)
 

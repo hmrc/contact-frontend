@@ -49,7 +49,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "useRefererHeader" -> true)
       .build()
 
-  implicit val message: Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+  given Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
   // RFC 5321: https://tools.ietf.org/html/rfc5321
   // Maximum domain name length: https://www.nic.ad.jp/timeline/en/20th/appendix1.html#:~:text=Each%20element%20of%20a%20domain,a%20maximum%20of%20253%20characters.

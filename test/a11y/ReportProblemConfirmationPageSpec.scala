@@ -33,9 +33,9 @@ class ReportProblemConfirmationPageSpec
     with MessagesSupport
     with AccessibilityMatchers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/submit")
-  implicit lazy val messages: Messages         = getMessages()
-  implicit lazy val appConfig: AppConfig       = app.injector.instanceOf[AppConfig]
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/submit")
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   "the Problem Reports standalone confirmation page" should {
     val confirmationPage = app.injector.instanceOf[ReportProblemConfirmationPage]

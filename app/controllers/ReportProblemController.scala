@@ -112,7 +112,7 @@ class ReportProblemController @Inject() (
     with DeskproSubmission
     with I18nSupport {
 
-  given lang(using request: Request[_]): Lang = request.lang
+  given lang(using request: Request[?]): Lang = request.lang
 
   def index(service: Option[String], referrerUrl: Option[ReferrerUrl]): Action[AnyContent] = Action { request =>
     given Request[AnyContent] = request
@@ -169,7 +169,8 @@ class ReportProblemController @Inject() (
   private def fromForm(key: String, form: Form[ReportProblemForm]): Option[String] =
     form.data.get(key).flatMap(r => if (r.isEmpty) None else Some(r))
 
-  def thanks(): Action[AnyContent] = Action { implicit request =>
+  def thanks(): Action[AnyContent] = Action { request =>
+    given MessagesRequest[AnyContent] = request
     Ok(confirmationPage())
   }
 

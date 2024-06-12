@@ -26,7 +26,7 @@ extension (actionBuilder: ActionBuilder[Request, AnyContent]) {
 }
 
 extension (actionBuilder: ActionBuilder[Request, AnyContent]) {
-  def asyncUsingT[T <: Request[_]](block: T ?=> Future[Result])(using ExecutionContext): Action[AnyContent] =
+  def asyncUsingT[T <: Request[?]](block: T ?=> Future[Result])(using ExecutionContext): Action[AnyContent] =
     actionBuilder.async { request =>
       given T = request.asInstanceOf[T]
       block

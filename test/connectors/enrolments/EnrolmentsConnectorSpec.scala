@@ -103,7 +103,7 @@ class EnrolmentsConnectorSpec extends AnyWordSpec with Matchers {
       val authConnector: AuthConnector = authConnectorReturning(json)
       val enrolmentsConnector          = EnrolmentsConnector(authConnector)
 
-      given Request[_]    = FakeRequest()
+      given Request[?]    = FakeRequest()
       given HeaderCarrier = HeaderCarrier()
 
       val maybeEnrolments = Await.result(

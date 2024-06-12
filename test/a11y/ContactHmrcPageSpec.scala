@@ -38,10 +38,8 @@ class ContactHmrcPageSpec
     with AccessibilityMatchers {
 
   given fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
-
-  given messages: Messages = getMessages()
-
-  given appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   val contactHmrcForm: Form[ContactForm] = Form[ContactForm](
     mapping(

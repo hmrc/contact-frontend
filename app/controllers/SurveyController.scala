@@ -45,7 +45,7 @@ class SurveyController @Inject() (
     with I18nSupport
     with Logging {
 
-  given lang(using request: Request[_]): Lang = request.lang
+  given lang(using request: Request[?]): Lang = request.lang
 
   private val TicketId = "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$".r
 
