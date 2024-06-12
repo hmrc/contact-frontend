@@ -436,7 +436,7 @@ class ContactHmrcControllerSpec
     val configuration = app.configuration
 
     given CFConfig              = new CFConfig(configuration)
-    given ExecutionContext      = ExecutionContext.Implicits.global
+    given ExecutionContext      = ExecutionContext.global
     given messages: MessagesApi = app.injector.instanceOf[MessagesApi]
     given HeaderCarrier         = any[HeaderCarrier]
 

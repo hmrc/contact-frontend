@@ -77,7 +77,7 @@ class EnrolmentsConnectorSpec extends AnyWordSpec with Matchers {
 
     "return None if connection to auth fails" in {
       val authConnector       = new AuthConnector {
-        override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
+        override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(using
           hc: HeaderCarrier,
           ec: ExecutionContext
         ): Future[A] =

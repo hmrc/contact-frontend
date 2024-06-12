@@ -79,8 +79,8 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = accessibilityProblemPage(accessibilityForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = accessibilityProblemPage(accessibilityForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -240,8 +240,8 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = accessibilityProblemPage(accessibilityForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = accessibilityProblemPage(accessibilityForm, action)
 
       val paragraphs = welshContent.select("label[for=problemDescription]")
       paragraphs.first.text should be("Disgrifiwch y broblem hygyrchedd rydych wedi dod o hyd iddi")

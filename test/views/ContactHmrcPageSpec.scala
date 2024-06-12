@@ -79,8 +79,8 @@ class ContactHmrcPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = contactHmrcPage(contactHmrcForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = contactHmrcPage(contactHmrcForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -109,8 +109,8 @@ class ContactHmrcPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = contactHmrcPage(contactHmrcForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = contactHmrcPage(contactHmrcForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
       paragraphs.first.text should include(

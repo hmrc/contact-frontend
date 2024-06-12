@@ -87,8 +87,8 @@ class FeedbackPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = feedbackPage(form, action)
+      given Messages   = getWelshMessages()
+      val welshContent = feedbackPage(form, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -117,8 +117,8 @@ class FeedbackPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = feedbackPage(form, action)
+      given Messages   = getWelshMessages()
+      val welshContent = feedbackPage(form, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
       paragraphs.first.text should include("Rydym yn defnyddio’ch adborth i wella ein gwasanaethau.")
@@ -453,8 +453,8 @@ class FeedbackPageSpec
     }
 
     "translate the textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = feedbackPage(form, action)
+      given Messages   = getWelshMessages()
+      val welshContent = feedbackPage(form, action)
 
       val paragraphs = welshContent.select("label[for=feedback-comments]")
       paragraphs.first.text should be("Sylwadau")

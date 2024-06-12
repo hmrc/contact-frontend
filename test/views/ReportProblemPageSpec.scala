@@ -81,8 +81,8 @@ class ReportProblemPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = reportProblemPage(problemReportsForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = reportProblemPage(problemReportsForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -111,8 +111,8 @@ class ReportProblemPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = reportProblemPage(problemReportsForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
       paragraphs.first.text should include("Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.")
@@ -242,8 +242,8 @@ class ReportProblemPageSpec
     }
 
     "translate the report action textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = reportProblemPage(problemReportsForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("label[for=report-action]")
       paragraphs.first.text should be("Beth oeddech yn ei wneud?")
@@ -285,8 +285,8 @@ class ReportProblemPageSpec
     }
 
     "translate the report an error textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages()
-      val welshContent                = reportProblemPage(problemReportsForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("label[for=report-error]")
       paragraphs.first.text should be("Gyda beth ydych angen help?")
