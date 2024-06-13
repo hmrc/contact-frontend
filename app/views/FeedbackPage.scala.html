@@ -14,8 +14,8 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF => PlayFrontendFormWithCSRF}
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF as PlayFrontendFormWithCSRF
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.*
 @import model.FeedbackForm
 @import views.html.components.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Paragraph, ReportTechnicalIssue}
 
@@ -44,7 +44,7 @@
     }
     @h1(content = Text(messages("feedback.heading")))
     @p(content = Text(messages("form.online.services.data")))
-    @formWithCSRF(action, 'id -> "feedback-form") {
+    @formWithCSRF(action, Symbol("id") -> "feedback-form") {
       @inputHidden(feedbackForm("service"))
       @inputHidden(feedbackForm("referrer"))
       @inputHidden(feedbackForm("canOmitComments"))

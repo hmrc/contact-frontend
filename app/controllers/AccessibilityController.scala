@@ -22,9 +22,9 @@ import connectors.enrolments.EnrolmentsConnector
 import model.AccessibilityForm
 import model.Aliases.ReferrerUrl
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc._
+import play.api.mvc.*
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission
@@ -81,7 +81,7 @@ object AccessibilityFormBind {
       "csrfToken"          -> text,
       "service"            -> optional(text),
       "userAction"         -> optional(text)
-    )(AccessibilityForm.apply)(AccessibilityForm.unapply)
+    )(AccessibilityForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 }
 
@@ -93,22 +93,23 @@ class AccessibilityController @Inject() (
   accessibilityProblemConfirmationPage: AccessibilityProblemConfirmationPage,
   errorPage: InternalErrorPage,
   headerRetriever: RefererHeaderRetriever
-)(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
+)(using AppConfig, ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport {
 
-  implicit def lang(implicit request: Request[_]): Lang = request.lang
+  given lang(using request: Request[?]): Lang = request.lang
 
   def index(
     service: Option[String],
     userAction: Option[String],
     referrerUrl: Option[ReferrerUrl]
   ): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       Future.successful {
         val submit    = routes.AccessibilityController.submit(service, userAction)
-        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders
+        val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders()
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
         val form      = AccessibilityFormBind.emptyForm(csrfToken, referrer, service, userAction)
         Ok(accessibilityPage(form, submit))
@@ -116,7 +117,8 @@ class AccessibilityController @Inject() (
     }
 
   def submit(service: Option[String], userAction: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       AccessibilityFormBind.form
         .bindFromRequest()
         .fold(
@@ -139,13 +141,12 @@ class AccessibilityController @Inject() (
         )
     }
 
-  def thanks(): Action[AnyContent] = Action.async { implicit request =>
+  def thanks(): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     Future.successful(Ok(accessibilityProblemConfirmationPage()))
   }
 
-  private def accessibilityPage(form: Form[AccessibilityForm], submit: Call)(implicit
-    request: Request[_]
-  ): Html =
+  private def accessibilityPage(form: Form[AccessibilityForm], submit: Call)(using Request[?]): Html =
     accessibilityProblemPage(form, submit)
 
 }

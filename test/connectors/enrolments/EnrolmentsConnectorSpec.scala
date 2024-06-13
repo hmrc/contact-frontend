@@ -34,9 +34,9 @@ class EnrolmentsConnectorSpec extends AnyWordSpec with Matchers {
 
   private def authConnectorReturning(json: JsValue): AuthConnector =
     new AuthConnector {
-      override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
-        hc: HeaderCarrier,
-        ec: ExecutionContext
+      override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(using
+        HeaderCarrier,
+        ExecutionContext
       ): Future[A] =
         Future.successful(json.as[A](retrieval.reads))
     }
@@ -48,12 +48,12 @@ class EnrolmentsConnectorSpec extends AnyWordSpec with Matchers {
       val authConnector: AuthConnector = authConnectorReturning(json)
       val enrolmentsConnector          = EnrolmentsConnector(authConnector)
 
-      val request: Request[_] =
+      given Request[?]    =
         FakeRequest().withSession((SessionKeys.authToken, "some-auth-token"))
-      val hc: HeaderCarrier   = HeaderCarrier()
+      given HeaderCarrier = HeaderCarrier()
 
       val maybeEnrolments = Await.result(
-        enrolmentsConnector.maybeAuthenticatedUserEnrolments()(hc, request),
+        enrolmentsConnector.maybeAuthenticatedUserEnrolments(),
         Duration(1, SECONDS)
       )
       maybeEnrolments shouldBe Some(Enrolments(Set(Enrolment("enrolmentKey"))))
@@ -64,12 +64,12 @@ class EnrolmentsConnectorSpec extends AnyWordSpec with Matchers {
       val authConnector: AuthConnector = authConnectorReturning(json)
       val enrolmentsConnector          = EnrolmentsConnector(authConnector)
 
-      val request: Request[_] =
+      given Request[?]    =
         FakeRequest().withSession((SessionKeys.authToken, "some-auth-token"))
-      val hc: HeaderCarrier   = HeaderCarrier()
+      given HeaderCarrier = HeaderCarrier()
 
       val maybeEnrolments = Await.result(
-        enrolmentsConnector.maybeAuthenticatedUserEnrolments()(hc, request),
+        enrolmentsConnector.maybeAuthenticatedUserEnrolments(),
         Duration(1, SECONDS)
       )
       maybeEnrolments shouldBe Some(Enrolments(Set.empty[Enrolment]))
@@ -77,7 +77,7 @@ class EnrolmentsConnectorSpec extends AnyWordSpec with Matchers {
 
     "return None if connection to auth fails" in {
       val authConnector       = new AuthConnector {
-        override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
+        override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(using
           hc: HeaderCarrier,
           ec: ExecutionContext
         ): Future[A] =
@@ -85,12 +85,12 @@ class EnrolmentsConnectorSpec extends AnyWordSpec with Matchers {
       }
       val enrolmentsConnector = EnrolmentsConnector(authConnector)
 
-      val request: Request[_] =
+      given Request[?]    =
         FakeRequest().withSession((SessionKeys.authToken, "some-auth-token"))
-      val hc: HeaderCarrier   = HeaderCarrier()
+      given HeaderCarrier = HeaderCarrier()
 
       val maybeEnrolments = Await.result(
-        enrolmentsConnector.maybeAuthenticatedUserEnrolments()(hc, request),
+        enrolmentsConnector.maybeAuthenticatedUserEnrolments(),
         Duration(1, SECONDS)
       )
       maybeEnrolments shouldBe None
@@ -103,11 +103,11 @@ class EnrolmentsConnectorSpec extends AnyWordSpec with Matchers {
       val authConnector: AuthConnector = authConnectorReturning(json)
       val enrolmentsConnector          = EnrolmentsConnector(authConnector)
 
-      val request: Request[_] = FakeRequest()
-      val hc: HeaderCarrier   = HeaderCarrier()
+      given Request[?]    = FakeRequest()
+      given HeaderCarrier = HeaderCarrier()
 
       val maybeEnrolments = Await.result(
-        enrolmentsConnector.maybeAuthenticatedUserEnrolments()(hc, request),
+        enrolmentsConnector.maybeAuthenticatedUserEnrolments(),
         Duration(1, SECONDS)
       )
       maybeEnrolments shouldBe None

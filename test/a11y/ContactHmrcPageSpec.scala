@@ -22,10 +22,10 @@ import controllers.ContactForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
-import play.api.test.CSRFTokenHelper._
+import play.api.test.CSRFTokenHelper.*
 import play.api.test.FakeRequest
 import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.ContactHmrcPage
@@ -37,11 +37,9 @@ class ContactHmrcPageSpec
     with MessagesSupport
     with AccessibilityMatchers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
-
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
-
-  implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   val contactHmrcForm: Form[ContactForm] = Form[ContactForm](
     mapping(
@@ -53,7 +51,7 @@ class ContactHmrcPageSpec
       "csrfToken"        -> text,
       "service"          -> optional(text),
       "userAction"       -> optional(text)
-    )(ContactForm.apply)(ContactForm.unapply)
+    )(ContactForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val action: Call = Call(method = "POST", url = "/contact/contact-hmrc/submit")

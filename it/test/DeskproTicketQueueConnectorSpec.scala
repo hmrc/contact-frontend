@@ -19,8 +19,8 @@ package test
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, equalToJson, postRequestedFor, urlEqualTo}
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{BetaFeedbackTicketConstants, ReportTechnicalProblemTicketConstants, TicketId}
+import org.mockito.Mockito.when
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, Mockito}
-import org.mockito.MockitoSugar.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -40,7 +40,7 @@ import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 class DeskproTicketQueueConnectorSpec
     extends AnyWordSpec
@@ -53,24 +53,25 @@ class DeskproTicketQueueConnectorSpec
 
   val auditConnector = new AuditConnector {
     val mockAuditingConfig = mock[AuditingConfig]
-    when(mockAuditingConfig.enabled).thenAnswer(true)
+    when(mockAuditingConfig.enabled).thenReturn(true)
 
     override def auditingConfig: AuditingConfig       = mockAuditingConfig
     override def auditChannel: AuditChannel           = ???
     override def datastreamMetrics: DatastreamMetrics = ???
 
-    override def sendExtendedEvent(event: ExtendedDataEvent)(implicit hc: HeaderCarrier = HeaderCarrier(), ec: ExecutionContext): Future[AuditResult] = {
+    override def sendExtendedEvent(
+      event: ExtendedDataEvent
+    )(using hc: HeaderCarrier = HeaderCarrier(), ec: ExecutionContext): Future[AuditResult] =
       mockAuditConnector.sendExtendedEvent(event)
-    }
   }
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
       .configure(
-        "metrics.jvm"                       -> false,
-        "metrics.enabled"                         -> false,
+        "metrics.jvm"                                     -> false,
+        "metrics.enabled"                                 -> false,
         "microservice.services.deskpro-ticket-queue.port" -> endpointPort,
-        "sendExplicitAuditEvents" -> true
+        "sendExplicitAuditEvents"                         -> true
       )
       .overrides(
         bind(classOf[AuditConnector]).toInstance(auditConnector)
@@ -116,7 +117,7 @@ class DeskproTicketQueueConnectorSpec
       )
 
       val explicitAuditEvents = captureAuditEvents().filter(_.auditType == "ReportTechnicalProblemFormSubmission")
-      explicitAuditEvents.length shouldBe 1
+      explicitAuditEvents.length      shouldBe 1
       explicitAuditEvents.head.detail shouldBe Json.parse(problemReportsRequestJson)
     }
 
@@ -192,7 +193,6 @@ class DeskproTicketQueueConnectorSpec
                                   |"rating":"4"
                                   |}""".stripMargin
 
-
       endpointServer.verify(
         postRequestedFor(urlEqualTo("/deskpro/feedback"))
           .withHeader("Content-Type", equalTo("application/json"))
@@ -202,7 +202,7 @@ class DeskproTicketQueueConnectorSpec
       )
 
       val explicitAuditEvents = captureAuditEvents().filter(_.auditType == "BetaFeedbackFormSubmission")
-      explicitAuditEvents.length shouldBe 1
+      explicitAuditEvents.length      shouldBe 1
       explicitAuditEvents.head.detail shouldBe Json.parse(feedbackRequestJson)
     }
 
@@ -251,10 +251,10 @@ class DeskproTicketQueueConnectorSpec
   class Setup {
     def ticketQueueConnector = app.injector.instanceOf[DeskproTicketQueueConnector]
 
-    implicit val request: Request[AnyRef] = FakeRequest()
+    given request: Request[AnyRef] = FakeRequest()
 
     def createTicket(enrolments: Enrolments): Future[TicketId] = {
-      implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       ticketQueueConnector.createDeskProTicket(
         name = "Mary",
         email = "mary@example.com",
@@ -270,7 +270,7 @@ class DeskproTicketQueueConnectorSpec
     }
 
     def createFeedback(enrolments: Enrolments): Future[TicketId] = {
-      implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       ticketQueueConnector.createFeedback(
         name = "Eric",
         email = "eric@example.com",

@@ -22,12 +22,12 @@ import model.FeedbackForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
-import play.api.test.CSRFTokenHelper._
+import play.api.test.CSRFTokenHelper.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.FeedbackPage
 
 class FeedbackPageSpec
@@ -37,11 +37,9 @@ class FeedbackPageSpec
     with MessagesSupport
     with JsoupHelpers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
-
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
-
-  implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   val form: Form[FeedbackForm] = Form[FeedbackForm](
     mapping(
@@ -59,7 +57,7 @@ class FeedbackPageSpec
       "service"           -> optional(text),
       "backUrl"           -> optional(text),
       "canOmitComments"   -> boolean
-    )(FeedbackForm.apply)(FeedbackForm.unapply)
+    )(FeedbackForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val formValues: FeedbackForm = FeedbackForm(
@@ -89,8 +87,8 @@ class FeedbackPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = feedbackPage(form, action)
+      given Messages   = getWelshMessages()
+      val welshContent = feedbackPage(form, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -119,8 +117,8 @@ class FeedbackPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = feedbackPage(form, action)
+      given Messages   = getWelshMessages()
+      val welshContent = feedbackPage(form, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
       paragraphs.first.text should include("Rydym yn defnyddio’ch adborth i wella ein gwasanaethau.")
@@ -455,8 +453,8 @@ class FeedbackPageSpec
     }
 
     "translate the textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = feedbackPage(form, action)
+      given Messages   = getWelshMessages()
+      val welshContent = feedbackPage(form, action)
 
       val paragraphs = welshContent.select("label[for=feedback-comments]")
       paragraphs.first.text should be("Sylwadau")

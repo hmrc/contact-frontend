@@ -20,10 +20,10 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import model.SurveyForm
 import play.api.Logging
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.{Call, MessagesControllerComponents, Request, Result}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request, Result}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -40,12 +40,12 @@ class SurveyController @Inject() (
   mcc: MessagesControllerComponents,
   playFrontendSurveyPage: SurveyPage,
   playFrontendSurveyConfirmationPage: SurveyConfirmationPage
-)(implicit appConfig: AppConfig, executionContext: ExecutionContext)
+)(using AppConfig, ExecutionContext)
     extends FrontendController(mcc)
     with I18nSupport
     with Logging {
 
-  implicit def lang(implicit request: Request[_]): Lang = request.lang
+  given lang(using request: Request[?]): Lang = request.lang
 
   private val TicketId = "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$".r
 
@@ -65,12 +65,13 @@ class SurveyController @Inject() (
     HeaderNames.akamaiReputation
   )
 
-  def validateTicketId(ticketId: String) = ticketId match {
+  def validateTicketId(ticketId: String): Boolean = ticketId match {
     case TicketId() => true
     case _          => false
   }
 
-  def survey(ticketId: String, serviceId: String) = Action.async { implicit request =>
+  def survey(ticketId: String, serviceId: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     Future.successful(
       if (validateTicketId(ticketId)) {
         val form   = emptyForm(serviceId = Some(serviceId), ticketId = Some(ticketId))
@@ -83,13 +84,15 @@ class SurveyController @Inject() (
     )
   }
 
-  def submitDeprecated() = Action.async { implicit request =>
+  def submitDeprecated(): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     Future.successful {
       submitSurveyAction
     }
   }
 
-  def submit(ticketId: String, serviceId: String) = Action.async { implicit request =>
+  def submit(ticketId: String, serviceId: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     Future.successful {
       playFrontendSurveyForm
         .bindFromRequest()
@@ -106,14 +109,15 @@ class SurveyController @Inject() (
     }
   }
 
-  def confirmation() = Action.async { implicit request =>
+  def confirmation(): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     Future.successful(
       Ok(surveyConfirmationPage)
     )
   }
 
-  private[controllers] def getAuditEventOrFormErrors(implicit
-    request: Request[_]
+  private[controllers] def getAuditEventOrFormErrors(using
+    Request[?]
   ): Either[Option[Future[DataEvent]], Seq[FormError]] = {
     val form = surveyForm.bindFromRequest()
     form.errors match {
@@ -122,7 +126,7 @@ class SurveyController @Inject() (
     }
   }
 
-  private[controllers] def submitSurveyAction(implicit request: Request[_]): Result = {
+  private[controllers] def submitSurveyAction(using request: Request[?]): Result = {
     getAuditEventOrFormErrors match {
       case Left(eventOption) =>
         eventOption foreach { dataEventFuture =>
@@ -138,7 +142,7 @@ class SurveyController @Inject() (
     Redirect(routes.SurveyController.confirmation())
   }
 
-  private[controllers] def buildAuditEvent(formData: SurveyForm)(implicit hc: HeaderCarrier): Future[DataEvent] =
+  private[controllers] def buildAuditEvent(formData: SurveyForm)(using hc: HeaderCarrier): Future[DataEvent] =
     Future.successful(
       DataEvent(
         auditSource = "frontend",
@@ -163,7 +167,7 @@ class SurveyController @Inject() (
       "improve"    -> optional(text(maxLength = 2500)),
       "ticket-id"  -> optional(text).verifying(ticketId => validateTicketId(ticketId.getOrElse(""))),
       "service-id" -> optional(text(maxLength = 20)).verifying(serviceId => serviceId.getOrElse("").length > 0)
-    )(SurveyForm.apply)(SurveyForm.unapply)
+    )(SurveyForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   private[controllers] def playFrontendSurveyForm = Form[SurveyForm](
@@ -176,7 +180,7 @@ class SurveyController @Inject() (
         .verifying("survey.improve.error.length", improve => improve.getOrElse("").length <= 2500),
       "ticket-id"  -> optional(text),
       "service-id" -> optional(text)
-    )(SurveyForm.apply)(SurveyForm.unapply)
+    )(SurveyForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   private[controllers] def emptyForm(
@@ -193,16 +197,9 @@ class SurveyController @Inject() (
       )
     )
 
-  private def surveyPage(form: Form[SurveyForm], action: Call)(implicit
-    request: Request[_]
-  ): Html =
-    playFrontendSurveyPage(
-      form,
-      action
-    )
+  private def surveyPage(form: Form[SurveyForm], action: Call)(using Request[?]): Html =
+    playFrontendSurveyPage(form, action)
 
-  private def surveyConfirmationPage(implicit
-    request: Request[_]
-  ): Html =
+  private def surveyConfirmationPage(using Request[?]): Html =
     playFrontendSurveyConfirmationPage()
 }

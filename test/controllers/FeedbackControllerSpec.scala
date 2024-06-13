@@ -17,13 +17,13 @@
 package controllers
 
 import java.net.URLEncoder
-import config.CFConfig
+import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
-import org.mockito.ArgumentMatchers.{any, eq => meq}
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.{any, eq as meq}
+import org.mockito.Mockito.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
@@ -32,7 +32,7 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
@@ -283,7 +283,8 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     def ticketQueueConnectorWillReturnTheTicketId() = mockQueueConnector(Future.successful(TicketId(123)))
 
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
-    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
+    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
+      .thenReturn(Future.successful(None))
 
     val feedbackName: String     = "John Densmore"
     val feedbackRating: String   = "2"
@@ -304,7 +305,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
           any[Option[Enrolments]],
           any[Option[String]],
           any[TicketConstants]
-        )(any[HeaderCarrier])
+        )(using any[HeaderCarrier])
       ).thenReturn(result)
 
     def verifyRequestMade(comment: String = feedbackComment): Unit =
@@ -319,7 +320,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         any[Option[Enrolments]],
         any[Option[String]],
         any[TicketConstants]
-      )(any[HeaderCarrier])
+      )(using any[HeaderCarrier])
 
     val backUrlValidator = new BackUrlValidator() {
       override def validate(backUrl: String) = backUrl == "http://www.valid.url"
@@ -329,7 +330,10 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     val playFrontendFeedbackConfirmationPage =
       app.injector.instanceOf[views.html.FeedbackConfirmationPage]
     val errorPage                            = app.injector.instanceOf[views.html.InternalErrorPage]
-    val cfconfig                             = new CFConfig(app.configuration)
+
+    given AppConfig        = CFConfig(app.configuration)
+    given ExecutionContext = ExecutionContext.global
+    given HeaderCarrier    = any[HeaderCarrier]
 
     val controller = new FeedbackController(
       ticketQueueConnector,
@@ -340,7 +344,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       playFrontendFeedbackPage,
       errorPage,
       new RefererHeaderRetriever
-    )(cfconfig, ExecutionContext.Implicits.global)
+    )
 
     def generateRequest(
       javascriptEnabled: Boolean = true,
@@ -352,14 +356,14 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     ) = {
 
       val fields = Map(
-        "feedback-name"          -> name,
-        "feedback-email"         -> email,
-        "feedback-rating"        -> "2",
-        "feedback-comments"      -> comments,
-        "csrfToken"              -> "token",
-        "referrer"               -> feedbackReferrer,
-        "canOmitComments"        -> canOmitComments.toString,
-        "isJavascript"           -> javascriptEnabled.toString
+        "feedback-name"     -> name,
+        "feedback-email"    -> email,
+        "feedback-rating"   -> "2",
+        "feedback-comments" -> comments,
+        "csrfToken"         -> "token",
+        "referrer"          -> feedbackReferrer,
+        "canOmitComments"   -> canOmitComments.toString,
+        "isJavascript"      -> javascriptEnabled.toString
       ) ++ backUrl.map("backUrl" -> _)
 
       FakeRequest("POST", "/")
@@ -367,7 +371,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
         .withFormUrlEncodedBody(fields.toSeq: _*)
     }
 
-    def generateInvalidRequest()                      = FakeRequest("POST", "/")
+    def generateInvalidRequest() = FakeRequest("POST", "/")
       .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
       .withFormUrlEncodedBody("isJavascript" -> "true")
 

@@ -17,16 +17,16 @@
 package helpers
 
 import play.api.Application
-import play.api.i18n.{Lang, MessagesApi}
+import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.mvc.RequestHeader
 
 trait MessagesSupport {
-  def getMessages(implicit app: Application, request: RequestHeader) = {
+  def getMessages()(using app: Application, request: RequestHeader): Messages = {
     val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
     messagesApi.preferred(request)
   }
 
-  def getWelshMessages(implicit app: Application) = {
+  def getWelshMessages()(using app: Application): Messages = {
     val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
     messagesApi.preferred(Seq(Lang("cy")))
   }

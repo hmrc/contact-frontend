@@ -22,12 +22,12 @@ import model.ReportProblemForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
-import play.api.test.CSRFTokenHelper._
+import play.api.test.CSRFTokenHelper.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.ReportProblemPage
 
 class ReportProblemPageSpec
@@ -37,11 +37,9 @@ class ReportProblemPageSpec
     with MessagesSupport
     with JsoupHelpers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/problem_reports_nonjs").withCSRFToken
-
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
-
-  implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/problem_reports_nonjs").withCSRFToken
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   val problemReportsForm: Form[ReportProblemForm] = Form[ReportProblemForm](
     mapping(
@@ -54,7 +52,7 @@ class ReportProblemPageSpec
       "referrer"      -> optional(text),
       "csrfToken"     -> text,
       "userAction"    -> optional(text)
-    )(ReportProblemForm.apply)(ReportProblemForm.unapply)
+    )(ReportProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val formValues: ReportProblemForm = ReportProblemForm(
@@ -83,8 +81,8 @@ class ReportProblemPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = reportProblemPage(problemReportsForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = reportProblemPage(problemReportsForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -113,8 +111,8 @@ class ReportProblemPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = reportProblemPage(problemReportsForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
       paragraphs.first.text should include("Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.")
@@ -244,8 +242,8 @@ class ReportProblemPageSpec
     }
 
     "translate the report action textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = reportProblemPage(problemReportsForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("label[for=report-action]")
       paragraphs.first.text should be("Beth oeddech yn ei wneud?")
@@ -287,8 +285,8 @@ class ReportProblemPageSpec
     }
 
     "translate the report an error textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = reportProblemPage(problemReportsForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("label[for=report-error]")
       paragraphs.first.text should be("Gyda beth ydych angen help?")

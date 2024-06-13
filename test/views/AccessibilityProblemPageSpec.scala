@@ -22,12 +22,12 @@ import model.AccessibilityForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
-import play.api.test.CSRFTokenHelper._
+import play.api.test.CSRFTokenHelper.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.AccessibilityProblemPage
 
 class AccessibilityProblemPageSpec
@@ -37,11 +37,9 @@ class AccessibilityProblemPageSpec
     with MessagesSupport
     with JsoupHelpers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
-
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
-
-  implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   val accessibilityForm: Form[AccessibilityForm] = Form[AccessibilityForm](
     mapping(
@@ -53,7 +51,7 @@ class AccessibilityProblemPageSpec
       "csrfToken"          -> text,
       "service"            -> optional(text),
       "userAction"         -> optional(text)
-    )(AccessibilityForm.apply)(AccessibilityForm.unapply)
+    )(AccessibilityForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val formValues: AccessibilityForm = AccessibilityForm(
@@ -81,8 +79,8 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = accessibilityProblemPage(accessibilityForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = accessibilityProblemPage(accessibilityForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -111,8 +109,8 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = accessibilityProblemPage(accessibilityForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = accessibilityProblemPage(accessibilityForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
       paragraphs.first.text should include("Dylech dim ond defnyddio’r")
@@ -242,8 +240,8 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = accessibilityProblemPage(accessibilityForm, action)
+      given Messages   = getWelshMessages()
+      val welshContent = accessibilityProblemPage(accessibilityForm, action)
 
       val paragraphs = welshContent.select("label[for=problemDescription]")
       paragraphs.first.text should be("Disgrifiwch y broblem hygyrchedd rydych wedi dod o hyd iddi")

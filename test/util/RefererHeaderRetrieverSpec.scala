@@ -19,25 +19,26 @@ package util
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.FakeRequest
-import play.api.http.HeaderNames._
+import play.api.http.HeaderNames.*
+import play.api.mvc.AnyContent
 
 class RefererHeaderRetrieverSpec extends AnyWordSpec with Matchers {
 
   "Given a referer header retrieve, calling retrieve" should {
 
     "return some referer header if header in request" in {
-      val retriever = new RefererHeaderRetriever
-      val request   = FakeRequest().withHeaders((REFERER, "some-service-url"))
+      val retriever                          = new RefererHeaderRetriever
+      given request: FakeRequest[AnyContent] = FakeRequest().withHeaders((REFERER, "some-service-url"))
 
-      val refererHeader = retriever.refererFromHeaders(request)
+      val refererHeader = retriever.refererFromHeaders()
       refererHeader shouldBe Some("some-service-url")
     }
 
     "return none if header not present" in {
-      val retriever = new RefererHeaderRetriever
-      val request   = FakeRequest()
+      val retriever                 = new RefererHeaderRetriever
+      given FakeRequest[AnyContent] = FakeRequest()
 
-      val refererHeader = retriever.refererFromHeaders(request)
+      val refererHeader = retriever.refererFromHeaders()
       refererHeader shouldBe None
     }
   }

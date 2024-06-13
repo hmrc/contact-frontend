@@ -22,20 +22,18 @@ import model.SurveyForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
-import play.api.test.CSRFTokenHelper._
+import play.api.test.CSRFTokenHelper.*
 import play.api.test.FakeRequest
 import views.html.SurveyPage
 
 class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport with MessagesSupport with JsoupHelpers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
-
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
-
-  implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   val form: Form[SurveyForm] = Form[SurveyForm](
     mapping(
@@ -47,7 +45,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport w
         .verifying("survey.improve.error.length", improve => improve.getOrElse("").length <= 10),
       "ticket-id"  -> optional(text),
       "service-id" -> optional(text)
-    )(SurveyForm.apply)(SurveyForm.unapply)
+    )(SurveyForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val formValues: SurveyForm = SurveyForm(
@@ -72,8 +70,8 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport w
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = surveyPage(form, action)
+      given Messages   = getWelshMessages()
+      val welshContent = surveyPage(form, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -329,8 +327,8 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport w
     }
 
     "translate the textarea label into Welsh if requested" in {
-      implicit val messages: Messages = getWelshMessages
-      val welshContent                = surveyPage(form, action)
+      given Messages   = getWelshMessages()
+      val welshContent = surveyPage(form, action)
 
       val paragraphs = welshContent.select("label[for=improve]")
       paragraphs.first.text should be("Rhowch wybod i ni sut y gallwn wella’r cymorth a roddwn i chi.")

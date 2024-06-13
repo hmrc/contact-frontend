@@ -40,7 +40,7 @@ case class Ticket private (
 
 object Ticket extends FieldTransformer with Logging {
 
-  implicit val formats: OFormat[Ticket] = Json.format[Ticket]
+  given OFormat[Ticket] = Json.format[Ticket]
 
   def create(
     name: String,
@@ -75,7 +75,7 @@ object Ticket extends FieldTransformer with Logging {
 }
 
 object TicketId {
-  implicit val formats: OFormat[TicketId] = Json.format[TicketId]
+  given OFormat[TicketId] = Json.format[TicketId]
 }
 
 case class TicketId(ticket_id: Int)
@@ -98,7 +98,7 @@ case class Feedback(
 
 object Feedback extends FieldTransformer {
 
-  implicit val formats: OFormat[Feedback] = Json.format[Feedback]
+  given OFormat[Feedback] = Json.format[Feedback]
 
   def create(
     name: String,
@@ -162,7 +162,7 @@ trait FieldTransformer {
       case _                                       => nonPayeEnrolmentToTaxIdentifiers(enrolment).toMap
     }
 
-  private def extractEmpRef(enrolment: Enrolment)                            =
+  private def extractEmpRef(enrolment: Enrolment) =
     for (
       taxOfficeNumber <- extractIdentifier(enrolment, "TaxOfficeNumber");
       taxOfficeRef    <- extractIdentifier(enrolment, "TaxOfficeReference")

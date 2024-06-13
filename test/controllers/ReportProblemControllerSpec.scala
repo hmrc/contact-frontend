@@ -16,21 +16,21 @@
 
 package controllers
 
-import config.CFConfig
+import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import helpers.ApplicationSupport
 import org.jsoup.Jsoup
-import org.mockito.ArgumentMatchers.{any, eq => meq}
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.{any, eq as meq}
+import org.mockito.Mockito.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport with Matchers {
 
-  implicit val messages: Messages =
+  given Messages =
     app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
   "Requesting the standalone page" should {
@@ -126,7 +126,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq(None),
           meq(None),
           any[TicketConstants]
-        )(any(classOf[HeaderCarrier]))
+        )
       ).thenReturn(Future.successful(TicketId(123)))
 
       val request           = generateRequest(isAjaxRequest = true)
@@ -213,7 +213,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq(None),
           meq(None),
           any[TicketConstants]
-        )(any(classOf[HeaderCarrier]))
+        )
       ).thenReturn(Future.failed(new Exception("failed")))
 
       val request = generateRequest(isAjaxRequest = false)
@@ -242,12 +242,16 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
   class TestScope extends MockitoSugar {
 
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
-    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
+    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
+      .thenReturn(Future.successful(None))
 
     val reportProblemPage = app.injector.instanceOf[views.html.ReportProblemPage]
     val confirmationPage  = app.injector.instanceOf[views.html.ReportProblemConfirmationPage]
     val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
-    val cfconfig          = new CFConfig(app.configuration)
+
+    given cfconfig: AppConfig = new CFConfig(app.configuration)
+    given ExecutionContext    = ExecutionContext.global
+    given HeaderCarrier       = any[HeaderCarrier]
 
     val controller = new ReportProblemController(
       mock[DeskproTicketQueueConnector],
@@ -257,15 +261,14 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       confirmationPage,
       errorPage,
       new RefererHeaderRetriever
-    )(cfconfig, ExecutionContext.Implicits.global)
+    )
 
     val deskproName: String           = "John Densmore"
     val deskproEmail: String          = "name@mail.com"
     val deskproSubject: String        = "Support Request"
+    given Messages                    = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
     val deskproProblemMessage: String =
-      controller.problemMessage("Some Action", "Some Error")(
-        app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
-      )
+      controller.problemMessage("Some Action", "Some Error")
     val deskproReferrer: String       = "/contact/problem_reports"
 
     val hmrcDeskproConnector = controller.ticketQueueConnector
@@ -330,7 +333,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq(None),
           meq(None),
           any[TicketConstants]
-        )(any(classOf[HeaderCarrier]))
+        )
       ).thenReturn(result)
   }
 

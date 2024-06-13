@@ -19,13 +19,13 @@ package controllers
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
-import model.Aliases._
+import model.Aliases.*
 import model.FeedbackForm
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission
@@ -45,12 +45,12 @@ import scala.concurrent.{ExecutionContext, Future}
   feedbackPage: FeedbackPage,
   errorPage: InternalErrorPage,
   headerRetriever: RefererHeaderRetriever
-)(implicit val appConfig: AppConfig, val executionContext: ExecutionContext)
+)(using AppConfig, ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport {
 
-  implicit def lang(implicit request: Request[_]): Lang = request.lang
+  given lang(using request: Request[?]): Lang = request.lang
 
   val formId = "FeedbackForm"
 
@@ -59,9 +59,10 @@ import scala.concurrent.{ExecutionContext, Future}
     backUrl: Option[BackUrl],
     canOmitComments: Boolean,
     referrerUrl: Option[ReferrerUrl]
-  ) =
-    Action.async { implicit request =>
-      val referrer = referrerUrl orElse headerRetriever.refererFromHeaders
+  ): Action[AnyContent] =
+    Action.async { request =>
+      given Request[AnyContent] = request
+      val referrer              = referrerUrl orElse headerRetriever.refererFromHeaders()
       Future.successful(
         Ok(
           renderFeedbackPage(
@@ -86,7 +87,8 @@ import scala.concurrent.{ExecutionContext, Future}
     backUrl: Option[BackUrl] = None,
     canOmitComments: Boolean = false,
     referrerUrl: Option[ReferrerUrl] = None
-  ) = Action.async { implicit request =>
+  ): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     FeedbackFormBind.form
       .bindFromRequest()
       .fold(
@@ -103,12 +105,13 @@ import scala.concurrent.{ExecutionContext, Future}
       )
   }
 
-  def thanks(backUrl: Option[BackUrl] = None) = Action.async { implicit request =>
-    val validatedBackUrl = backUrl.filter(accessibleUrlValidator.validate)
+  def thanks(backUrl: Option[BackUrl] = None): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    val validatedBackUrl      = backUrl.filter(accessibleUrlValidator.validate)
     Future.successful(Ok(feedbackConfirmationPage(backUrl = validatedBackUrl)))
   }
 
-  private def feedbackView(form: Form[FeedbackForm])(implicit request: Request[AnyRef]) =
+  private def feedbackView(form: Form[FeedbackForm])(using Request[AnyRef]) =
     renderFeedbackPage(
       form,
       form("service").value,
@@ -123,9 +126,7 @@ import scala.concurrent.{ExecutionContext, Future}
     backUrl: Option[BackUrl],
     canOmitComments: Boolean,
     referrerUrl: Option[String]
-  )(implicit
-    request: Request[_]
-  ): Html = {
+  )(using Request[?]): Html = {
     val action = routes.FeedbackController.submit(service, backUrl, canOmitComments, referrerUrl)
     feedbackPage(form, action)
   }
@@ -133,7 +134,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object FeedbackFormBind {
 
-  import model.FeedbackFormConfig._
+  import model.FeedbackFormConfig.*
 
   private val emailValidator = DeskproEmailValidator()
   private val nameValidator  = NameValidator()
@@ -160,14 +161,14 @@ object FeedbackFormBind {
       )
     )
 
-  def form =
+  def form: Form[FeedbackForm] =
     Form[FeedbackForm](
       mapping(
         "feedback-rating"   -> optional(text)
           .verifying("feedback.rating.error.required", rating => rating.isDefined && !rating.get.trim.isEmpty)
           .verifying(
             "feedback.rating.error.invalid",
-            rating => rating.map(validExperiences.contains(_)).getOrElse(true)
+            rating => rating.forall(validExperiences.contains(_))
           ),
         "feedback-name"     -> text
           .verifying("feedback.name.error.required", name => name.trim.nonEmpty)
@@ -202,6 +203,6 @@ object FeedbackFormBind {
         "service"         -> optional(text),
         "backUrl"         -> optional(text),
         "canOmitComments" -> boolean
-      )(FeedbackForm.apply)(FeedbackForm.unapply)
+      )(FeedbackForm.apply)(o => Some(Tuple.fromProductTyped(o)))
     )
 }

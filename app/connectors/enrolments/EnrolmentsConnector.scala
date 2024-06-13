@@ -24,13 +24,10 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-case class EnrolmentsConnector @Inject() (authConnector: AuthConnector)(implicit executionContext: ExecutionContext)
+case class EnrolmentsConnector @Inject() (authConnector: AuthConnector)(using ExecutionContext)
     extends AuthorisedFunctions {
 
-  def maybeAuthenticatedUserEnrolments()(implicit
-    hc: HeaderCarrier,
-    request: Request[_]
-  ): Future[Option[Enrolments]] =
+  def maybeAuthenticatedUserEnrolments()(using request: Request[?])(using HeaderCarrier): Future[Option[Enrolments]] =
     if (request.session.get(SessionKeys.authToken).isDefined) {
       authorised()
         .retrieve(Retrievals.allEnrolments) { enrolments =>

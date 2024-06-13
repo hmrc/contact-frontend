@@ -20,7 +20,7 @@ import config.AppConfig
 import org.mockito.Mockito
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatest.wordspec.AnyWordSpec
 
 class ConfigurationBasedBackUrlValidatorSpec extends AnyWordSpec with Matchers with MockitoSugar {

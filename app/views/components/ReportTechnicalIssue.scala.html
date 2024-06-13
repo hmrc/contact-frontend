@@ -18,7 +18,7 @@
 
 @(serviceId: Option[String])(implicit appConfig: AppConfig, messages: Messages)
 @serviceId.map { s =>
- @hmrcReportTechnicalIssue(ReportTechnicalIssue(
+ @hmrcReportTechnicalIssue(ReportTechnicalIssue.apply(
   serviceId = s,
   language = if (messages.lang.code == "cy") Cy else En
  ))

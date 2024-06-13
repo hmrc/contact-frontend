@@ -22,10 +22,10 @@ import model.SurveyForm
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
-import play.api.test.CSRFTokenHelper._
+import play.api.test.CSRFTokenHelper.*
 import play.api.test.FakeRequest
 import uk.gov.hmrc.scalatestaccessibilitylinter.AccessibilityMatchers
 import views.html.SurveyPage
@@ -37,11 +37,9 @@ class SurveyPageSpec
     with MessagesSupport
     with AccessibilityMatchers {
 
-  implicit lazy val fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
-
-  implicit lazy val messages: Messages = getMessages(app, fakeRequest)
-
-  implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
+  given Messages                   = getMessages()
+  given AppConfig                  = app.injector.instanceOf[AppConfig]
 
   val form: Form[SurveyForm] = Form[SurveyForm](
     mapping(
@@ -53,7 +51,7 @@ class SurveyPageSpec
         .verifying("survey.improve.error.length", improve => improve.getOrElse("").length <= 10),
       "ticket-id"  -> optional(text),
       "service-id" -> optional(text)
-    )(SurveyForm.apply)(SurveyForm.unapply)
+    )(SurveyForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val action: Call = Call(method = "POST", url = "/contact/the-submit-url")

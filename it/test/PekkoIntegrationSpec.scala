@@ -22,7 +22,7 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 class PekkoIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneServerPerSuite {
   private val configuredUriLimit = 16 * 1024

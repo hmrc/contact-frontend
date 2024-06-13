@@ -16,13 +16,13 @@
 
 package controllers
 
-import config.CFConfig
+import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
@@ -32,7 +32,7 @@ import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.Application
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
@@ -40,7 +40,7 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.RefererHeaderRetriever
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -49,7 +49,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "useRefererHeader" -> true)
       .build()
 
-  implicit val message: Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+  given Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
   // RFC 5321: https://tools.ietf.org/html/rfc5321
   // Maximum domain name length: https://www.nic.ad.jp/timeline/en/20th/appendix1.html#:~:text=Each%20element%20of%20a%20domain,a%20maximum%20of%20253%20characters.
@@ -215,7 +215,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )(any[HeaderCarrier])
+        )
       ).thenReturn(Future.successful(TicketId(1234)))
 
       val request = generateRequest(
@@ -244,7 +244,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )(any[HeaderCarrier])
+        )
       ).thenReturn(Future.failed(new Exception("failed")))
 
       val request = generateRequest(
@@ -270,9 +270,12 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
     val ticketQueueConnector: DeskproTicketQueueConnector = mock[DeskproTicketQueueConnector]
 
     val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
-    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(any(), any())).thenReturn(Future.successful(None))
+    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
+      .thenReturn(Future.successful(None))
 
-    implicit val cconfig: CFConfig = new CFConfig(app.configuration)
+    given AppConfig        = new CFConfig(app.configuration)
+    given ExecutionContext = ExecutionContext.global
+    given HeaderCarrier    = any[HeaderCarrier]
 
     val messages                                  = app.injector.instanceOf[MessagesApi]
     val playFrontendAccessibilityPage             = app.injector.instanceOf[views.html.AccessibilityProblemPage]
@@ -288,7 +291,7 @@ class AccessibilityControllerSpec extends AnyWordSpec with Matchers with GuiceOn
       playFrontendAccessibilityConfirmationPage,
       errorPage,
       new RefererHeaderRetriever
-    )(cconfig, ExecutionContext.Implicits.global)
+    )
 
     def generateRequest(desc: String, formName: String, email: String, isJavascript: Boolean, referrer: String) = {
       val fields = Map(

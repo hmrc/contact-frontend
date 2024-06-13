@@ -16,6 +16,8 @@
 
 package model
 
+import Aliases.*
+
 // Type aliases to suppress PR-commenter warnings around potential open redirects
 object Aliases {
   // These backUrls are already validated against an allow-list by the BackUrlValidator
@@ -23,8 +25,6 @@ object Aliases {
   // These referrerUrls aren't used to redirect anywhere - they're just passed along to Deskpro for information
   type ReferrerUrl = String
 }
-
-import Aliases._
 
 case class AccessibilityForm(
   problemDescription: String,
@@ -63,7 +63,7 @@ case class FeedbackForm(
 )
 
 object FeedbackFormConfig {
-  val validExperiences = (5 to 1 by -1) map (_.toString)
+  val validExperiences: Seq[String] = (5 to 1 by -1) map (_.toString)
 }
 
 case class SurveyForm(

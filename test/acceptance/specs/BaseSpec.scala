@@ -17,7 +17,7 @@
 package acceptance.specs
 
 import acceptance.driver.BrowserDriver
-import org.scalatest._
+import org.scalatest.*
 import org.scalatest.concurrent.Eventually
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers

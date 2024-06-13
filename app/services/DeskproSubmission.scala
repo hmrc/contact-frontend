@@ -17,7 +17,7 @@
 package services
 
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain._
+import connectors.deskpro.domain.*
 import controllers.ContactForm
 import model.{AccessibilityForm, FeedbackForm, ReportProblemForm}
 import play.api.i18n.Messages
@@ -36,9 +36,8 @@ trait DeskproSubmission {
 
   protected def ticketQueueConnector: DeskproTicketQueueConnector
 
-  def createDeskproTicket(data: ContactForm, enrolments: Option[Enrolments])(implicit
-    request: Request[AnyContent],
-    hc: HeaderCarrier
+  def createDeskproTicket(data: ContactForm, enrolments: Option[Enrolments])(using request: Request[AnyContent])(using
+    HeaderCarrier
   ): Future[TicketId] =
     ticketQueueConnector.createDeskProTicket(
       name = data.contactName,
@@ -53,9 +52,8 @@ trait DeskproSubmission {
       ticketConstants = ContactHmrcTicketConstants
     )
 
-  def createDeskproFeedback(data: FeedbackForm, enrolments: Option[Enrolments])(implicit
-    request: Request[AnyContent],
-    hc: HeaderCarrier
+  def createDeskproFeedback(data: FeedbackForm, enrolments: Option[Enrolments])(using request: Request[AnyContent])(
+    using HeaderCarrier
   ): Future[TicketId] =
     ticketQueueConnector.createFeedback(
       name = data.name,
@@ -78,8 +76,8 @@ trait DeskproSubmission {
     request: Request[AnyRef],
     enrolmentsOption: Option[Enrolments],
     referrer: Option[String]
-  )(implicit messages: Messages): Future[TicketId] = {
-    implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+  )(using Messages): Future[TicketId] = {
+    given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     ticketQueueConnector.createDeskProTicket(
       name = problemReport.reportName,
       email = problemReport.reportEmail,
@@ -94,7 +92,7 @@ trait DeskproSubmission {
     )
   }
 
-  def problemMessage(action: String, error: String)(implicit messages: Messages): String =
+  def problemMessage(action: String, error: String)(using Messages): String =
     s"""
     ${Messages("problem_report.action.label")}:
     $action
@@ -103,10 +101,9 @@ trait DeskproSubmission {
     $error
     """
 
-  def createAccessibilityTicket(accessibilityForm: AccessibilityForm, enrolments: Option[Enrolments])(implicit
-    req: Request[AnyContent],
-    hc: HeaderCarrier
-  ): Future[TicketId] =
+  def createAccessibilityTicket(accessibilityForm: AccessibilityForm, enrolments: Option[Enrolments])(using
+    req: Request[AnyContent]
+  )(using HeaderCarrier): Future[TicketId] =
     ticketQueueConnector.createDeskProTicket(
       name = accessibilityForm.name,
       email = accessibilityForm.email,
