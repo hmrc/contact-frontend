@@ -80,7 +80,8 @@ class ContactHmrcController @Inject() (
   given lang(using request: Request[?]): Lang = request.lang
 
   def index(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl]): Action[AnyContent] =
-    Action.asyncUsing { request ?=>
+    Action.async { request =>
+      given Request[AnyContent] = request
       Future.successful {
         val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders() getOrElse "n/a"
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
@@ -96,7 +97,8 @@ class ContactHmrcController @Inject() (
     userAction: Option[String],
     referrerUrl: Option[ReferrerUrl]
   ): Action[AnyContent] =
-    Action.asyncUsing { request ?=>
+    Action.async { request =>
+      given Request[AnyContent] = request
       ContactHmrcForm.form
         .bindFromRequest()
         .fold(
@@ -117,7 +119,8 @@ class ContactHmrcController @Inject() (
         )
     }
 
-  def thanks: Action[AnyContent] = Action.asyncUsing { request ?=>
+  def thanks: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     Future.successful(Ok(contactHmrcConfirmationPage()))
   }
 }

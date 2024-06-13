@@ -24,7 +24,7 @@ import model.ReportProblemForm
 import play.api.data.Forms.*
 import play.api.data.*
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.*
+import play.api.mvc.{AnyContent, *}
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
@@ -129,7 +129,8 @@ class ReportProblemController @Inject() (
   }
 
   def submit(service: Option[String], referrerUrl: Option[ReferrerUrl]): Action[AnyContent] =
-    Action.asyncUsingT[MessagesRequest[AnyContent]] { request ?=>
+    Action.async { request =>
+      given MessagesRequest[AnyContent] = request
       doSubmit(service, referrerUrl)
     }
 

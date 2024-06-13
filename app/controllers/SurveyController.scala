@@ -70,7 +70,8 @@ class SurveyController @Inject() (
     case _          => false
   }
 
-  def survey(ticketId: String, serviceId: String): Action[AnyContent] = Action.asyncUsing { request ?=>
+  def survey(ticketId: String, serviceId: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     Future.successful(
       if (validateTicketId(ticketId)) {
         val form   = emptyForm(serviceId = Some(serviceId), ticketId = Some(ticketId))
@@ -83,13 +84,15 @@ class SurveyController @Inject() (
     )
   }
 
-  def submitDeprecated(): Action[AnyContent] = Action.asyncUsing { request ?=>
+  def submitDeprecated(): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     Future.successful {
       submitSurveyAction
     }
   }
 
-  def submit(ticketId: String, serviceId: String): Action[AnyContent] = Action.asyncUsing { request ?=>
+  def submit(ticketId: String, serviceId: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     Future.successful {
       playFrontendSurveyForm
         .bindFromRequest()
@@ -106,7 +109,8 @@ class SurveyController @Inject() (
     }
   }
 
-  def confirmation(): Action[AnyContent] = Action.asyncUsing { request ?=>
+  def confirmation(): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     Future.successful(
       Ok(surveyConfirmationPage)
     )
