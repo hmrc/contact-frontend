@@ -483,7 +483,7 @@ class FeedbackPageSpec
         action
       )
 
-      val links = contentWithService.select("a[href=/contact/report-technical-problem?newTab=true&service=foo]")
+      val links = contentWithService.select("a[href=/contact/report-technical-problem?service=foo]")
       links              should have size 1
       links.first.text shouldBe "Is this page not working properly? (opens in new tab)"
     }
