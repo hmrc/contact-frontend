@@ -7,8 +7,8 @@ object AppDependencies {
     compile ++ testDependencies
   }
 
-  private val bootstrapFrontendVersion = "9.0.0"
-  private val playFrontendHmrcVersion  = "10.8.0"
+  private val bootstrapFrontendVersion = "9.3.0"
+  private val playFrontendHmrcVersion  = "10.10.0"
   private val playVersion              = "play-30"
 
   private val compile = Seq(
@@ -18,8 +18,8 @@ object AppDependencies {
 
   private def test(scope: String) = Seq(
     "uk.gov.hmrc"       %% s"bootstrap-test-$playVersion" % bootstrapFrontendVersion % scope,
-    "uk.gov.hmrc"       %% "ui-test-runner"               % "0.31.0"                 % scope,
-    "org.scalatestplus" %% "selenium-4-12"                % "3.2.17.0"               % scope,
+    "uk.gov.hmrc"       %% "ui-test-runner"               % "0.35.0"                 % scope,
+    "org.scalatestplus" %% "selenium-4-21"                % "3.2.19.0"               % scope,
     "org.scalatestplus" %% "mockito-3-4"                  % "3.2.10.0"               % scope,
     "org.jsoup"          % "jsoup"                        % "1.17.2"                 % scope
   )
