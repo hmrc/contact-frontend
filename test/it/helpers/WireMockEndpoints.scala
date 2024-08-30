@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.helpers
+package it.helpers
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -36,7 +36,7 @@ trait WireMockEndpoints extends Suite with BeforeAndAfterAll with BeforeAndAfter
   val endpointServer: WireMockServer = new WireMockServer(wireMockConfig().port(endpointPort))
 
   def startWireMock(): Unit = endpointServer.start()
-  def stopWireMock(): Unit = endpointServer.stop()
+  def stopWireMock(): Unit  = endpointServer.stop()
 
   override def beforeEach(): Unit = {
     endpointMock.resetMappings()
@@ -58,9 +58,9 @@ trait WireMockEndpoints extends Suite with BeforeAndAfterAll with BeforeAndAfter
         )
     )
   }
-  override def afterAll(): Unit  =
+  override def afterAll(): Unit   =
     endpointServer.stop()
-  override def beforeAll(): Unit =
+  override def beforeAll(): Unit  =
     endpointServer.start()
 
   def printMappings(): Unit =

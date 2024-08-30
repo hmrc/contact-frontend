@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test
+package it
 
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, equalToJson, postRequestedFor, urlEqualTo}
 import connectors.deskpro.DeskproTicketQueueConnector
@@ -31,7 +31,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import test.helpers.{AwaitSupport, WireMockEndpoints}
+import it.helpers.{AwaitSupport, WireMockEndpoints}
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.config.AuditingConfig

@@ -1,4 +1,4 @@
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 import play.sbt.routes.RoutesKeys
 
 val appName = "contact-frontend"
@@ -12,8 +12,7 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it"))
   )
   .configs(IntegrationTest, AcceptanceTest)
-  .settings(unitTestSettings, acceptanceTestSettings)
-  .settings(integrationTestSettings(): _*)
+  .settings(unitTestSettings, acceptanceTestSettings, integrationTestSettings)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(
     PlayKeys.playDefaultPort := 9250,
@@ -64,4 +63,12 @@ lazy val acceptanceTestSettings =
         "-Dconfig.resource=test.application.conf",
         "-Dlogger.resource=logback-test.xml"
       )
+    )
+
+lazy val IntegrationTest         = config("it") extend Test
+lazy val integrationTestSettings =
+  inConfig(IntegrationTest)(Defaults.testTasks) ++
+    Seq(
+      (IntegrationTest / testOptions) := Seq(Tests.Filter(_ startsWith "it")),
+      addTestReportOption(IntegrationTest, "it-test-reports")
     )

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test
+package it
 
 import org.jsoup.Jsoup
 import org.scalatest.matchers.should.Matchers
@@ -24,7 +24,7 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{DefaultWSCookie, WSClient, WSResponse}
 import play.api.test.Helpers.*
-import test.helpers.WireMockEndpoints
+import it.helpers.WireMockEndpoints
 import play.api.libs.ws.writeableOf_urlEncodedSimpleForm
 
 class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoints with GuiceOneServerPerSuite {
@@ -32,9 +32,9 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
       .configure(
-        "metrics.jvm"                       -> false,
-        "metrics.enabled"                         -> false,
-        "auditing.enabled"                        -> false,
+        "metrics.jvm"                                     -> false,
+        "metrics.enabled"                                 -> false,
+        "auditing.enabled"                                -> false,
         "microservice.services.deskpro-ticket-queue.port" -> endpointPort
       )
       .build()
@@ -51,7 +51,7 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
     "report-email"  -> "things@example.com",
     "report-action" -> "Doing stuff",
     "report-error"  -> "Things broken",
-    "csrfToken" -> "token"
+    "csrfToken"     -> "token"
   )
 
   private val contactForm = Map(
@@ -154,7 +154,6 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
             .url(problemReportsNonjsUrl)
             .addCookies(DefaultWSCookie("mdtp", mdtp2))
             .post(problemForm ++ Map("csrfToken" -> csrfToken))
-
         )
 
       postResponse.status should be(FORBIDDEN)

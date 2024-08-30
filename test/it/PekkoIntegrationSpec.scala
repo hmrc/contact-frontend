@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test
+package it
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
