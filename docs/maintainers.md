@@ -37,7 +37,7 @@ You should then be able to navigate to the following endpoints:
 To run the Scala unit and integration tests,
 
 ```shell script
-sbt test a11y:test it:test
+sbt test it/test a11y:test
 ```
 
 The above tests include accessibility checks via the

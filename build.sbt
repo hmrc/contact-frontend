@@ -1,19 +1,14 @@
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 import play.sbt.routes.RoutesKeys
+import uk.gov.hmrc.DefaultBuildSettings
 
 val appName = "contact-frontend"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
-  .settings(
-    scalaVersion := "3.3.3",
-    majorVersion := 4,
-    libraryDependencies ++= AppDependencies.dependencies(testPhases = Seq("test", "it"))
-  )
-  .configs(IntegrationTest, AcceptanceTest)
+  .settings(sharedSettings)
+  .configs(AcceptanceTest)
   .settings(unitTestSettings, acceptanceTestSettings)
-  .settings(integrationTestSettings(): _*)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(
     PlayKeys.playDefaultPort := 9250,
@@ -33,6 +28,12 @@ lazy val microservice = Project(appName, file("."))
     scalacOptions += "-Wconf:src=routes/.*:s",
     scalacOptions += "-Wconf:src=views/.*:s"
   )
+
+lazy val sharedSettings = Seq(
+  libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
+  majorVersion := 4,
+  scalaVersion := "3.3.3"
+)
 
 lazy val unitTestSettings =
   inConfig(Test)(Defaults.testTasks) ++
@@ -65,3 +66,9 @@ lazy val acceptanceTestSettings =
         "-Dlogger.resource=logback-test.xml"
       )
     )
+
+lazy val it = project
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test")
+  .settings(DefaultBuildSettings.itSettings())
+  .settings(sharedSettings)
