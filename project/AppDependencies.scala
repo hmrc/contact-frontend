@@ -2,7 +2,7 @@ import sbt.*
 
 object AppDependencies {
 
-  private val bootstrapFrontendVersion = "9.3.0"
+  private val bootstrapFrontendVersion = "9.4.0"
   private val playFrontendHmrcVersion  = "10.10.0"
   private val playVersion              = "play-30"
 
