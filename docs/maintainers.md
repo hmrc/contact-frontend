@@ -2,8 +2,6 @@
 
 ## Prerequisites
 
-* [Node.js](https://nodejs.org/en/) `>= 12.13.1`
-
 * [Mongo DB](https://www.mongodb.com/)
 
 The easiest way to run Mongo is using [docker](https://hub.docker.com/_/mongo).
@@ -37,19 +35,13 @@ You should then be able to navigate to the following endpoints:
 To run the Scala unit and integration tests,
 
 ```shell script
-sbt test it/test a11y:test
+sbt test it/test
 ```
 
-The above tests include accessibility checks via the
-[sbt-accessibility-linter](https://www.github.com/hmrc/sbt-accessibility-linter)
-plugin.
+## Running UI acceptance tests and accessibility tests
 
-## Running UI acceptance tests
-
-To execute the UI acceptance tests on your local machine, ensure that you have [local-selenium-grid](https://github.com/hmrc/local-selenium-grid) installed and running. Once set up, you can proceed with running the tests with.
-```shell script
-./run_acceptance_tests.sh
-```
+To execute the UI acceptance tests on your local machine, follow the guidance in the [contact-frontend-ui-tests](https://github.com/hmrc/contact-frontend-ui-tests)
+repository. These will also run the accessibility tests via [ui-test-runner](https://github.com/hmrc/ui-test-runner).
 
 ## ADRs in contact-frontend
 
