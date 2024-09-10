@@ -158,7 +158,7 @@ class ReportProblemSpec extends BaseSpec {
       }
 
       val orderedErrorMessages = List(
-        "The comment cannot be longer than 1000 characters"
+        "Comment must be 1000 characters or less"
       )
 
       eventually {

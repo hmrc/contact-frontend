@@ -129,7 +129,7 @@ class ContactHmrcSpec extends BaseSpec {
       }
 
       val orderedErrorMessages = List(
-        "Comment must be 2000 characters or fewer"
+        "Comment must be 2000 characters or less"
       )
 
       eventually {

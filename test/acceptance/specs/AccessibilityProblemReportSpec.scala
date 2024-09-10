@@ -129,7 +129,7 @@ class AccessibilityProblemReportSpec extends BaseSpec {
       }
 
       val orderedErrorMessages = List(
-        "Problem description must be 2000 characters or fewer"
+        "Problem description must be 2000 characters or less"
       )
 
       eventually {
