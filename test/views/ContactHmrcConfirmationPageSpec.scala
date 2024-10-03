@@ -43,17 +43,22 @@ class ContactHmrcConfirmationPageSpec
     "include the H1 element with page title" in {
       val heading1 = content.select("h1")
       heading1            should have size 1
-      heading1.first.text should be("Help and contact")
+      heading1.first.text should be("We have received your request for help")
     }
 
-    "include the H2 element with thanks" in {
+    "include the H2 element for what happens next" in {
       val heading2 = content.select("h2")
-      heading2.first.text should be("Thank you")
+      heading2.first.text should be("What happens next")
     }
 
-    "include the paragraph body element with confirmation submission" in {
-      val paragraph = content.select("p.govuk-body")
-      paragraph.first.text should be("Someone will get back to you within 2 working days.")
+    "include a paragraph body element with confirmation submission" in {
+      val paragraphs = content.select("p.govuk-body")
+      paragraphs.get(0).text should be("We will send a confirmation email to the email address you provided.")
+    }
+
+    "include a paragraph body element with what will happen next" in {
+      val paragraphs = content.select("p.govuk-body")
+      paragraphs.get(1).text() should be("Someone will email you back within 2 working days with the next steps.")
     }
 
     "translate the title into Welsh if requested" in {
@@ -61,7 +66,7 @@ class ContactHmrcConfirmationPageSpec
       val welshContent = confirmationPage()
 
       val titles = welshContent.select("h1")
-      titles.first.text should be("Cymorth a chysylltiadau")
+      titles.first.text should be("Mae’ch cais am help wedi dod i law")
     }
   }
 }
