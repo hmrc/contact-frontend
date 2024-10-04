@@ -7,8 +7,7 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(sharedSettings)
-  .configs(AcceptanceTest)
-  .settings(unitTestSettings, acceptanceTestSettings)
+  .settings(unitTestSettings)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(
     PlayKeys.playDefaultPort := 9250,
@@ -21,8 +20,7 @@ lazy val microservice = Project(appName, file("."))
       "uk.gov.hmrc.govukfrontend.views.html.components.*",
       "uk.gov.hmrc.hmrcfrontend.views.html.components.*"
     ),
-    RoutesKeys.routesImport += "model.Aliases.*",
-    A11yTest / unmanagedSourceDirectories += (baseDirectory.value / "test" / "a11y")
+    RoutesKeys.routesImport += "model.Aliases.*"
   )
   .settings(
     scalacOptions += "-Wconf:src=routes/.*:s",
@@ -50,20 +48,6 @@ lazy val unitTestSettings =
             _ startsWith "views"
           )
         )
-      )
-    )
-
-lazy val AcceptanceTest = config("acceptance") extend Test
-
-lazy val acceptanceTestSettings =
-  inConfig(AcceptanceTest)(Defaults.testTasks) ++
-    Seq(
-      // The following is needed to preserve the -Dbrowser option to the HMRC webdriver factory library
-      AcceptanceTest / fork := false,
-      AcceptanceTest / testOptions := Seq(Tests.Filter(_ startsWith "acceptance")),
-      AcceptanceTest / run / javaOptions ++= Seq(
-        "-Dconfig.resource=test.application.conf",
-        "-Dlogger.resource=logback-test.xml"
       )
     )
 
