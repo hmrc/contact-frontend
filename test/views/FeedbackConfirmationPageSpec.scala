@@ -43,7 +43,7 @@ class FeedbackConfirmationPageSpec
     "include the confirmation panel" in {
       val panels = content.select("h1")
       panels            should have size 1
-      panels.first.text should be("Your feedback has been received.")
+      panels.first.text should be("We have received your feedback")
     }
 
     "include a back link" in {
@@ -58,7 +58,7 @@ class FeedbackConfirmationPageSpec
       val welshContent = feedbackConfirmationPage()
 
       val titles = welshContent.select("h1")
-      titles.first.text should be("Mae eich adborth wedi dod i law.")
+      titles.first.text should be("Mae’ch adborth wedi dod i law")
     }
   }
 }

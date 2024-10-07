@@ -1,4 +1,3 @@
-common.thank.you=Diolch
 common.fullstop=.
 
 feedback.name.label=Enw llawn
@@ -14,10 +13,8 @@ feedback.comments.error.length=Mae rhaid i’r sylw fod yn 2000 o gymeriadau neu
 feedback.title=Anfon eich adborth – GOV.UK
 feedback.heading=Anfon eich adborth
 feedback.send=Anfon
-feedback.confirmation.title=Eich adborth – GOV.UK
-feedback.confirmation.heading=Eich adborth
-feedback.confirmation.message=Mae eich adborth wedi dod i law.
 feedback.confirmation.back=Yn ôl
+feedback.confirmation.panel.title=Mae’ch adborth wedi dod i law
 feedback.comments.hint=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
 
 common.feedback.get.help=A yw’r dudalen hon yn gweithio’n iawn?
@@ -48,6 +45,10 @@ problem_report.action.error.length=Mae rhaid i’r sylw fod yn 1000 o gymeriadau
 problem_report.error.error.required=Rhowch fanylion yr hyn a aeth o’i le
 problem_report.error.error.length=Mae rhaid i’r sylw fod yn 1000 o gymeriadau neu lai
 problem_report.button=Anfon
+problem_report.confirmation.panel.title=Mae’ch adroddiad ynghylch problem dechnegol wedi dod i law
+problem_report.confirmation.paragraph=Byddwn yn anfon e-bost o gadarnhad at y cyfeiriad e-bost a roddwyd gennych.
+problem_report.confirmation.next.heading=Yr hyn sy’n digwydd nesaf
+problem_report.confirmation.next.paragraph=Bydd rhywun yn egluro’r camau nesaf drwy anfon e-bost atoch cyn pen dau ddiwrnod gwaith.
 
 problem_report.common.size_limit=Gallwch nodi hyd at {0} o gymeriadau
 
@@ -74,7 +75,6 @@ deskpro.error.not.sent=Nid yw’ch neges wedi’i hanfon.
 
 contact.title=Cymorth a chysylltiadau – GOV.UK
 contact.heading=Cymorth a chysylltiadau
-contact.confirmation.message=Bydd rhywun yn cysylltu â chi cyn pen 2 ddiwrnod gwaith.
 contact.form.specific.query=Os oes gennych ymholiad penodol ynghylch treth {0}.
 contact.button=Anfon
 contact.comments.label=Eich sylwadau
@@ -94,6 +94,10 @@ contact.form.para3=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. 
 contact.hmrc.link=Cysylltu â CThEF
 contact.hmrc.url=https://www.gov.uk/government/organisations/hm-revenue-customs/contact
 contact.hmrc.link.newtab=' (yn agor mewn tab newydd)'
+contact.confirmation.panel.title=Mae’ch cais am help wedi dod i law
+contact.confirmation.paragraph=Byddwn yn anfon e-bost o gadarnhad at y cyfeiriad e-bost a roddwyd gennych.
+contact.confirmation.next.heading=Yr hyn sy’n digwydd nesaf
+contact.confirmation.next.paragraph=Bydd rhywun yn egluro’r camau nesaf drwy anfon e-bost atoch cyn pen dau ddiwrnod gwaith.
 
 form.online.services=Beth yw eich barn am y gwasanaeth ar-lein hwn?
 form.online.services.data=Rydym yn defnyddio’ch adborth i wella ein gwasanaethau.

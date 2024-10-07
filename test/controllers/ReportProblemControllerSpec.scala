@@ -233,8 +233,8 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
 
       val document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("govuk-error-summary").size() should be(0)
-      document.getElementsByClass("govuk-body").text()          should be(
-        "Someone will get back to you within 2 working days."
+      document.getElementsByClass("govuk-panel__title").text()  should be(
+        "We have received your technical problem report"
       )
     }
   }

@@ -18,17 +18,19 @@
 
 @this(
     mainLayout: Layout,
-    h1: Heading1,
     h2: Heading2,
-    p: Paragraph
+    p: Paragraph,
+    govukPanel: GovukPanel
 )
 @()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
-@mainLayout(Messages("contact.title")) {
+@mainLayout(Messages("problem_report.title")) {
 
-    @h1(content = Text(Messages("contact.heading")))
-    @h2(content = Text(messages("common.thank.you")))
+ @govukPanel(Panel(title = Text(messages("problem_report.confirmation.panel.title"))))
 
-    @p(content = Text(messages("contact.confirmation.message")))
+ @p(content = Text(messages("problem_report.confirmation.paragraph")))
+
+ @h2(content = Text(messages("problem_report.confirmation.next.heading")))
+ @p(content = Text(messages("problem_report.confirmation.next.paragraph")))
 
 }
