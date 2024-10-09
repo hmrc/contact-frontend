@@ -67,6 +67,7 @@ survey.disagree.response=Dissatisfied
 survey.strongly.disagree.response=Very dissatisfied
 survey.tell.us.how.we.can.improve=Tell us how we can improve the support we give you (optional).
 survey.submit=Submit
+survey.ticket.id.error=Invalid ticket id
 
 deskpro.error.page.title=Sorry, there is a problem with the service – Contact HMRC – GOV.UK
 deskpro.error.page.heading=Sorry, there is a problem with the service
