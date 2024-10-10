@@ -134,3 +134,9 @@ forms.name.error.invalid=Full name must only include letters a to z, hyphens, fu
 
 testPage.title = Service test page – GOV.UK
 testPage.heading = Service test page
+
+## Not Found Page
+notFound.pageTitle=Page not found – GOV.UK
+notFound.heading=Page not found
+notFound.paragraph1=If you typed the web address, check it is correct.
+notFound.paragraph2=If you pasted the web address, check you copied the entire address.

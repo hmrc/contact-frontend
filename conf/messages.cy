@@ -67,6 +67,7 @@ survey.disagree.response=Anfodlon
 survey.strongly.disagree.response=Anfodlon iawn
 survey.tell.us.how.we.can.improve=Rhowch wybod i ni sut y gallwn wella’r cymorth a roddwn i chi.
 survey.submit=Cyflwyno
+survey.ticket.id.error=i need translation pls
 
 deskpro.error.page.title=Mae’n ddrwg gennym, mae problem gyda’r gwasanaeth – Cysylltu â CThEF – GOV.UK
 deskpro.error.page.heading=Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
@@ -134,3 +135,9 @@ forms.name.error.invalid=Rhowch lythrennau neu atalnodi’n unig
 
 testPage.title = Service test page – GOV.UK
 testPage.heading  = Service test page
+
+## Not Found Page
+notFound.pageTitle=Heb ddod o hyd i’r dudalen – GOV.UK
+notFound.heading=Heb ddod o hyd i’r dudalen
+notFound.paragraph1=Os gwnaethoch deipio’r cyfeiriad gwe, dylech wirio ei fod yn gywir.
+notFound.paragraph2=Os gwnaethoch bastio’r cyfeiriad gwe, dylech wirio’ch bod wedi copïo’r cyfeiriad yn llawn.
