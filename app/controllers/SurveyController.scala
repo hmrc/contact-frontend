@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.{SurveyConfirmationPage, SurveyPage, NotFoundPage}
+import views.html.{NotFoundPage, SurveyConfirmationPage, SurveyPage}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
