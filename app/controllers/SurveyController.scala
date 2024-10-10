@@ -29,17 +29,18 @@ import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.{SurveyConfirmationPage, SurveyPage, ErrorPage}
+import views.html.{SurveyConfirmationPage, SurveyPage, NotFoundPage}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import play.api.i18n.Messages
+import play.api.mvc.MessagesRequest
 
 @Singleton
 class SurveyController @Inject() (
   auditConnector: AuditConnector,
   mcc: MessagesControllerComponents,
-  errorPage: ErrorPage,
+  notFoundPage: NotFoundPage,
   playFrontendSurveyPage: SurveyPage,
   playFrontendSurveyConfirmationPage: SurveyConfirmationPage
 )(using AppConfig, ExecutionContext)
@@ -73,7 +74,7 @@ class SurveyController @Inject() (
   }
 
   def survey(ticketId: String, serviceId: String): Action[AnyContent] = Action.async { request =>
-    given Request[AnyContent] = request
+    given MessagesRequest[AnyContent] = request
     Future.successful(
       if (validateTicketId(ticketId)) {
         val form   = emptyForm(serviceId = Some(serviceId), ticketId = Some(ticketId))
@@ -81,12 +82,7 @@ class SurveyController @Inject() (
         Ok(surveyPage(form, action))
       } else {
         logger.error(s"Invalid ticket id $ticketId when requesting survey form")
-        BadRequest(errorPage(
-          pageTitle = Messages("error.browser.title.prefix") + " " + Messages("survey.title"),
-          heading   = Messages("error.browser.title.prefix") + " " + Messages("survey.heading"),
-          message   = Messages("survey.ticket.id.error")
-          )
-        )
+        NotFound(notFoundPage())
       }
     )
   }

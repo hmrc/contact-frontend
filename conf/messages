@@ -67,7 +67,6 @@ survey.disagree.response=Dissatisfied
 survey.strongly.disagree.response=Very dissatisfied
 survey.tell.us.how.we.can.improve=Tell us how we can improve the support we give you (optional).
 survey.submit=Submit
-survey.ticket.id.error=Invalid ticket id
 
 deskpro.error.page.title=Sorry, there is a problem with the service – Contact HMRC – GOV.UK
 deskpro.error.page.heading=Sorry, there is a problem with the service
@@ -135,3 +134,9 @@ forms.name.error.invalid=Full name must only include letters a to z, hyphens, fu
 
 testPage.title = Service test page – GOV.UK
 testPage.heading = Service test page
+
+## Not Found Page
+notFound.pageTitle=Page not found – GOV.UK
+notFound.heading=Page not found
+notFound.paragraph1=If you typed the web address, check it is correct.
+notFound.paragraph2=If you pasted the web address, check you copied the entire address.
