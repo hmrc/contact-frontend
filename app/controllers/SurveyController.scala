@@ -33,7 +33,6 @@ import views.html.{NotFoundPage, SurveyConfirmationPage, SurveyPage}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-import play.api.i18n.Messages
 import play.api.mvc.MessagesRequest
 
 @Singleton

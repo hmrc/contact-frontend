@@ -175,6 +175,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
   }
 
   class TestScope extends MockitoSugar {
+    val notFoundPage           = app.injector.instanceOf[views.html.NotFoundPage]
     val playFrontendSurveyPage = app.injector.instanceOf[views.html.SurveyPage]
     val messagesApi            = app.injector.instanceOf[MessagesApi]
 
@@ -184,6 +185,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     val controller = new SurveyController(
       mock[AuditConnector],
       Stubs.stubMessagesControllerComponents(messagesApi = messagesApi),
+      notFoundPage,
       playFrontendSurveyPage,
       mock[views.html.SurveyConfirmationPage]
     )

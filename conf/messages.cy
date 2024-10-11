@@ -67,7 +67,6 @@ survey.disagree.response=Anfodlon
 survey.strongly.disagree.response=Anfodlon iawn
 survey.tell.us.how.we.can.improve=Rhowch wybod i ni sut y gallwn wella’r cymorth a roddwn i chi.
 survey.submit=Cyflwyno
-survey.ticket.id.error=i need translation pls
 
 deskpro.error.page.title=Mae’n ddrwg gennym, mae problem gyda’r gwasanaeth – Cysylltu â CThEF – GOV.UK
 deskpro.error.page.heading=Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
