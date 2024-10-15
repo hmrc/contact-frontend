@@ -33,7 +33,6 @@ import views.html.{NotFoundPage, SurveyConfirmationPage, SurveyPage}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-import play.api.mvc.MessagesRequest
 
 @Singleton
 class SurveyController @Inject() (
@@ -73,7 +72,7 @@ class SurveyController @Inject() (
   }
 
   def survey(ticketId: String, serviceId: String): Action[AnyContent] = Action.async { request =>
-    given MessagesRequest[AnyContent] = request
+    given Request[AnyContent] = request
     Future.successful(
       if (validateTicketId(ticketId)) {
         val form   = emptyForm(serviceId = Some(serviceId), ticketId = Some(ticketId))
