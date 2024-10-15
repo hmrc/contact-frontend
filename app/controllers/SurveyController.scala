@@ -67,7 +67,7 @@ class SurveyController @Inject() (
     HeaderNames.akamaiReputation
   )
 
-  def validateTicketId(ticketId: String): Boolean = ticketId match {
+  private def validateTicketId(ticketId: String): Boolean = ticketId match {
     case TicketId() => true
     case _          => false
   }
