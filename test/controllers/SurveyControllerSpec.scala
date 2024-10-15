@@ -117,7 +117,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       val result   = controller.survey(ticketId, serviceId)(FakeRequest())
       val document = Jsoup.parse(contentAsString(result))
 
-      status(result) should be(404)
+      status(result)                        should be(404)
       document.body().select("h1").text() shouldBe "Page not found"
     }
   }
