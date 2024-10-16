@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.{SurveyConfirmationPage, SurveyPage}
+import views.html.{NotFoundPage, SurveyConfirmationPage, SurveyPage}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -38,6 +38,7 @@ import scala.util.Try
 class SurveyController @Inject() (
   auditConnector: AuditConnector,
   mcc: MessagesControllerComponents,
+  notFoundPage: NotFoundPage,
   playFrontendSurveyPage: SurveyPage,
   playFrontendSurveyConfirmationPage: SurveyConfirmationPage
 )(using AppConfig, ExecutionContext)
@@ -65,7 +66,7 @@ class SurveyController @Inject() (
     HeaderNames.akamaiReputation
   )
 
-  def validateTicketId(ticketId: String): Boolean = ticketId match {
+  private def validateTicketId(ticketId: String): Boolean = ticketId match {
     case TicketId() => true
     case _          => false
   }
@@ -79,7 +80,7 @@ class SurveyController @Inject() (
         Ok(surveyPage(form, action))
       } else {
         logger.error(s"Invalid ticket id $ticketId when requesting survey form")
-        BadRequest("Invalid ticket id")
+        NotFound(notFoundPage())
       }
     )
   }

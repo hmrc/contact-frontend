@@ -46,17 +46,6 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       )
       .build()
 
-  "ticketId regex" should {
-    "validates correct ticket refs" in new TestScope {
-      controller.validateTicketId("GFBN-8051-KLNY") shouldBe true
-    }
-
-    "rejects invalid ticket refs" in new TestScope {
-      controller.validateTicketId("GFBN-8051-") shouldBe false
-      controller.validateTicketId("")           shouldBe false
-    }
-  }
-
   "SurveyController" should {
     "bind query string parameters to the form as expected" in new TestScope {
       val ticketId  = "GFBN-8051-KLNY"
@@ -120,6 +109,17 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       errors.size                     shouldBe 1
       errors.headOption map { _.key } shouldBe Some("service-id")
     }
+
+    "return a page not found error page when ticketId is invalid" in new TestScope {
+      val ticketId  = "ABCD-EFGH-"
+      val serviceId = "abcdefg"
+
+      val result   = controller.survey(ticketId, serviceId)(FakeRequest())
+      val document = Jsoup.parse(contentAsString(result))
+
+      status(result)                        should be(404)
+      document.body().select("h1").text() shouldBe "Page not found"
+    }
   }
 
   "display errors when form isn't filled out at all" in new TestScope {
@@ -175,6 +175,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
   }
 
   class TestScope extends MockitoSugar {
+    val notFoundPage           = app.injector.instanceOf[views.html.NotFoundPage]
     val playFrontendSurveyPage = app.injector.instanceOf[views.html.SurveyPage]
     val messagesApi            = app.injector.instanceOf[MessagesApi]
 
@@ -184,6 +185,7 @@ class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     val controller = new SurveyController(
       mock[AuditConnector],
       Stubs.stubMessagesControllerComponents(messagesApi = messagesApi),
+      notFoundPage,
       playFrontendSurveyPage,
       mock[views.html.SurveyConfirmationPage]
     )

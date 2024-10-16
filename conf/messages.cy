@@ -134,3 +134,9 @@ forms.name.error.invalid=Rhowch lythrennau neu atalnodi’n unig
 
 testPage.title = Service test page – GOV.UK
 testPage.heading  = Service test page
+
+## Not Found Page
+notFound.pageTitle=Heb ddod o hyd i’r dudalen – GOV.UK
+notFound.heading=Heb ddod o hyd i’r dudalen
+notFound.paragraph1=Os gwnaethoch deipio’r cyfeiriad gwe, dylech wirio ei fod yn gywir.
+notFound.paragraph2=Os gwnaethoch bastio’r cyfeiriad gwe, dylech wirio’ch bod wedi copïo’r cyfeiriad yn llawn.
