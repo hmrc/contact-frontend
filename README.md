@@ -76,6 +76,8 @@ In addition to the information provided by the user, the service collects the fo
 
 ### Getting help
 * [#team-platui](https://hmrcdigital.slack.com/messages/team-plat-ui/) - PlatUI is responsible for contact-frontend
+  
+  (Slack is our preferred method of contact, but you can also reach us by email via platform-ui@digital.hmrc.gov.uk)
 * [#team-ddcops](https://hmrcdigital.slack.com/messages/team-ddcops) - DDCOps is responsible for Deskpro
 
 ### Maintenance documentation
