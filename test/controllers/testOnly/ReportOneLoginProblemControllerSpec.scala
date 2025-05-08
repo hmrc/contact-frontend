@@ -221,10 +221,6 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
   class TestScope extends MockitoSugar {
 
-    val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
-    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
-      .thenReturn(Future.successful(None))
-
     val reportProblemPage = app.injector.instanceOf[views.html.testOnly.ReportOneLoginProblemPage]
     val confirmationPage  = app.injector.instanceOf[views.html.testOnly.ReportOneLoginProblemConfirmationPage]
     val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
