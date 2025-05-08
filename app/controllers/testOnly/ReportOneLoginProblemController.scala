@@ -28,18 +28,18 @@ import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.InternalErrorPage
-import views.html.testOnly.{ReportOneLoginProblemPage, ReportOneLoginConfirmationPage}
+import views.html.testOnly.{ReportOneLoginConfirmationPage, ReportOneLoginProblemPage}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 object ReportOneLoginProblemFormBind {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
-  private val nameValidator = NameValidator()
+  private val nameValidator                         = NameValidator()
 
   def form: Form[ReportProblemForm] = Form[ReportProblemForm](
     mapping(
-      "report-name" -> text
+      "report-name"   -> text
         .verifying(
           "problem_report.name.error.required",
           name => name.nonEmpty
@@ -52,7 +52,7 @@ object ReportOneLoginProblemFormBind {
           "forms.name.error.invalid",
           name => nameValidator.validate(name) || name.isEmpty
         ),
-      "report-email" -> text
+      "report-email"  -> text
         .verifying(
           s"problem_report.email.error.required",
           email => email.nonEmpty
@@ -68,17 +68,17 @@ object ReportOneLoginProblemFormBind {
           action => action.nonEmpty
         )
         .verifying("problem_report.action.error.length", action => action.length <= 1000),
-      "report-error" -> text
+      "report-error"  -> text
         .verifying(
           s"problem_report.error.error.required",
           error => error.nonEmpty
         )
         .verifying("problem_report.error.error.length", error => error.length <= 1000),
-      "isJavascript" -> boolean,
+      "isJavascript"  -> boolean,
       "service"       -> optional(text),
-      "referrer" -> optional(text),
-      "csrfToken" -> text,
-      "userAction" -> optional(text)
+      "referrer"      -> optional(text),
+      "csrfToken"     -> text,
+      "userAction"    -> optional(text)
     )(ReportProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
@@ -107,7 +107,7 @@ class ReportOneLoginProblemController @Inject() (
   errorPage: InternalErrorPage,
   headerRetriever: RefererHeaderRetriever
 )(using AppConfig, ExecutionContext)
-  extends FrontendController(mcc)
+    extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport {
 
@@ -115,7 +115,7 @@ class ReportOneLoginProblemController @Inject() (
     given Request[AnyContent] = request
 
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
-    val referrer = referrerUrl orElse headerRetriever.refererFromHeaders()
+    val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders()
 
     Ok(page(ReportOneLoginProblemFormBind.emptyForm(csrfToken, Some("one-login-complaint"), referrer), referrerUrl))
   }
@@ -144,8 +144,8 @@ class ReportOneLoginProblemController @Inject() (
 
           createProblemReportsTicket(problemReport, request, None, referrer).map { _ =>
             Redirect(routes.ReportOneLoginProblemController.thanks())
-          } recover {
-            case _ => InternalServerError(errorPage())
+          } recover { case _ =>
+            InternalServerError(errorPage())
           }
         }
       )
