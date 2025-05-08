@@ -28,7 +28,7 @@ import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.InternalErrorPage
-import views.html.testOnly.{ReportOneLoginConfirmationPage, ReportOneLoginProblemPage}
+import views.html.testOnly.{ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -103,7 +103,7 @@ class ReportOneLoginProblemController @Inject() (
   val ticketQueueConnector: DeskproTicketQueueConnector,
   mcc: MessagesControllerComponents,
   reportOneLoginProblemPage: ReportOneLoginProblemPage,
-  oneLoginConfirmationPage: ReportOneLoginConfirmationPage,
+  oneLoginConfirmationPage: ReportOneLoginProblemConfirmationPage,
   errorPage: InternalErrorPage,
   headerRetriever: RefererHeaderRetriever
 )(using AppConfig, ExecutionContext)
