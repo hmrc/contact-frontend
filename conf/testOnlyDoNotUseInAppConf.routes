@@ -12,7 +12,7 @@
 # Add all the application routes to the prod.routes file
 ->         /                           prod.Routes
 
-GET         /test-only/report-one-login-problem                    @controllers.testOnly.ReportOneLoginProblemController.index(referrerUrl: Option[ReferrerUrl])
-POST        /test-only/report-one-login-problem                    @controllers.testOnly.ReportOneLoginProblemController.submit(referrerUrl: Option[ReferrerUrl])
-GET         /test-only/report-one-login-problem/thanks             @controllers.testOnly.ReportOneLoginProblemController.thanks()
+GET         /contact/report-one-login-problem                    @controllers.testOnly.ReportOneLoginProblemController.index(referrerUrl: Option[ReferrerUrl])
+POST        /contact/report-one-login-problem                    @controllers.testOnly.ReportOneLoginProblemController.submit(referrerUrl: Option[ReferrerUrl])
+GET         /contact/report-one-login-problem/thanks             @controllers.testOnly.ReportOneLoginProblemController.thanks()
 
