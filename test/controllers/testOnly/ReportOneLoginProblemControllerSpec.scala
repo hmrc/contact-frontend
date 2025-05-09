@@ -19,7 +19,6 @@ package controllers.testOnly
 import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
-import connectors.enrolments.EnrolmentsConnector
 import helpers.ApplicationSupport
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq as meq}
@@ -55,7 +54,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
         .body()
         .select("form[id=error-feedback-form]")
         .first
-        .attr("action") shouldBe s"/test-only/report-one-login-problem?$queryString"
+        .attr("action") shouldBe s"/contact/test-only/report-one-login-problem?$queryString"
 
       document.getElementById("error-feedback-form")            should not be null
       document.getElementsByClass("govuk-error-summary").size() should be(0)
@@ -90,7 +89,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       val result  = controller.submit(None)(request)
 
       status(result)             should be(SEE_OTHER)
-      redirectLocation(result) shouldBe Some("/test-only/report-one-login-problem/thanks")
+      redirectLocation(result) shouldBe Some("/contact/test-only/report-one-login-problem/thanks")
     }
 
     "bind the referrerUrl parameter if provided in the URL" in new TestScope {
@@ -114,7 +113,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       val result            = controller.submit(Some("referrer-from-url"))(requestWithHeader)
 
       status(result)             should be(SEE_OTHER)
-      redirectLocation(result) shouldBe Some("/test-only/report-one-login-problem/thanks")
+      redirectLocation(result) shouldBe Some("/contact/test-only/report-one-login-problem/thanks")
     }
 
     "return Bad Request and page with validation error for invalid input" in new TestScope {
@@ -151,7 +150,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
         .body()
         .select("form[id=error-feedback-form]")
         .first
-        .attr("action")                                       shouldBe s"/test-only/report-one-login-problem"
+        .attr("action")                                       shouldBe s"/contact/test-only/report-one-login-problem"
     }
 
     "return Bad Request and page with validation error if the name has invalid characters" in new TestScope {
