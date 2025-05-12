@@ -19,7 +19,7 @@ package services
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.*
 import controllers.ContactForm
-import model.{AccessibilityForm, FeedbackForm, ReportProblemForm}
+import model.{AccessibilityForm, FeedbackForm, ReportOneLoginProblemForm, ReportProblemForm}
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
@@ -117,6 +117,49 @@ trait DeskproSubmission {
       ticketConstants = AccessibilityProblemTicketConstants
     )
 
+  def createOneLoginProblemTicket(
+    problemReport: ReportOneLoginProblemForm,
+    request: Request[AnyRef]
+  )(using Messages): Future[TicketId] = {
+    given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+    def oneLoginProblemMessage(): String =
+      s"""
+      ${Messages("NINO")}:
+      ${problemReport.nino}
+
+      ${Messages("SA UTR")}:
+      ${problemReport.saUtr.getOrElse("n/a")}
+
+      ${Messages("Date of Birth")}:
+      ${problemReport.dateOfBirth}
+
+      ${Messages("Phone Number")}:
+      ${problemReport.phoneNumber.getOrElse("n/a")}
+
+      ${Messages("Address")}:
+      ${problemReport.address}
+
+      ${Messages("Contact Preference")}:
+      ${problemReport.contactPreference.getOrElse("n/a")}
+
+      ${Messages("Complaint")}:
+      ${problemReport.complaint.getOrElse("n/a")}
+      """
+
+    ticketQueueConnector.createDeskProTicket(
+      name = problemReport.name,
+      email = problemReport.email,
+      message = oneLoginProblemMessage(),
+      referrer = "n/a",
+      isJavascript = false,
+      request = request,
+      enrolmentsOption = None,
+      service = Some("one-login-complaint"),
+      userAction = None,
+      ticketConstants = ReportOneLoginProblemTicketConstants
+    )
+  }
 }
 
 object DeskproSubmission {

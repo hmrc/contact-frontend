@@ -18,15 +18,14 @@ package controllers.testOnly
 
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import model.Aliases.ReferrerUrl
-import model.ReportProblemForm
+import model.{DateOfBirth, ReportOneLoginProblemForm}
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.{DeskproEmailValidator, NameValidator}
 import views.html.InternalErrorPage
 import views.html.testOnly.{ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
 
@@ -37,9 +36,9 @@ object ReportOneLoginProblemFormBind {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
   private val nameValidator                         = NameValidator()
 
-  def form: Form[ReportProblemForm] = Form[ReportProblemForm](
+  def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
-      "report-name"   -> text
+      "name"              -> text
         .verifying(
           "problem_report.name.error.required",
           name => name.nonEmpty
@@ -52,7 +51,14 @@ object ReportOneLoginProblemFormBind {
           "forms.name.error.invalid",
           name => nameValidator.validate(name) || name.isEmpty
         ),
-      "report-email"  -> text
+      "nino"              -> text,
+      "sa-utr"             -> optional(text),
+      "date-of-birth" -> mapping(
+        "day" -> text,
+        "month" -> text,
+        "year"  -> text
+      )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d))),
+      "email"             -> text
         .verifying(
           s"problem_report.email.error.required",
           email => email.nonEmpty
@@ -60,40 +66,28 @@ object ReportOneLoginProblemFormBind {
         .verifying(
           s"problem_report.email.error.valid",
           email => emailValidator.validate(email) || email.isEmpty
-        )
-        .verifying("problem_report.email.error.length", email => email.length <= 255),
-      "report-action" -> text
-        .verifying(
-          s"problem_report.action.error.required",
-          action => action.nonEmpty
-        )
-        .verifying("problem_report.action.error.length", action => action.length <= 1000),
-      "report-error"  -> text
-        .verifying(
-          s"problem_report.error.error.required",
-          error => error.nonEmpty
-        )
-        .verifying("problem_report.error.error.length", error => error.length <= 1000),
-      "isJavascript"  -> boolean,
-      "service"       -> optional(text),
-      "referrer"      -> optional(text),
-      "csrfToken"     -> text,
-      "userAction"    -> optional(text)
-    )(ReportProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
+        ),
+      "phone-number"             -> optional(text),
+      "address"           -> text,
+      "contact-preference" -> optional(text),
+      "complaint"         -> optional(text),
+      "csrfToken"         -> text
+    )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
-  def emptyForm(csrfToken: String, service: Option[String], referrer: Option[String]): Form[ReportProblemForm] =
+  def emptyForm(csrfToken: String): Form[ReportOneLoginProblemForm] =
     ReportOneLoginProblemFormBind.form.fill(
-      ReportProblemForm(
-        reportName = "",
-        reportEmail = "",
-        reportAction = "",
-        reportError = "",
-        isJavascript = false,
-        service = Some("one-login-complaint"),
-        referrer = referrer,
-        csrfToken = csrfToken,
-        userAction = None
+      ReportOneLoginProblemForm(
+        name = "",
+        nino = "",
+        saUtr = None,
+        dateOfBirth = DateOfBirth.empty,
+        email = "",
+        phoneNumber = None,
+        address = "",
+        contactPreference = None,
+        complaint = None,
+        csrfToken = csrfToken
       )
     )
 }
@@ -104,57 +98,45 @@ class ReportOneLoginProblemController @Inject() (
   mcc: MessagesControllerComponents,
   reportOneLoginProblemPage: ReportOneLoginProblemPage,
   oneLoginConfirmationPage: ReportOneLoginProblemConfirmationPage,
-  errorPage: InternalErrorPage,
-  headerRetriever: RefererHeaderRetriever
+  errorPage: InternalErrorPage
 )(using AppConfig, ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport {
 
-  def index(referrerUrl: Option[ReferrerUrl]): Action[AnyContent] = Action { request =>
+  def index(): Action[AnyContent] = Action { request =>
     given Request[AnyContent] = request
 
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
-    val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders()
 
-    Ok(page(ReportOneLoginProblemFormBind.emptyForm(csrfToken, Some("one-login-complaint"), referrer), referrerUrl))
+    Ok(page(ReportOneLoginProblemFormBind.emptyForm(csrfToken)))
   }
 
-  def submit(referrerUrl: Option[ReferrerUrl]): Action[AnyContent] =
+  def submit(): Action[AnyContent] =
     Action.async { request =>
       given MessagesRequest[AnyContent] = request
 
-      doSubmit(referrerUrl)
+      doSubmit()
     }
 
-  private def doSubmit(referrerUrl: Option[String])(using request: MessagesRequest[AnyContent]) =
+  private def doSubmit()(using request: MessagesRequest[AnyContent]) =
     ReportOneLoginProblemFormBind.form
       .bindFromRequest()
       .fold(
         formWithError =>
           Future.successful(
-            BadRequest(page(formWithError, referrerUrl.orElse(fromForm("referrer", formWithError))))
+            BadRequest(page(formWithError))
           ),
-        report => {
-          val problemReport = report.copy(service = Some("one-login-complaint"))
-
-          val referrer = referrerUrl
-            .orElse(problemReport.referrer.filter(_.trim.nonEmpty))
-            .orElse(headerRetriever.refererFromHeaders())
-
-          createProblemReportsTicket(problemReport, request, None, referrer).map { _ =>
+        problemReport =>
+          createOneLoginProblemTicket(problemReport, request).map { _ =>
             Redirect(routes.ReportOneLoginProblemController.thanks())
           } recover { case _ =>
             InternalServerError(errorPage())
           }
-        }
       )
 
-  private def page(form: Form[ReportProblemForm], referrerUrl: Option[String])(using Request[?]) =
-    reportOneLoginProblemPage(form, routes.ReportOneLoginProblemController.submit(referrerUrl))
-
-  private def fromForm(key: String, form: Form[ReportProblemForm]): Option[String] =
-    form.data.get(key).flatMap(r => if (r.isEmpty) None else Some(r))
+  private def page(form: Form[ReportOneLoginProblemForm])(using Request[?]) =
+    reportOneLoginProblemPage(form, routes.ReportOneLoginProblemController.submit())
 
   def thanks(): Action[AnyContent] = Action { request =>
     given MessagesRequest[AnyContent] = request
