@@ -54,7 +54,11 @@ object ReportOneLoginProblemFormBind {
         ),
       "nino"              -> text,
       "sa-utr"             -> optional(text),
-      "date-of-birth"       -> date,
+      "date-of-birth" -> mapping(
+        "day" -> text,
+        "month" -> text,
+        "year"  -> text
+      )((d, m, y) => new Date(y.toInt, m.toInt, d.toInt))(date => Some((date.getDay.toString, date.getMonth.toString, date.getYear.toString))),
       "email"             -> text
         .verifying(
           s"problem_report.email.error.required",
