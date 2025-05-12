@@ -18,6 +18,8 @@ package model
 
 import Aliases.*
 
+import java.util.Date
+
 // Type aliases to suppress PR-commenter warnings around potential open redirects
 object Aliases {
   // These backUrls are already validated against an allow-list by the BackUrlValidator
@@ -73,3 +75,16 @@ case class SurveyForm(
   ticketId: Option[String],
   serviceId: Option[String]
 )
+
+case class ReportOneLoginProblemForm(
+                              name: String,
+                              nino: String,
+                              saUtr: Option[String],
+                              dateOfBirth: Date,
+                              email: String,
+                              phoneNumber: Option[String],
+                              address: String,
+                              contactPreference: Option[String],
+                              complaint: Option[String],
+                              csrfToken: String
+                            )
