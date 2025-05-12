@@ -19,7 +19,7 @@ package controllers.testOnly
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import model.Aliases.ReferrerUrl
-import model.ReportProblemForm
+import model.ReportOneLoginProblemForm
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.I18nSupport
@@ -30,6 +30,7 @@ import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.InternalErrorPage
 import views.html.testOnly.{ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
 
+import java.util.Date
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,7 +38,7 @@ object ReportOneLoginProblemFormBind {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
   private val nameValidator                         = NameValidator()
 
-  def form: Form[ReportProblemForm] = Form[ReportProblemForm](
+  def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
       "report-name"   -> text
         .verifying(
@@ -79,21 +80,23 @@ object ReportOneLoginProblemFormBind {
       "referrer"      -> optional(text),
       "csrfToken"     -> text,
       "userAction"    -> optional(text)
-    )(ReportProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
+    )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
-  def emptyForm(csrfToken: String, service: Option[String], referrer: Option[String]): Form[ReportProblemForm] =
+  def emptyForm(csrfToken: String, service: Option[String], referrer: Option[String]): Form[ReportOneLoginProblemForm] =
     ReportOneLoginProblemFormBind.form.fill(
-      ReportProblemForm(
-        reportName = "",
-        reportEmail = "",
-        reportAction = "",
-        reportError = "",
-        isJavascript = false,
-        service = Some("one-login-complaint"),
-        referrer = referrer,
-        csrfToken = csrfToken,
-        userAction = None
+      ReportOneLoginProblemForm(
+        name = "",
+        nino = "",
+        saUtr = None,
+        dateOfBirth = new Date(System.currentTimeMillis()),
+        email = "",
+        phoneNumber = None,
+        address = "",
+        contactPreference = None,
+        complaint = None,
+//        service = Some("one-login-complaint"),
+        csrfToken = csrfToken
       )
     )
 }
@@ -135,14 +138,8 @@ class ReportOneLoginProblemController @Inject() (
           Future.successful(
             BadRequest(page(formWithError, referrerUrl.orElse(fromForm("referrer", formWithError))))
           ),
-        report => {
-          val problemReport = report.copy(service = Some("one-login-complaint"))
-
-          val referrer = referrerUrl
-            .orElse(problemReport.referrer.filter(_.trim.nonEmpty))
-            .orElse(headerRetriever.refererFromHeaders())
-
-          createProblemReportsTicket(problemReport, request, None, referrer).map { _ =>
+        problemReport => {
+          createOneLoginProblemTicket(problemReport, request).map { _ =>
             Redirect(routes.ReportOneLoginProblemController.thanks())
           } recover { case _ =>
             InternalServerError(errorPage())
