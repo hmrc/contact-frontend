@@ -18,8 +18,6 @@ package model
 
 import Aliases.*
 
-import java.util.Date
-
 // Type aliases to suppress PR-commenter warnings around potential open redirects
 object Aliases {
   // These backUrls are already validated against an allow-list by the BackUrlValidator
@@ -76,11 +74,17 @@ case class SurveyForm(
   serviceId: Option[String]
 )
 
+case class DateOfBirth(day: String, month: String, year: String)
+
+object DateOfBirth {
+  val empty: DateOfBirth = DateOfBirth("", "", "")
+}
+
 case class ReportOneLoginProblemForm(
   name: String,
   nino: String,
   saUtr: Option[String],
-  dateOfBirth: Date,
+  dateOfBirth: DateOfBirth,
   email: String,
   phoneNumber: Option[String],
   address: String,

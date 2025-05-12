@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF as PlayFrontendFormWithCSRF
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.*
 @import model.ReportOneLoginProblemForm
-@import views.html.components.{Layout, InputText, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
+@import views.html.components.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
 
 @this(
         inputCharacterCount: InputCharacterCount,
@@ -25,6 +25,7 @@
         inputHidden: InputHidden,
         inputText: InputText,
         govukButton: GovukButton,
+        inputRadios: InputRadios,
         govukDateInput: GovukDateInput,
         govukFieldset: GovukFieldset,
         govukErrorSummary: GovukErrorSummary,
@@ -37,8 +38,8 @@
 @(problemReportForm: Form[ReportOneLoginProblemForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @pageTitle = @{
-    if(problemReportForm.hasErrors){Messages("error.browser.title.prefix") + " " + Messages("problem_report.title")}
-    else Messages("problem_report.title")
+    if(problemReportForm.hasErrors){messages("error.browser.title.prefix") + " " + messages("problem_report.title")}
+    else messages("problem_report.title")
 }
 
 @mainLayout(pageTitle) {
@@ -93,6 +94,15 @@
             label = messages("problem_report.address.label"),
             classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
+        )
+        @inputRadios(
+            problemReportForm("contact-preference"),
+            legend = messages("problem_report.contact-preference.label"),
+            items = Seq(
+                ("email", messages("problem_report.email.label")),
+                ("phone", messages("problem_report.phone-call.label")),
+                ("text", messages("problem_report.text-message.label"))
+            )
         )
         @inputText(
             problemReportForm("contact-preference"),

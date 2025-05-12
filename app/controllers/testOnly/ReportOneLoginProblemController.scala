@@ -18,7 +18,7 @@ package controllers.testOnly
 
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import model.ReportOneLoginProblemForm
+import model.{DateOfBirth, ReportOneLoginProblemForm}
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.I18nSupport
@@ -29,7 +29,6 @@ import util.{DeskproEmailValidator, NameValidator}
 import views.html.InternalErrorPage
 import views.html.testOnly.{ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
 
-import java.util.Date
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -58,7 +57,7 @@ object ReportOneLoginProblemFormBind {
         "day" -> text,
         "month" -> text,
         "year"  -> text
-      )((d, m, y) => new Date(y.toInt, m.toInt, d.toInt))(date => Some((date.getDay.toString, date.getMonth.toString, date.getYear.toString))),
+      )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d))),
       "email"             -> text
         .verifying(
           s"problem_report.email.error.required",
@@ -82,7 +81,7 @@ object ReportOneLoginProblemFormBind {
         name = "",
         nino = "",
         saUtr = None,
-        dateOfBirth = new Date(System.currentTimeMillis()),
+        dateOfBirth = DateOfBirth.empty,
         email = "",
         phoneNumber = None,
         address = "",
