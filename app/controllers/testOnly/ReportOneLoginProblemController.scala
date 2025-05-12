@@ -18,7 +18,6 @@ package controllers.testOnly
 
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import model.Aliases.ReferrerUrl
 import model.ReportOneLoginProblemForm
 import play.api.data.Form
 import play.api.data.Forms.*
@@ -26,7 +25,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.{DeskproEmailValidator, NameValidator}
 import views.html.InternalErrorPage
 import views.html.testOnly.{ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
 
@@ -53,7 +52,7 @@ object ReportOneLoginProblemFormBind {
     )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
-  def emptyForm(csrfToken: String, service: Option[String], referrer: Option[String]): Form[ReportOneLoginProblemForm] =
+  def emptyForm(csrfToken: String): Form[ReportOneLoginProblemForm] =
     ReportOneLoginProblemFormBind.form.fill(
       ReportOneLoginProblemForm(
         name = "",
@@ -76,36 +75,34 @@ class ReportOneLoginProblemController @Inject() (
   mcc: MessagesControllerComponents,
   reportOneLoginProblemPage: ReportOneLoginProblemPage,
   oneLoginConfirmationPage: ReportOneLoginProblemConfirmationPage,
-  errorPage: InternalErrorPage,
-  headerRetriever: RefererHeaderRetriever
+  errorPage: InternalErrorPage
 )(using AppConfig, ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport {
 
-  def index(referrerUrl: Option[ReferrerUrl]): Action[AnyContent] = Action { request =>
+  def index(): Action[AnyContent] = Action { request =>
     given Request[AnyContent] = request
 
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
-    val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders()
 
-    Ok(page(ReportOneLoginProblemFormBind.emptyForm(csrfToken, Some("one-login-complaint"), referrer), referrerUrl))
+    Ok(page(ReportOneLoginProblemFormBind.emptyForm(csrfToken)))
   }
 
-  def submit(referrerUrl: Option[ReferrerUrl]): Action[AnyContent] =
+  def submit(): Action[AnyContent] =
     Action.async { request =>
       given MessagesRequest[AnyContent] = request
 
-      doSubmit(referrerUrl)
+      doSubmit()
     }
 
-  private def doSubmit(referrerUrl: Option[String])(using request: MessagesRequest[AnyContent]) =
+  private def doSubmit()(using request: MessagesRequest[AnyContent]) =
     ReportOneLoginProblemFormBind.form
       .bindFromRequest()
       .fold(
         formWithError =>
           Future.successful(
-            BadRequest(page(formWithError, referrerUrl.orElse(fromForm("referrer", formWithError))))
+            BadRequest(page(formWithError))
           ),
         problemReport =>
           createOneLoginProblemTicket(problemReport, request).map { _ =>
@@ -115,8 +112,8 @@ class ReportOneLoginProblemController @Inject() (
           }
       )
 
-  private def page(form: Form[ReportOneLoginProblemForm], referrerUrl: Option[String])(using Request[?]) =
-    reportOneLoginProblemPage(form, routes.ReportOneLoginProblemController.submit(referrerUrl))
+  private def page(form: Form[ReportOneLoginProblemForm])(using Request[?]) =
+    reportOneLoginProblemPage(form, routes.ReportOneLoginProblemController.submit())
 
   private def fromForm(key: String, form: Form[ReportOneLoginProblemForm]): Option[String] =
     form.data.get(key).flatMap(r => if (r.isEmpty) None else Some(r))
