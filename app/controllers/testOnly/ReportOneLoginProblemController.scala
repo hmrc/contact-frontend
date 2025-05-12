@@ -53,8 +53,8 @@ object ReportOneLoginProblemFormBind {
           name => nameValidator.validate(name) || name.isEmpty
         ),
       "nino"              -> text,
-      "saUtr"             -> optional(text),
-      "dateOfBirth"       -> date,
+      "sa-utr"             -> optional(text),
+      "date-of-birth"       -> date,
       "email"             -> text
         .verifying(
           s"problem_report.email.error.required",
@@ -64,9 +64,9 @@ object ReportOneLoginProblemFormBind {
           s"problem_report.email.error.valid",
           email => emailValidator.validate(email) || email.isEmpty
         ),
-      "phone"             -> optional(text),
+      "phone-number"             -> optional(text),
       "address"           -> text,
-      "contactPreference" -> optional(text),
+      "contact-preference" -> optional(text),
       "complaint"         -> optional(text),
       "csrfToken"         -> text
     )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
