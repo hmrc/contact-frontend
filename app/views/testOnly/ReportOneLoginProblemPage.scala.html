@@ -25,6 +25,7 @@
         inputHidden: InputHidden,
         inputText: InputText,
         govukButton: GovukButton,
+        govukDateInput: GovukDateInput,
         govukFieldset: GovukFieldset,
         govukErrorSummary: GovukErrorSummary,
         formWithCSRF: PlayFrontendFormWithCSRF,
@@ -63,16 +64,15 @@
         )
         @inputText(
             problemReportForm("sa-utr"),
-            label = messages("problem_report.sa-utl.label"),
+            label = messages("problem_report.sa-utr.label"),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false)
         )
-        @inputText(
-            problemReportForm("date-of-birth"),
-            label = messages("problem_report.date-of-birth.label"),
-            classes = "govuk-!-width-two-thirds",
-            spellcheck = Some(false)
-        )
+
+        @govukDateInput(DateInput(
+            hint = Some(Hint(content = Text("date.hint"))),
+        ).withDayMonthYearFormField(problemReportForm("date-of-birth")))
+
         @inputText(
             problemReportForm("email"),
             inputType = "email",
@@ -97,7 +97,7 @@
         @inputText(
             problemReportForm("contact-preference"),
             inputType = "email",
-            label = messages("problem_report.contact-preferance.label"),
+            label = messages("problem_report.contact-preference.label"),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false)
         )
