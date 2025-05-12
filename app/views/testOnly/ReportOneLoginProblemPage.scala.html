@@ -48,32 +48,62 @@
     @p(content = Text(messages("problem_report.paragraph.1")))
     @p(content = Text(messages("problem_report.paragraph.2")))
     @formWithCSRF(action, Symbol("id") -> "error-feedback-form") {
-        @inputHidden(problemReportForm("referrer"))
-        @inputHidden(problemReportForm("userAction"))
         @inputText(
-            problemReportForm("report-name"),
+            problemReportForm("name"),
             label = messages("problem_report.name.label"),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("name")
         )
         @inputText(
-            problemReportForm("report-email"),
+            problemReportForm("nino"),
+            label = messages("problem_report.nino.label"),
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false)
+        )
+        @inputText(
+            problemReportForm("sa-utr"),
+            label = messages("problem_report.sa-utl.label"),
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false)
+        )
+        @inputText(
+            problemReportForm("date-of-birth"),
+            label = messages("problem_report.date-of-birth.label"),
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false)
+        )
+        @inputText(
+            problemReportForm("email"),
             inputType = "email",
             label = messages("problem_report.email.label"),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("email")
         )
+        @inputText(
+            problemReportForm("phone-number"),
+            inputType = "email",
+            label = messages("problem_report.phone-number.label"),
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false)
+        )
         @inputCharacterCount(
-            problemReportForm("report-action"),
-            label = messages("problem_report.action.label"),
+            problemReportForm("address"),
+            label = messages("problem_report.address.label"),
             classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
         )
+        @inputText(
+            problemReportForm("contact-preference"),
+            inputType = "email",
+            label = messages("problem_report.contact-preferance.label"),
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false)
+        )
         @inputCharacterCount(
-            problemReportForm("report-error"),
-            label = messages("problem_report.error.label"),
+            problemReportForm("complaint"),
+            label = messages("problem_report.complaint.label"),
             classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
         )
