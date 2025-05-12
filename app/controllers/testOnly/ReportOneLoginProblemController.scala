@@ -39,11 +39,31 @@ object ReportOneLoginProblemFormBind {
 
   def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
-      "name"              -> text,
+      "name"              -> text
+        .verifying(
+          "problem_report.name.error.required",
+          name => name.nonEmpty
+        )
+        .verifying(
+          "problem_report.name.error.length",
+          name => name.length <= 70
+        )
+        .verifying(
+          "forms.name.error.invalid",
+          name => nameValidator.validate(name) || name.isEmpty
+        ),
       "nino"              -> text,
       "saUtr"             -> optional(text),
       "dateOfBirth"       -> date,
-      "email"             -> text,
+      "email"             -> text
+        .verifying(
+          s"problem_report.email.error.required",
+          email => email.nonEmpty
+        )
+        .verifying(
+          s"problem_report.email.error.valid",
+          email => emailValidator.validate(email) || email.isEmpty
+        ),
       "phone"             -> optional(text),
       "address"           -> text,
       "contactPreference" -> optional(text),
