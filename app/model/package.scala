@@ -77,14 +77,14 @@ case class SurveyForm(
 )
 
 case class ReportOneLoginProblemForm(
-                              name: String,
-                              nino: String,
-                              saUtr: Option[String],
-                              dateOfBirth: Date,
-                              email: String,
-                              phoneNumber: Option[String],
-                              address: String,
-                              contactPreference: Option[String],
-                              complaint: Option[String],
-                              csrfToken: String
-                            )
+  name: String,
+  nino: String,
+  saUtr: Option[String],
+  dateOfBirth: Date,
+  email: String,
+  phoneNumber: Option[String],
+  address: String,
+  contactPreference: Option[String],
+  complaint: Option[String],
+  csrfToken: String
+)

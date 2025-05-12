@@ -19,7 +19,7 @@ package services
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.*
 import controllers.ContactForm
-import model.{AccessibilityForm, FeedbackForm, ReportProblemForm, ReportOneLoginProblemForm}
+import model.{AccessibilityForm, FeedbackForm, ReportOneLoginProblemForm, ReportProblemForm}
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
@@ -118,9 +118,9 @@ trait DeskproSubmission {
     )
 
   def createOneLoginProblemTicket(
-                                   problemReport: ReportOneLoginProblemForm,
-                                   request: Request[AnyRef]
-                                 )(using Messages): Future[TicketId] = {
+    problemReport: ReportOneLoginProblemForm,
+    request: Request[AnyRef]
+  )(using Messages): Future[TicketId] = {
     given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     def oneLoginProblemMessage(): String = "This is a problem"

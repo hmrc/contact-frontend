@@ -40,46 +40,16 @@ object ReportOneLoginProblemFormBind {
 
   def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
-      "report-name"   -> text
-        .verifying(
-          "problem_report.name.error.required",
-          name => name.nonEmpty
-        )
-        .verifying(
-          "problem_report.name.error.length",
-          name => name.length <= 70
-        )
-        .verifying(
-          "forms.name.error.invalid",
-          name => nameValidator.validate(name) || name.isEmpty
-        ),
-      "report-email"  -> text
-        .verifying(
-          s"problem_report.email.error.required",
-          email => email.nonEmpty
-        )
-        .verifying(
-          s"problem_report.email.error.valid",
-          email => emailValidator.validate(email) || email.isEmpty
-        )
-        .verifying("problem_report.email.error.length", email => email.length <= 255),
-      "report-action" -> text
-        .verifying(
-          s"problem_report.action.error.required",
-          action => action.nonEmpty
-        )
-        .verifying("problem_report.action.error.length", action => action.length <= 1000),
-      "report-error"  -> text
-        .verifying(
-          s"problem_report.error.error.required",
-          error => error.nonEmpty
-        )
-        .verifying("problem_report.error.error.length", error => error.length <= 1000),
-      "isJavascript"  -> boolean,
-      "service"       -> optional(text),
-      "referrer"      -> optional(text),
-      "csrfToken"     -> text,
-      "userAction"    -> optional(text)
+      "name"              -> text,
+      "nino"              -> text,
+      "saUtr"             -> optional(text),
+      "dateOfBirth"       -> date,
+      "email"             -> text,
+      "phone"             -> optional(text),
+      "address"           -> text,
+      "contactPreference" -> optional(text),
+      "complaint"         -> optional(text),
+      "csrfToken"         -> text
     )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
@@ -95,7 +65,6 @@ object ReportOneLoginProblemFormBind {
         address = "",
         contactPreference = None,
         complaint = None,
-//        service = Some("one-login-complaint"),
         csrfToken = csrfToken
       )
     )
@@ -138,19 +107,18 @@ class ReportOneLoginProblemController @Inject() (
           Future.successful(
             BadRequest(page(formWithError, referrerUrl.orElse(fromForm("referrer", formWithError))))
           ),
-        problemReport => {
+        problemReport =>
           createOneLoginProblemTicket(problemReport, request).map { _ =>
             Redirect(routes.ReportOneLoginProblemController.thanks())
           } recover { case _ =>
             InternalServerError(errorPage())
           }
-        }
       )
 
-  private def page(form: Form[ReportProblemForm], referrerUrl: Option[String])(using Request[?]) =
+  private def page(form: Form[ReportOneLoginProblemForm], referrerUrl: Option[String])(using Request[?]) =
     reportOneLoginProblemPage(form, routes.ReportOneLoginProblemController.submit(referrerUrl))
 
-  private def fromForm(key: String, form: Form[ReportProblemForm]): Option[String] =
+  private def fromForm(key: String, form: Form[ReportOneLoginProblemForm]): Option[String] =
     form.data.get(key).flatMap(r => if (r.isEmpty) None else Some(r))
 
   def thanks(): Action[AnyContent] = Action { request =>
