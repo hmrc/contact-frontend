@@ -123,7 +123,29 @@ trait DeskproSubmission {
   )(using Messages): Future[TicketId] = {
     given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    def oneLoginProblemMessage(): String = "This is a problem"
+    def oneLoginProblemMessage(): String =
+      s"""
+      ${Messages("NINO")}:
+      ${problemReport.nino}
+
+      ${Messages("SA UTR")}:
+      ${problemReport.saUtr.getOrElse("n/a")}
+
+      ${Messages("Date of Birth")}:
+      ${problemReport.dateOfBirth}
+
+      ${Messages("Phone Number")}:
+      ${problemReport.phoneNumber.getOrElse("n/a")}
+
+      ${Messages("Address")}:
+      ${problemReport.address}
+
+      ${Messages("Contact Preference")}:
+      ${problemReport.contactPreference.getOrElse("n/a")}
+
+      ${Messages("Complaint")}:
+      ${problemReport.complaint.getOrElse("n/a")}
+      """
 
     ticketQueueConnector.createDeskProTicket(
       name = problemReport.name,
