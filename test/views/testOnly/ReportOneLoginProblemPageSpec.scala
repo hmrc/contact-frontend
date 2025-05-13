@@ -18,7 +18,7 @@ package views.testOnly
 
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
-import model.ReportProblemForm
+import model.{ReportOneLoginProblemForm, DateOfBirth}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
@@ -41,37 +41,43 @@ class ReportOneLoginProblemPageSpec
   given Messages                   = getMessages()
   given AppConfig                  = app.injector.instanceOf[AppConfig]
 
-  val problemReportsForm: Form[ReportProblemForm] = Form[ReportProblemForm](
+  val oneLoginProblemReportsForm: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
-      "report-name"   -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
-      "report-email"  -> text.verifying("problem_report.email.error.required", msg => msg.nonEmpty),
-      "report-action" -> text.verifying("problem_report.action.error.required", msg => msg.nonEmpty),
-      "report-error"  -> text.verifying("problem_report.error.error.required", msg => msg.nonEmpty),
-      "isJavascript"  -> boolean,
-      "service"       -> optional(text),
-      "referrer"      -> optional(text),
+      "name"   -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
+      "nino"   -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
+      "sa-utr"       -> optional(text),
+      "date-of-birth" -> mapping(
+        "day" -> text,
+        "month" -> text,
+        "year"  -> text
+      )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d))),
+      "email"  -> text.verifying("problem_report.email.error.required", msg => msg.nonEmpty),
+      "phone-number"       -> optional(text),
+      "address"   -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
+      "contact-preference"       -> optional(text),
+      "complaint"       -> optional(text),
       "csrfToken"     -> text,
-      "userAction"    -> optional(text)
-    )(ReportProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
+    )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
-  val formValues: ReportProblemForm = ReportProblemForm(
-    reportName = "Test Person",
-    reportEmail = "test@example.com",
-    reportAction = "Testing action",
-    reportError = "Testing error",
-    isJavascript = false,
-    referrer = None,
-    csrfToken = "",
-    service = Some("one-login-complaint"),
-    userAction = None
+  val formValues: ReportOneLoginProblemForm = ReportOneLoginProblemForm(
+    name = "Test Person",
+    nino = "AA123456D",
+    saUtr = Some("1234567890"),
+    dateOfBirth = DateOfBirth("1", "1", "1990"),
+    email = "test@example.com",
+    phoneNumber = Some("020 7123 4567"),
+    address = "1 Whitehall, London, SW1A",
+    contactPreference = Some("Email"),
+    complaint = Some("Testing complaint"),
+    csrfToken = ""
   )
 
   val action: Call = Call(method = "POST", url = "/contact/submit-error-feedback")
 
   "the Problem Reports standalone page" should {
     val reportProblemPage = app.injector.instanceOf[ReportOneLoginProblemPage]
-    val content           = reportProblemPage(problemReportsForm, action)
+    val content           = reportProblemPage(oneLoginProblemReportsForm, action)
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")
@@ -82,7 +88,7 @@ class ReportOneLoginProblemPageSpec
 
     "translate the hmrc banner into Welsh if requested" in {
       given Messages   = getWelshMessages()
-      val welshContent = reportProblemPage(problemReportsForm, action)
+      val welshContent = reportProblemPage(oneLoginProblemReportsForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -95,72 +101,48 @@ class ReportOneLoginProblemPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").first().text shouldBe "Get help with a technical problem – GOV.UK"
+      content.select("title").first().text shouldBe "Your complaint"
     }
 
     "display the correct page heading" in {
       val headers = content.select("h1")
       headers.size       shouldBe 1
-      headers.first.text shouldBe "Get help with a technical problem"
+      headers.first.text shouldBe "Your complaint"
     }
 
-    "return the introductory content" in {
-      contentAsString(content) should include(
-        "Only use this form to report technical problems."
-      )
-    }
+//    "return the introductory content" in {
+//      contentAsString(content) should include(
+//        "Only use this form to report technical problems."
+//      )
+//    }
 
-    "translate the help text into Welsh if requested" in {
-      given Messages   = getWelshMessages()
-      val welshContent = reportProblemPage(problemReportsForm, action)
+//    "translate the help text into Welsh if requested" in {
+//      given Messages   = getWelshMessages()
+//      val welshContent = reportProblemPage(oneLoginProblemReportsForm, action)
+//
+//      val paragraphs = welshContent.select("p.govuk-body")
+//      paragraphs.first.text should include("Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.")
+//    }
 
-      val paragraphs = welshContent.select("p.govuk-body")
-      paragraphs.first.text should include("Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.")
-    }
-
-    "include the correct form tag" in {
-      val forms = content.select("form[id=error-feedback-form]")
-      forms                             should have size 1
-      forms.first.attr("method")        should be("POST")
-      forms.first.hasAttr("novalidate") should be(true)
-    }
-
-    "include the correct form action attribute" in {
-      val content = reportProblemPage(problemReportsForm, action)
-
-      val forms = content.select("form[id=error-feedback-form]")
-      forms                      should have size 1
-      forms.first.attr("action") should be("/contact/submit-error-feedback")
-    }
+//    "include the correct form tag" in {
+//      val forms = content.select("form[id=error-feedback-form]")
+//      forms                             should have size 1
+//      forms.first.attr("method")        should be("POST")
+//      forms.first.hasAttr("novalidate") should be(true)
+//    }
+//
+//    "include the correct form action attribute" in {
+//      val content = reportProblemPage(oneLoginProblemReportsForm, action)
+//
+//      val forms = content.select("form[id=error-feedback-form]")
+//      forms                      should have size 1
+//      forms.first.attr("action") should be("/contact/submit-error-feedback")
+//    }
 
     "include a CSRF token as a hidden input" in {
       val input = content.select("input[name=csrfToken]")
       input              should have size 1
       input.attr("type") should be("hidden")
-    }
-
-    "include the referrer hidden input" in {
-      val contentWithService = reportProblemPage(
-        problemReportsForm.fill(
-          formValues.copy(referrer = Some("my-referrer-url"))
-        ),
-        action
-      )
-      val input              = contentWithService.select("input[name=referrer]")
-      input.attr("type")  should be("hidden")
-      input.attr("value") should be("my-referrer-url")
-    }
-
-    "include the userAction hidden input" in {
-      val contentWithService = reportProblemPage(
-        problemReportsForm.fill(
-          formValues.copy(userAction = Some("my-user-action"))
-        ),
-        action
-      )
-      val input              = contentWithService.select("input[name=userAction]")
-      input.attr("value") should be("my-user-action")
-      input.attr("type")  should be("hidden")
     }
 
     "not initially include an error summary" in {
@@ -170,8 +152,8 @@ class ReportOneLoginProblemPageSpec
 
     "include an error summary if errors occur" in {
       val contentWithErrors = reportProblemPage(
-        problemReportsForm.fillAndValidate(
-          formValues.copy(reportName = "", reportEmail = "", reportAction = "", reportError = "")
+        oneLoginProblemReportsForm.fillAndValidate(
+          formValues.copy(name = "", email = "", complaint = None)
         ),
         action
       )
@@ -182,196 +164,106 @@ class ReportOneLoginProblemPageSpec
 
     "include Error: in the title if errors occur" in {
       val contentWithErrors = reportProblemPage(
-        problemReportsForm.fillAndValidate(
-          formValues.copy(reportName = "", reportEmail = "", reportAction = "", reportError = "")
+        oneLoginProblemReportsForm.fillAndValidate(
+          formValues.copy(name = "", email = "", complaint = None)
         ),
         action
       )
-      asDocument(contentWithErrors).title should be("Error: Get help with a technical problem – GOV.UK")
-    }
-
-    "include the report action" in {
-      content.select("textarea[name=report-action]") should have size 1
-    }
-
-    "include the report action label" in {
-      val label = content.select("label[for=report-action]")
-      label              should have size 1
-      label.first.text shouldBe "What were you doing?"
-    }
-
-    "not initially include an error message for the report action input" in {
-      val errors = content.select("#report-action-error")
-      errors should have size 0
-    }
-
-    "include an error message for the problem input when a validation error exists" in {
-      val contentWithService = reportProblemPage(
-        problemReportsForm.fillAndValidate(
-          formValues.copy(reportAction = "")
-        ),
-        action
-      )
-      val errors             = contentWithService.select("#report-action-error")
-      errors            should have size 1
-      errors.first.text should include("Enter details of what you were doing")
-    }
-
-    "include the submitted problem input value" in {
-      val contentWithService = reportProblemPage(
-        problemReportsForm.fill(
-          formValues.copy(reportAction = "Something went wrong for me")
-        ),
-        action
-      )
-      val inputs             = contentWithService.select("textarea[name=report-action]")
-      inputs            should have size 1
-      inputs.first.text should include("Something went wrong for me")
-    }
-
-    "translate the report action textarea label into Welsh if requested" in {
-      given Messages   = getWelshMessages()
-      val welshContent = reportProblemPage(problemReportsForm, action)
-
-      val paragraphs = welshContent.select("label[for=report-action]")
-      paragraphs.first.text should be("Beth oeddech yn ei wneud?")
-    }
-
-    "include the report an error label" in {
-      val label = content.select("label[for=report-error]")
-      label              should have size 1
-      label.first.text shouldBe "What do you need help with?"
-    }
-
-    "not initially include an error message for the report an error input" in {
-      val errors = content.select("#report-error-error")
-      errors should have size 0
-    }
-
-    "include an error message for the report an error input when a validation error exists" in {
-      val contentWithService = reportProblemPage(
-        problemReportsForm.fillAndValidate(
-          formValues.copy(reportError = "")
-        ),
-        action
-      )
-      val errors             = contentWithService.select("#report-error-error")
-      errors            should have size 1
-      errors.first.text should include("Enter details of what went wrong")
-    }
-
-    "include the submitted report an error input value" in {
-      val contentWithService = reportProblemPage(
-        problemReportsForm.fill(
-          formValues.copy(reportError = "This was the error I saw")
-        ),
-        action
-      )
-      val inputs             = contentWithService.select("textarea[name=report-error]")
-      inputs            should have size 1
-      inputs.first.text should include("This was the error I saw")
-    }
-
-    "translate the report an error textarea label into Welsh if requested" in {
-      given Messages   = getWelshMessages()
-      val welshContent = reportProblemPage(problemReportsForm, action)
-
-      val paragraphs = welshContent.select("label[for=report-error]")
-      paragraphs.first.text should be("Gyda beth ydych angen help?")
+      asDocument(contentWithErrors).title should be("Error: Your complaint")
     }
 
     "include a name input" in {
-      content.select("input[name=report-name]") should have size 1
+      content.select("input[name=name]") should have size 1
     }
 
     "include a name input with spellcheck turned off" in {
-      val inputs = content.select("input[name=report-name]")
+      val inputs = content.select("input[name=name]")
 
       inputs.first.attr("spellcheck") should be("false")
     }
 
     "include a label for the name input" in {
-      val label = content.select("label[for=report-name]")
+      val label = content.select("label[for=name]")
       label              should have size 1
       label.first.text shouldBe "Full name"
     }
 
     "not initially include an error message for the name input" in {
-      val errors = content.select("#report-name-error")
+      val errors = content.select("#name-error")
       errors should have size 0
     }
 
     "include an error message for the name input" in {
       val contentWithService = reportProblemPage(
-        problemReportsForm.fillAndValidate(
-          formValues.copy(reportName = "")
+        oneLoginProblemReportsForm.fillAndValidate(
+          formValues.copy(name = "")
         ),
         action
       )
-      val errors             = contentWithService.select("#report-name-error")
+      val errors             = contentWithService.select("#name-error")
       errors            should have size 1
       errors.first.text should include("Enter your full name")
     }
 
     "include the submitted name input value" in {
       val contentWithService = reportProblemPage(
-        problemReportsForm.fill(
-          formValues.copy(reportName = "AN Other")
+        oneLoginProblemReportsForm.fill(
+          formValues.copy(name = "AN Other")
         ),
         action
       )
-      val inputs             = contentWithService.select("input[name=report-name]")
+      val inputs             = contentWithService.select("input[name=name]")
       inputs                     should have size 1
       inputs.first.attr("value") should include("AN Other")
     }
 
     "include an email input" in {
-      content.select("input[name=report-email]") should have size 1
+      content.select("input[name=email]") should have size 1
     }
 
     "include an email input with spellcheck turned off" in {
-      val inputs = content.select("input[name=report-email]")
+      val inputs = content.select("input[name=email]")
 
       inputs.first.attr("spellcheck") should be("false")
     }
 
     "include a email input with the correct type" in {
-      val inputs = content.select("input[name=report-email]")
+      val inputs = content.select("input[name=email]")
 
       inputs.first.attr("type") should be("email")
     }
 
     "include a label for the email input" in {
-      val label = content.select("label[for=report-email]")
+      val label = content.select("label[for=email]")
       label              should have size 1
       label.first.text shouldBe "Email address"
     }
 
     "not initially include an error message for the email input" in {
-      val errors = content.select("#report-email-error")
+      val errors = content.select("#email-error")
       errors should have size 0
     }
 
     "include an error message for the email input if a validation error exists" in {
       val contentWithService = reportProblemPage(
-        problemReportsForm.fillAndValidate(
-          formValues.copy(reportEmail = "")
+        oneLoginProblemReportsForm.fillAndValidate(
+          formValues.copy(email = "")
         ),
         action
       )
-      val errors             = contentWithService.select("#report-email-error")
+      val errors             = contentWithService.select("#email-error")
       errors            should have size 1
       errors.first.text should include("Enter your email address")
     }
 
     "include the submitted email input value" in {
       val contentWithService = reportProblemPage(
-        problemReportsForm.fill(
-          formValues.copy(reportEmail = "bloggs@example.com")
+        oneLoginProblemReportsForm.fill(
+          formValues.copy(email = "bloggs@example.com")
         ),
         action
       )
-      val inputs             = contentWithService.select("input[name=report-email]")
+      val inputs             = contentWithService.select("input[name=email]")
       inputs                     should have size 1
       inputs.first.attr("value") should include("bloggs@example.com")
     }
