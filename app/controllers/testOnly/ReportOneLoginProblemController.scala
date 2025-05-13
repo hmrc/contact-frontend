@@ -38,7 +38,7 @@ object ReportOneLoginProblemFormBind {
 
   def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
-      "name"              -> text
+      "name"               -> text
         .verifying(
           "problem_report.name.error.required",
           name => name.nonEmpty
@@ -51,14 +51,14 @@ object ReportOneLoginProblemFormBind {
           "forms.name.error.invalid",
           name => nameValidator.validate(name) || name.isEmpty
         ),
-      "nino"              -> text,
+      "nino"               -> text,
       "sa-utr"             -> optional(text),
-      "date-of-birth" -> mapping(
-        "day" -> text,
+      "date-of-birth"      -> mapping(
+        "day"   -> text,
         "month" -> text,
         "year"  -> text
       )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d))),
-      "email"             -> text
+      "email"              -> text
         .verifying(
           s"problem_report.email.error.required",
           email => email.nonEmpty
@@ -67,11 +67,11 @@ object ReportOneLoginProblemFormBind {
           s"problem_report.email.error.valid",
           email => emailValidator.validate(email) || email.isEmpty
         ),
-      "phone-number"             -> optional(text),
-      "address"           -> text,
+      "phone-number"       -> optional(text),
+      "address"            -> text,
       "contact-preference" -> optional(text),
-      "complaint"         -> optional(text),
-      "csrfToken"         -> text
+      "complaint"          -> optional(text),
+      "csrfToken"          -> text
     )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
