@@ -138,9 +138,6 @@ class ReportOneLoginProblemController @Inject() (
   private def page(form: Form[ReportOneLoginProblemForm])(using Request[?]) =
     reportOneLoginProblemPage(form, routes.ReportOneLoginProblemController.submit())
 
-  private def fromForm(key: String, form: Form[ReportOneLoginProblemForm]): Option[String] =
-    form.data.get(key).flatMap(r => if (r.isEmpty) None else Some(r))
-
   def thanks(): Action[AnyContent] = Action { request =>
     given MessagesRequest[AnyContent] = request
 

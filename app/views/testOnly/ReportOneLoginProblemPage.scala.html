@@ -38,82 +38,90 @@
 @(problemReportForm: Form[ReportOneLoginProblemForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @pageTitle = @{
-    if(problemReportForm.hasErrors){messages("error.browser.title.prefix") + " " + messages("problem_report.title")}
-    else messages("problem_report.title")
+    if(problemReportForm.hasErrors){messages("error.browser.title.prefix") + " " + messages("one_login_problem.title")}
+    else messages("one_login_problem.title")
 }
 
 @mainLayout(pageTitle) {
     @if(problemReportForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(problemReportForm))
     }
-    @h1(content = Text(messages("problem_report.heading")))
-    @p(content = Text(messages("problem_report.paragraph.1")))
-    @p(content = Text(messages("problem_report.paragraph.2")))
+    @h1(content = Text(messages("one_login_problem.heading")))
     @formWithCSRF(action, Symbol("id") -> "error-feedback-form") {
         @inputText(
             problemReportForm("name"),
-            label = messages("problem_report.name.label"),
+            label = messages("one_login_problem.name.label"),
+            labelClasses = "govuk-label--s",
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("name")
         )
         @inputText(
             problemReportForm("nino"),
-            label = messages("problem_report.nino.label"),
+            label = messages("one_login_problem.nino.label"),
+            labelClasses = "govuk-label--s",
+            hint = Some(messages("one_login_problem.nino.hint")),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false)
         )
         @inputText(
             problemReportForm("sa-utr"),
-            label = messages("problem_report.sa-utr.label"),
+            label = messages("one_login_problem.sa-utr.label"),
+            labelClasses = "govuk-label--s",
+            hint = Some(messages("one_login_problem.sa-utr.hint")),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false)
         )
 
         @govukDateInput(DateInput(
-            hint = Some(Hint(content = Text("date.hint"))),
+            fieldset = Some(Fieldset(
+              legend = Some(Legend(
+                content = Text(messages("one_login_problem.date-of-birth.label")),
+                classes = "govuk-fieldset__legend--s"
+              ))
+            )),
+            hint = Some(Hint(content = Text(messages("one_login_problem.date-of-birth.hint")))),
         ).withDayMonthYearFormField(problemReportForm("date-of-birth")))
 
         @inputText(
             problemReportForm("email"),
             inputType = "email",
-            label = messages("problem_report.email.label"),
+            label = messages("one_login_problem.email.label"),
+            labelClasses = "govuk-label--s",
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
             autocomplete = Some("email")
         )
         @inputText(
             problemReportForm("phone-number"),
-            inputType = "email",
-            label = messages("problem_report.phone-number.label"),
+            label = messages("one_login_problem.phone-number.label"),
+            labelClasses = "govuk-label--s",
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false)
         )
         @inputCharacterCount(
             problemReportForm("address"),
-            label = messages("problem_report.address.label"),
+            label = messages("one_login_problem.address.label"),
+            labelClasses = "govuk-label--s",
             classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
         )
         @inputRadios(
             problemReportForm("contact-preference"),
-            legend = messages("problem_report.contact-preference.label"),
+            legend = messages("one_login_problem.contact-preference.label"),
             items = Seq(
-                ("email", messages("problem_report.email.label")),
-                ("phone", messages("problem_report.phone-call.label")),
-                ("text", messages("problem_report.text-message.label"))
-            )
-        )
-        @inputText(
-            problemReportForm("contact-preference"),
-            inputType = "email",
-            label = messages("problem_report.contact-preference.label"),
-            classes = "govuk-!-width-two-thirds",
-            spellcheck = Some(false)
+                ("email", messages("one_login_problem.radio.email.label")),
+                ("phone", messages("one_login_problem.radio.phone-call.label")),
+                ("text", messages("one_login_problem.radio.text-message.label"))
+            ),
+            hintText = Some(messages("one_login_problem.contact-preference.hint")),
+            legendClasses = "govuk-fieldset__legend--s"
         )
         @inputCharacterCount(
             problemReportForm("complaint"),
-            label = messages("problem_report.complaint.label"),
+            label = messages("one_login_problem.complaint.label"),
+            labelClasses = "govuk-label--s",
+            hint = Some(messages("one_login_problem.complaint.hint")),
             classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
         )
