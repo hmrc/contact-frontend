@@ -18,19 +18,20 @@ package controllers.testOnly
 
 import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.{TicketConstants, TicketId}
+import connectors.deskpro.domain.TicketId
 import helpers.ApplicationSupport
 import org.jsoup.Jsoup
-import org.mockito.ArgumentMatchers.{any, eq as meq}
+import org.jsoup.nodes.Document
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
+import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import play.api.mvc.Request
+import play.api.mvc.AnyContentAsFormUrlEncoded
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
@@ -47,54 +48,27 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
       status(result) should be(OK)
 
-//      val document    = Jsoup.parse(contentAsString(result))
-//      val queryString = s"referrerUrl=my-referrer-url"
-//      document
-//        .body()
-//        .select("form[id=error-feedback-form]")
-//        .first
-//        .attr("action") shouldBe s"/contact/test-only/report-one-login-problem?$queryString"
-//
-//      document.getElementById("error-feedback-form")            should not be null
-//      document.getElementsByClass("govuk-error-summary").size() should be(0)
+      val document: Document = Jsoup.parse(contentAsString(result))
+
+      document.getElementById("error-feedback-form")            should not be null
+      document.getElementsByClass("govuk-error-summary").size() should be(0)
     }
   }
 
   "Reporting a problem via the standalone page" should {
-//    "redirect to a Thank You html page for a valid request" in new TestScope {
-//      hrmcConnectorWillReturnTheTicketId
-//
-//      val request = generateRequest(isAjaxRequest = false)
-//      val result  = controller.submit()(request)
-//
-//      status(result)             should be(SEE_OTHER)
-//      redirectLocation(result) shouldBe Some("/contact/test-only/report-one-login-problem/thanks")
-//    }
+    "redirect to a Thank You html page for a valid request" in new TestScope {
+      setHmrcConnectorResponse(Future.successful(TicketId(123)))
 
-    "return Bad Request and page with validation error for invalid input" in new TestScope {
-      val result = controller.submit()(generateInvalidRequest(isAjaxRequest = false))
+      val request = generateRequest()
+      val result  = controller.submit()(request)
 
-      status(result) should be(BAD_REQUEST)
-      verifyNoInteractions(hmrcDeskproConnector)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByClass("govuk-error-summary").size() should be > 0
+      status(result)             should be(SEE_OTHER)
+      redirectLocation(result) shouldBe Some("/contact/test-only/report-one-login-problem/thanks")
     }
 
-    "return Bad Request, page with validation error, and correct submit URL if no service URL param for invalid input" in new TestScope {
-      val headers = Seq((REFERER, deskproReferrer), ("User-Agent", "iAmAUserAgent"))
-      val request = FakeRequest("POST", "/")
-        .withHeaders(headers: _*)
-        .withFormUrlEncodedBody(
-          "report-name"     -> deskproName,
-          "THIS-WILL-ERROR" -> deskproEmail,
-          "report-action"   -> "Some Action",
-          "report-error"    -> "Some Error",
-          "isJavascript"    -> "false",
-          "service"         -> ""
-        )
-
-      val result = controller.submit()(request)
+    "return Bad Request and page with validation error for invalid input" in new TestScope {
+      val invalidRequest = FakeRequest("POST", "/").withFormUrlEncodedBody("some-key" -> "some-value")
+      val result         = controller.submit()(invalidRequest)
 
       status(result) should be(BAD_REQUEST)
       verifyNoInteractions(hmrcDeskproConnector)
@@ -110,7 +84,6 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
     "return Bad Request and page with validation error if the name has invalid characters" in new TestScope {
       val request = generateRequest(
-        isAjaxRequest = false,
         name = """<a href="blah.com">something</a>"""
       )
 
@@ -124,7 +97,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Bad Request and page with validation error if the email has invalid syntax (for Deskpro)" in new TestScope {
-      val request = generateRequest(isAjaxRequest = false, email = "a.a.a")
+      val request = generateRequest(email = "a.a.a")
       val submit  = controller.submit()(request)
       val page    = Jsoup.parse(contentAsString(submit))
 
@@ -134,29 +107,15 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
-//    "return Internal Server Error and error page if the Deskpro ticket creation fails" in new TestScope {
-//      when(
-//        hmrcDeskproConnector.createDeskProTicket(
-//          meq("John Densmore"),
-//          meq("name@mail.com"),
-//          meq(controller.problemMessage("Some Action", "Some Error")),
-//          meq("/contact/problem_reports"),
-//          meq(false),
-//          any[Request[AnyRef]](),
-//          meq(None),
-//          meq(Some("one-login-complaint")),
-//          meq(None),
-//          any[TicketConstants]
-//        )
-//      ).thenReturn(Future.failed(new Exception("failed")))
-//
-//      val request = generateRequest(isAjaxRequest = false)
-//      val result  = controller.submit()(request)
-//      status(result) should be(INTERNAL_SERVER_ERROR)
-//
-//      val document = Jsoup.parse(contentAsString(result))
-//      document.text() should include("Try again later.")
-//    }
+    "return Internal Server Error and error page if the Deskpro ticket creation fails" in new TestScope {
+      setHmrcConnectorResponse(Future.failed(new Exception("failed")))
+
+      val result = controller.submit()(generateRequest())
+      status(result) should be(INTERNAL_SERVER_ERROR)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.text() should include("Try again later.")
+    }
   }
 
   "Requesting the standalone thanks page" should {
@@ -191,78 +150,51 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       errorPage
     )
 
-    val deskproName: String           = "John Densmore"
-    val deskproEmail: String          = "name@mail.com"
+    val deskproName: String           = "Gary Grapefruit"
+    val deskproEmail: String          = "grapefruit@test.com"
     val deskproSubject: String        = "Support Request"
     given Messages                    = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
     val deskproProblemMessage: String =
       controller.problemMessage("Some Action", "Some Error")
-    val deskproReferrer: String       = "/contact/problem_reports"
 
     val hmrcDeskproConnector = controller.ticketQueueConnector
 
-    val enrolments = Some(Enrolments(Set()))
-
     def generateRequest(
-      isAjaxRequest: Boolean,
       name: String = deskproName,
       email: String = deskproEmail
-    ) = {
-
-      val headers = Seq(
-        (REFERER, deskproReferrer),
-        ("User-Agent", "iAmAUserAgent")
-      ) ++ Seq(
-        ("X-Requested-With", "XMLHttpRequest")
-      ).filter(_ => isAjaxRequest)
-
+    ): FakeRequest[AnyContentAsFormUrlEncoded] =
       FakeRequest("POST", "/")
-        .withHeaders(headers: _*)
         .withFormUrlEncodedBody(
-          "report-name"   -> name,
-          "report-email"  -> email,
-          "report-action" -> "Some Action",
-          "report-error"  -> "Some Error",
-          "csrfToken"     -> "token",
-          "isJavascript"  -> isAjaxRequest.toString
+          "name"                -> name,
+          "nino"                -> "AB112233B",
+          "saUtr"               -> "1234567890",
+          "date-of-birth.day"   -> "10",
+          "date-of-birth.month" -> "10",
+          "date-of-birth.year"  -> "1990",
+          "email"               -> email,
+          "phone-number"        -> "07711 112233",
+          "address"             -> "1 The Street, London, SW1A",
+          "contact-preference"  -> "email",
+          "complaint"           -> "This is a complaint",
+          "csrfToken"           -> "token"
         )
-    }
 
-    def generateInvalidRequest(isAjaxRequest: Boolean) = {
-
-      val headers = Seq(
-        (REFERER, deskproReferrer),
-        ("User-Agent", "iAmAUserAgent")
-      ) ++ Seq(
-        ("X-Requested-With", "XMLHttpRequest")
-      ).filter(_ => isAjaxRequest)
-
-      FakeRequest("POST", "/")
-        .withHeaders(headers: _*)
-        .withFormUrlEncodedBody("isJavascript" -> isAjaxRequest.toString)
-    }
-
-    def hmrcConnectorWillFail =
-      mockHmrcConnector(Future.failed(new Exception("failed")))
-
-    def hrmcConnectorWillReturnTheTicketId =
-      mockHmrcConnector(Future.successful(TicketId(123)))
-
-    private def mockHmrcConnector(result: Future[TicketId]) =
+    def setHmrcConnectorResponse(result: Future[TicketId]): OngoingStubbing[Future[TicketId]] =
       when(
         hmrcDeskproConnector.createDeskProTicket(
-          meq(deskproName),
-          meq(deskproEmail),
-          meq(deskproProblemMessage),
-          meq(deskproReferrer),
-          meq(false),
-          any[Request[AnyRef]](),
-          meq(None),
-          meq(Some("one-login-complaint")),
-          meq(None),
-          any[TicketConstants]
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any
         )
       ).thenReturn(result)
+
   }
 
 }
