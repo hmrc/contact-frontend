@@ -18,7 +18,7 @@ package views.testOnly
 
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
-import model.{ReportOneLoginProblemForm, DateOfBirth}
+import model.{DateOfBirth, ReportOneLoginProblemForm}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
@@ -43,20 +43,20 @@ class ReportOneLoginProblemPageSpec
 
   val oneLoginProblemReportsForm: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
-      "name"   -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
-      "nino"   -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
-      "sa-utr"       -> optional(text),
-      "date-of-birth" -> mapping(
-        "day" -> text,
+      "name"               -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
+      "nino"               -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
+      "sa-utr"             -> optional(text),
+      "date-of-birth"      -> mapping(
+        "day"   -> text,
         "month" -> text,
         "year"  -> text
       )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d))),
-      "email"  -> text.verifying("problem_report.email.error.required", msg => msg.nonEmpty),
+      "email"              -> text.verifying("problem_report.email.error.required", msg => msg.nonEmpty),
       "phone-number"       -> optional(text),
-      "address"   -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
-      "contact-preference"       -> optional(text),
-      "complaint"       -> optional(text),
-      "csrfToken"     -> text,
+      "address"            -> text.verifying("problem_report.name.error.required", msg => msg.nonEmpty),
+      "contact-preference" -> optional(text),
+      "complaint"          -> optional(text),
+      "csrfToken"          -> text
     )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
