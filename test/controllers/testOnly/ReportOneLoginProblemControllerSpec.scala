@@ -24,6 +24,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
+import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
@@ -178,7 +179,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
           "csrfToken"           -> "token"
         )
 
-    def setHmrcConnectorResponse(result: Future[TicketId]) =
+    def setHmrcConnectorResponse(result: Future[TicketId]): OngoingStubbing[Future[TicketId]] =
       when(
         hmrcDeskproConnector.createDeskProTicket(
           any,
