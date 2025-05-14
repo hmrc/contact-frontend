@@ -221,8 +221,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val errors = contentWithService.select("#nino-error")
-      errors should have size 1
+      val errors             = contentWithService.select("#nino-error")
+      errors            should have size 1
       errors.first.text should include("Error: Enter a National Insurance number in the correct format")
     }
 
@@ -233,8 +233,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val errors = contentWithService.select("#nino-error")
-      errors should have size 1
+      val errors             = contentWithService.select("#nino-error")
+      errors            should have size 1
       errors.first.text should include("Error: Enter a National Insurance number in the correct format")
     }
 
@@ -284,9 +284,11 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val errors = contentWithService.select("#sa-utr-error")
-      errors should have size 1
-      errors.first.text should include("Error: Enter your Self Assessment Unique Taxpayer Reference in the correct format or leave empty")
+      val errors             = contentWithService.select("#sa-utr-error")
+      errors            should have size 1
+      errors.first.text should include(
+        "Error: Enter your Self Assessment Unique Taxpayer Reference in the correct format or leave empty"
+      )
     }
 
     "include the submitted sa-utr input value" in {
@@ -309,7 +311,7 @@ class ReportOneLoginProblemPageSpec
 
     "include a label for the date of birth input" in {
       val label = content.select("legend")
-      label should have size 2
+      label              should have size 2
       label.first.text shouldBe "Date of birth"
     }
 
@@ -541,19 +543,19 @@ class ReportOneLoginProblemPageSpec
     "include a label for the contact preference input" in {
       val label = content.select("legend")
 
-      label should have size 2
+      label             should have size 2
       label.last.text shouldBe "How would you prefer to be contacted?"
     }
 
     "include a hint for contact preference input" in {
       val hint = content.select("div[id=contact-preference-hint]")
-      hint should have size 1
+      hint              should have size 1
       hint.first.text shouldBe "Select one option"
     }
 
     "have email as default value in contact preference" in {
       val inputs = content.select("input[name=contact-preference]")
-      inputs should have size 3
+      inputs                 should have size 3
       inputs.get(0).toString should include("checked")
       inputs.get(1).toString shouldNot include("checked")
       inputs.get(2).toString shouldNot include("checked")
@@ -571,13 +573,13 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val inputs = contentWithService.select("input[name=contact-preference]")
-      val errors = content.select("#contact-preference-error")
-      inputs should have size 3
+      val inputs             = contentWithService.select("input[name=contact-preference]")
+      val errors             = content.select("#contact-preference-error")
+      inputs            should have size 3
       inputs.get(0).toString shouldNot include("checked")
       inputs.get(1).toString shouldNot include("checked")
       inputs.get(2).toString shouldNot include("checked")
-      errors should have size 1
+      errors            should have size 1
       errors.first.text should include("Incorrect contact preference")
     }
 
@@ -588,8 +590,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val inputs = contentWithService.select("input[name=contact-preference]")
-      inputs should have size 3
+      val inputs             = contentWithService.select("input[name=contact-preference]")
+      inputs                 should have size 3
       inputs.get(0).toString should include("checked")
       inputs.get(1).toString shouldNot include("checked")
       inputs.get(2).toString shouldNot include("checked")

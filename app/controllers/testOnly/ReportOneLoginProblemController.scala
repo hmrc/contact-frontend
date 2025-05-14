@@ -33,10 +33,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 object ReportOneLoginProblemFormBind {
-  private val emailValidator = DeskproEmailValidator()
-  private val nameValidator                         = NameValidator()
-  private val taxIdentifierValidator                = TaxIdentifierValidator()
-  private val dateOfBirthValidator = DateOfBirthValidator()
+  private val emailValidator         = DeskproEmailValidator()
+  private val nameValidator          = NameValidator()
+  private val taxIdentifierValidator = TaxIdentifierValidator()
+  private val dateOfBirthValidator   = DateOfBirthValidator()
 
   def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
