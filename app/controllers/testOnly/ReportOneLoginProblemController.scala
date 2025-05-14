@@ -25,7 +25,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, TaxIdentifierValidator}
+import util.{DateOfBirthValidator, DeskproEmailValidator, NameValidator, TaxIdentifierValidator}
 import views.html.InternalErrorPage
 import views.html.{ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
 
@@ -33,9 +33,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 object ReportOneLoginProblemFormBind {
-  private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
+  private val emailValidator = DeskproEmailValidator()
   private val nameValidator                         = NameValidator()
   private val taxIdentifierValidator                = TaxIdentifierValidator()
+  private val dateOfBirthValidator = DateOfBirthValidator()
 
   def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
