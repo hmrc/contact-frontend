@@ -18,6 +18,11 @@ package model
 
 import Aliases.*
 
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import scala.util.{Failure, Success, Try}
+
 // Type aliases to suppress PR-commenter warnings around potential open redirects
 object Aliases {
   // These backUrls are already validated against an allow-list by the BackUrlValidator
@@ -74,7 +79,18 @@ case class SurveyForm(
   serviceId: Option[String]
 )
 
-case class DateOfBirth(day: String, month: String, year: String)
+case class DateOfBirth(day: String, month: String, year: String) {
+  private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+
+  def asLocalDate(): Try[LocalDate] =
+    Try(LocalDate.of(year.toInt, month.toInt, day.toInt))
+
+  override def toString: String =
+    asLocalDate() match {
+      case Success(localDate) => localDate.format(dateFormatter)
+      case Failure(exception) => "Error in date of birth"
+    }
+}
 
 object DateOfBirth {
   val empty: DateOfBirth = DateOfBirth("", "", "")

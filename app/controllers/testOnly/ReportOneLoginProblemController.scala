@@ -25,7 +25,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request}
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, TaxIdentifierValidator}
+import util.{DateOfBirthValidator, DeskproEmailValidator, NameValidator, TaxIdentifierValidator}
 import views.html.InternalErrorPage
 import views.html.{ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
 
@@ -33,9 +33,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 object ReportOneLoginProblemFormBind {
-  private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
-  private val nameValidator                         = NameValidator()
-  private val taxIdentifierValidator                = TaxIdentifierValidator()
+  private val emailValidator         = DeskproEmailValidator()
+  private val nameValidator          = NameValidator()
+  private val taxIdentifierValidator = TaxIdentifierValidator()
+  private val dateOfBirthValidator   = DateOfBirthValidator()
 
   def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
@@ -69,10 +70,12 @@ object ReportOneLoginProblemFormBind {
           )
       ),
       "date-of-birth"      -> mapping(
-        "day"   -> text,
-        "month" -> text,
-        "year"  -> text
-      )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d))),
+        "day"   -> text.verifying("add error msg", day => day.nonEmpty),
+        "month" -> text.verifying("add error msg", month => month.nonEmpty),
+        "year"  -> text.verifying("add error msg", year => year.nonEmpty)
+      )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d)))
+        .verifying("one_login_problem.date-of-birth.error.invalid", dob => dateOfBirthValidator.isValidDate(dob))
+        .verifying("one_login_problem.date-of-birth.error.future", dob => dateOfBirthValidator.isNotFutureDate(dob)),
       "email"              -> text
         .verifying(
           s"problem_report.email.error.required",
