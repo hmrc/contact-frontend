@@ -22,8 +22,6 @@ import controllers.testOnly.ReportOneLoginProblemFormBind
 import model.{DateOfBirth, ReportOneLoginProblemForm}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.data.Form
-import play.api.data.Forms.*
 import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper.*
@@ -59,7 +57,7 @@ class ReportOneLoginProblemPageSpec
     csrfToken = ""
   )
 
-  val action: Call = Call(method = "POST", url = "/contact/submit-error-feedback")
+  val action: Call = Call(method = "POST", url = "/contact/test-only/report-one-login-problem")
 
   "the OlfG Problem Reports standalone page" should {
     val reportProblemPage = app.injector.instanceOf[ReportOneLoginProblemPage]
@@ -96,34 +94,20 @@ class ReportOneLoginProblemPageSpec
       headers.first.text shouldBe "Your complaint"
     }
 
-//    "return the introductory content" in {
-//      contentAsString(content) should include(
-//        "Only use this form to report technical problems."
-//      )
-//    }
+    "include the correct form tag" in {
+      val forms = content.select("form[id=error-feedback-form]")
+      forms                             should have size 1
+      forms.first.attr("method")        should be("POST")
+      forms.first.hasAttr("novalidate") should be(true)
+    }
 
-//    "translate the help text into Welsh if requested" in {
-//      given Messages   = getWelshMessages()
-//      val welshContent = reportProblemPage(oneLoginProblemReportsForm, action)
-//
-//      val paragraphs = welshContent.select("p.govuk-body")
-//      paragraphs.first.text should include("Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.")
-//    }
+    "include the correct form action attribute" in {
+      val content = reportProblemPage(oneLoginProblemReportsForm, action)
 
-//    "include the correct form tag" in {
-//      val forms = content.select("form[id=error-feedback-form]")
-//      forms                             should have size 1
-//      forms.first.attr("method")        should be("POST")
-//      forms.first.hasAttr("novalidate") should be(true)
-//    }
-//
-//    "include the correct form action attribute" in {
-//      val content = reportProblemPage(oneLoginProblemReportsForm, action)
-//
-//      val forms = content.select("form[id=error-feedback-form]")
-//      forms                      should have size 1
-//      forms.first.attr("action") should be("/contact/submit-error-feedback")
-//    }
+      val forms = content.select("form[id=error-feedback-form]")
+      forms                      should have size 1
+      forms.first.attr("action") should be("/contact/test-only/report-one-login-problem")
+    }
 
     "include a CSRF token as a hidden input" in {
       val input = content.select("input[name=csrfToken]")
@@ -523,7 +507,7 @@ class ReportOneLoginProblemPageSpec
       )
       val errors             = contentWithService.select("#address-error")
       errors            should have size 1
-      errors.first.text should include("Enter your full name")
+      errors.first.text should include("Error: Enter your postal address")
     }
 
     "include an error message for the incorrect address input" in {
@@ -562,7 +546,7 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include a hint for contact preference input" in {
-      val hint = content.select("div[id=contact-preference-hint]") //legend without any identifiers
+      val hint = content.select("div[id=contact-preference-hint]")
       hint should have size 1
       hint.first.text shouldBe "Select one option"
     }
