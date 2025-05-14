@@ -22,8 +22,6 @@ import controllers.testOnly.ReportOneLoginProblemFormBind
 import model.{DateOfBirth, ReportOneLoginProblemForm}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.data.Form
-import play.api.data.Forms.*
 import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper.*
@@ -59,7 +57,7 @@ class ReportOneLoginProblemPageSpec
     csrfToken = ""
   )
 
-  val action: Call = Call(method = "POST", url = "/contact/submit-error-feedback")
+  val action: Call = Call(method = "POST", url = "/contact/test-only/report-one-login-problem")
 
   "the OlfG Problem Reports standalone page" should {
     val reportProblemPage = app.injector.instanceOf[ReportOneLoginProblemPage]
@@ -96,34 +94,20 @@ class ReportOneLoginProblemPageSpec
       headers.first.text shouldBe "Your complaint"
     }
 
-//    "return the introductory content" in {
-//      contentAsString(content) should include(
-//        "Only use this form to report technical problems."
-//      )
-//    }
+    "include the correct form tag" in {
+      val forms = content.select("form[id=error-feedback-form]")
+      forms                             should have size 1
+      forms.first.attr("method")        should be("POST")
+      forms.first.hasAttr("novalidate") should be(true)
+    }
 
-//    "translate the help text into Welsh if requested" in {
-//      given Messages   = getWelshMessages()
-//      val welshContent = reportProblemPage(oneLoginProblemReportsForm, action)
-//
-//      val paragraphs = welshContent.select("p.govuk-body")
-//      paragraphs.first.text should include("Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.")
-//    }
+    "include the correct form action attribute" in {
+      val content = reportProblemPage(oneLoginProblemReportsForm, action)
 
-//    "include the correct form tag" in {
-//      val forms = content.select("form[id=error-feedback-form]")
-//      forms                             should have size 1
-//      forms.first.attr("method")        should be("POST")
-//      forms.first.hasAttr("novalidate") should be(true)
-//    }
-//
-//    "include the correct form action attribute" in {
-//      val content = reportProblemPage(oneLoginProblemReportsForm, action)
-//
-//      val forms = content.select("form[id=error-feedback-form]")
-//      forms                      should have size 1
-//      forms.first.attr("action") should be("/contact/submit-error-feedback")
-//    }
+      val forms = content.select("form[id=error-feedback-form]")
+      forms                      should have size 1
+      forms.first.attr("action") should be("/contact/test-only/report-one-login-problem")
+    }
 
     "include a CSRF token as a hidden input" in {
       val input = content.select("input[name=csrfToken]")
@@ -215,13 +199,13 @@ class ReportOneLoginProblemPageSpec
 
     "include a label for the nino input" in {
       val label = content.select("label[for=nino]")
-      label should have size 1
+      label              should have size 1
       label.first.text shouldBe "National Insurance number"
     }
 
     "include a hint for the nino input" in {
       val hint = content.select("div[id=nino-hint]")
-      hint should have size 1
+      hint              should have size 1
       hint.first.text shouldBe "It's on your National Insurance card, benefit letter, payslip or P60 - for example, 'QQ 12 34 56 C'"
     }
 
@@ -239,7 +223,7 @@ class ReportOneLoginProblemPageSpec
       )
       val errors = contentWithService.select("#nino-error")
       errors should have size 1
-      errors.first.text should include("Enter your full name")
+      errors.first.text should include("Error: Enter a National Insurance number in the correct format")
     }
 
     "include an error message for the incorrect nino input" in {
@@ -251,7 +235,7 @@ class ReportOneLoginProblemPageSpec
       )
       val errors = contentWithService.select("#nino-error")
       errors should have size 1
-      errors.first.text should include("Enter your full name")
+      errors.first.text should include("Error: Enter a National Insurance number in the correct format")
     }
 
     "include the submitted nino input value" in {
@@ -261,8 +245,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val inputs = contentWithService.select("input[name=nino]")
-      inputs should have size 1
+      val inputs             = contentWithService.select("input[name=nino]")
+      inputs                     should have size 1
       inputs.first.attr("value") should include("AN Other")
     }
 
@@ -278,13 +262,13 @@ class ReportOneLoginProblemPageSpec
 
     "include a label for the sa-utr input" in {
       val label = content.select("label[for=sa-utr]")
-      label should have size 1
+      label              should have size 1
       label.first.text shouldBe "Self Assessment UTR"
     }
 
     "include a hint for the sa-utr input" in {
       val label = content.select("div[id=sa-utr-hint]")
-      label should have size 1
+      label              should have size 1
       label.first.text shouldBe "You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called 'reference', 'UTR' or 'official use'."
     }
 
@@ -302,7 +286,7 @@ class ReportOneLoginProblemPageSpec
       )
       val errors = contentWithService.select("#sa-utr-error")
       errors should have size 1
-      errors.first.text should include("Enter your full name")
+      errors.first.text should include("Error: Enter your Self Assessment Unique Taxpayer Reference in the correct format or leave empty")
     }
 
     "include the submitted sa-utr input value" in {
@@ -312,26 +296,26 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val inputs = contentWithService.select("input[name=sa-utr]")
-      inputs should have size 1
+      val inputs             = contentWithService.select("input[name=sa-utr]")
+      inputs                     should have size 1
       inputs.first.attr("value") should include("AN Other")
     }
 
     "include a date of birth input" in {
-      content.select("input[name=date-of-birth.day]") should have size 1
+      content.select("input[name=date-of-birth.day]")   should have size 1
       content.select("input[name=date-of-birth.month]") should have size 1
-      content.select("input[name=date-of-birth.year]") should have size 1
+      content.select("input[name=date-of-birth.year]")  should have size 1
     }
 
     "include a label for the date of birth input" in {
-      val label = content.select("label[for=date-of-birth]") //legend without any identifiers
-      label should have size 1
+      val label = content.select("legend")
+      label should have size 2
       label.first.text shouldBe "Date of birth"
     }
 
     "include a hint for the date of birth input" in {
       val label = content.select("div[id=date-of-birth-hint]")
-      label should have size 1
+      label              should have size 1
       label.first.text shouldBe "For example, 27 3 2024"
     }
 
@@ -347,8 +331,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val errors = contentWithService.select("#date-of-birth-error")
-      errors should have size 1
+      val errors             = contentWithService.select("#date-of-birth-error")
+      errors            should have size 1
       errors.first.text should include("Enter your full name")
     }
 
@@ -359,8 +343,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val errors = contentWithService.select("#date-of-birth-error")
-      errors should have size 1
+      val errors             = contentWithService.select("#date-of-birth-error")
+      errors            should have size 1
       errors.first.text should include("Enter your full name")
     }
 
@@ -370,7 +354,8 @@ class ReportOneLoginProblemPageSpec
         DateOfBirth(
           day = futureDate.getDayOfMonth.toString,
           month = futureDate.getMonthValue.toString,
-          year = futureDate.getYear.toString)
+          year = futureDate.getYear.toString
+        )
       }
 
       val contentWithService = reportProblemPage(
@@ -379,8 +364,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val errors = contentWithService.select("#date-of-birth-error")
-      errors should have size 1
+      val errors             = contentWithService.select("#date-of-birth-error")
+      errors            should have size 1
       errors.first.text should include("Enter your full name")
     }
 
@@ -391,15 +376,15 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val dayInput = contentWithService.select("input[name=date-of-birth.day]")
-      val monthInput = contentWithService.select("input[name=date-of-birth.month]")
-      val yearInput = contentWithService.select("input[name=date-of-birth.year]")
-      dayInput should have size 1
-      monthInput should have size 1
-      yearInput should have size 1
-      dayInput.first.attr("value") should include("10")
+      val dayInput           = contentWithService.select("input[name=date-of-birth.day]")
+      val monthInput         = contentWithService.select("input[name=date-of-birth.month]")
+      val yearInput          = contentWithService.select("input[name=date-of-birth.year]")
+      dayInput                       should have size 1
+      monthInput                     should have size 1
+      yearInput                      should have size 1
+      dayInput.first.attr("value")   should include("10")
       monthInput.first.attr("value") should include("11")
-      yearInput.first.attr("value") should include("1990")
+      yearInput.first.attr("value")  should include("1990")
     }
 
     "include an email input" in {
@@ -465,7 +450,7 @@ class ReportOneLoginProblemPageSpec
 
     "include a label for the phone number input" in {
       val label = content.select("label[for=phone-number]")
-      label should have size 1
+      label              should have size 1
       label.first.text shouldBe "Phone number (optional)"
     }
 
@@ -481,8 +466,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val errors = contentWithService.select("#phone-number-error")
-      errors should have size 1
+      val errors             = contentWithService.select("#phone-number-error")
+      errors            should have size 1
       errors.first.text should include("Enter your full name")
     }
 
@@ -493,8 +478,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val inputs = contentWithService.select("input[name=phone-number]")
-      inputs should have size 1
+      val inputs             = contentWithService.select("input[name=phone-number]")
+      inputs                     should have size 1
       inputs.first.attr("value") should include("01234123123")
     }
 
@@ -504,7 +489,7 @@ class ReportOneLoginProblemPageSpec
 
     "include a label for the address input" in {
       val label = content.select("label[for=address]")
-      label should have size 1
+      label              should have size 1
       label.first.text shouldBe "What is your address?"
     }
 
@@ -520,9 +505,9 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val errors = contentWithService.select("#address-error")
-      errors should have size 1
-      errors.first.text should include("Enter your full name")
+      val errors             = contentWithService.select("#address-error")
+      errors            should have size 1
+      errors.first.text should include("Error: Enter your postal address")
     }
 
     "include an error message for the incorrect address input" in {
@@ -532,8 +517,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val errors = contentWithService.select("#address-error")
-      errors should have size 1
+      val errors             = contentWithService.select("#address-error")
+      errors            should have size 1
       errors.first.text should include("Enter your full name")
     }
 
@@ -544,30 +529,34 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val inputs = contentWithService.select("textarea[name=address]")
-      inputs should have size 1
+      val inputs             = contentWithService.select("textarea[name=address]")
+      inputs              should have size 1
       inputs.first.text() should include("address")
     }
 
     "include a contact preference input" in {
-      content.select("input[name=contact-preference]") should have size 1
+      content.select("fieldset[aria-describedby=contact-preference-hint]") should have size 1
     }
 
     "include a label for the contact preference input" in {
-      val label = content.select("label[for=contact-preference]")
-      label should have size 1
-      label.first.text shouldBe "How would you prefer to be contacted?"
+      val label = content.select("legend")
+
+      label should have size 2
+      label.last.text shouldBe "How would you prefer to be contacted?"
     }
 
     "include a hint for contact preference input" in {
-      val hint = content.select("label[for=contact-preference]") //legend without any identifiers
+      val hint = content.select("div[id=contact-preference-hint]")
       hint should have size 1
       hint.first.text shouldBe "Select one option"
     }
 
-    "have email as default value" in {
-
-      false shouldBe(true)
+    "have email as default value in contact preference" in {
+      val inputs = content.select("input[name=contact-preference]")
+      inputs should have size 3
+      inputs.get(0).toString should include("checked")
+      inputs.get(1).toString shouldNot include("checked")
+      inputs.get(2).toString shouldNot include("checked")
     }
 
     "not initially include an error message for the contact preference input" in {
@@ -575,7 +564,22 @@ class ReportOneLoginProblemPageSpec
       errors should have size 0
     }
 
-    // TODO DO we need a test for incorrect contact preference?
+    "include error for incorrect contact preference" in {
+      val contentWithService = reportProblemPage(
+        oneLoginProblemReportsForm.fill(
+          formValues.copy(contactPreference = Some("incorrect"))
+        ),
+        action
+      )
+      val inputs = contentWithService.select("input[name=contact-preference]")
+      val errors = content.select("#contact-preference-error")
+      inputs should have size 3
+      inputs.get(0).toString shouldNot include("checked")
+      inputs.get(1).toString shouldNot include("checked")
+      inputs.get(2).toString shouldNot include("checked")
+      errors should have size 1
+      errors.first.text should include("Incorrect contact preference")
+    }
 
     "include the submitted contact preference input value" in {
       val contentWithService = reportProblemPage(
@@ -584,9 +588,11 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val inputs = contentWithService.select("input[name=complaint]")
-      inputs should have size 1
-      inputs.first.attr("value") should include("complaint text")
+      val inputs = contentWithService.select("input[name=contact-preference]")
+      inputs should have size 3
+      inputs.get(0).toString should include("checked")
+      inputs.get(1).toString shouldNot include("checked")
+      inputs.get(2).toString shouldNot include("checked")
     }
 
     "include a complaint input" in {
@@ -595,13 +601,13 @@ class ReportOneLoginProblemPageSpec
 
     "include a label for the complaint input" in {
       val label = content.select("label[for=complaint]")
-      label should have size 1
+      label              should have size 1
       label.first.text shouldBe "Complaint"
     }
 
     "include a hint for the complaint input" in {
       val label = content.select("div[id=complaint-hint]")
-      label should have size 1
+      label              should have size 1
       label.first.text shouldBe "Do not include personal or financial information"
     }
 
@@ -617,8 +623,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val errors = contentWithService.select("#complaint-error")
-      errors should have size 1
+      val errors             = contentWithService.select("#complaint-error")
+      errors            should have size 1
       errors.first.text should include("Enter your full name")
     }
 
@@ -629,8 +635,8 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      val inputs = contentWithService.select("textarea[name=complaint]")
-      inputs should have size 1
+      val inputs             = contentWithService.select("textarea[name=complaint]")
+      inputs              should have size 1
       inputs.first.text() should include("complaint text")
     }
 

@@ -55,13 +55,19 @@ object ReportOneLoginProblemFormBind {
       "nino"               -> text
         .verifying(
           "one_login_problem.nino.error",
+          nino => nino.nonEmpty
+        )
+        .verifying(
+          "one_login_problem.nino.error",
           nino => taxIdentifierValidator.validateNino(nino) || nino.isEmpty
         ),
-      "sa-utr"             -> optional(text)
-        .verifying(
-          "one_login_problem.sa-utr.error",
-          saUtr => taxIdentifierValidator.validateSaUtr(saUtr)
-        ),
+      "sa-utr"             -> optional(
+        text
+          .verifying(
+            "one_login_problem.sa-utr.error",
+            saUtr => taxIdentifierValidator.validateSaUtr(saUtr)
+          )
+      ),
       "date-of-birth"      -> mapping(
         "day"   -> text,
         "month" -> text,
@@ -77,7 +83,11 @@ object ReportOneLoginProblemFormBind {
           email => emailValidator.validate(email) || email.isEmpty
         ),
       "phone-number"       -> optional(text),
-      "address"            -> text,
+      "address"            -> text
+        .verifying(
+          s"one_login_problem.address.error",
+          address => address.nonEmpty
+        ),
       "contact-preference" -> optional(text),
       "complaint"          -> optional(text),
       "csrfToken"          -> text

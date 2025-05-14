@@ -107,6 +107,32 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
+    "return Bad Request and page with validation error if the NINO format is invalid" in new TestScope {
+      setHmrcConnectorResponse(Future.successful(TicketId(123)))
+
+      val request = generateRequest(nino = "I don't know")
+      val submit  = controller.submit()(request)
+      val page    = Jsoup.parse(contentAsString(submit))
+
+      status(submit) shouldBe BAD_REQUEST
+      verifyNoInteractions(hmrcDeskproConnector)
+
+      page.getElementsByClass("govuk-error-summary").size() should be > 0
+    }
+
+    "return Bad Request and page with validation error if the SA UTR format is invalid" in new TestScope {
+      setHmrcConnectorResponse(Future.successful(TicketId(123)))
+
+      val request = generateRequest(saUtr = Some("Invalid number"))
+      val submit  = controller.submit()(request)
+      val page    = Jsoup.parse(contentAsString(submit))
+
+      status(submit) shouldBe BAD_REQUEST
+      verifyNoInteractions(hmrcDeskproConnector)
+
+      page.getElementsByClass("govuk-error-summary").size() should be > 0
+    }
+
     "return Internal Server Error and error page if the Deskpro ticket creation fails" in new TestScope {
       setHmrcConnectorResponse(Future.failed(new Exception("failed")))
 
@@ -153,6 +179,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     val deskproName: String           = "Gary Grapefruit"
     val deskproEmail: String          = "grapefruit@test.com"
     val deskproSubject: String        = "Support Request"
+    val deskproNino: String           = "AA112233B"
     given Messages                    = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
     val deskproProblemMessage: String =
       controller.problemMessage("Some Action", "Some Error")
@@ -161,13 +188,15 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
     def generateRequest(
       name: String = deskproName,
-      email: String = deskproEmail
+      email: String = deskproEmail,
+      nino: String = deskproNino,
+      saUtr: Option[String] = None
     ): FakeRequest[AnyContentAsFormUrlEncoded] =
       FakeRequest("POST", "/")
         .withFormUrlEncodedBody(
           "name"                -> name,
-          "nino"                -> "AB112233B",
-          "saUtr"               -> "1234567890",
+          "nino"                -> nino,
+          "sa-utr"              -> saUtr.getOrElse(""),
           "date-of-birth.day"   -> "10",
           "date-of-birth.month" -> "10",
           "date-of-birth.year"  -> "1990",

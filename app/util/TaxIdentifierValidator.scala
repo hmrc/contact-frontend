@@ -23,9 +23,8 @@ case class TaxIdentifierValidator() {
 
   def validateNino(nino: String): Boolean = Nino.isValid(nino)
 
-  def validateSaUtr(saUtr: Option[String]): Boolean = saUtr match
-    case None      => true
-    case Some(utr) =>
-      val trimmed = utr.replaceAll(" ", "")
-      trimmed.isEmpty || trimmed.matches(saUtrRegex)
+  def validateSaUtr(saUtr: String): Boolean = {
+    val trimmed = saUtr.replaceAll(" ", "")
+    trimmed.isEmpty || trimmed.matches(saUtrRegex)
+  }
 }
