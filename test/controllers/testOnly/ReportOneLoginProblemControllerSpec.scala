@@ -18,20 +18,19 @@ package controllers.testOnly
 
 import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
-import connectors.deskpro.domain.{TicketConstants, TicketId}
+import connectors.deskpro.domain.TicketId
 import helpers.ApplicationSupport
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.ArgumentMatchers.{any, eq as meq}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import play.api.mvc.{AnyContentAsFormUrlEncoded, Request}
+import play.api.mvc.AnyContentAsFormUrlEncoded
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
