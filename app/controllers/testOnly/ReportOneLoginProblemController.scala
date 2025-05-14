@@ -27,7 +27,7 @@ import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator}
 import views.html.InternalErrorPage
-import views.html.testOnly.{ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
+import views.html.{ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

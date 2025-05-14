@@ -134,8 +134,8 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
   class TestScope extends MockitoSugar {
 
-    val reportProblemPage = app.injector.instanceOf[views.html.testOnly.ReportOneLoginProblemPage]
-    val confirmationPage  = app.injector.instanceOf[views.html.testOnly.ReportOneLoginProblemConfirmationPage]
+    val reportProblemPage = app.injector.instanceOf[views.html.ReportOneLoginProblemPage]
+    val confirmationPage  = app.injector.instanceOf[views.html.ReportOneLoginProblemConfirmationPage]
     val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
 
     given cfconfig: AppConfig = new CFConfig(app.configuration)
