@@ -73,7 +73,9 @@ object ReportOneLoginProblemFormBind {
         "day"   -> text,
         "month" -> text,
         "year"  -> text
-      )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d))),
+      )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d)))
+        .verifying(dob => dateOfBirthValidator.isValidDate(dob))
+        .verifying(dob => dateOfBirthValidator.isNotFutureDate(dob)),
       "email"              -> text
         .verifying(
           s"problem_report.email.error.required",
