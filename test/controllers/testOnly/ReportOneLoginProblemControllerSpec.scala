@@ -88,7 +88,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       )
 
       val submit = controller.submit()(request)
-      val page = Jsoup.parse(contentAsString(submit))
+      val page   = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
       verifyNoInteractions(hmrcDeskproConnector)
@@ -111,8 +111,8 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       setHmrcConnectorResponse(Future.successful(TicketId(123)))
 
       val request = generateRequest(nino = "I don't know")
-      val submit = controller.submit()(request)
-      val page = Jsoup.parse(contentAsString(submit))
+      val submit  = controller.submit()(request)
+      val page    = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
       verifyNoInteractions(hmrcDeskproConnector)
@@ -123,9 +123,9 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     "return Bad Request and page with validation error if the SA UTR format is invalid" in new TestScope {
       setHmrcConnectorResponse(Future.successful(TicketId(123)))
 
-      val request = generateRequest(saUtr = Some("12345678"))
-      val submit = controller.submit()(request)
-      val page = Jsoup.parse(contentAsString(submit))
+      val request = generateRequest(saUtr = Some("Invalid number"))
+      val submit  = controller.submit()(request)
+      val page    = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
       verifyNoInteractions(hmrcDeskproConnector)
@@ -179,7 +179,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     val deskproName: String           = "Gary Grapefruit"
     val deskproEmail: String          = "grapefruit@test.com"
     val deskproSubject: String        = "Support Request"
-    val deskproNino: String = "AA112233B"
+    val deskproNino: String           = "AA112233B"
     given Messages                    = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
     val deskproProblemMessage: String =
       controller.problemMessage("Some Action", "Some Error")
@@ -196,7 +196,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
         .withFormUrlEncodedBody(
           "name"                -> name,
           "nino"                -> nino,
-          "saUtr"               -> saUtr.getOrElse("n/a"),
+          "sa-utr"              -> saUtr.getOrElse(""),
           "date-of-birth.day"   -> "10",
           "date-of-birth.month" -> "10",
           "date-of-birth.year"  -> "1990",

@@ -39,23 +39,22 @@ class TaxIdentifierValidatorSpec extends AnyWordSpec with Matchers {
     val validator = TaxIdentifierValidator()
 
     "return true if no SA UTR passed in" in {
-      validator.validateSaUtr(None)     shouldBe true
-      validator.validateSaUtr(Some("")) shouldBe true
+      validator.validateSaUtr("") shouldBe true
     }
 
     "return true if passed a valid SA UTR" in {
-      val validSaUtr: Option[String] = Some("1234567890")
+      val validSaUtr = "1234567890"
       validator.validateSaUtr(validSaUtr) shouldBe true
     }
 
     "return true if passed a valid SA UTR with spaces" in {
-      val validSaUtr = Some(" 12 34 56 78 90 ")
+      val validSaUtr = " 12 34 56 78 90 "
       validator.validateSaUtr(validSaUtr) shouldBe true
     }
 
     "return false if passed an invalid SA UTR" in {
-      val tooShortSaUtr = Some("12345678")
-      val tooLongSaUtr  = Some("1234567890123")
+      val tooShortSaUtr = "12345678"
+      val tooLongSaUtr  = "1234567890123"
 
       validator.validateSaUtr(tooShortSaUtr) shouldBe false
       validator.validateSaUtr(tooLongSaUtr)  shouldBe false

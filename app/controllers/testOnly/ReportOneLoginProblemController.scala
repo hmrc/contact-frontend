@@ -55,13 +55,15 @@ object ReportOneLoginProblemFormBind {
       "nino"               -> text
         .verifying(
           "one_login_problem.nino.error",
-          nino => taxIdentifierValidator.validateNino(nino) || nino.nonEmpty
+          nino => taxIdentifierValidator.validateNino(nino) || nino.isEmpty
         ),
-      "sa-utr"             -> optional(text)
-        .verifying(
-          "one_login_problem.sa-utr.error",
-          saUtr => taxIdentifierValidator.validateSaUtr(saUtr)
-        ),
+      "sa-utr"             -> optional(
+        text
+          .verifying(
+            "one_login_problem.sa-utr.error",
+            saUtr => taxIdentifierValidator.validateSaUtr(saUtr)
+          )
+      ),
       "date-of-birth"      -> mapping(
         "day"   -> text,
         "month" -> text,
