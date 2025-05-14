@@ -237,9 +237,15 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
+<<<<<<< Updated upstream
       val errors             = contentWithService.select("#nino-error")
       errors            should have size 1
       errors.first.text should include("Enter your full name")
+=======
+      val errors = contentWithService.select("#nino-error")
+      errors should have size 1
+      errors.first.text should include("Error: Enter a National Insurance number in the correct format")
+>>>>>>> Stashed changes
     }
 
     "include an error message for the incorrect nino input" in {
@@ -249,9 +255,15 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
+<<<<<<< Updated upstream
       val errors             = contentWithService.select("#nino-error")
       errors            should have size 1
       errors.first.text should include("Enter your full name")
+=======
+      val errors = contentWithService.select("#nino-error")
+      errors should have size 1
+      errors.first.text should include("Error: Enter a National Insurance number in the correct format")
+>>>>>>> Stashed changes
     }
 
     "include the submitted nino input value" in {
@@ -300,9 +312,15 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
+<<<<<<< Updated upstream
       val errors             = contentWithService.select("#sa-utr-error")
       errors            should have size 1
       errors.first.text should include("Enter your full name")
+=======
+      val errors = contentWithService.select("#sa-utr-error")
+      errors should have size 1
+      errors.first.text should include("Error: Enter your Self Assessment Unique Taxpayer Reference in the correct format or leave empty")
+>>>>>>> Stashed changes
     }
 
     "include the submitted sa-utr input value" in {
@@ -324,8 +342,13 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include a label for the date of birth input" in {
+<<<<<<< Updated upstream
       val label = content.select("label[for=date-of-birth]") // legend without any identifiers
       label              should have size 1
+=======
+      val label = content.select("legend")
+      label should have size 2
+>>>>>>> Stashed changes
       label.first.text shouldBe "Date of birth"
     }
 
@@ -551,10 +574,11 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include a contact preference input" in {
-      content.select("input[name=contact-preference]") should have size 1
+      content.select("fieldset[aria-describedby=contact-preference-hint]") should have size 1
     }
 
     "include a label for the contact preference input" in {
+<<<<<<< Updated upstream
       val label = content.select("label[for=contact-preference]")
       label              should have size 1
       label.first.text shouldBe "How would you prefer to be contacted?"
@@ -563,12 +587,31 @@ class ReportOneLoginProblemPageSpec
     "include a hint for contact preference input" in {
       val hint = content.select("label[for=contact-preference]") // legend without any identifiers
       hint              should have size 1
+=======
+      val label = content.select("legend")
+
+      label should have size 2
+      label.last.text shouldBe "How would you prefer to be contacted?"
+    }
+
+    "include a hint for contact preference input" in {
+      val hint = content.select("div[id=contact-preference-hint]") //legend without any identifiers
+      hint should have size 1
+>>>>>>> Stashed changes
       hint.first.text shouldBe "Select one option"
     }
 
-    "have email as default value" in {
+    "have email as default value in contact preference" in {
+      val inputs = content.select("input[name=contact-preference]")
+      inputs should have size 3
+      inputs.get(0).toString should include("checked")
+      inputs.get(1).toString shouldNot include("checked")
+      inputs.get(2).toString shouldNot include("checked")
 
+<<<<<<< Updated upstream
       false shouldBe true
+=======
+>>>>>>> Stashed changes
     }
 
     "not initially include an error message for the contact preference input" in {
@@ -576,7 +619,22 @@ class ReportOneLoginProblemPageSpec
       errors should have size 0
     }
 
-    // TODO DO we need a test for incorrect contact preference?
+    "include error for incorrect contact preference" in {
+      val contentWithService = reportProblemPage(
+        oneLoginProblemReportsForm.fill(
+          formValues.copy(contactPreference = Some("incorrect"))
+        ),
+        action
+      )
+      val inputs = contentWithService.select("input[name=contact-preference]")
+      val errors = content.select("#contact-preference-error")
+      inputs should have size 3
+      inputs.get(0).toString shouldNot include("checked")
+      inputs.get(1).toString shouldNot include("checked")
+      inputs.get(2).toString shouldNot include("checked")
+      errors should have size 1
+      errors.first.text should include("Incorrect contact preference")
+    }
 
     "include the submitted contact preference input value" in {
       val contentWithService = reportProblemPage(
@@ -585,9 +643,17 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
+<<<<<<< Updated upstream
       val inputs             = contentWithService.select("input[name=complaint]")
       inputs                     should have size 1
       inputs.first.attr("value") should include("complaint text")
+=======
+      val inputs = contentWithService.select("input[name=contact-preference]")
+      inputs should have size 3
+      inputs.get(0).toString should include("checked")
+      inputs.get(1).toString shouldNot include("checked")
+      inputs.get(2).toString shouldNot include("checked")
+>>>>>>> Stashed changes
     }
 
     "include a complaint input" in {

@@ -55,6 +55,10 @@ object ReportOneLoginProblemFormBind {
       "nino"               -> text
         .verifying(
           "one_login_problem.nino.error",
+          nino => nino.nonEmpty
+        )
+        .verifying(
+          "one_login_problem.nino.error",
           nino => taxIdentifierValidator.validateNino(nino) || nino.isEmpty
         ),
       "sa-utr"             -> optional(
