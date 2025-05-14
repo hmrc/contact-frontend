@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.testOnly
+package views
 
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
@@ -23,7 +23,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
-import views.html.testOnly.ReportOneLoginProblemConfirmationPage
+import views.html.ReportOneLoginProblemConfirmationPage
 
 class ReportOneLoginProblemConfirmationPageSpec
     extends AnyWordSpec
