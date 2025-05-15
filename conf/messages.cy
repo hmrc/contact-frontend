@@ -163,6 +163,7 @@ one_login_problem.address.label=WELSH PLACEHOLDER TEXT
 one_login_problem.address.error=WELSH PLACEHOLDER TEXT
 one_login_problem.contact-preference.label=WELSH PLACEHOLDER TEXT
 one_login_problem.contact-preference.hint=WELSH PLACEHOLDER TEXT
+one_login_problem.contact-preference.error=WELSH PLACEHOLDER TEXT
 one_login_problem.radio.email.label=WELSH PLACEHOLDER TEXT
 one_login_problem.radio.phone-call.label=WELSH PLACEHOLDER TEXT
 one_login_problem.radio.letter-message.label=WELSH PLACEHOLDER TEXT

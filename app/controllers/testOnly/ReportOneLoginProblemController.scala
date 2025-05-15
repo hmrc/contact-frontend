@@ -18,7 +18,7 @@ package controllers.testOnly
 
 import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
-import model.{DateOfBirth, ReportOneLoginProblemForm}
+import model.{ContactPreference, ContactPreferenceFormatter, DateOfBirth, EmailPreference, ReportOneLoginProblemForm}
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.I18nSupport
@@ -91,7 +91,7 @@ object ReportOneLoginProblemFormBind {
           s"one_login_problem.address.error",
           address => address.nonEmpty
         ),
-      "contact-preference" -> text,
+      "contact-preference" -> of[ContactPreference],
       "complaint"          -> optional(text),
       "csrfToken"          -> text
     )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
@@ -107,7 +107,7 @@ object ReportOneLoginProblemFormBind {
         email = "",
         phoneNumber = None,
         address = "",
-        contactPreference = "",
+        contactPreference = EmailPreference,
         complaint = None,
         csrfToken = csrfToken
       )
