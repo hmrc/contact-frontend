@@ -338,7 +338,7 @@ class ReportOneLoginProblemPageSpec
       errors.first.text should include("Error: Date of birth must include a day")
     }
 
-    // TODO: why does this not work?
+//    TODO: This is not triggering the error, why not?
 //    "include an error message for the incorrect date of birth input" in {
 //      val contentWithService = reportProblemPage(
 //        oneLoginProblemReportsForm.fillAndValidate(
@@ -346,12 +346,13 @@ class ReportOneLoginProblemPageSpec
 //        ),
 //        action
 //      )
+//
 //      val errors             = contentWithService.select("#date-of-birth-error")
 //      errors            should have size 1
-//      errors.first.text should include("Enter your full name")
+//      errors.first.text should include("Error: Date of birth must be a valid date")
 //    }
 
-    // TODO: why does this not work?
+//    TODO: This is not triggering the error, why not?
 //    "include an error message for the future date of birth input" in {
 //      val futureDateOfBirth = {
 //        val futureDate = LocalDate.now().plusDays(10)
@@ -370,7 +371,7 @@ class ReportOneLoginProblemPageSpec
 //      )
 //      val errors             = contentWithService.select("#date-of-birth-error")
 //      errors            should have size 1
-//      errors.first.text should include("Enter your full name")
+//      errors.first.text should include("Error: Date of birth must not be in the future")
 //    }
 
     "include the submitted date of birth input value" in {
