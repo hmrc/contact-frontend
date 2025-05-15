@@ -115,7 +115,8 @@
                 ("text", messages("one_login_problem.radio.letter-message.label"))
             ),
             hintText = Some(messages("one_login_problem.contact-preference.hint")),
-            legendClasses = "govuk-fieldset__legend--s"
+            legendClasses = "govuk-fieldset__legend--s",
+            checked = Some("email")
         )
         @inputCharacterCount(
             problemReportForm("complaint"),

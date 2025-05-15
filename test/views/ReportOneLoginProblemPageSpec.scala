@@ -335,7 +335,7 @@ class ReportOneLoginProblemPageSpec
       )
       val errors             = contentWithService.select("#date-of-birth-error")
       errors            should have size 1
-      errors.first.text should include("Error: add error msg")
+      errors.first.text should include("Error: Date of birth must include a day")
     }
 
     // TODO: why does this not work?
