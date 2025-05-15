@@ -124,28 +124,15 @@ trait DeskproSubmission {
     given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     def oneLoginProblemMessage(): String =
-      s"""
-      ${Messages("NINO")}:
-      ${problemReport.nino}
-
-      ${Messages("SA UTR")}:
-      ${problemReport.saUtr.getOrElse("n/a")}
-
-      ${Messages("Date of Birth")}:
-      ${problemReport.dateOfBirth}
-
-      ${Messages("Phone Number")}:
-      ${problemReport.phoneNumber.getOrElse("n/a")}
-
-      ${Messages("Address")}:
-      ${problemReport.address}
-
-      ${Messages("Contact Preference")}:
-      ${problemReport.contactPreference.getOrElse("n/a")}
-
-      ${Messages("Complaint")}:
-      ${problemReport.complaint.getOrElse("n/a")}
-      """
+      s"${Messages("NINO")}: ${problemReport.nino}\n\n" +
+        s"${Messages("SA UTR")}: ${problemReport.saUtr.getOrElse("None provided")}\n\n" +
+        s"${Messages("Date of Birth")}: ${problemReport.dateOfBirth.toString()}\n\n" +
+        s"${Messages("Phone Number")}: ${problemReport.phoneNumber.getOrElse("None provided")}\n\n" +
+        s"${Messages("Address")}:\n" +
+        s"${problemReport.address}\n\n" +
+        s"${Messages("Contact Preference")}: ${problemReport.contactPreference}\n\n" +
+        s"${Messages("Complaint")}\n" +
+        s"${problemReport.complaint.getOrElse("None provided")}"
 
     ticketQueueConnector.createDeskProTicket(
       name = problemReport.name,
