@@ -162,6 +162,6 @@ one_login_problem.contact-preference.label=How would you prefer to be contacted?
 one_login_problem.contact-preference.hint=Select one option
 one_login_problem.radio.email.label=Email
 one_login_problem.radio.phone-call.label=Phone call
-one_login_problem.radio.text-message.label=Text message
+one_login_problem.radio.letter-message.label=Letter
 one_login_problem.complaint.label=Complaint
 one_login_problem.complaint.hint=Do not include personal or financial information
