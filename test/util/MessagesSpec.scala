@@ -32,26 +32,26 @@ class MessagesSpec extends AnyWordSpec with Matchers {
   private val welshMessages   = parseMessages("conf/messages.cy")
 
   // TODO: Reinstate this once we have added in the messages keys
-//  "All message files" should {
-//    "have the same set of keys" in {
-//      withClue(describeMismatch(englishMessages.keySet, welshMessages.keySet)) {
-//        welshMessages.keySet shouldBe englishMessages.keySet
-//      }
-//    }
-//
-//    "have a non-empty message for each key" in {
-//      assertNonEmpty("English", englishMessages)
-//      assertNonEmpty("Welsh", welshMessages)
-//    }
-//
-//    "have no unescaped single quotes in value" in {
-//      assertCorrectUseOfQuotes("English", englishMessages)
-//      assertCorrectUseOfQuotes("Welsh", welshMessages)
-//    }
-//    "have a resolvable message for keys which take args" in {
-//      countMessagesWithArgs(welshMessages).size shouldBe countMessagesWithArgs(englishMessages).size
-//    }
-//  }
+  "All message files" should {
+    "have the same set of keys" in {
+      withClue(describeMismatch(englishMessages.keySet, welshMessages.keySet)) {
+        welshMessages.keySet shouldBe englishMessages.keySet
+      }
+    }
+
+    "have a non-empty message for each key" in {
+      assertNonEmpty("English", englishMessages)
+      assertNonEmpty("Welsh", welshMessages)
+    }
+
+    "have no unescaped single quotes in value" in {
+      assertCorrectUseOfQuotes("English", englishMessages)
+      assertCorrectUseOfQuotes("Welsh", welshMessages)
+    }
+    "have a resolvable message for keys which take args" in {
+      countMessagesWithArgs(welshMessages).size shouldBe countMessagesWithArgs(englishMessages).size
+    }
+  }
 
   private def parseMessages(filename: String): Map[String, String] =
     Messages.parse(

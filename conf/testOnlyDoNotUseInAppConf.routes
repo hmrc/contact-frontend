@@ -10,8 +10,8 @@
 # Failing to follow this rule may result in test routes deployed in production.
 
 # Add all the application routes to the prod.routes file
-GET         /contact/test-only/report-one-login-problem                    @controllers.testOnly.ReportOneLoginProblemController.index()
-POST        /contact/test-only/report-one-login-problem                    @controllers.testOnly.ReportOneLoginProblemController.submit()
-GET         /contact/test-only/report-one-login-problem/thanks             @controllers.testOnly.ReportOneLoginProblemController.thanks()
+GET         /contact/test-only/report-one-oogin-complaint                  @controllers.testOnly.ReportOneLoginProblemController.index()
+POST        /contact/test-only/report-one-login-complaint                    @controllers.testOnly.ReportOneLoginProblemController.submit()
+GET         /contact/test-only/report-one-login-complaint/thanks             @controllers.testOnly.ReportOneLoginProblemController.thanks()
 
 ->         /                           prod.Routes
