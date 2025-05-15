@@ -43,7 +43,7 @@ class ReportOneLoginProblemConfirmationPageSpec
     "include the H1 element with page title" in {
       val heading1 = content.select("h1")
       heading1            should have size 1
-      heading1.first.text should be("We have received your technical problem report")
+      heading1.first.text should be("We have received your One Login for Government complaint")
     }
 
     "include the H2 element for what happens next" in {
@@ -66,7 +66,7 @@ class ReportOneLoginProblemConfirmationPageSpec
       val welshContent = confirmationPage()
 
       val titles = welshContent.select("h1")
-      titles.first.text should be("Mae’ch adroddiad ynghylch problem dechnegol wedi dod i law")
+      titles.first.text should be("WELSH PLACEHOLDER TEXT")
     }
   }
 }

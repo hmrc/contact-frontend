@@ -63,7 +63,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       val result  = controller.submit()(request)
 
       status(result)             should be(SEE_OTHER)
-      redirectLocation(result) shouldBe Some("/contact/test-only/report-one-login-problem/thanks")
+      redirectLocation(result) shouldBe Some("/contact/test-only/report-one-login-complaint/thanks")
     }
 
     "return Bad Request and page with validation error for invalid input" in new TestScope {
@@ -79,7 +79,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
         .body()
         .select("form[id=error-feedback-form]")
         .first
-        .attr("action")                                       shouldBe s"/contact/test-only/report-one-login-problem"
+        .attr("action")                                       shouldBe s"/contact/test-only/report-one-login-complaint"
     }
 
     "return Bad Request and page with validation error if the name has invalid characters" in new TestScope {
@@ -153,7 +153,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       val document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("govuk-error-summary").size() should be(0)
       document.getElementsByClass("govuk-panel__title").text()  should be(
-        "We have received your technical problem report"
+        "We have received your One Login for Government complaint"
       )
     }
   }

@@ -85,13 +85,13 @@ class ReportOneLoginProblemPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").first().text shouldBe "Your complaint"
+      content.select("title").first().text shouldBe "One Login for Government complaint – GOV.UK"
     }
 
     "display the correct page heading" in {
       val headers = content.select("h1")
       headers.size       shouldBe 1
-      headers.first.text shouldBe "Your complaint"
+      headers.first.text shouldBe "One Login for Government complaint"
     }
 
     "include the correct form tag" in {
@@ -139,7 +139,7 @@ class ReportOneLoginProblemPageSpec
         ),
         action
       )
-      asDocument(contentWithErrors).title should be("Error: Your complaint")
+      asDocument(contentWithErrors).title should be("Error: One Login for Government complaint – GOV.UK")
     }
 
     "include a name input" in {

@@ -168,3 +168,5 @@ one_login_problem.radio.phone-call.label=Phone call
 one_login_problem.radio.letter-message.label=Letter
 one_login_problem.complaint.label=Complaint
 one_login_problem.complaint.hint=Do not include personal or financial information
+one_login_problem.confirmation.title=One Login for Government complaint – GOV.UK
+one_login_problem.confirmation.panel.title=We have received your One Login for Government complaint
