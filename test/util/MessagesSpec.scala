@@ -31,7 +31,6 @@ class MessagesSpec extends AnyWordSpec with Matchers {
   private val englishMessages = parseMessages("conf/messages")
   private val welshMessages   = parseMessages("conf/messages.cy")
 
-  // TODO: Reinstate this once we have added in the messages keys
   "All message files" should {
     "have the same set of keys" in {
       withClue(describeMismatch(englishMessages.keySet, welshMessages.keySet)) {
