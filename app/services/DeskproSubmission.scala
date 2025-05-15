@@ -119,7 +119,8 @@ trait DeskproSubmission {
 
   def createOneLoginProblemTicket(
     problemReport: ReportOneLoginProblemForm,
-    request: Request[AnyRef]
+    request: Request[AnyRef],
+    referrer: String
   )(using Messages): Future[TicketId] = {
     given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
@@ -141,7 +142,7 @@ trait DeskproSubmission {
       name = problemReport.name,
       email = problemReport.email,
       message = oneLoginProblemMessage(),
-      referrer = "n/a",
+      referrer = referrer,
       isJavascript = false,
       request = request,
       enrolmentsOption = None,
