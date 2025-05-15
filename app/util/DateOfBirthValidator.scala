@@ -19,18 +19,15 @@ package util
 import model.DateOfBirth
 
 import java.time.LocalDate
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 case class DateOfBirthValidator() {
 
-  private def asTryDate(dateOfBirth: DateOfBirth): Try[LocalDate] =
-    Try(LocalDate.of(dateOfBirth.year.toInt, dateOfBirth.month.toInt, dateOfBirth.day.toInt))
-
   def isValidDate(dateOfBirth: DateOfBirth): Boolean =
-    asTryDate(dateOfBirth).isSuccess
+    dateOfBirth.asLocalDate().isSuccess
 
   def isNotFutureDate(dateOfBirth: DateOfBirth): Boolean =
-    asTryDate(dateOfBirth) match {
+    dateOfBirth.asLocalDate() match {
       case Success(localDate) => localDate.isBefore(LocalDate.now())
       case Failure(_)         => false
     }
