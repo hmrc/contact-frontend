@@ -18,7 +18,6 @@ package model
 
 import Aliases.*
 
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import scala.util.{Failure, Success, Try}
