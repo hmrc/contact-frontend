@@ -141,8 +141,8 @@ notFound.heading=Page not found
 notFound.paragraph1=If you typed the web address, check it is correct.
 notFound.paragraph2=If you pasted the web address, check you copied the entire address.
 
-one_login_problem.title=Your complaint
-one_login_problem.heading=Your complaint
+one_login_problem.title=One Login for Government complaint – GOV.UK
+one_login_problem.heading=One Login for Government complaint
 one_login_problem.name.label=Full name
 one_login_problem.nino.label=National Insurance number
 one_login_problem.nino.hint=It''s on your National Insurance card, benefit letter, payslip or P60 - for example, ''QQ 12 34 56 C''
