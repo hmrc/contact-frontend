@@ -50,7 +50,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
       val document: Document = Jsoup.parse(contentAsString(result))
 
-      document.getElementById("error-feedback-form")            should not be null
+      document.getElementById("one-login-complaint-form")       should not be null
       document.getElementsByClass("govuk-error-summary").size() should be(0)
     }
   }
@@ -77,7 +77,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       document.getElementsByClass("govuk-error-summary").size() should be > 0
       document
         .body()
-        .select("form[id=error-feedback-form]")
+        .select("form[id=one-login-complaint-form]")
         .first
         .attr("action")                                       shouldBe s"/contact/test-only/report-one-login-complaint"
     }

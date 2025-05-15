@@ -47,7 +47,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(problemReportForm))
     }
     @h1(content = Text(messages("one_login_problem.heading")))
-    @formWithCSRF(action, Symbol("id") -> "error-feedback-form") {
+    @formWithCSRF(action, Symbol("id") -> "one-login-complaint-form") {
         @inputText(
             problemReportForm("name"),
             label = messages("one_login_problem.name.label"),
@@ -124,7 +124,7 @@
             labelClasses = "govuk-label--s",
             hint = Some(messages("one_login_problem.complaint.hint")),
             classes = "govuk-!-width-two-thirds",
-            maxLength = Some(1000)
+            maxLength = Some(2000)
         )
         @govukButton(Button(
             content = Text(messages("problem_report.button")),

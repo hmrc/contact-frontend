@@ -95,7 +95,7 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the correct form tag" in {
-      val forms = content.select("form[id=error-feedback-form]")
+      val forms = content.select("form[id=one-login-complaint-form]")
       forms                             should have size 1
       forms.first.attr("method")        should be("POST")
       forms.first.hasAttr("novalidate") should be(true)
@@ -104,7 +104,7 @@ class ReportOneLoginProblemPageSpec
     "include the correct form action attribute" in {
       val content = reportProblemPage(oneLoginProblemReportsForm, action)
 
-      val forms = content.select("form[id=error-feedback-form]")
+      val forms = content.select("form[id=one-login-complaint-form]")
       forms                      should have size 1
       forms.first.attr("action") should be("/contact/test-only/report-one-login-problem")
     }
