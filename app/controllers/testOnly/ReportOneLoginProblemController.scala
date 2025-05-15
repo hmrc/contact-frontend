@@ -70,9 +70,9 @@ object ReportOneLoginProblemFormBind {
           )
       ),
       "date-of-birth"      -> mapping(
-        "day"   -> text.verifying("add error msg", day => day.nonEmpty),
-        "month" -> text.verifying("add error msg", month => month.nonEmpty),
-        "year"  -> text.verifying("add error msg", year => year.nonEmpty)
+        "day"   -> text.verifying("one_login_problem.date-of-birth.error.day", day => day.nonEmpty),
+        "month" -> text.verifying("one_login_problem.date-of-birth.error.month", month => month.nonEmpty),
+        "year"  -> text.verifying("one_login_problem.date-of-birth.error.year", year => year.nonEmpty)
       )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d)))
         .verifying("one_login_problem.date-of-birth.error.invalid", dob => dateOfBirthValidator.isValidDate(dob))
         .verifying("one_login_problem.date-of-birth.error.future", dob => dateOfBirthValidator.isNotFutureDate(dob)),
