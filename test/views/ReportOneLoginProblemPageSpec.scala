@@ -18,7 +18,7 @@ package views
 
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
-import controllers.testOnly.ReportOneLoginProblemFormBind
+import controllers.ReportOneLoginProblemFormBind
 import model.{DateOfBirth, EmailPreference, LetterPreference, ReportOneLoginProblemForm}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
