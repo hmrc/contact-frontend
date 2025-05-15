@@ -150,8 +150,9 @@ class ReportOneLoginProblemController @Inject() (
             BadRequest(page(formWithError))
           ),
         problemReport =>
-          createOneLoginProblemTicket(problemReport, request).map { _ =>
-            Redirect(routes.ReportOneLoginProblemController.thanks())
+          createOneLoginProblemTicket(problemReport, request, routes.ReportOneLoginProblemController.index().url).map {
+            _ =>
+              Redirect(routes.ReportOneLoginProblemController.thanks())
           } recover { case _ =>
             InternalServerError(errorPage())
           }
