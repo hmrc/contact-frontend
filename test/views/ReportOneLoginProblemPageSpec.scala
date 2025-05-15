@@ -19,7 +19,7 @@ package views
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import controllers.testOnly.ReportOneLoginProblemFormBind
-import model.{DateOfBirth, ReportOneLoginProblemForm}
+import model.{DateOfBirth, EmailPreference, LetterPreference, ReportOneLoginProblemForm}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.Messages
@@ -52,7 +52,7 @@ class ReportOneLoginProblemPageSpec
     email = "test@example.com",
     phoneNumber = Some("020 7123 4567"),
     address = "1 Whitehall, London, SW1A",
-    contactPreference = "email",
+    contactPreference = EmailPreference,
     complaint = Some("Testing complaint"),
     csrfToken = ""
   )
@@ -567,7 +567,7 @@ class ReportOneLoginProblemPageSpec
     "include the submitted contact preference input value" in {
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
-          formValues.copy(contactPreference = "email")
+          formValues.copy(contactPreference = EmailPreference)
         ),
         action
       )

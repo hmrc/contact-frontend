@@ -163,6 +163,7 @@ one_login_problem.address.label=What is your address?
 one_login_problem.address.error=Enter your full address
 one_login_problem.contact-preference.label=How would you prefer to be contacted?
 one_login_problem.contact-preference.hint=Select one option
+one_login_problem.contact-preference.error=Contact preference must be one of: Email, Phone, Letter
 one_login_problem.radio.email.label=Email
 one_login_problem.radio.phone-call.label=Phone call
 one_login_problem.radio.letter-message.label=Letter

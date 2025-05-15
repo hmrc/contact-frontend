@@ -17,7 +17,8 @@
 package model
 
 import Aliases.*
-
+import play.api.data.format.Formatter
+import play.api.data.format.Formats._
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import scala.util.{Failure, Success, Try}
@@ -86,7 +87,7 @@ case class ReportOneLoginProblemForm(
   email: String,
   phoneNumber: Option[String],
   address: String,
-  contactPreference: String,
+  contactPreference: ContactPreference,
   complaint: Option[String],
   csrfToken: String
 )
@@ -102,6 +103,36 @@ case class DateOfBirth(day: String, month: String, year: String) {
       case Success(localDate) => localDate.format(dateFormatter)
       case Failure(exception) => "Error in date of birth"
     }
+}
+
+sealed trait ContactPreference {
+  def toString: String
+}
+
+case object EmailPreference extends ContactPreference {
+  override def toString: String = "Email"
+}
+
+case object PhonePreference extends ContactPreference {
+  override def toString: String = "Phone"
+}
+
+case object LetterPreference extends ContactPreference {
+  override def toString: String = "Letter"
+}
+
+implicit object ContactPreferenceFormatter extends Formatter[ContactPreference] {
+  override def bind(key: String, data: Map[String, String]) = parsing(
+    parse = _.toLowerCase() match {
+      case "phone"  => PhonePreference
+      case "letter" => LetterPreference
+      case _        => EmailPreference
+    },
+    errMsg = "one_login_problem.contact-preference.error",
+    Nil
+  )(key, data)
+
+  override def unbind(key: String, value: ContactPreference) = Map(key -> value.toString)
 }
 
 object DateOfBirth {
