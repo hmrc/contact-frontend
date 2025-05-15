@@ -91,7 +91,7 @@ object ReportOneLoginProblemFormBind {
           s"one_login_problem.address.error",
           address => address.nonEmpty
         ),
-      "contact-preference" -> optional(text),
+      "contact-preference" -> text,
       "complaint"          -> optional(text),
       "csrfToken"          -> text
     )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
@@ -107,7 +107,7 @@ object ReportOneLoginProblemFormBind {
         email = "",
         phoneNumber = None,
         address = "",
-        contactPreference = None,
+        contactPreference = "",
         complaint = None,
         csrfToken = csrfToken
       )

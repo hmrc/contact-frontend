@@ -123,29 +123,19 @@ trait DeskproSubmission {
   )(using Messages): Future[TicketId] = {
     given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    def oneLoginProblemMessage(): String =
-      s"""
-      ${Messages("NINO")}:
-      ${problemReport.nino}
+    def oneLoginProblemMessage(): String = {
+      val optionalNoneProvided: String = "None provided"
 
-      ${Messages("SA UTR")}:
-      ${problemReport.saUtr.getOrElse("n/a")}
-
-      ${Messages("Date of Birth")}:
-      ${problemReport.dateOfBirth}
-
-      ${Messages("Phone Number")}:
-      ${problemReport.phoneNumber.getOrElse("n/a")}
-
-      ${Messages("Address")}:
-      ${problemReport.address}
-
-      ${Messages("Contact Preference")}:
-      ${problemReport.contactPreference.getOrElse("n/a")}
-
-      ${Messages("Complaint")}:
-      ${problemReport.complaint.getOrElse("n/a")}
-      """
+      s"${Messages("one_login_problem.nino.label")}: ${problemReport.nino}\n\n" +
+        s"${Messages("one_login_problem.sa-utr.label")}: ${problemReport.saUtr.getOrElse(optionalNoneProvided)}\n\n" +
+        s"${Messages("one_login_problem.date-of-birth.label")}: ${problemReport.dateOfBirth.toString()}\n\n" +
+        s"${Messages("one_login_problem.phone-number.label")}: ${problemReport.phoneNumber.getOrElse(optionalNoneProvided)}\n\n" +
+        s"${Messages("one_login_problem.address.label")}:\n" +
+        s"${problemReport.address}\n\n" +
+        s"${Messages("one_login_problem.contact-preference.label")}: ${problemReport.contactPreference}\n\n" +
+        s"${Messages("one_login_problem.complaint.label")}\n" +
+        s"${problemReport.complaint.getOrElse(optionalNoneProvided)}"
+    }
 
     ticketQueueConnector.createDeskProTicket(
       name = problemReport.name,

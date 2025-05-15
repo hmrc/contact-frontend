@@ -52,7 +52,7 @@ class ReportOneLoginProblemPageSpec
     email = "test@example.com",
     phoneNumber = Some("020 7123 4567"),
     address = "1 Whitehall, London, SW1A",
-    contactPreference = Some("Email"),
+    contactPreference = "email",
     complaint = Some("Testing complaint"),
     csrfToken = ""
   )
@@ -567,7 +567,7 @@ class ReportOneLoginProblemPageSpec
     "include the submitted contact preference input value" in {
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
-          formValues.copy(contactPreference = Some("email"))
+          formValues.copy(contactPreference = "email")
         ),
         action
       )

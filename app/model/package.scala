@@ -78,6 +78,19 @@ case class SurveyForm(
   serviceId: Option[String]
 )
 
+case class ReportOneLoginProblemForm(
+  name: String,
+  nino: String,
+  saUtr: Option[String],
+  dateOfBirth: DateOfBirth,
+  email: String,
+  phoneNumber: Option[String],
+  address: String,
+  contactPreference: String,
+  complaint: Option[String],
+  csrfToken: String
+)
+
 case class DateOfBirth(day: String, month: String, year: String) {
   private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
@@ -94,16 +107,3 @@ case class DateOfBirth(day: String, month: String, year: String) {
 object DateOfBirth {
   val empty: DateOfBirth = DateOfBirth("", "", "")
 }
-
-case class ReportOneLoginProblemForm(
-  name: String,
-  nino: String,
-  saUtr: Option[String],
-  dateOfBirth: DateOfBirth,
-  email: String,
-  phoneNumber: Option[String],
-  address: String,
-  contactPreference: Option[String],
-  complaint: Option[String],
-  csrfToken: String
-)
