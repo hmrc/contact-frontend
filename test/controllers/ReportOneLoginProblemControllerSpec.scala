@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.testOnly
+package controllers
 
 import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.TicketId
+import controllers.testOnly.ReportOneLoginProblemController
 import helpers.ApplicationSupport
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
