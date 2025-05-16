@@ -164,7 +164,9 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     val confirmationPage  = app.injector.instanceOf[views.html.ReportOneLoginProblemConfirmationPage]
     val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
 
-    given cfconfig: AppConfig = new CFConfig(app.configuration)
+    given cfconfig: AppConfig = new CFConfig(app.configuration) {
+      override def enableOlfgComplaintsEndpoints: Boolean = true
+    }
     given ExecutionContext    = ExecutionContext.global
     given HeaderCarrier       = any[HeaderCarrier]
 

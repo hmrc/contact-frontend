@@ -22,7 +22,7 @@ import model.{ContactPreference, ContactPreferenceFormatter, DateOfBirth, EmailP
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request, Result}
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DateOfBirthValidator, DeskproEmailValidator, NameValidator, TaxIdentifierValidator}
@@ -121,7 +121,7 @@ class ReportOneLoginProblemController @Inject() (
   reportOneLoginProblemPage: ReportOneLoginProblemPage,
   oneLoginConfirmationPage: ReportOneLoginProblemConfirmationPage,
   errorPage: InternalErrorPage
-)(using AppConfig, ExecutionContext)
+)(using appConfig: AppConfig, ec: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport {
@@ -131,17 +131,17 @@ class ReportOneLoginProblemController @Inject() (
 
     val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
 
-    Ok(page(ReportOneLoginProblemFormBind.emptyForm(csrfToken)))
+    pageIfEnabled(Ok(page(ReportOneLoginProblemFormBind.emptyForm(csrfToken))))
   }
 
   def submit(): Action[AnyContent] =
     Action.async { request =>
       given MessagesRequest[AnyContent] = request
 
-      doSubmit()
+      pageIfEnabled(doSubmit())
     }
 
-  private def doSubmit()(using request: MessagesRequest[AnyContent]) =
+  private def doSubmit()(using request: MessagesRequest[AnyContent]): Future[Result] =
     ReportOneLoginProblemFormBind.form
       .bindFromRequest()
       .fold(
@@ -164,6 +164,14 @@ class ReportOneLoginProblemController @Inject() (
   def thanks(): Action[AnyContent] = Action { request =>
     given MessagesRequest[AnyContent] = request
 
-    Ok(oneLoginConfirmationPage())
+    pageIfEnabled(Ok(oneLoginConfirmationPage()))
   }
+
+  private def pageIfEnabled(resultIfEnabled: Result)(using Request[?]): Result =
+    if (appConfig.enableOlfgComplaintsEndpoints) resultIfEnabled
+    else NotFound(errorPage())
+
+  private def pageIfEnabled(resultIfEnabled: Future[Result])(using Request[?]): Future[Result] =
+    if (appConfig.enableOlfgComplaintsEndpoints) resultIfEnabled
+    else Future(NotFound(errorPage()))
 }
