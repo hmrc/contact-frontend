@@ -26,10 +26,7 @@ import play.api.i18n.Messages
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.CSRFTokenHelper.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
 import views.html.ReportOneLoginProblemPage
-
-import java.time.LocalDate
 
 class ReportOneLoginProblemPageSpec
     extends AnyWordSpec
@@ -340,14 +337,14 @@ class ReportOneLoginProblemPageSpec
 
 //    TODO: This is not triggering the error, why not?
 //    "include an error message for the incorrect date of birth input" in {
-//      val contentWithService = reportProblemPage(
+//      val contentWithError = reportProblemPage(
 //        oneLoginProblemReportsForm.fillAndValidate(
 //          formValues.copy(dateOfBirth = DateOfBirth("32", "13", "1000"))
 //        ),
 //        action
 //      )
 //
-//      val errors             = contentWithService.select("#date-of-birth-error")
+//      val errors = contentWithError.select("#date-of-birth-error")
 //      errors            should have size 1
 //      errors.first.text should include("Error: Date of birth must be a valid date")
 //    }
