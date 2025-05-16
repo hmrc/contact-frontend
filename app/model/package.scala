@@ -98,7 +98,7 @@ case class DateOfBirth(day: String, month: String, year: String) {
   def asLocalDate(): Try[LocalDate] =
     Try(LocalDate.of(year.toInt, month.toInt, day.toInt))
 
-  override def toString: String =
+  def asFormattedDate(): String =
     asLocalDate() match {
       case Success(localDate) => localDate.format(dateFormatter)
       case Failure(exception) => "Error in date of birth"

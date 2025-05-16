@@ -129,7 +129,7 @@ trait DeskproSubmission {
 
       s"${Messages("one_login_problem.nino.label")}: ${problemReport.nino}\n\n" +
         s"${Messages("one_login_problem.sa-utr.label")}: ${problemReport.saUtr.getOrElse(optionalNoneProvided)}\n\n" +
-        s"${Messages("one_login_problem.date-of-birth.label")}: ${problemReport.dateOfBirth.toString()}\n\n" +
+        s"${Messages("one_login_problem.date-of-birth.label")}: ${problemReport.dateOfBirth.asFormattedDate()}\n\n" +
         s"${Messages("one_login_problem.phone-number.label")}: ${problemReport.phoneNumber.getOrElse(optionalNoneProvided)}\n\n" +
         s"${Messages("one_login_problem.address.label")}:\n" +
         s"${problemReport.address}\n\n" +
