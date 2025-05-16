@@ -19,7 +19,6 @@ package controllers
 import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.TicketId
-import controllers.ReportOneLoginProblemController
 import helpers.ApplicationSupport
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
@@ -45,7 +44,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
   "Requesting the standalone page with endpoints disabled" should {
 
     "return Not Found and error HTML for index" in new TestScope {
-      val controller = setupController(false, Future.successful(TicketId(12345)))
+      val controller = setupController(enableEndpoints = false)
       val result     = controller.index()(FakeRequest())
 
       status(result) should be(NOT_FOUND)
@@ -58,7 +57,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Not Found and error HTML for thanks" in new TestScope {
-      val controller = setupController(false, Future.successful(TicketId(12345)))
+      val controller = setupController(enableEndpoints = false)
       val result     = controller.thanks()(FakeRequest())
 
       status(result) should be(NOT_FOUND)
@@ -71,7 +70,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Not Found and error HTML for submit" in new TestScope {
-      val controller = setupController(false, Future.successful(TicketId(12345)))
+      val controller = setupController(enableEndpoints = false)
       val result     = controller.submit()(generateRequest())
 
       status(result) should be(NOT_FOUND)
@@ -86,7 +85,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
   "Requesting the standalone page with endpoints enabled" should {
     "return OK and valid HTML" in new TestScope {
-      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val controller = setupController()
       val result     = controller.index()(FakeRequest())
       status(result) should be(OK)
 
@@ -99,7 +98,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
   "Reporting a problem via the standalone page with endpoints enabled" should {
     "redirect to a Thank You html page for a valid request" in new TestScope {
-      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val controller = setupController()
 
       val request = generateRequest()
       val result  = controller.submit()(request)
@@ -109,7 +108,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Bad Request and page with validation error for invalid input" in new TestScope {
-      val controller     = setupController(true, Future.successful(TicketId(12345)))
+      val controller     = setupController()
       val invalidRequest = FakeRequest("POST", "/").withFormUrlEncodedBody("some-key" -> "some-value")
       val result         = controller.submit()(invalidRequest)
 
@@ -126,7 +125,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Bad Request and page with validation error if the name has invalid characters" in new TestScope {
-      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val controller = setupController()
       val request    = generateRequest(
         name = """<a href="blah.com">something</a>"""
       )
@@ -141,7 +140,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Bad Request and page with validation error if the email has invalid syntax (for Deskpro)" in new TestScope {
-      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val controller = setupController()
       val request    = generateRequest(email = "a.a.a")
       val submit     = controller.submit()(request)
       val page       = Jsoup.parse(contentAsString(submit))
@@ -153,7 +152,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Bad Request and page with validation error if the NINO format is invalid" in new TestScope {
-      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val controller = setupController()
 
       val request = generateRequest(nino = "I don't know")
       val submit  = controller.submit()(request)
@@ -166,7 +165,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Bad Request and page with validation error if the SA UTR format is invalid" in new TestScope {
-      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val controller = setupController()
       val request    = generateRequest(saUtr = Some("Invalid number"))
       val submit     = controller.submit()(request)
       val page       = Jsoup.parse(contentAsString(submit))
@@ -178,7 +177,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Internal Server Error and error page if the Deskpro ticket creation fails" in new TestScope {
-      val controller = setupController(true, Future.failed(Exception("Expected connector exception")))
+      val controller = setupController(connectorResponse = Future.failed(Exception("Expected connector exception")))
 
       val result = controller.submit()(generateRequest())
       status(result) should be(INTERNAL_SERVER_ERROR)
@@ -190,7 +189,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
   "Requesting the standalone thanks page" should {
     "return OK and valid html" in new TestScope {
-      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val controller = setupController()
       val result     = controller.thanks()(FakeRequest())
 
       status(result) should be(OK)
@@ -206,8 +205,8 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
   class TestScope extends MockitoSugar {
 
     def setupController(
-      enableEndpoints: Boolean,
-      connectorResponse: Future[TicketId]
+      enableEndpoints: Boolean = true,
+      connectorResponse: Future[TicketId] = Future.successful(TicketId(12345))
     ): ReportOneLoginProblemController = {
       val reportProblemPage = app.injector.instanceOf[views.html.ReportOneLoginProblemPage]
       val confirmationPage  = app.injector.instanceOf[views.html.ReportOneLoginProblemConfirmationPage]
