@@ -17,6 +17,11 @@
 package model
 
 import Aliases.*
+import play.api.data.format.Formatter
+import play.api.data.format.Formats._
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import scala.util.{Failure, Success, Try}
 
 // Type aliases to suppress PR-commenter warnings around potential open redirects
 object Aliases {
@@ -73,3 +78,63 @@ case class SurveyForm(
   ticketId: Option[String],
   serviceId: Option[String]
 )
+
+case class ReportOneLoginProblemForm(
+  name: String,
+  nino: String,
+  saUtr: Option[String],
+  dateOfBirth: DateOfBirth,
+  email: String,
+  phoneNumber: Option[String],
+  address: String,
+  contactPreference: ContactPreference,
+  complaint: Option[String],
+  csrfToken: String
+)
+
+case class DateOfBirth(day: String, month: String, year: String) {
+  private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+
+  def asLocalDate(): Try[LocalDate] =
+    Try(LocalDate.of(year.toInt, month.toInt, day.toInt))
+
+  def asFormattedDate(): String =
+    asLocalDate() match {
+      case Success(localDate) => localDate.format(dateFormatter)
+      case Failure(exception) => "Error in date of birth"
+    }
+}
+
+sealed trait ContactPreference {
+  def toString: String
+}
+
+case object EmailPreference extends ContactPreference {
+  override def toString: String = "Email"
+}
+
+case object PhonePreference extends ContactPreference {
+  override def toString: String = "Phone"
+}
+
+case object LetterPreference extends ContactPreference {
+  override def toString: String = "Letter"
+}
+
+implicit object ContactPreferenceFormatter extends Formatter[ContactPreference] {
+  override def bind(key: String, data: Map[String, String]) = parsing(
+    parse = _.toLowerCase() match {
+      case "phone"  => PhonePreference
+      case "letter" => LetterPreference
+      case _        => EmailPreference
+    },
+    errMsg = "one_login_problem.contact-preference.error",
+    Nil
+  )(key, data)
+
+  override def unbind(key: String, value: ContactPreference) = Map(key -> value.toString)
+}
+
+object DateOfBirth {
+  val empty: DateOfBirth = DateOfBirth("", "", "")
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package helpers
+package util
 
-import config.AppConfig
+import uk.gov.hmrc.domain.Nino
 
-class TestAppConfig extends AppConfig {
-  def externalReportProblemUrl: String = ???
+case class TaxIdentifierValidator() {
+  private val saUtrRegex = """^(\d{10})$"""
 
-  def backUrlDestinationAllowList: Set[String] = ???
+  def validateNino(nino: String): Boolean = Nino.isValid(nino)
 
-  override def sendExplicitAuditEvents: Boolean = false
-
-  override def enableOlfgComplaintsEndpoints: Boolean = ???
+  def validateSaUtr(saUtr: String): Boolean = {
+    val trimmed = saUtr.replaceAll(" ", "")
+    trimmed.isEmpty || trimmed.matches(saUtrRegex)
+  }
 }

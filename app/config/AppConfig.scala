@@ -24,6 +24,7 @@ trait AppConfig {
   def externalReportProblemUrl: String
   def backUrlDestinationAllowList: Set[String]
   def sendExplicitAuditEvents: Boolean
+  def enableOlfgComplaintsEndpoints: Boolean
 
 }
 
@@ -52,5 +53,8 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
 
   override def sendExplicitAuditEvents: Boolean =
     configuration.getOptional[Boolean]("sendExplicitAuditEvents").getOrElse(false)
+
+  override def enableOlfgComplaintsEndpoints: Boolean =
+    configuration.getOptional[Boolean]("enableOlfgComplaintsEndpoints").getOrElse(false)
 
 }

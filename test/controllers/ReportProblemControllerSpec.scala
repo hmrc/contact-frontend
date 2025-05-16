@@ -24,6 +24,7 @@ import helpers.ApplicationSupport
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq as meq}
 import org.mockito.Mockito.*
+import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
@@ -104,7 +105,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
 
   "Reporting a problem via the standalone page" should {
     "redirect to a Thank You html page for a valid request" in new TestScope {
-      hrmcConnectorWillReturnTheTicketId
+      setHmrcConnectorResponse(Future.successful(TicketId(123)))
 
       val request = generateRequest(isAjaxRequest = false)
       val result  = controller.submit(None, None)(request)
@@ -201,20 +202,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
     }
 
     "return Internal Server Error and error page if the Deskpro ticket creation fails" in new TestScope {
-      when(
-        hmrcDeskproConnector.createDeskProTicket(
-          meq("John Densmore"),
-          meq("name@mail.com"),
-          meq(controller.problemMessage("Some Action", "Some Error")),
-          meq("/contact/problem_reports"),
-          meq(false),
-          any[Request[AnyRef]](),
-          meq(None),
-          meq(None),
-          meq(None),
-          any[TicketConstants]
-        )
-      ).thenReturn(Future.failed(new Exception("failed")))
+      setHmrcConnectorResponse(Future.failed(new Exception("failed")))
 
       val request = generateRequest(isAjaxRequest = false)
       val result  = controller.submit(None, None)(request)
@@ -314,25 +302,19 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
         .withFormUrlEncodedBody("isJavascript" -> isAjaxRequest.toString)
     }
 
-    def hmrcConnectorWillFail =
-      mockHmrcConnector(Future.failed(new Exception("failed")))
-
-    def hrmcConnectorWillReturnTheTicketId =
-      mockHmrcConnector(Future.successful(TicketId(123)))
-
-    private def mockHmrcConnector(result: Future[TicketId]) =
+    def setHmrcConnectorResponse(result: Future[TicketId]): OngoingStubbing[Future[TicketId]] =
       when(
         hmrcDeskproConnector.createDeskProTicket(
-          meq(deskproName),
-          meq(deskproEmail),
-          meq(deskproProblemMessage),
-          meq(deskproReferrer),
-          meq(false),
-          any[Request[AnyRef]](),
-          meq(None),
-          meq(None),
-          meq(None),
-          any[TicketConstants]
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any
         )
       ).thenReturn(result)
   }

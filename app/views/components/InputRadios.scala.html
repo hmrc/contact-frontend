@@ -21,18 +21,29 @@
 @(
     field: Field,
     legend: String,
-    items: Seq[(String, String)]
+    items: Seq[(String, String)],
+    hintText: Option[String] = None,
+    legendClasses: String = "",
+    checked: Option[String] = None
 )(implicit messages: Messages)
 @govukRadios(Radios(
   fieldset = Some(Fieldset(
     legend = Some(Legend(
-      content = Text(legend)
-    ))
+      content = Text(legend),
+      classes = legendClasses
+    )),
   )),
+  hint = hintText.map { hint =>
+    Hint(
+      content = Text(hint)
+    )
+  },
+  value = checked,
   items = items map { case (value: String, label: String) =>
     RadioItem(
       content = Text(label),
       value = Some(value)
     )
-  }).withFormField(field)
+  }
+).withFormField(field)
 )

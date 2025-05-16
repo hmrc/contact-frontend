@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package helpers
+package util
 
-import config.AppConfig
+import model.DateOfBirth
 
-class TestAppConfig extends AppConfig {
-  def externalReportProblemUrl: String = ???
+import java.time.LocalDate
+import scala.util.{Failure, Success}
 
-  def backUrlDestinationAllowList: Set[String] = ???
+case class DateOfBirthValidator() {
 
-  override def sendExplicitAuditEvents: Boolean = false
+  def isValidDate(dateOfBirth: DateOfBirth): Boolean =
+    dateOfBirth.asLocalDate().isSuccess
 
-  override def enableOlfgComplaintsEndpoints: Boolean = ???
+  def isNotFutureDate(dateOfBirth: DateOfBirth): Boolean =
+    dateOfBirth.asLocalDate() match {
+      case Success(localDate) => localDate.isBefore(LocalDate.now())
+      case Failure(_)         => false
+    }
 }
