@@ -214,6 +214,6 @@ case object AccessibilityProblemTicketConstants extends TicketConstants {
 }
 
 case object ReportOneLoginProblemTicketConstants extends TicketConstants {
-  val auditType: String = "ReportOneLoginProblemFormSubmission"
-  val subject: String   = "One Login for Government Problem Report Submission"
+  val auditType: String = "ReportOneLoginComplaintFormSubmission"
+  val subject: String   = "One Login for Government Complaint"
 }
