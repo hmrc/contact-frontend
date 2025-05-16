@@ -21,10 +21,9 @@ import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.TicketId
 import helpers.ApplicationSupport
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.{Document, Element}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
-import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
@@ -42,10 +41,52 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
   given Messages =
     app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
-  "Requesting the standalone page" should {
-    "return OK and valid HTML" in new TestScope {
-      val result = controller.index()(FakeRequest())
+  "Requesting the standalone page with endpoints disabled" should {
 
+    "return Not Found and error HTML for index" in new TestScope {
+      val controller = setupController(false, Future.successful(TicketId(12345)))
+      val result     = controller.index()(FakeRequest())
+
+      status(result) should be(NOT_FOUND)
+
+      val document: Document = Jsoup.parse(contentAsString(result))
+      val header: Element    = document.getElementsByClass("govuk-heading-xl").first
+
+      header          should not be null
+      header.text() shouldBe "Sorry, there is a problem with the service"
+    }
+
+    "return Not Found and error HTML for thanks" in new TestScope {
+      val controller = setupController(false, Future.successful(TicketId(12345)))
+      val result     = controller.thanks()(FakeRequest())
+
+      status(result) should be(NOT_FOUND)
+
+      val document: Document = Jsoup.parse(contentAsString(result))
+      val header: Element    = document.getElementsByClass("govuk-heading-xl").first
+
+      header          should not be null
+      header.text() shouldBe "Sorry, there is a problem with the service"
+    }
+
+    "return Not Found and error HTML for submit" in new TestScope {
+      val controller = setupController(false, Future.successful(TicketId(12345)))
+      val result     = controller.submit()(generateRequest())
+
+      status(result) should be(NOT_FOUND)
+
+      val document: Document = Jsoup.parse(contentAsString(result))
+      val header: Element    = document.getElementsByClass("govuk-heading-xl").first
+
+      header          should not be null
+      header.text() shouldBe "Sorry, there is a problem with the service"
+    }
+  }
+
+  "Requesting the standalone page with endpoints enabled" should {
+    "return OK and valid HTML" in new TestScope {
+      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val result     = controller.index()(FakeRequest())
       status(result) should be(OK)
 
       val document: Document = Jsoup.parse(contentAsString(result))
@@ -55,9 +96,9 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
   }
 
-  "Reporting a problem via the standalone page" should {
+  "Reporting a problem via the standalone page with endpoints enabled" should {
     "redirect to a Thank You html page for a valid request" in new TestScope {
-      setHmrcConnectorResponse(Future.successful(TicketId(123)))
+      val controller = setupController(true, Future.successful(TicketId(12345)))
 
       val request = generateRequest()
       val result  = controller.submit()(request)
@@ -67,11 +108,12 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Bad Request and page with validation error for invalid input" in new TestScope {
+      val controller     = setupController(true, Future.successful(TicketId(12345)))
       val invalidRequest = FakeRequest("POST", "/").withFormUrlEncodedBody("some-key" -> "some-value")
       val result         = controller.submit()(invalidRequest)
 
       status(result) should be(BAD_REQUEST)
-      verifyNoInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(controller.ticketQueueConnector)
 
       val document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("govuk-error-summary").size() should be > 0
@@ -83,7 +125,8 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     }
 
     "return Bad Request and page with validation error if the name has invalid characters" in new TestScope {
-      val request = generateRequest(
+      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val request    = generateRequest(
         name = """<a href="blah.com">something</a>"""
       )
 
@@ -91,50 +134,50 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       val page   = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
-      verifyNoInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(controller.ticketQueueConnector)
 
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
     "return Bad Request and page with validation error if the email has invalid syntax (for Deskpro)" in new TestScope {
-      val request = generateRequest(email = "a.a.a")
-      val submit  = controller.submit()(request)
-      val page    = Jsoup.parse(contentAsString(submit))
+      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val request    = generateRequest(email = "a.a.a")
+      val submit     = controller.submit()(request)
+      val page       = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
-      verifyNoInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(controller.ticketQueueConnector)
 
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
     "return Bad Request and page with validation error if the NINO format is invalid" in new TestScope {
-      setHmrcConnectorResponse(Future.successful(TicketId(123)))
+      val controller = setupController(true, Future.successful(TicketId(12345)))
 
       val request = generateRequest(nino = "I don't know")
       val submit  = controller.submit()(request)
       val page    = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
-      verifyNoInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(controller.ticketQueueConnector)
 
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
     "return Bad Request and page with validation error if the SA UTR format is invalid" in new TestScope {
-      setHmrcConnectorResponse(Future.successful(TicketId(123)))
-
-      val request = generateRequest(saUtr = Some("Invalid number"))
-      val submit  = controller.submit()(request)
-      val page    = Jsoup.parse(contentAsString(submit))
+      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val request    = generateRequest(saUtr = Some("Invalid number"))
+      val submit     = controller.submit()(request)
+      val page       = Jsoup.parse(contentAsString(submit))
 
       status(submit) shouldBe BAD_REQUEST
-      verifyNoInteractions(hmrcDeskproConnector)
+      verifyNoInteractions(controller.ticketQueueConnector)
 
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
     "return Internal Server Error and error page if the Deskpro ticket creation fails" in new TestScope {
-      setHmrcConnectorResponse(Future.failed(new Exception("failed")))
+      val controller = setupController(true, Future.failed(Exception("Expected connector exception")))
 
       val result = controller.submit()(generateRequest())
       status(result) should be(INTERNAL_SERVER_ERROR)
@@ -146,7 +189,8 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
   "Requesting the standalone thanks page" should {
     "return OK and valid html" in new TestScope {
-      val result = controller.thanks()(FakeRequest())
+      val controller = setupController(true, Future.successful(TicketId(12345)))
+      val result     = controller.thanks()(FakeRequest())
 
       status(result) should be(OK)
 
@@ -160,33 +204,51 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
   class TestScope extends MockitoSugar {
 
-    val reportProblemPage = app.injector.instanceOf[views.html.ReportOneLoginProblemPage]
-    val confirmationPage  = app.injector.instanceOf[views.html.ReportOneLoginProblemConfirmationPage]
-    val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
+    def setupController(
+      enableEndpoints: Boolean,
+      connectorResponse: Future[TicketId]
+    ): ReportOneLoginProblemController = {
+      val reportProblemPage = app.injector.instanceOf[views.html.ReportOneLoginProblemPage]
+      val confirmationPage  = app.injector.instanceOf[views.html.ReportOneLoginProblemConfirmationPage]
+      val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
 
-    given cfconfig: AppConfig = new CFConfig(app.configuration) {
-      override def enableOlfgComplaintsEndpoints: Boolean = true
+      given ExecutionContext = ExecutionContext.global
+      given HeaderCarrier    = any[HeaderCarrier]
+
+      given cfconfig: AppConfig = new CFConfig(app.configuration) {
+        override def enableOlfgComplaintsEndpoints: Boolean = enableEndpoints
+      }
+
+      val mockConnector = mock[DeskproTicketQueueConnector]
+      when(
+        mockConnector.createDeskProTicket(
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any,
+          any
+        )
+      ).thenReturn(connectorResponse)
+
+      new ReportOneLoginProblemController(
+        mockConnector,
+        Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
+        reportProblemPage,
+        confirmationPage,
+        errorPage
+      )
     }
-    given ExecutionContext    = ExecutionContext.global
-    given HeaderCarrier       = any[HeaderCarrier]
 
-    val controller = new ReportOneLoginProblemController(
-      mock[DeskproTicketQueueConnector],
-      Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
-      reportProblemPage,
-      confirmationPage,
-      errorPage
-    )
-
-    val deskproName: String           = "Gary Grapefruit"
-    val deskproEmail: String          = "grapefruit@test.com"
-    val deskproSubject: String        = "Support Request"
-    val deskproNino: String           = "AA112233B"
-    given Messages                    = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
-    val deskproProblemMessage: String =
-      controller.problemMessage("Some Action", "Some Error")
-
-    val hmrcDeskproConnector = controller.ticketQueueConnector
+    val deskproName: String    = "Gary Grapefruit"
+    val deskproEmail: String   = "grapefruit@test.com"
+    val deskproSubject: String = "Support Request"
+    val deskproNino: String    = "AA112233B"
+    given Messages             = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 
     def generateRequest(
       name: String = deskproName,
@@ -209,23 +271,5 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
           "complaint"           -> "This is a complaint",
           "csrfToken"           -> "token"
         )
-
-    def setHmrcConnectorResponse(result: Future[TicketId]): OngoingStubbing[Future[TicketId]] =
-      when(
-        hmrcDeskproConnector.createDeskProTicket(
-          any,
-          any,
-          any,
-          any,
-          any,
-          any,
-          any,
-          any,
-          any,
-          any
-        )
-      ).thenReturn(result)
-
   }
-
 }
