@@ -35,3 +35,7 @@ GET         /accessibility/thanks                        @controllers.Accessibil
 GET         /accessibility-unauthenticated               @controllers.AccessibilityController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl])
 POST        /accessibility-unauthenticated               @controllers.AccessibilityController.submit(service: Option[String], userAction: Option[String])
 GET         /accessibility-unauthenticated/thanks        @controllers.AccessibilityController.thanks()
+
+GET         /report-one-login-complaint                  @controllers.ReportOneLoginProblemController.index()
+POST        /report-one-login-complaint                  @controllers.ReportOneLoginProblemController.submit()
+GET         /report-one-login-complaint/thanks           @controllers.ReportOneLoginProblemController.thanks()

@@ -19,7 +19,7 @@ package controllers
 import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.TicketId
-import controllers.testOnly.ReportOneLoginProblemController
+import controllers.ReportOneLoginProblemController
 import helpers.ApplicationSupport
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
@@ -105,7 +105,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       val result  = controller.submit()(request)
 
       status(result)             should be(SEE_OTHER)
-      redirectLocation(result) shouldBe Some("/contact/test-only/report-one-login-complaint/thanks")
+      redirectLocation(result) shouldBe Some("/contact/report-one-login-complaint/thanks")
     }
 
     "return Bad Request and page with validation error for invalid input" in new TestScope {
@@ -122,7 +122,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
         .body()
         .select("form[id=one-login-complaint-form]")
         .first
-        .attr("action")                                       shouldBe s"/contact/test-only/report-one-login-complaint"
+        .attr("action")                                       shouldBe s"/contact/report-one-login-complaint"
     }
 
     "return Bad Request and page with validation error if the name has invalid characters" in new TestScope {
