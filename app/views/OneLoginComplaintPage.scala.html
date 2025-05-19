@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF as PlayFrontendFormWithCSRF
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.*
-@import model.ReportOneLoginProblemForm
+@import model.OneLoginComplaintForm
 @import views.html.components.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
 
 @this(
@@ -35,7 +35,7 @@
         h2: Heading2,
         p: Paragraph
 )
-@(problemReportForm: Form[ReportOneLoginProblemForm])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(problemReportForm: Form[OneLoginComplaintForm])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @pageTitle = @{
     if(problemReportForm.hasErrors){messages("error.browser.title.prefix") + " " + messages("one_login_problem.title")}
@@ -48,7 +48,7 @@
     }
     @h1(content = Text(messages("one_login_problem.heading")))
     @p(content = Text(messages("one_login_problem.paragraph")))
-    @formWithCSRF(routes.ReportOneLoginProblemController.submit(), Symbol("id") -> "one-login-complaint-form") {
+    @formWithCSRF(routes.OneLoginComplaintController.submit(), Symbol("id") -> "one-login-complaint-form") {
         @inputText(
             problemReportForm("name"),
             label = messages("one_login_problem.name.label"),

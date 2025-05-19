@@ -23,7 +23,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
-import views.html.ReportOneLoginProblemConfirmationPage
+import views.html.OneLoginComplaintConfirmationPage
 
 class ReportOneLoginProblemConfirmationPageSpec
     extends AnyWordSpec
@@ -36,8 +36,8 @@ class ReportOneLoginProblemConfirmationPageSpec
   given Messages                   = getMessages()
   given AppConfig                  = app.injector.instanceOf[AppConfig]
 
-  "the Problem Reports standalone confirmation page" should {
-    val confirmationPage = app.injector.instanceOf[ReportOneLoginProblemConfirmationPage]
+  "the One Login complaint standalone confirmation page" should {
+    val confirmationPage = app.injector.instanceOf[OneLoginComplaintConfirmationPage]
     val content          = confirmationPage()
 
     "include the H1 element with page title" in {

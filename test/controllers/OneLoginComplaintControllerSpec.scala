@@ -36,7 +36,7 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSupport with Matchers {
+class OneLoginComplaintControllerSpec extends AnyWordSpec with ApplicationSupport with Matchers {
 
   given Messages =
     app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
@@ -207,7 +207,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
     def setupController(
       enableEndpoints: Boolean = true,
       connectorResponse: Future[TicketId] = Future.successful(TicketId(12345))
-    ): ReportOneLoginProblemController = {
+    ): OneLoginComplaintController = {
       val reportProblemPage = app.injector.instanceOf[views.html.ReportOneLoginProblemPage]
       val confirmationPage  = app.injector.instanceOf[views.html.ReportOneLoginProblemConfirmationPage]
       val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
@@ -236,7 +236,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
         )
       ).thenReturn(connectorResponse)
 
-      new ReportOneLoginProblemController(
+      new OneLoginComplaintController(
         mockConnector,
         Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
         reportProblemPage,

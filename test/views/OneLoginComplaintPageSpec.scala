@@ -18,15 +18,15 @@ package views
 
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
-import controllers.ReportOneLoginProblemFormBind
-import model.{DateOfBirth, EmailPreference, ReportOneLoginProblemForm}
+import controllers.OneLoginComplaintFormBind
+import model.{DateOfBirth, EmailPreference, OneLoginComplaintForm}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.api.test.CSRFTokenHelper.*
 import play.api.test.FakeRequest
-import views.html.ReportOneLoginProblemPage
+import views.html.OneLoginComplaintPage
 
 import java.time.LocalDate
 import scala.util.Random
@@ -42,9 +42,9 @@ class ReportOneLoginProblemPageSpec
   given Messages                   = getMessages()
   given AppConfig                  = app.injector.instanceOf[AppConfig]
 
-  val oneLoginProblemReportsForm = ReportOneLoginProblemFormBind.form
+  val oneLoginComplaintForm = OneLoginComplaintFormBind.form
 
-  val formValues: ReportOneLoginProblemForm = ReportOneLoginProblemForm(
+  val formValues: OneLoginComplaintForm = OneLoginComplaintForm(
     name = "Test Person",
     nino = "AA123456D",
     saUtr = Some("1234567890"),
@@ -56,9 +56,9 @@ class ReportOneLoginProblemPageSpec
     complaint = Some("Testing complaint")
   )
 
-  "the OlfG Problem Reports standalone page" should {
-    val reportProblemPage = app.injector.instanceOf[ReportOneLoginProblemPage]
-    val content           = reportProblemPage(oneLoginProblemReportsForm)
+  "the OlfG Complaint standalone page" should {
+    val oneLoginComplaintPage = app.injector.instanceOf[OneLoginComplaintPage]
+    val content           = oneLoginComplaintPage(oneLoginComplaintForm)
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")
@@ -69,7 +69,7 @@ class ReportOneLoginProblemPageSpec
 
     "translate the hmrc banner into Welsh if requested" in {
       given Messages   = getWelshMessages()
-      val welshContent = reportProblemPage(oneLoginProblemReportsForm)
+      val welshContent = oneLoginComplaintPage(oneLoginComplaintForm)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -106,7 +106,7 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the correct form action attribute" in {
-      val content = reportProblemPage(oneLoginProblemReportsForm)
+      val content = oneLoginComplaintPage(oneLoginComplaintForm)
 
       val forms = content.select("form[id=one-login-complaint-form]")
       forms                      should have size 1
@@ -125,8 +125,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error summary if errors occur" in {
-      val contentWithErrors = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithErrors = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(name = "", email = "", complaint = None)
         )
       )
@@ -136,8 +136,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include Error: in the title if errors occur" in {
-      val contentWithErrors = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithErrors = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(name = "", email = "", complaint = None)
         )
       )
@@ -166,8 +166,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the name input" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(name = "")
         )
       )
@@ -177,8 +177,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the submitted name input value" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fill(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fill(
           formValues.copy(name = "AN Other")
         )
       )
@@ -215,8 +215,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the empty nino input" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(nino = "")
         )
       )
@@ -226,8 +226,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the incorrect nino input" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(nino = "incorrect nino")
         )
       )
@@ -237,8 +237,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the submitted nino input value" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fill(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fill(
           formValues.copy(nino = "AN Other")
         )
       )
@@ -275,8 +275,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the incorrect sa-utr input" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(saUtr = Some("this is a very long sa utr, far too long"))
         )
       )
@@ -288,8 +288,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the submitted sa-utr input value" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fill(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fill(
           formValues.copy(saUtr = Some("AN Other"))
         )
       )
@@ -322,8 +322,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the empty date of birth input" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(dateOfBirth = DateOfBirth("", "", ""))
         )
       )
@@ -333,11 +333,11 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the incorrect date of birth input" in {
-      val incorrectForm    = oneLoginProblemReportsForm.fillAndValidate(
+      val incorrectForm    = oneLoginComplaintForm.fillAndValidate(
         formValues.copy(dateOfBirth = DateOfBirth("32", "13", "1000"))
       )
-      val contentWithError = reportProblemPage(
-        oneLoginProblemReportsForm.bind(
+      val contentWithError = oneLoginComplaintPage(
+        oneLoginComplaintForm.bind(
           incorrectForm.data
         )
       )
@@ -348,11 +348,11 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the future date of birth input" in {
-      val incorrectForm    = oneLoginProblemReportsForm.fillAndValidate(
+      val incorrectForm    = oneLoginComplaintForm.fillAndValidate(
         formValues.copy(dateOfBirth = DateOfBirth("12", "12", "3000"))
       )
-      val contentWithError = reportProblemPage(
-        oneLoginProblemReportsForm.bind(
+      val contentWithError = oneLoginComplaintPage(
+        oneLoginComplaintForm.bind(
           incorrectForm.data
         )
       )
@@ -363,8 +363,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the submitted date of birth input value" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fill(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fill(
           formValues.copy(dateOfBirth = DateOfBirth("10", "11", "1990"))
         )
       )
@@ -407,8 +407,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the email input if a validation error exists" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(email = "")
         )
       )
@@ -418,8 +418,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the submitted email input value" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fill(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fill(
           formValues.copy(email = "bloggs@example.com")
         )
       )
@@ -450,8 +450,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the submitted phone number input value" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fill(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fill(
           formValues.copy(phoneNumber = Some("01234123123"))
         )
       )
@@ -462,8 +462,8 @@ class ReportOneLoginProblemPageSpec
 
     "include error for phone number which is too long" in {
       val tooLongPhoneNumber = Random.nextString(51)
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(phoneNumber = Some(tooLongPhoneNumber))
         )
       )
@@ -488,8 +488,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the empty address input" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(address = "")
         )
       )
@@ -499,8 +499,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the submitted address input value" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fill(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fill(
           formValues.copy(address = "address")
         )
       )
@@ -540,7 +540,7 @@ class ReportOneLoginProblemPageSpec
     }
 
 //    "include error for incorrect contact preference" in {
-//      val contentWithService = reportProblemPage(
+//      val contentWithService = oneLoginComplaintPage(
 //        oneLoginProblemReportsForm.fill(
 //          formValues.copy(contactPreference = Some("incorrect"))
 //        ),
@@ -557,8 +557,8 @@ class ReportOneLoginProblemPageSpec
 //    }
 
     "include the submitted contact preference input value" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fill(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fill(
           formValues.copy(contactPreference = EmailPreference)
         )
       )
@@ -591,8 +591,8 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the submitted complaint input value" in {
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fill(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fill(
           formValues.copy(complaint = Some("complaint text"))
         )
       )
@@ -603,8 +603,8 @@ class ReportOneLoginProblemPageSpec
 
     "include error for complaint which is too long" in {
       val tooLongComplaint   = Random.nextString(1001)
-      val contentWithService = reportProblemPage(
-        oneLoginProblemReportsForm.fillAndValidate(
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
           formValues.copy(complaint = Some(tooLongComplaint))
         )
       )
