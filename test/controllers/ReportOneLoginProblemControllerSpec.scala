@@ -53,7 +53,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       val header: Element    = document.getElementsByClass("govuk-heading-xl").first
 
       header          should not be null
-      header.text() shouldBe "Sorry, there is a problem with the service"
+      header.text() shouldBe "This page can’t be found"
     }
 
     "return Not Found and error HTML for thanks" in new TestScope {
@@ -66,7 +66,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       val header: Element    = document.getElementsByClass("govuk-heading-xl").first
 
       header          should not be null
-      header.text() shouldBe "Sorry, there is a problem with the service"
+      header.text() shouldBe "This page can’t be found"
     }
 
     "return Not Found and error HTML for submit" in new TestScope {
@@ -79,7 +79,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       val header: Element    = document.getElementsByClass("govuk-heading-xl").first
 
       header          should not be null
-      header.text() shouldBe "Sorry, there is a problem with the service"
+      header.text() shouldBe "This page can’t be found"
     }
   }
 
@@ -211,6 +211,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
       val reportProblemPage = app.injector.instanceOf[views.html.ReportOneLoginProblemPage]
       val confirmationPage  = app.injector.instanceOf[views.html.ReportOneLoginProblemConfirmationPage]
       val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
+      val errorHandler      = app.injector.instanceOf[ContactFrontendErrorHandler]
 
       given ExecutionContext = ExecutionContext.global
       given HeaderCarrier    = any[HeaderCarrier]
@@ -240,7 +241,8 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
         Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
         reportProblemPage,
         confirmationPage,
-        errorPage
+        errorPage,
+        errorHandler
       )
     }
 

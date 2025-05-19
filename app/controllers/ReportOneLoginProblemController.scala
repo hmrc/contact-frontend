@@ -16,9 +16,9 @@
 
 package controllers
 
-import config.AppConfig
+import config.{AppConfig, ContactFrontendErrorHandler}
 import connectors.deskpro.DeskproTicketQueueConnector
-import model.{ContactPreference, ContactPreferenceFormatter, DateOfBirth, EmailPreference, ReportOneLoginProblemForm}
+import model.{ContactPreference, ContactPreferenceFormatter, DateOfBirth, ReportOneLoginProblemForm}
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.I18nSupport
@@ -109,24 +109,28 @@ class ReportOneLoginProblemController @Inject() (
   mcc: MessagesControllerComponents,
   reportOneLoginProblemPage: ReportOneLoginProblemPage,
   oneLoginConfirmationPage: ReportOneLoginProblemConfirmationPage,
-  errorPage: InternalErrorPage
+  errorPage: InternalErrorPage,
+  errorHandler: ContactFrontendErrorHandler
 )(using appConfig: AppConfig, ec: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport {
 
-  def index(): Action[AnyContent] = Action { request =>
-    given Request[AnyContent] = request
+  def index(): Action[AnyContent] = checkIfEnabled {
+    Action { request =>
+      given Request[AnyContent] = request
 
-    pageIfEnabled(Ok(page(ReportOneLoginProblemFormBind.form)))
+      Ok(page(ReportOneLoginProblemFormBind.form))
+    }
   }
 
-  def submit(): Action[AnyContent] =
+  def submit(): Action[AnyContent] = checkIfEnabled {
     Action.async { request =>
       given MessagesRequest[AnyContent] = request
 
-      pageIfEnabled(doSubmit())
+      doSubmit()
     }
+  }
 
   private def doSubmit()(using request: MessagesRequest[AnyContent]): Future[Result] =
     ReportOneLoginProblemFormBind.form
@@ -148,17 +152,17 @@ class ReportOneLoginProblemController @Inject() (
   private def page(form: Form[ReportOneLoginProblemForm])(using Request[?]) =
     reportOneLoginProblemPage(form, routes.ReportOneLoginProblemController.submit())
 
-  def thanks(): Action[AnyContent] = Action { request =>
-    given MessagesRequest[AnyContent] = request
+  def thanks(): Action[AnyContent] = checkIfEnabled {
+    Action { request =>
+      given MessagesRequest[AnyContent] = request
 
-    pageIfEnabled(Ok(oneLoginConfirmationPage()))
+      Ok(oneLoginConfirmationPage())
+    }
   }
 
-  private def pageIfEnabled(resultIfEnabled: Result)(using Request[?]): Result =
-    if (appConfig.enableOlfgComplaintsEndpoints) resultIfEnabled
-    else NotFound(errorPage())
-
-  private def pageIfEnabled(resultIfEnabled: Future[Result])(using Request[?]): Future[Result] =
-    if (appConfig.enableOlfgComplaintsEndpoints) resultIfEnabled
-    else Future(NotFound(errorPage()))
+  private def checkIfEnabled[A](action: Action[A]): Action[A] =
+    Action.async(action.parser) { request =>
+      if appConfig.enableOlfgComplaintsEndpoints then action(request)
+      else errorHandler.notFoundTemplate(request).map(NotFound(_))
+    }
 }
