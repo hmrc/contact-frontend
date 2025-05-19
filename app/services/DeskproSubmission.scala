@@ -121,20 +121,20 @@ trait DeskproSubmission {
     problemReport: ReportOneLoginProblemForm,
     request: Request[AnyRef],
     referrer: String
-  )(using Messages): Future[TicketId] = {
+  )(using messages: Messages): Future[TicketId] = {
     given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     def oneLoginProblemMessage(): String = {
       val optionalNoneProvided: String = "None provided"
 
-      s"${Messages("one_login_problem.nino.label")}: ${problemReport.nino}\n\n" +
-        s"${Messages("one_login_problem.sa-utr.label")}: ${problemReport.saUtr.getOrElse(optionalNoneProvided)}\n\n" +
-        s"${Messages("one_login_problem.date-of-birth.label")}: ${problemReport.dateOfBirth.asFormattedDate()}\n\n" +
-        s"${Messages("one_login_problem.phone-number.label")}: ${problemReport.phoneNumber.getOrElse(optionalNoneProvided)}\n\n" +
-        s"${Messages("one_login_problem.address.label")}:\n" +
+      s"${messages("one_login_problem.nino.label")}: ${problemReport.nino}\n\n" +
+        s"${messages("one_login_problem.sa-utr.label")}: ${problemReport.saUtr.getOrElse(optionalNoneProvided)}\n\n" +
+        s"${messages("one_login_problem.date-of-birth.label")}: ${problemReport.dateOfBirth.asFormattedDate()}\n\n" +
+        s"${messages("one_login_problem.phone-number.label")}: ${problemReport.phoneNumber.getOrElse(optionalNoneProvided)}\n\n" +
+        s"${messages("one_login_problem.address.label")}:\n" +
         s"${problemReport.address}\n\n" +
-        s"${Messages("one_login_problem.contact-preference.label")}: ${problemReport.contactPreference}\n\n" +
-        s"${Messages("one_login_problem.complaint.label")}\n" +
+        s"${messages("one_login_problem.contact-preference.label")}: ${problemReport.contactPreference}\n\n" +
+        s"${messages("one_login_problem.complaint.label")}\n" +
         s"${problemReport.complaint.getOrElse(optionalNoneProvided)}"
     }
 

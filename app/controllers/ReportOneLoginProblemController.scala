@@ -87,14 +87,18 @@ object ReportOneLoginProblemFormBind {
           s"problem_report.email.error.valid",
           email => emailValidator.validate(email) || email.isEmpty
         ),
-      "phone-number"       -> optional(text),
+      "phone-number"       -> optional(
+        text.verifying("one_login_problem.phone-number.error", phoneNumber => phoneNumber.length <= 50)
+      ),
       "address"            -> text
         .verifying(
           s"one_login_problem.address.error",
           address => address.nonEmpty
         ),
       "contact-preference" -> of[ContactPreference],
-      "complaint"          -> optional(text)
+      "complaint"          -> optional(
+        text.verifying("one_login_problem.complaint.error", complaint => complaint.length <= 1000)
+      )
     )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
