@@ -19,15 +19,16 @@ package views
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import controllers.ReportOneLoginProblemFormBind
-import model.{DateOfBirth, EmailPreference, LetterPreference, ReportOneLoginProblemForm}
+import model.{DateOfBirth, EmailPreference, ReportOneLoginProblemForm}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.Messages
-import play.api.mvc.{Call, RequestHeader}
+import play.api.mvc.RequestHeader
 import play.api.test.CSRFTokenHelper.*
 import play.api.test.FakeRequest
 import views.html.ReportOneLoginProblemPage
 
+import java.time.LocalDate
 import scala.util.Random
 
 class ReportOneLoginProblemPageSpec
@@ -324,41 +325,42 @@ class ReportOneLoginProblemPageSpec
       errors.first.text should include("Error: Date of birth must include a day")
     }
 
-//    TODO: This is not triggering the error, why not?
-//    "include an error message for the incorrect date of birth input" in {
-//      val contentWithError = reportProblemPage(
-//        oneLoginProblemReportsForm.fillAndValidate(
-//          formValues.copy(dateOfBirth = DateOfBirth("32", "13", "1000"))
-//        ),
-//        action
-//      )
-//
-//      val errors = contentWithError.select("#date-of-birth-error")
-//      errors            should have size 1
-//      errors.first.text should include("Error: Date of birth must be a valid date")
-//    }
+    "include an error message for the incorrect date of birth input" in {
+      val incorrectForm = oneLoginProblemReportsForm.fillAndValidate(
+        formValues.copy(dateOfBirth = DateOfBirth("32", "13", "1000"))
+      )
+      val contentWithError = reportProblemPage(
+        oneLoginProblemReportsForm.bind(
+          incorrectForm.data
+        )
+      )
 
-//    TODO: This is not triggering the error, why not?
-//    "include an error message for the future date of birth input" in {
-//      val futureDateOfBirth = {
-//        val futureDate = LocalDate.now().plusDays(10)
-//        DateOfBirth(
-//          day = futureDate.getDayOfMonth.toString,
-//          month = futureDate.getMonthValue.toString,
-//          year = futureDate.getYear.toString
-//        )
-//      }
-//
-//      val contentWithService = reportProblemPage(
-//        oneLoginProblemReportsForm.fillAndValidate(
-//          formValues.copy(dateOfBirth = futureDateOfBirth)
-//        ),
-//        action
-//      )
-//      val errors             = contentWithService.select("#date-of-birth-error")
-//      errors            should have size 1
-//      errors.first.text should include("Error: Date of birth must not be in the future")
-//    }
+      val errors = contentWithError.select("#date-of-birth-error")
+      errors            should have size 1
+      errors.first.text should include("Error: Date of birth must be a real date")
+    }
+
+    "include an error message for the future date of birth input" in {
+      val futureDateOfBirth = {
+        val futureDate = LocalDate.now().plusDays(10)
+        DateOfBirth(
+          day = futureDate.getDayOfMonth.toString,
+          month = futureDate.getMonthValue.toString,
+          year = futureDate.getYear.toString
+        )
+      }
+      val incorrectForm = oneLoginProblemReportsForm.fillAndValidate(
+        formValues.copy(dateOfBirth = futureDateOfBirth)
+      )
+      val contentWithService = reportProblemPage(
+        oneLoginProblemReportsForm.bind(
+          incorrectForm.data
+        )
+      )
+      val errors             = contentWithService.select("#date-of-birth-error")
+      errors            should have size 1
+      errors.first.text should include("Error: Your date of birth must be in the past")
+    }
 
     "include the submitted date of birth input value" in {
       val contentWithService = reportProblemPage(
@@ -458,19 +460,17 @@ class ReportOneLoginProblemPageSpec
       inputs.first.attr("value") should include("01234123123")
     }
 
-    // TODO test is not passing
-//    "include error for phone number which is too long" in {
-//      val tooLongPhoneNumber = Random.nextString(51)
-//      val contentWithService = reportProblemPage(
-//        oneLoginProblemReportsForm.fillAndValidate(
-//          formValues.copy(phoneNumber = Some(tooLongPhoneNumber))
-//        ),
-//        action
-//      )
-//      val errors = content.select("#phone-number-error")
-//      errors should have size 1
-//      errors.first should be("Phone number cannot be longer than 50 characters")
-//    }
+    "include error for phone number which is too long" in {
+      val tooLongPhoneNumber = Random.nextString(51)
+      val contentWithService = reportProblemPage(
+        oneLoginProblemReportsForm.fillAndValidate(
+          formValues.copy(phoneNumber = Some(tooLongPhoneNumber))
+        )
+      )
+      val errors = contentWithService.select("#phone-number-error")
+      errors should have size 1
+      errors.first.text() should be("Error: Phone number cannot be longer than 50 characters")
+    }
 
     "include a address input" in {
       content.select("textarea[name=address]") should have size 1
@@ -526,21 +526,19 @@ class ReportOneLoginProblemPageSpec
       hint.first.text shouldBe "Select one option"
     }
 
-    // TODO: Commented until implemented
-//    "have email as default value in contact preference" in {
-//      val inputs = content.select("input[name=contact-preference]")
-//      inputs                 should have size 3
-//      inputs.get(0).toString should include("checked")
-//      inputs.get(1).toString shouldNot include("checked")
-//      inputs.get(2).toString shouldNot include("checked")
-//    }
+    "have email as default value in contact preference" in {
+      val inputs = content.select("input[name=contact-preference]")
+      inputs                 should have size 3
+      inputs.get(0).toString should include("checked")
+      inputs.get(1).toString shouldNot include("checked")
+      inputs.get(2).toString shouldNot include("checked")
+    }
 
     "not initially include an error message for the contact preference input" in {
       val errors = content.select("#contact-preference-error")
       errors should have size 0
     }
 
-    // TODO: Commented until implemented
 //    "include error for incorrect contact preference" in {
 //      val contentWithService = reportProblemPage(
 //        oneLoginProblemReportsForm.fill(
@@ -549,7 +547,7 @@ class ReportOneLoginProblemPageSpec
 //        action
 //      )
 //      val inputs             = contentWithService.select("input[name=contact-preference]")
-//      val errors             = content.select("#contact-preference-error")
+//      val errors             = contentWithService.select("#contact-preference-error")
 //      inputs            should have size 3
 //      inputs.get(0).toString shouldNot include("checked")
 //      inputs.get(1).toString shouldNot include("checked")
@@ -603,19 +601,17 @@ class ReportOneLoginProblemPageSpec
       inputs.first.text() should include("complaint text")
     }
 
-    // TODO test is not passing
-//    "include error for complaint which is too long" in {
-//      val tooLongComplaint = Random.nextString(1001)
-//      val contentWithService = reportProblemPage(
-//        oneLoginProblemReportsForm.fillAndValidate(
-//          formValues.copy(complaint = Some(tooLongComplaint))
-//        ),
-//        action
-//      )
-//      val errors = content.select("#complaint-error")
-//      errors should have size 1
-//      errors.first should be("Complaint cannot be longer than 1000 characters")
-//    }
+    "include error for complaint which is too long" in {
+      val tooLongComplaint = Random.nextString(1001)
+      val contentWithService = reportProblemPage(
+        oneLoginProblemReportsForm.fillAndValidate(
+          formValues.copy(complaint = Some(tooLongComplaint))
+        )
+      )
+      val errors = contentWithService.select("#complaint-error")
+      errors should have size 1
+      errors.first.text() should be("Error: Complaint cannot be longer than 1000 characters")
+    }
 
     "include a submit button" in {
       val buttons = content.select("button[type=submit]")
