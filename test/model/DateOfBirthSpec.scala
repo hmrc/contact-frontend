@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package util
+package model
 
-import model.DateOfBirth
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class DateOfBirthValidatorSpec extends AnyWordSpec with Matchers {
+class DateOfBirthSpec extends AnyWordSpec with Matchers {
 
   "Given a date of birth validator, calling isValidDate" should {
-    val validator = DateOfBirthValidator()
 
     "return true if the date of birth is a valid date" in {
       val validDate = DateOfBirth("01", "01", "1990")
-      validator.isValidDate(validDate) shouldBe true
+      validDate.isValidDate() shouldBe true
     }
 
     "return false if the date of birth is not a real date" in {
@@ -35,23 +33,22 @@ class DateOfBirthValidatorSpec extends AnyWordSpec with Matchers {
       val invalidMonth = DateOfBirth("01", "13", "1990")
       val invalidYear  = DateOfBirth("01", "01", "sausage")
 
-      validator.isValidDate(invalidDay)   shouldBe false
-      validator.isValidDate(invalidMonth) shouldBe false
-      validator.isValidDate(invalidYear)  shouldBe false
+      invalidDay.isValidDate()   shouldBe false
+      invalidMonth.isValidDate() shouldBe false
+      invalidYear.isValidDate()  shouldBe false
     }
   }
 
   "Given a date of birth validator, calling isNotFutureDate" should {
-    val validator = DateOfBirthValidator()
 
     "return true if the date of birth is a in the past" in {
       val pastDate = DateOfBirth("01", "01", "1990")
-      validator.isNotFutureDate(pastDate) shouldBe true
+      pastDate.isNotFutureDate() shouldBe true
     }
 
     "return false if the date of birth is in the future" in {
       val futureDate = DateOfBirth("01", "01", "2035")
-      validator.isNotFutureDate(futureDate) shouldBe false
+      futureDate.isNotFutureDate() shouldBe false
     }
   }
 }

@@ -21,7 +21,7 @@ import play.api.data.format.Formatter
 import play.api.data.format.Formats._
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 // Type aliases to suppress PR-commenter warnings around potential open redirects
 object Aliases {
@@ -94,14 +94,15 @@ case class ReportOneLoginProblemForm(
 case class DateOfBirth(day: String, month: String, year: String) {
   private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
-  def asLocalDate(): Try[LocalDate] =
+  private def asLocalDate(): Try[LocalDate] =
     Try(LocalDate.of(year.toInt, month.toInt, day.toInt))
 
-  def asFormattedDate(): String =
-    asLocalDate() match {
-      case Success(localDate) => localDate.format(dateFormatter)
-      case Failure(exception) => "Error in date of birth"
-    }
+  def asFormattedDate(): String = asLocalDate().map(_.format(dateFormatter)).getOrElse("Error in date of birth")
+
+  def isValidDate(): Boolean = asLocalDate().isSuccess
+
+  def isNotFutureDate(): Boolean = asLocalDate().map(_.isBefore(LocalDate.now)).isSuccess
+
 }
 
 object DateOfBirth {

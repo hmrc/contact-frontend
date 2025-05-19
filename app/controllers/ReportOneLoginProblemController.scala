@@ -25,7 +25,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DateOfBirthValidator, DeskproEmailValidator, NameValidator, TaxIdentifierValidator}
+import util.{DeskproEmailValidator, NameValidator, TaxIdentifierValidator}
 import views.html.{InternalErrorPage, ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
 
 import javax.inject.{Inject, Singleton}
@@ -35,7 +35,6 @@ object ReportOneLoginProblemFormBind {
   private val emailValidator         = DeskproEmailValidator()
   private val nameValidator          = NameValidator()
   private val taxIdentifierValidator = TaxIdentifierValidator()
-  private val dateOfBirthValidator   = DateOfBirthValidator()
 
   def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
@@ -73,11 +72,8 @@ object ReportOneLoginProblemFormBind {
         "month" -> text.verifying("one_login_problem.date-of-birth.error.month", month => month.nonEmpty),
         "year"  -> text.verifying("one_login_problem.date-of-birth.error.year", year => year.nonEmpty)
       )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d)))
-        .verifying("one_login_problem.date-of-birth.error.invalid", dob => dateOfBirthValidator.isValidDate(dob))
-        .verifying(
-          "one_login_problem.date-of-birth.error.future",
-          dob => dateOfBirthValidator.isNotFutureDate(dob) || !dateOfBirthValidator.isValidDate(dob)
-        ),
+        .verifying("one_login_problem.date-of-birth.error.invalid", _.isValidDate())
+        .verifying("one_login_problem.date-of-birth.error.future", dob => dob.isNotFutureDate() || !dob.isValidDate()),
       "email"              -> text
         .verifying(
           s"problem_report.email.error.required",
