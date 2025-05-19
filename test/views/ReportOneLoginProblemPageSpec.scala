@@ -277,7 +277,7 @@ class ReportOneLoginProblemPageSpec
     "include an error message for the incorrect sa-utr input" in {
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
-          formValues.copy(saUtr = Some("incorrect UTR"))
+          formValues.copy(saUtr = Some("this is a very long sa utr, far too long"))
         )
       )
       val errors             = contentWithService.select("#sa-utr-error")

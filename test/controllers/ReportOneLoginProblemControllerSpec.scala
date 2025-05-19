@@ -166,7 +166,7 @@ class ReportOneLoginProblemControllerSpec extends AnyWordSpec with ApplicationSu
 
     "return Bad Request and page with validation error if the SA UTR format is invalid" in new TestScope {
       val controller = setupController()
-      val request    = generateRequest(saUtr = Some("Invalid number"))
+      val request    = generateRequest(saUtr = Some("This is an input that is too long and should fail validation"))
       val submit     = controller.submit()(request)
       val page       = Jsoup.parse(contentAsString(submit))
 

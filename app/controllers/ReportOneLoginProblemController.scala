@@ -25,16 +25,16 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import util.{DeskproEmailValidator, NameValidator, TaxIdentifierValidator}
+import util.{DeskproEmailValidator, NameValidator}
 import views.html.{InternalErrorPage, ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
+import uk.gov.hmrc.domain.Nino
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 object ReportOneLoginProblemFormBind {
-  private val emailValidator         = DeskproEmailValidator()
-  private val nameValidator          = NameValidator()
-  private val taxIdentifierValidator = TaxIdentifierValidator()
+  private val emailValidator = DeskproEmailValidator()
+  private val nameValidator  = NameValidator()
 
   def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
     mapping(
@@ -58,13 +58,13 @@ object ReportOneLoginProblemFormBind {
         )
         .verifying(
           "one_login_problem.nino.error",
-          nino => taxIdentifierValidator.validateNino(nino) || nino.isEmpty
+          nino => Nino.isValid(nino) || nino.isEmpty
         ),
       "sa-utr"             -> optional(
         text
           .verifying(
             "one_login_problem.sa-utr.error",
-            saUtr => taxIdentifierValidator.validateSaUtr(saUtr)
+            saUtr => saUtr.length <= 20
           )
       ),
       "date-of-birth"      -> mapping(
