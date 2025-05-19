@@ -101,21 +101,6 @@ object ReportOneLoginProblemFormBind {
       )
     )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
-
-  def emptyForm(): Form[ReportOneLoginProblemForm] =
-    ReportOneLoginProblemFormBind.form.fill(
-      ReportOneLoginProblemForm(
-        name = "",
-        nino = "",
-        saUtr = None,
-        dateOfBirth = DateOfBirth.empty,
-        email = "",
-        phoneNumber = None,
-        address = "",
-        contactPreference = EmailPreference,
-        complaint = None
-      )
-    )
 }
 
 @Singleton
@@ -133,7 +118,7 @@ class ReportOneLoginProblemController @Inject() (
   def index(): Action[AnyContent] = Action { request =>
     given Request[AnyContent] = request
 
-    pageIfEnabled(Ok(page(ReportOneLoginProblemFormBind.emptyForm())))
+    pageIfEnabled(Ok(page(ReportOneLoginProblemFormBind.form)))
   }
 
   def submit(): Action[AnyContent] =
