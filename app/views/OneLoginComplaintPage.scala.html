@@ -38,20 +38,20 @@
 @(problemReportForm: Form[OneLoginComplaintForm])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @pageTitle = @{
-    if(problemReportForm.hasErrors){messages("error.browser.title.prefix") + " " + messages("one_login_problem.title")}
-    else messages("one_login_problem.title")
+    if(problemReportForm.hasErrors){messages("error.browser.title.prefix") + " " + messages("one_login_complaint.title")}
+    else messages("one_login_complaint.title")
 }
 
 @mainLayout(pageTitle) {
     @if(problemReportForm.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(problemReportForm))
     }
-    @h1(content = Text(messages("one_login_problem.heading")))
-    @p(content = Text(messages("one_login_problem.paragraph")))
+    @h1(content = Text(messages("one_login_complaint.heading")))
+    @p(content = Text(messages("one_login_complaint.paragraph")))
     @formWithCSRF(routes.OneLoginComplaintController.submit(), Symbol("id") -> "one-login-complaint-form") {
         @inputText(
             problemReportForm("name"),
-            label = messages("one_login_problem.name.label"),
+            label = messages("one_login_complaint.name.label"),
             labelClasses = "govuk-label--s",
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
@@ -59,17 +59,17 @@
         )
         @inputText(
             problemReportForm("nino"),
-            label = messages("one_login_problem.nino.label"),
+            label = messages("one_login_complaint.nino.label"),
             labelClasses = "govuk-label--s",
-            hint = Some(messages("one_login_problem.nino.hint")),
+            hint = Some(messages("one_login_complaint.nino.hint")),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false)
         )
         @inputText(
             problemReportForm("sa-utr"),
-            label = messages("one_login_problem.sa-utr.label"),
+            label = messages("one_login_complaint.sa-utr.label"),
             labelClasses = "govuk-label--s",
-            hint = Some(messages("one_login_problem.sa-utr.hint")),
+            hint = Some(messages("one_login_complaint.sa-utr.hint")),
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false)
         )
@@ -77,17 +77,17 @@
         @govukDateInput(DateInput(
             fieldset = Some(Fieldset(
               legend = Some(Legend(
-                content = Text(messages("one_login_problem.date-of-birth.label")),
+                content = Text(messages("one_login_complaint.date-of-birth.label")),
                 classes = "govuk-fieldset__legend--s"
               ))
             )),
-            hint = Some(Hint(content = Text(messages("one_login_problem.date-of-birth.hint")))),
+            hint = Some(Hint(content = Text(messages("one_login_complaint.date-of-birth.hint")))),
         ).withDayMonthYearFormField(problemReportForm("date-of-birth")))
 
         @inputText(
             problemReportForm("email"),
             inputType = "email",
-            label = messages("one_login_problem.email.label"),
+            label = messages("one_login_complaint.email.label"),
             labelClasses = "govuk-label--s",
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false),
@@ -95,36 +95,36 @@
         )
         @inputText(
             problemReportForm("phone-number"),
-            label = messages("one_login_problem.phone-number.label"),
+            label = messages("one_login_complaint.phone-number.label"),
             labelClasses = "govuk-label--s",
             classes = "govuk-!-width-two-thirds",
             spellcheck = Some(false)
         )
         @inputCharacterCount(
             problemReportForm("address"),
-            label = messages("one_login_problem.address.label"),
+            label = messages("one_login_complaint.address.label"),
             labelClasses = "govuk-label--s",
             classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000),
-            hint = Some(messages("one_login_problem.address.hint"))
+            hint = Some(messages("one_login_complaint.address.hint"))
         )
         @inputRadios(
             problemReportForm("contact-preference"),
-            legend = messages("one_login_problem.contact-preference.label"),
+            legend = messages("one_login_complaint.contact-preference.label"),
             items = Seq(
-                ("email", messages("one_login_problem.radio.email.label")),
-                ("phone", messages("one_login_problem.radio.phone-call.label")),
-                ("text", messages("one_login_problem.radio.letter-message.label"))
+                ("email", messages("one_login_complaint.radio.email.label")),
+                ("phone", messages("one_login_complaint.radio.phone-call.label")),
+                ("text", messages("one_login_complaint.radio.letter-message.label"))
             ),
-            hintText = Some(messages("one_login_problem.contact-preference.hint")),
+            hintText = Some(messages("one_login_complaint.contact-preference.hint")),
             legendClasses = "govuk-fieldset__legend--s",
             checked = Some("email")
         )
         @inputCharacterCount(
             problemReportForm("complaint"),
-            label = messages("one_login_problem.complaint.label"),
+            label = messages("one_login_complaint.complaint.label"),
             labelClasses = "govuk-label--s",
-            hint = Some(messages("one_login_problem.complaint.hint")),
+            hint = Some(messages("one_login_complaint.complaint.hint")),
             maxLength = Some(2000)
         )
         @govukButton(Button(

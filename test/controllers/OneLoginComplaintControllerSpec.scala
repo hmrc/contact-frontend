@@ -208,10 +208,10 @@ class OneLoginComplaintControllerSpec extends AnyWordSpec with ApplicationSuppor
       enableEndpoints: Boolean = true,
       connectorResponse: Future[TicketId] = Future.successful(TicketId(12345))
     ): OneLoginComplaintController = {
-      val reportProblemPage = app.injector.instanceOf[views.html.ReportOneLoginProblemPage]
-      val confirmationPage  = app.injector.instanceOf[views.html.ReportOneLoginProblemConfirmationPage]
-      val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
-      val errorHandler      = app.injector.instanceOf[ContactFrontendErrorHandler]
+      val complaintPage    = app.injector.instanceOf[views.html.OneLoginComplaintPage]
+      val confirmationPage = app.injector.instanceOf[views.html.OneLoginComplaintConfirmationPage]
+      val errorPage        = app.injector.instanceOf[views.html.InternalErrorPage]
+      val errorHandler     = app.injector.instanceOf[ContactFrontendErrorHandler]
 
       given ExecutionContext = ExecutionContext.global
       given HeaderCarrier    = any[HeaderCarrier]
@@ -239,7 +239,7 @@ class OneLoginComplaintControllerSpec extends AnyWordSpec with ApplicationSuppor
       new OneLoginComplaintController(
         mockConnector,
         Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
-        reportProblemPage,
+        complaintPage,
         confirmationPage,
         errorPage,
         errorHandler

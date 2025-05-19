@@ -18,7 +18,7 @@ package controllers
 
 import config.{AppConfig, ContactFrontendErrorHandler}
 import connectors.deskpro.DeskproTicketQueueConnector
-import model.{ContactPreference, ContactPreferenceFormatter, DateOfBirth, ReportOneLoginProblemForm}
+import model.{ContactPreference, ContactPreferenceFormatter, DateOfBirth, OneLoginComplaintForm}
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.I18nSupport
@@ -26,17 +26,17 @@ import play.api.mvc.*
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator}
-import views.html.{InternalErrorPage, ReportOneLoginProblemConfirmationPage, ReportOneLoginProblemPage}
+import views.html.{InternalErrorPage, OneLoginComplaintConfirmationPage, OneLoginComplaintPage}
 import uk.gov.hmrc.domain.Nino
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-object ReportOneLoginProblemFormBind {
+object OneLoginComplaintFormBind {
   private val emailValidator = DeskproEmailValidator()
   private val nameValidator  = NameValidator()
 
-  def form: Form[ReportOneLoginProblemForm] = Form[ReportOneLoginProblemForm](
+  def form: Form[OneLoginComplaintForm] = Form[OneLoginComplaintForm](
     mapping(
       "name"               -> text
         .verifying(
@@ -53,27 +53,30 @@ object ReportOneLoginProblemFormBind {
         ),
       "nino"               -> text
         .verifying(
-          "one_login_problem.nino.error",
+          "one_login_complaint.nino.error",
           nino => nino.nonEmpty
         )
         .verifying(
-          "one_login_problem.nino.error",
+          "one_login_complaint.nino.error",
           nino => Nino.isValid(nino) || nino.isEmpty
         ),
       "sa-utr"             -> optional(
         text
           .verifying(
-            "one_login_problem.sa-utr.error",
+            "one_login_complaint.sa-utr.error",
             saUtr => saUtr.length <= 20
           )
       ),
       "date-of-birth"      -> mapping(
-        "day"   -> text.verifying("one_login_problem.date-of-birth.error.day", day => day.nonEmpty),
-        "month" -> text.verifying("one_login_problem.date-of-birth.error.month", month => month.nonEmpty),
-        "year"  -> text.verifying("one_login_problem.date-of-birth.error.year", year => year.nonEmpty)
+        "day"   -> text.verifying("one_login_complaint.date-of-birth.error.day", day => day.nonEmpty),
+        "month" -> text.verifying("one_login_complaint.date-of-birth.error.month", month => month.nonEmpty),
+        "year"  -> text.verifying("one_login_complaint.date-of-birth.error.year", year => year.nonEmpty)
       )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d)))
-        .verifying("one_login_problem.date-of-birth.error.invalid", _.isValidDate())
-        .verifying("one_login_problem.date-of-birth.error.future", dob => dob.isNotFutureDate() || !dob.isValidDate()),
+        .verifying("one_login_complaint.date-of-birth.error.invalid", _.isValidDate())
+        .verifying(
+          "one_login_complaint.date-of-birth.error.future",
+          dob => dob.isNotFutureDate() || !dob.isValidDate()
+        ),
       "email"              -> text
         .verifying(
           s"problem_report.email.error.required",
@@ -84,27 +87,27 @@ object ReportOneLoginProblemFormBind {
           email => emailValidator.validate(email) || email.isEmpty
         ),
       "phone-number"       -> optional(
-        text.verifying("one_login_problem.phone-number.error", phoneNumber => phoneNumber.length <= 50)
+        text.verifying("one_login_complaint.phone-number.error", phoneNumber => phoneNumber.length <= 50)
       ),
       "address"            -> text
         .verifying(
-          s"one_login_problem.address.error",
+          s"one_login_complaint.address.error",
           address => address.nonEmpty
         ),
       "contact-preference" -> of[ContactPreference],
       "complaint"          -> optional(
-        text.verifying("one_login_problem.complaint.error", complaint => complaint.length <= 1000)
+        text.verifying("one_login_complaint.complaint.error", complaint => complaint.length <= 1000)
       )
-    )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
+    )(OneLoginComplaintForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 }
 
 @Singleton
-class ReportOneLoginProblemController @Inject() (
+class OneLoginComplaintController @Inject() (
   val ticketQueueConnector: DeskproTicketQueueConnector,
   mcc: MessagesControllerComponents,
-  reportOneLoginProblemPage: ReportOneLoginProblemPage,
-  oneLoginConfirmationPage: ReportOneLoginProblemConfirmationPage,
+  oneLoginComplaintPage: OneLoginComplaintPage,
+  oneLoginComplaintConfirmationPage: OneLoginComplaintConfirmationPage,
   errorPage: InternalErrorPage,
   errorHandler: ContactFrontendErrorHandler
 )(using appConfig: AppConfig, ec: ExecutionContext)
@@ -116,7 +119,7 @@ class ReportOneLoginProblemController @Inject() (
     Action { request =>
       given Request[AnyContent] = request
 
-      Ok(reportOneLoginProblemPage(ReportOneLoginProblemFormBind.form))
+      Ok(oneLoginComplaintPage(OneLoginComplaintFormBind.form))
     }
   }
 
@@ -129,18 +132,18 @@ class ReportOneLoginProblemController @Inject() (
   }
 
   private def doSubmit()(using request: MessagesRequest[AnyContent]): Future[Result] =
-    ReportOneLoginProblemFormBind.form
+    OneLoginComplaintFormBind.form
       .bindFromRequest()
       .fold(
         formWithError =>
           Future.successful(
-            BadRequest(reportOneLoginProblemPage(formWithError))
+            BadRequest(oneLoginComplaintPage(formWithError))
           ),
-        problemReport =>
-          createOneLoginProblemTicket(problemReport, request, routes.ReportOneLoginProblemController.index().url).map {
-            _ =>
-              Redirect(routes.ReportOneLoginProblemController.thanks())
-          } recover { case _ =>
+        oneLoginComplaint =>
+          createOneLoginComplaintTicket(oneLoginComplaint, request, routes.OneLoginComplaintController.index().url)
+            .map { _ =>
+              Redirect(routes.OneLoginComplaintController.thanks())
+            } recover { case _ =>
             InternalServerError(errorPage())
           }
       )
@@ -149,7 +152,7 @@ class ReportOneLoginProblemController @Inject() (
     Action { request =>
       given MessagesRequest[AnyContent] = request
 
-      Ok(oneLoginConfirmationPage())
+      Ok(oneLoginComplaintConfirmationPage())
     }
   }
 

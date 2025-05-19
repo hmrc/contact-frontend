@@ -31,7 +31,7 @@ import views.html.OneLoginComplaintPage
 import java.time.LocalDate
 import scala.util.Random
 
-class ReportOneLoginProblemPageSpec
+class OneLoginComplaintPageSpec
     extends AnyWordSpec
     with Matchers
     with ApplicationSupport
@@ -58,7 +58,7 @@ class ReportOneLoginProblemPageSpec
 
   "the OlfG Complaint standalone page" should {
     val oneLoginComplaintPage = app.injector.instanceOf[OneLoginComplaintPage]
-    val content           = oneLoginComplaintPage(oneLoginComplaintForm)
+    val content               = oneLoginComplaintPage(oneLoginComplaintForm)
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")

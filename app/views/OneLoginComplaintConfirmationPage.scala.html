@@ -24,9 +24,9 @@
 )
 @()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
-@mainLayout(Messages("one_login_problem.confirmation.title")) {
+@mainLayout(Messages("one_login_complaint.confirmation.title")) {
 
-    @govukPanel(Panel(title = Text(messages("one_login_problem.confirmation.panel.title"))))
+    @govukPanel(Panel(title = Text(messages("one_login_complaint.confirmation.panel.title"))))
 
     @p(content = Text(messages("problem_report.confirmation.paragraph")))
 

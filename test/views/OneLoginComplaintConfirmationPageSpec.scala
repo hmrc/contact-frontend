@@ -25,7 +25,7 @@ import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import views.html.OneLoginComplaintConfirmationPage
 
-class ReportOneLoginProblemConfirmationPageSpec
+class OneLoginComplaintConfirmationPageSpec
     extends AnyWordSpec
     with Matchers
     with ApplicationSupport

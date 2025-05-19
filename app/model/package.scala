@@ -79,7 +79,7 @@ case class SurveyForm(
   serviceId: Option[String]
 )
 
-case class ReportOneLoginProblemForm(
+case class OneLoginComplaintForm(
   name: String,
   nino: String,
   saUtr: Option[String],
@@ -135,7 +135,7 @@ implicit object ContactPreferenceFormatter extends Formatter[ContactPreference] 
       case "letter" => LetterPreference
       case _        => EmailPreference
     },
-    errMsg = "one_login_problem.contact-preference.error",
+    errMsg = "one_login_complaint.contact-preference.error",
     Nil
   )(key, data)
 

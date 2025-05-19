@@ -19,7 +19,7 @@ package services
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.*
 import controllers.ContactForm
-import model.{AccessibilityForm, FeedbackForm, ReportOneLoginProblemForm, ReportProblemForm}
+import model.{AccessibilityForm, FeedbackForm, OneLoginComplaintForm, ReportProblemForm}
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
@@ -117,38 +117,38 @@ trait DeskproSubmission {
       ticketConstants = AccessibilityProblemTicketConstants
     )
 
-  def createOneLoginProblemTicket(
-    problemReport: ReportOneLoginProblemForm,
+  def createOneLoginComplaintTicket(
+    oneLoginComplaint: OneLoginComplaintForm,
     request: Request[AnyRef],
     referrer: String
   )(using messages: Messages): Future[TicketId] = {
     given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    def oneLoginProblemMessage(): String = {
+    def oneLoginComplaintMessage(): String = {
       val optionalNoneProvided: String = "None provided"
 
-      s"${messages("one_login_problem.nino.label")}: ${problemReport.nino}\n\n" +
-        s"${messages("one_login_problem.sa-utr.label")}: ${problemReport.saUtr.getOrElse(optionalNoneProvided)}\n\n" +
-        s"${messages("one_login_problem.date-of-birth.label")}: ${problemReport.dateOfBirth.asFormattedDate()}\n\n" +
-        s"${messages("one_login_problem.phone-number.label")}: ${problemReport.phoneNumber.getOrElse(optionalNoneProvided)}\n\n" +
-        s"${messages("one_login_problem.address.label")}:\n" +
-        s"${problemReport.address}\n\n" +
-        s"${messages("one_login_problem.contact-preference.label")}: ${problemReport.contactPreference}\n\n" +
-        s"${messages("one_login_problem.complaint.label")}\n" +
-        s"${problemReport.complaint.getOrElse(optionalNoneProvided)}"
+      s"${messages("one_login_complaint.nino.label")}: ${oneLoginComplaint.nino}\n\n" +
+        s"${messages("one_login_complaint.sa-utr.label")}: ${oneLoginComplaint.saUtr.getOrElse(optionalNoneProvided)}\n\n" +
+        s"${messages("one_login_complaint.date-of-birth.label")}: ${oneLoginComplaint.dateOfBirth.asFormattedDate()}\n\n" +
+        s"${messages("one_login_complaint.phone-number.label")}: ${oneLoginComplaint.phoneNumber.getOrElse(optionalNoneProvided)}\n\n" +
+        s"${messages("one_login_complaint.address.label")}:\n" +
+        s"${oneLoginComplaint.address}\n\n" +
+        s"${messages("one_login_complaint.contact-preference.label")}: ${oneLoginComplaint.contactPreference}\n\n" +
+        s"${messages("one_login_complaint.complaint.label")}\n" +
+        s"${oneLoginComplaint.complaint.getOrElse(optionalNoneProvided)}"
     }
 
     ticketQueueConnector.createDeskProTicket(
-      name = problemReport.name,
-      email = problemReport.email,
-      message = oneLoginProblemMessage(),
+      name = oneLoginComplaint.name,
+      email = oneLoginComplaint.email,
+      message = oneLoginComplaintMessage(),
       referrer = referrer,
       isJavascript = false,
       request = request,
       enrolmentsOption = None,
       service = Some("one-login-complaint"),
       userAction = None,
-      ticketConstants = ReportOneLoginProblemTicketConstants
+      ticketConstants = OneLoginComplaintTicketConstants
     )
   }
 }
