@@ -94,12 +94,11 @@ object ReportOneLoginProblemFormBind {
           address => address.nonEmpty
         ),
       "contact-preference" -> of[ContactPreference],
-      "complaint"          -> optional(text),
-      "csrfToken"          -> text
+      "complaint"          -> optional(text)
     )(ReportOneLoginProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
-  def emptyForm(csrfToken: String): Form[ReportOneLoginProblemForm] =
+  def emptyForm(): Form[ReportOneLoginProblemForm] =
     ReportOneLoginProblemFormBind.form.fill(
       ReportOneLoginProblemForm(
         name = "",
@@ -110,8 +109,7 @@ object ReportOneLoginProblemFormBind {
         phoneNumber = None,
         address = "",
         contactPreference = EmailPreference,
-        complaint = None,
-        csrfToken = csrfToken
+        complaint = None
       )
     )
 }
@@ -131,9 +129,7 @@ class ReportOneLoginProblemController @Inject() (
   def index(): Action[AnyContent] = Action { request =>
     given Request[AnyContent] = request
 
-    val csrfToken = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
-
-    pageIfEnabled(Ok(page(ReportOneLoginProblemFormBind.emptyForm(csrfToken))))
+    pageIfEnabled(Ok(page(ReportOneLoginProblemFormBind.emptyForm())))
   }
 
   def submit(): Action[AnyContent] =

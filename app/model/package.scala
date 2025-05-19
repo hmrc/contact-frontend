@@ -88,8 +88,7 @@ case class ReportOneLoginProblemForm(
   phoneNumber: Option[String],
   address: String,
   contactPreference: ContactPreference,
-  complaint: Option[String],
-  csrfToken: String
+  complaint: Option[String]
 )
 
 case class DateOfBirth(day: String, month: String, year: String) {

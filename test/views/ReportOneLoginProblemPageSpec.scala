@@ -50,8 +50,7 @@ class ReportOneLoginProblemPageSpec
     phoneNumber = Some("020 7123 4567"),
     address = "1 Whitehall, London, SW1A",
     contactPreference = EmailPreference,
-    complaint = Some("Testing complaint"),
-    csrfToken = ""
+    complaint = Some("Testing complaint")
   )
 
   val action: Call = Call(method = "POST", url = "/contact/test-only/report-one-login-problem")
