@@ -104,6 +104,10 @@ case class DateOfBirth(day: String, month: String, year: String) {
     }
 }
 
+object DateOfBirth {
+  val empty: DateOfBirth = DateOfBirth("", "", "")
+}
+
 sealed trait ContactPreference {
   def toString: String
 }
@@ -132,8 +136,4 @@ implicit object ContactPreferenceFormatter extends Formatter[ContactPreference] 
   )(key, data)
 
   override def unbind(key: String, value: ContactPreference) = Map(key -> value.toString)
-}
-
-object DateOfBirth {
-  val empty: DateOfBirth = DateOfBirth("", "", "")
 }
