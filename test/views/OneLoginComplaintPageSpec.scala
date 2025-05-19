@@ -539,23 +539,6 @@ class OneLoginComplaintPageSpec
       errors should have size 0
     }
 
-//    "include error for incorrect contact preference" in {
-//      val contentWithService = oneLoginComplaintPage(
-//        oneLoginProblemReportsForm.fill(
-//          formValues.copy(contactPreference = Some("incorrect"))
-//        ),
-//        action
-//      )
-//      val inputs             = contentWithService.select("input[name=contact-preference]")
-//      val errors             = contentWithService.select("#contact-preference-error")
-//      inputs            should have size 3
-//      inputs.get(0).toString shouldNot include("checked")
-//      inputs.get(1).toString shouldNot include("checked")
-//      inputs.get(2).toString shouldNot include("checked")
-//      errors            should have size 1
-//      errors.first.text should include("Incorrect contact preference")
-//    }
-
     "include the submitted contact preference input value" in {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
