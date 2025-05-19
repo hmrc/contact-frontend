@@ -21,7 +21,7 @@ import play.api.data.format.Formatter
 import play.api.data.format.Formats._
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import scala.util.Try
+import scala.util.{Success, Try}
 
 // Type aliases to suppress PR-commenter warnings around potential open redirects
 object Aliases {
@@ -101,7 +101,10 @@ case class DateOfBirth(day: String, month: String, year: String) {
 
   def isValidDate(): Boolean = asLocalDate().isSuccess
 
-  def isNotFutureDate(): Boolean = asLocalDate().map(_.isBefore(LocalDate.now)).isSuccess
+  def isNotFutureDate(): Boolean =
+    asLocalDate() match
+      case Success(dob) => dob.isBefore(LocalDate.now)
+      case _            => false
 
 }
 

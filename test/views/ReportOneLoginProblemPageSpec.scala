@@ -326,7 +326,7 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the incorrect date of birth input" in {
-      val incorrectForm = oneLoginProblemReportsForm.fillAndValidate(
+      val incorrectForm    = oneLoginProblemReportsForm.fillAndValidate(
         formValues.copy(dateOfBirth = DateOfBirth("32", "13", "1000"))
       )
       val contentWithError = reportProblemPage(
@@ -341,26 +341,42 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include an error message for the future date of birth input" in {
-      val futureDateOfBirth = {
-        val futureDate = LocalDate.now().plusDays(10)
-        DateOfBirth(
-          day = futureDate.getDayOfMonth.toString,
-          month = futureDate.getMonthValue.toString,
-          year = futureDate.getYear.toString
-        )
-      }
-      val incorrectForm = oneLoginProblemReportsForm.fillAndValidate(
-        formValues.copy(dateOfBirth = futureDateOfBirth)
+      val incorrectForm    = oneLoginProblemReportsForm.fillAndValidate(
+        formValues.copy(dateOfBirth = DateOfBirth("12", "12", "3000"))
       )
-      val contentWithService = reportProblemPage(
+      val contentWithError = reportProblemPage(
         oneLoginProblemReportsForm.bind(
           incorrectForm.data
         )
       )
-      val errors             = contentWithService.select("#date-of-birth-error")
+
+      val errors = contentWithError.select("#date-of-birth-error")
       errors            should have size 1
       errors.first.text should include("Error: Your date of birth must be in the past")
     }
+
+//    "include an error message for the future date of birth input" in {
+//      val futureDateOfBirth = DateOfBirth("01", "12", "3000")
+////      {
+////        val futureDate = LocalDate.now().plusDays(10)
+////        DateOfBirth(
+////          day = futureDate.getDayOfMonth.toString,
+////          month = futureDate.getMonthValue.toString,
+////          year = futureDate.getYear.toString
+////        )
+////      }
+//      val incorrectForm = oneLoginProblemReportsForm.fillAndValidate(
+//        formValues.copy(dateOfBirth = futureDateOfBirth)
+//      )
+//      val contentWithService = reportProblemPage(
+//        oneLoginProblemReportsForm.bind(
+//          incorrectForm.data
+//        )
+//      )
+//      val errors             = contentWithService.select("#date-of-birth-error")
+//      errors            should have size 1
+//      errors.first.text should include("Error: Your date of birth must be in the past")
+//    }
 
     "include the submitted date of birth input value" in {
       val contentWithService = reportProblemPage(
@@ -467,8 +483,8 @@ class ReportOneLoginProblemPageSpec
           formValues.copy(phoneNumber = Some(tooLongPhoneNumber))
         )
       )
-      val errors = contentWithService.select("#phone-number-error")
-      errors should have size 1
+      val errors             = contentWithService.select("#phone-number-error")
+      errors              should have size 1
       errors.first.text() should be("Error: Phone number cannot be longer than 50 characters")
     }
 
@@ -602,14 +618,14 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include error for complaint which is too long" in {
-      val tooLongComplaint = Random.nextString(1001)
+      val tooLongComplaint   = Random.nextString(1001)
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
           formValues.copy(complaint = Some(tooLongComplaint))
         )
       )
-      val errors = contentWithService.select("#complaint-error")
-      errors should have size 1
+      val errors             = contentWithService.select("#complaint-error")
+      errors              should have size 1
       errors.first.text() should be("Error: Complaint cannot be longer than 1000 characters")
     }
 
