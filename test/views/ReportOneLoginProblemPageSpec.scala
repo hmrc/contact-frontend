@@ -91,6 +91,13 @@ class ReportOneLoginProblemPageSpec
       headers.first.text shouldBe "One Login for Government complaint"
     }
 
+    "include a paragraph of introductory content" in {
+      val paragraphs = content.select("p.govuk-body")
+      paragraphs.first().text() should be(
+        "This form is to make a complaint about the GOV.UK One Login process. To deal with the complaint we need you to provide all the mandatory information."
+      )
+    }
+
     "include the correct form tag" in {
       val forms = content.select("form[id=one-login-complaint-form]")
       forms                             should have size 1
@@ -250,10 +257,10 @@ class ReportOneLoginProblemPageSpec
       inputs.first.attr("spellcheck") should be("false")
     }
 
-    "include a label for the sa-utr input" in {
+    "include a label for the optional sa-utr input" in {
       val label = content.select("label[for=sa-utr]")
       label              should have size 1
-      label.first.text shouldBe "Self Assessment UTR"
+      label.first.text shouldBe "Self Assessment UTR (optional)"
     }
 
     "include a hint for the sa-utr input" in {
@@ -354,29 +361,6 @@ class ReportOneLoginProblemPageSpec
       errors            should have size 1
       errors.first.text should include("Error: Your date of birth must be in the past")
     }
-
-//    "include an error message for the future date of birth input" in {
-//      val futureDateOfBirth = DateOfBirth("01", "12", "3000")
-////      {
-////        val futureDate = LocalDate.now().plusDays(10)
-////        DateOfBirth(
-////          day = futureDate.getDayOfMonth.toString,
-////          month = futureDate.getMonthValue.toString,
-////          year = futureDate.getYear.toString
-////        )
-////      }
-//      val incorrectForm = oneLoginProblemReportsForm.fillAndValidate(
-//        formValues.copy(dateOfBirth = futureDateOfBirth)
-//      )
-//      val contentWithService = reportProblemPage(
-//        oneLoginProblemReportsForm.bind(
-//          incorrectForm.data
-//        )
-//      )
-//      val errors             = contentWithService.select("#date-of-birth-error")
-//      errors            should have size 1
-//      errors.first.text should include("Error: Your date of birth must be in the past")
-//    }
 
     "include the submitted date of birth input value" in {
       val contentWithService = reportProblemPage(
@@ -585,20 +569,20 @@ class ReportOneLoginProblemPageSpec
       inputs.get(2).toString shouldNot include("checked")
     }
 
-    "include a complaint input" in {
+    "include an optional complaint input" in {
       content.select("textarea[name=complaint]") should have size 1
     }
 
-    "include a label for the complaint input" in {
+    "include a label for the optional complaint input" in {
       val label = content.select("label[for=complaint]")
       label              should have size 1
-      label.first.text shouldBe "Complaint"
+      label.first.text shouldBe "Complaint (optional)"
     }
 
     "include a hint for the complaint input" in {
       val label = content.select("div[id=complaint-hint]")
       label              should have size 1
-      label.first.text shouldBe "Do not include personal or financial information"
+      label.first.text shouldBe "What problems are you experiencing and how can we help you. Please provide all the relevant information in the box below."
     }
 
     "not initially include an error message for the complaint input" in {

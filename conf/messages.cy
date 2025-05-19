@@ -143,6 +143,7 @@ notFound.paragraph2=Os gwnaethoch bastio’r cyfeiriad gwe, dylech wirio’ch bo
 
 one_login_problem.title=WELSH PLACEHOLDER TEXT – GOV.UK
 one_login_problem.heading=WELSH PLACEHOLDER TEXT
+one_login_problem.paragraph=WELSH PLACEHOLDER TEXT
 one_login_problem.name.label=Enw llawn
 one_login_problem.nino.label=WELSH PLACEHOLDER TEXT
 one_login_problem.nino.hint=WELSH PLACEHOLDER TEXT
@@ -161,6 +162,7 @@ one_login_problem.email.label=Cyfeiriad e-bost
 one_login_problem.phone-number.label=WELSH PLACEHOLDER TEXT
 one_login_problem.phone-number.error=WELSH PLACEHOLDER TEXT
 one_login_problem.address.label=WELSH PLACEHOLDER TEXT
+one_login_problem.address.hint=WELSH PLACEHOLDER TEXT
 one_login_problem.address.error=WELSH PLACEHOLDER TEXT
 one_login_problem.contact-preference.label=WELSH PLACEHOLDER TEXT
 one_login_problem.contact-preference.hint=WELSH PLACEHOLDER TEXT

@@ -47,6 +47,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(problemReportForm))
     }
     @h1(content = Text(messages("one_login_problem.heading")))
+    @p(content = Text(messages("one_login_problem.paragraph")))
     @formWithCSRF(routes.ReportOneLoginProblemController.submit(), Symbol("id") -> "one-login-complaint-form") {
         @inputText(
             problemReportForm("name"),
@@ -104,7 +105,8 @@
             label = messages("one_login_problem.address.label"),
             labelClasses = "govuk-label--s",
             classes = "govuk-!-width-two-thirds",
-            maxLength = Some(1000)
+            maxLength = Some(1000),
+            hint = Some(messages("one_login_problem.address.hint"))
         )
         @inputRadios(
             problemReportForm("contact-preference"),
