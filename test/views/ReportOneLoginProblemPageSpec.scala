@@ -55,11 +55,9 @@ class ReportOneLoginProblemPageSpec
     complaint = Some("Testing complaint")
   )
 
-  val action: Call = Call(method = "POST", url = "/contact/report-one-login-complaint")
-
   "the OlfG Problem Reports standalone page" should {
     val reportProblemPage = app.injector.instanceOf[ReportOneLoginProblemPage]
-    val content           = reportProblemPage(oneLoginProblemReportsForm, action)
+    val content           = reportProblemPage(oneLoginProblemReportsForm)
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")
@@ -70,7 +68,7 @@ class ReportOneLoginProblemPageSpec
 
     "translate the hmrc banner into Welsh if requested" in {
       given Messages   = getWelshMessages()
-      val welshContent = reportProblemPage(oneLoginProblemReportsForm, action)
+      val welshContent = reportProblemPage(oneLoginProblemReportsForm)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -100,7 +98,7 @@ class ReportOneLoginProblemPageSpec
     }
 
     "include the correct form action attribute" in {
-      val content = reportProblemPage(oneLoginProblemReportsForm, action)
+      val content = reportProblemPage(oneLoginProblemReportsForm)
 
       val forms = content.select("form[id=one-login-complaint-form]")
       forms                      should have size 1
@@ -122,8 +120,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithErrors = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
           formValues.copy(name = "", email = "", complaint = None)
-        ),
-        action
+        )
       )
       val errorSummaries    = contentWithErrors.select(".govuk-error-summary")
       errorSummaries                         should have size 1
@@ -134,8 +131,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithErrors = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
           formValues.copy(name = "", email = "", complaint = None)
-        ),
-        action
+        )
       )
       asDocument(contentWithErrors).title should be("Error: One Login for Government complaint – GOV.UK")
     }
@@ -165,8 +161,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
           formValues.copy(name = "")
-        ),
-        action
+        )
       )
       val errors             = contentWithService.select("#name-error")
       errors            should have size 1
@@ -177,8 +172,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
           formValues.copy(name = "AN Other")
-        ),
-        action
+        )
       )
       val inputs             = contentWithService.select("input[name=name]")
       inputs                     should have size 1
@@ -216,8 +210,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
           formValues.copy(nino = "")
-        ),
-        action
+        )
       )
       val errors             = contentWithService.select("#nino-error")
       errors            should have size 1
@@ -228,8 +221,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
           formValues.copy(nino = "incorrect nino")
-        ),
-        action
+        )
       )
       val errors             = contentWithService.select("#nino-error")
       errors            should have size 1
@@ -240,8 +232,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
           formValues.copy(nino = "AN Other")
-        ),
-        action
+        )
       )
       val inputs             = contentWithService.select("input[name=nino]")
       inputs                     should have size 1
@@ -279,8 +270,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
           formValues.copy(saUtr = Some("incorrect UTR"))
-        ),
-        action
+        )
       )
       val errors             = contentWithService.select("#sa-utr-error")
       errors            should have size 1
@@ -293,8 +283,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
           formValues.copy(saUtr = Some("AN Other"))
-        ),
-        action
+        )
       )
       val inputs             = contentWithService.select("input[name=sa-utr]")
       inputs                     should have size 1
@@ -328,8 +317,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
           formValues.copy(dateOfBirth = DateOfBirth("", "", ""))
-        ),
-        action
+        )
       )
       val errors             = contentWithService.select("#date-of-birth-error")
       errors            should have size 1
@@ -376,8 +364,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
           formValues.copy(dateOfBirth = DateOfBirth("10", "11", "1990"))
-        ),
-        action
+        )
       )
       val dayInput           = contentWithService.select("input[name=date-of-birth.day]")
       val monthInput         = contentWithService.select("input[name=date-of-birth.month]")
@@ -421,8 +408,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
           formValues.copy(email = "")
-        ),
-        action
+        )
       )
       val errors             = contentWithService.select("#email-error")
       errors            should have size 1
@@ -433,8 +419,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
           formValues.copy(email = "bloggs@example.com")
-        ),
-        action
+        )
       )
       val inputs             = contentWithService.select("input[name=email]")
       inputs                     should have size 1
@@ -466,8 +451,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
           formValues.copy(phoneNumber = Some("01234123123"))
-        ),
-        action
+        )
       )
       val inputs             = contentWithService.select("input[name=phone-number]")
       inputs                     should have size 1
@@ -507,8 +491,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fillAndValidate(
           formValues.copy(address = "")
-        ),
-        action
+        )
       )
       val errors             = contentWithService.select("#address-error")
       errors            should have size 1
@@ -519,8 +502,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
           formValues.copy(address = "address")
-        ),
-        action
+        )
       )
       val inputs             = contentWithService.select("textarea[name=address]")
       inputs              should have size 1
@@ -580,8 +562,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
           formValues.copy(contactPreference = EmailPreference)
-        ),
-        action
+        )
       )
       val inputs             = contentWithService.select("input[name=contact-preference]")
       inputs                 should have size 3
@@ -615,8 +596,7 @@ class ReportOneLoginProblemPageSpec
       val contentWithService = reportProblemPage(
         oneLoginProblemReportsForm.fill(
           formValues.copy(complaint = Some("complaint text"))
-        ),
-        action
+        )
       )
       val inputs             = contentWithService.select("textarea[name=complaint]")
       inputs              should have size 1

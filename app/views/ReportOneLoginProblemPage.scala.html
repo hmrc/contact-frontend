@@ -35,7 +35,7 @@
         h2: Heading2,
         p: Paragraph
 )
-@(problemReportForm: Form[ReportOneLoginProblemForm], action: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(problemReportForm: Form[ReportOneLoginProblemForm])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @pageTitle = @{
     if(problemReportForm.hasErrors){messages("error.browser.title.prefix") + " " + messages("one_login_problem.title")}
@@ -47,7 +47,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(problemReportForm))
     }
     @h1(content = Text(messages("one_login_problem.heading")))
-    @formWithCSRF(action, Symbol("id") -> "one-login-complaint-form") {
+    @formWithCSRF(routes.ReportOneLoginProblemController.submit(), Symbol("id") -> "one-login-complaint-form") {
         @inputText(
             problemReportForm("name"),
             label = messages("one_login_problem.name.label"),

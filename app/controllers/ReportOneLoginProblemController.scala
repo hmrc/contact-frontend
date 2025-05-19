@@ -120,7 +120,7 @@ class ReportOneLoginProblemController @Inject() (
     Action { request =>
       given Request[AnyContent] = request
 
-      Ok(page(ReportOneLoginProblemFormBind.form))
+      Ok(reportOneLoginProblemPage(ReportOneLoginProblemFormBind.form))
     }
   }
 
@@ -138,7 +138,7 @@ class ReportOneLoginProblemController @Inject() (
       .fold(
         formWithError =>
           Future.successful(
-            BadRequest(page(formWithError))
+            BadRequest(reportOneLoginProblemPage(formWithError))
           ),
         problemReport =>
           createOneLoginProblemTicket(problemReport, request, routes.ReportOneLoginProblemController.index().url).map {
@@ -148,9 +148,6 @@ class ReportOneLoginProblemController @Inject() (
             InternalServerError(errorPage())
           }
       )
-
-  private def page(form: Form[ReportOneLoginProblemForm])(using Request[?]) =
-    reportOneLoginProblemPage(form, routes.ReportOneLoginProblemController.submit())
 
   def thanks(): Action[AnyContent] = checkIfEnabled {
     Action { request =>
