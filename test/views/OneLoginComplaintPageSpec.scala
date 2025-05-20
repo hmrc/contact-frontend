@@ -585,7 +585,7 @@ class OneLoginComplaintPageSpec
     }
 
     "include error for complaint which is too long" in {
-      val tooLongComplaint   = Random.nextString(1001)
+      val tooLongComplaint   = Random.nextString(2001)
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(complaint = Some(tooLongComplaint))
