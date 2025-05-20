@@ -43,7 +43,7 @@ class OneLoginComplaintConfirmationPageSpec
     "include the H1 element with page title" in {
       val heading1 = content.select("h1")
       heading1            should have size 1
-      heading1.first.text should be("We have received your One Login for Government complaint")
+      heading1.first.text should be("We will respond to your complaint by email unless you have requested a response by phone or letter")
     }
 
     "include the H2 element for what happens next" in {
@@ -58,7 +58,7 @@ class OneLoginComplaintConfirmationPageSpec
 
     "include a paragraph body element with what will happen next" in {
       val paragraphs = content.select("p.govuk-body")
-      paragraphs.get(1).text() should be("Someone will email you back within 2 working days with the next steps.")
+      paragraphs.get(1).text() should be("We aim to review your complaint within 15 working days but there may be times when this can take longer. Please wait 30 working days before contacting us if you have not had a reply.")
     }
 
     "translate the title into Welsh if requested" in {

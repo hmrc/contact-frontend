@@ -197,7 +197,7 @@ class OneLoginComplaintControllerSpec extends AnyWordSpec with ApplicationSuppor
       val document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("govuk-error-summary").size() should be(0)
       document.getElementsByClass("govuk-panel__title").text()  should be(
-        "We have received your One Login for Government complaint"
+        "We will respond to your complaint by email unless you have requested a response by phone or letter"
       )
     }
   }
