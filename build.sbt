@@ -8,7 +8,6 @@ lazy val microservice = Project(appName, file("."))
   .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(sharedSettings)
   .settings(unitTestSettings)
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(
     PlayKeys.playDefaultPort := 9250,
     PlayKeys.devSettings ++= Seq("metrics.enabled" -> "false"),
