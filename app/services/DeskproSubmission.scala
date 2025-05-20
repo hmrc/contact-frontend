@@ -19,7 +19,7 @@ package services
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.*
 import controllers.ContactForm
-import model.{AccessibilityForm, FeedbackForm, ReportProblemForm}
+import model.{AccessibilityForm, FeedbackForm, OneLoginComplaintForm, ReportProblemForm}
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
@@ -117,6 +117,40 @@ trait DeskproSubmission {
       ticketConstants = AccessibilityProblemTicketConstants
     )
 
+  def createOneLoginComplaintTicket(
+    oneLoginComplaint: OneLoginComplaintForm,
+    request: Request[AnyRef],
+    referrer: String
+  )(using messages: Messages): Future[TicketId] = {
+    given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+    def oneLoginComplaintMessage(): String = {
+      val optionalNoneProvided: String = "None provided"
+
+      s"${messages("one_login_complaint.nino.label")}: ${oneLoginComplaint.nino}\n\n" +
+        s"${messages("one_login_complaint.sa-utr.label")}: ${oneLoginComplaint.saUtr.getOrElse(optionalNoneProvided)}\n\n" +
+        s"${messages("one_login_complaint.date-of-birth.label")}: ${oneLoginComplaint.dateOfBirth.asFormattedDate()}\n\n" +
+        s"${messages("one_login_complaint.phone-number.label")}: ${oneLoginComplaint.phoneNumber.getOrElse(optionalNoneProvided)}\n\n" +
+        s"${messages("one_login_complaint.address.label")}:\n" +
+        s"${oneLoginComplaint.address}\n\n" +
+        s"${messages("one_login_complaint.contact-preference.label")}: ${oneLoginComplaint.contactPreference}\n\n" +
+        s"${messages("one_login_complaint.complaint.label")}\n" +
+        s"${oneLoginComplaint.complaint.getOrElse(optionalNoneProvided)}"
+    }
+
+    ticketQueueConnector.createDeskProTicket(
+      name = oneLoginComplaint.name,
+      email = oneLoginComplaint.email,
+      message = oneLoginComplaintMessage(),
+      referrer = referrer,
+      isJavascript = false,
+      request = request,
+      enrolmentsOption = None,
+      service = Some("one-login-complaint"),
+      userAction = None,
+      ticketConstants = OneLoginComplaintTicketConstants
+    )
+  }
 }
 
 object DeskproSubmission {

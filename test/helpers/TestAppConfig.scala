@@ -24,4 +24,6 @@ class TestAppConfig extends AppConfig {
   def backUrlDestinationAllowList: Set[String] = ???
 
   override def sendExplicitAuditEvents: Boolean = false
+
+  override def enableOlfgComplaintsEndpoints: Boolean = ???
 }

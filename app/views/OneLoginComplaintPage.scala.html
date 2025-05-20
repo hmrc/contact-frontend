@@ -1,0 +1,136 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF as PlayFrontendFormWithCSRF
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.*
+@import model.OneLoginComplaintForm
+@import views.html.components.{Layout, InputText, InputRadios, InputHidden, InputCharacterCount, Heading1, Heading2, Paragraph}
+
+@this(
+        inputCharacterCount: InputCharacterCount,
+        govukInput: GovukInput,
+        inputHidden: InputHidden,
+        inputText: InputText,
+        govukButton: GovukButton,
+        inputRadios: InputRadios,
+        govukDateInput: GovukDateInput,
+        govukFieldset: GovukFieldset,
+        govukErrorSummary: GovukErrorSummary,
+        formWithCSRF: PlayFrontendFormWithCSRF,
+        mainLayout: Layout,
+        h1: Heading1,
+        h2: Heading2,
+        p: Paragraph
+)
+@(problemReportForm: Form[OneLoginComplaintForm])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@pageTitle = @{
+    if(problemReportForm.hasErrors){messages("error.browser.title.prefix") + " " + messages("one_login_complaint.title")}
+    else messages("one_login_complaint.title")
+}
+
+@mainLayout(pageTitle) {
+    @if(problemReportForm.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(problemReportForm))
+    }
+    @h1(content = Text(messages("one_login_complaint.heading")))
+    @p(content = Text(messages("one_login_complaint.paragraph")))
+    @formWithCSRF(routes.OneLoginComplaintController.submit(), Symbol("id") -> "one-login-complaint-form") {
+        @inputText(
+            problemReportForm("name"),
+            label = messages("one_login_complaint.name.label"),
+            labelClasses = "govuk-label--s",
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false),
+            autocomplete = Some("name")
+        )
+        @inputText(
+            problemReportForm("nino"),
+            label = messages("one_login_complaint.nino.label"),
+            labelClasses = "govuk-label--s",
+            hint = Some(messages("one_login_complaint.nino.hint")),
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false)
+        )
+        @inputText(
+            problemReportForm("sa-utr"),
+            label = messages("one_login_complaint.sa-utr.label"),
+            labelClasses = "govuk-label--s",
+            hint = Some(messages("one_login_complaint.sa-utr.hint")),
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false)
+        )
+
+        @govukDateInput(DateInput(
+            fieldset = Some(Fieldset(
+              legend = Some(Legend(
+                content = Text(messages("one_login_complaint.date-of-birth.label")),
+                classes = "govuk-fieldset__legend--s"
+              ))
+            )),
+            hint = Some(Hint(content = Text(messages("one_login_complaint.date-of-birth.hint")))),
+        ).withDayMonthYearFormField(problemReportForm("date-of-birth")))
+
+        @inputText(
+            problemReportForm("email"),
+            inputType = "email",
+            label = messages("one_login_complaint.email.label"),
+            labelClasses = "govuk-label--s",
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false),
+            autocomplete = Some("email")
+        )
+        @inputText(
+            problemReportForm("phone-number"),
+            label = messages("one_login_complaint.phone-number.label"),
+            labelClasses = "govuk-label--s",
+            classes = "govuk-!-width-two-thirds",
+            spellcheck = Some(false)
+        )
+        @inputCharacterCount(
+            problemReportForm("address"),
+            label = messages("one_login_complaint.address.label"),
+            labelClasses = "govuk-label--s",
+            classes = "govuk-!-width-two-thirds",
+            maxLength = Some(1000),
+            hint = Some(messages("one_login_complaint.address.hint"))
+        )
+        @inputRadios(
+            problemReportForm("contact-preference"),
+            legend = messages("one_login_complaint.contact-preference.label"),
+            items = Seq(
+                ("email", messages("one_login_complaint.radio.email.label")),
+                ("phone", messages("one_login_complaint.radio.phone-call.label")),
+                ("text", messages("one_login_complaint.radio.letter-message.label"))
+            ),
+            hintText = Some(messages("one_login_complaint.contact-preference.hint")),
+            legendClasses = "govuk-fieldset__legend--s",
+            checked = Some("email")
+        )
+        @inputCharacterCount(
+            problemReportForm("complaint"),
+            label = messages("one_login_complaint.complaint.label"),
+            labelClasses = "govuk-label--s",
+            hint = Some(messages("one_login_complaint.complaint.hint")),
+            maxLength = Some(2000)
+        )
+        @govukButton(Button(
+            content = Text(messages("problem_report.button")),
+            inputType = Some("submit"),
+            preventDoubleClick = Some(true)
+        ))
+    }
+}
