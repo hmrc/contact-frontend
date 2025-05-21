@@ -71,7 +71,7 @@ class OneLoginComplaintConfirmationPageSpec
       val welshContent = confirmationPage()
 
       val titles = welshContent.select("h1")
-      titles.first.text should be("WELSH PLACEHOLDER TEXT")
+      titles.first.text should be("Mae’ch cwyn One Login for Government wedi dod i law")
     }
   }
 }
