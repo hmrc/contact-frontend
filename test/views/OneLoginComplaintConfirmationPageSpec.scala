@@ -58,6 +58,7 @@ class OneLoginComplaintConfirmationPageSpec
 
     "include a paragraph body element with what will happen next" in {
       val paragraphs = content.select("p.govuk-body")
+
       paragraphs.get(1).text() should be(
         "We will respond to your complaint by email unless you have requested a response by phone or letter."
       )
