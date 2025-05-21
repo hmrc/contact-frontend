@@ -34,6 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object OneLoginComplaintFormBind {
   private val emailValidator = DeskproEmailValidator()
+
   private val nameValidator  = NameValidator()
 
   def form: Form[OneLoginComplaintForm] = Form[OneLoginComplaintForm](
