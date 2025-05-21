@@ -175,3 +175,5 @@ one_login_complaint.complaint.hint=WELSH PLACEHOLDER TEXT
 one_login_complaint.complaint.error=WELSH PLACEHOLDER TEXT
 one_login_complaint.confirmation.title=WELSH PLACEHOLDER TEXT
 one_login_complaint.confirmation.panel.title=WELSH PLACEHOLDER TEXT
+one_login_complaint.confirmation.next.paragraph=WELSH PLACEHOLDER TEXT
+one_login_complaint.confirmation.next.paragraph.two=WELSH PLACEHOLDER TEXT
