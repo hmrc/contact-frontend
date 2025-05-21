@@ -58,7 +58,12 @@ class OneLoginComplaintConfirmationPageSpec
 
     "include a paragraph body element with what will happen next" in {
       val paragraphs = content.select("p.govuk-body")
-      paragraphs.get(1).text() should be("Someone will email you back within 2 working days with the next steps.")
+      paragraphs.get(1).text() should be(
+        "We will respond to your complaint by email unless you have requested a response by phone or letter."
+      )
+      paragraphs.get(2).text() should be(
+        "We aim to review your complaint within 15 working days but there may be times when this can take longer. Please wait 30 working days before contacting us if you have not had a reply."
+      )
     }
 
     "translate the title into Welsh if requested" in {
