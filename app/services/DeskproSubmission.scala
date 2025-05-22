@@ -133,7 +133,7 @@ trait DeskproSubmission {
         s"${messages("one_login_complaint.phone-number.label")}: ${oneLoginComplaint.phoneNumber.getOrElse(optionalNoneProvided)}\n\n" +
         s"${messages("one_login_complaint.address.label")}:\n" +
         s"${oneLoginComplaint.address}\n\n" +
-        s"${messages("one_login_complaint.contact-preference.label")}: ${oneLoginComplaint.contactPreference}\n\n" +
+        s"${messages("one_login_complaint.contact-preference.label")}: ${oneLoginComplaint.contactPreference.asString}\n\n" +
         s"${messages("one_login_complaint.complaint.label")}\n" +
         s"${oneLoginComplaint.complaint.getOrElse(optionalNoneProvided)}"
     }

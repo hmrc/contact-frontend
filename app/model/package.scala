@@ -112,28 +112,17 @@ object DateOfBirth {
   val empty: DateOfBirth = DateOfBirth("", "", "")
 }
 
-sealed trait ContactPreference {
-  def toString: String
-}
-
-case object EmailPreference extends ContactPreference {
-  override def toString: String = "Email"
-}
-
-case object PhonePreference extends ContactPreference {
-  override def toString: String = "Phone"
-}
-
-case object LetterPreference extends ContactPreference {
-  override def toString: String = "Letter"
-}
+enum ContactPreference(val asString: String):
+  case EmailPreference extends ContactPreference(asString = "Email")
+  case PhonePreference extends ContactPreference(asString = "Phone")
+  case LetterPreference extends ContactPreference(asString = "Letter")
 
 implicit object ContactPreferenceFormatter extends Formatter[ContactPreference] {
   override def bind(key: String, data: Map[String, String]) = parsing(
     parse = _.toLowerCase() match {
-      case "phone"  => PhonePreference
-      case "letter" => LetterPreference
-      case _        => EmailPreference
+      case "phone"  => ContactPreference.PhonePreference
+      case "letter" => ContactPreference.LetterPreference
+      case _        => ContactPreference.EmailPreference
     },
     errMsg = "one_login_complaint.contact-preference.error",
     Nil
