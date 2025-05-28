@@ -53,7 +53,7 @@ class OneLoginComplaintPageSpec
     phoneNumber = Some("020 7123 4567"),
     address = "1 Whitehall, London, SW1A",
     contactPreference = EmailPreference,
-    complaint = Some("Testing complaint")
+    complaint = "Testing complaint"
   )
 
   "the OlfG Complaint standalone page" should {
@@ -127,7 +127,7 @@ class OneLoginComplaintPageSpec
     "include an error summary if errors occur" in {
       val contentWithErrors = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
-          formValues.copy(name = "", email = "", complaint = None)
+          formValues.copy(name = "", email = "", complaint = "")
         )
       )
       val errorSummaries    = contentWithErrors.select(".govuk-error-summary")
@@ -138,7 +138,7 @@ class OneLoginComplaintPageSpec
     "include Error: in the title if errors occur" in {
       val contentWithErrors = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
-          formValues.copy(name = "", email = "", complaint = None)
+          formValues.copy(name = "", email = "", complaint = "")
         )
       )
       asDocument(contentWithErrors).title should be("Error: One Login for Government complaint – GOV.UK")
@@ -559,7 +559,7 @@ class OneLoginComplaintPageSpec
     "include a label for the optional complaint input" in {
       val label = content.select("label[for=complaint]")
       label              should have size 1
-      label.first.text shouldBe "Complaint (optional)"
+      label.first.text shouldBe "Complaint"
     }
 
     "include a hint for the complaint input" in {
@@ -576,7 +576,7 @@ class OneLoginComplaintPageSpec
     "include the submitted complaint input value" in {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
-          formValues.copy(complaint = Some("complaint text"))
+          formValues.copy(complaint = "complaint text")
         )
       )
       val inputs             = contentWithService.select("textarea[name=complaint]")
@@ -584,11 +584,23 @@ class OneLoginComplaintPageSpec
       inputs.first.text() should include("complaint text")
     }
 
+    "include error for empty complaint" in {
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
+          formValues.copy(complaint = "")
+        )
+      )
+
+      val errors = contentWithService.select("#complaint-error")
+      errors              should have size 1
+      errors.first.text() should be("Error: Enter your complaint")
+    }
+
     "include error for complaint which is too long" in {
       val tooLongComplaint   = Random.nextString(2001)
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
-          formValues.copy(complaint = Some(tooLongComplaint))
+          formValues.copy(complaint = tooLongComplaint)
         )
       )
       val errors             = contentWithService.select("#complaint-error")

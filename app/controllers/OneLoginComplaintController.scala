@@ -95,9 +95,12 @@ object OneLoginComplaintFormBind {
           address => address.nonEmpty
         ),
       "contact-preference" -> of[ContactPreference],
-      "complaint"          -> optional(
-        text.verifying("one_login_complaint.complaint.error", complaint => complaint.length <= 2000)
-      )
+      "complaint"          -> text
+        .verifying(
+          "one_login_complaint.complaint.required",
+          complaint => complaint.nonEmpty
+        )
+        .verifying("one_login_complaint.complaint.error", complaint => complaint.length <= 2000)
     )(OneLoginComplaintForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 }

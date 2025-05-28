@@ -88,7 +88,7 @@ case class OneLoginComplaintForm(
   phoneNumber: Option[String],
   address: String,
   contactPreference: ContactPreference,
-  complaint: Option[String]
+  complaint: String
 )
 
 case class DateOfBirth(day: String, month: String, year: String) {
