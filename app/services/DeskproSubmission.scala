@@ -135,7 +135,7 @@ trait DeskproSubmission {
         s"${oneLoginComplaint.address}\n\n" +
         s"${messages("one_login_complaint.contact-preference.label")}: ${oneLoginComplaint.contactPreference}\n\n" +
         s"${messages("one_login_complaint.complaint.label")}\n" +
-        s"${oneLoginComplaint.complaint.getOrElse(optionalNoneProvided)}"
+        s"${oneLoginComplaint.complaint}"
     }
 
     ticketQueueConnector.createDeskProTicket(
