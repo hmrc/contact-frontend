@@ -143,7 +143,11 @@ class OneLoginComplaintController @Inject() (
             BadRequest(oneLoginComplaintPage(formWithError))
           ),
         oneLoginComplaint =>
-          createOneLoginComplaintTicket(oneLoginComplaint, request, routes.OneLoginComplaintController.index().absoluteURL())
+          createOneLoginComplaintTicket(
+            oneLoginComplaint,
+            request,
+            routes.OneLoginComplaintController.index().absoluteURL()
+          )
             .map { _ =>
               Redirect(routes.OneLoginComplaintController.thanks())
             } recover { case _ =>
