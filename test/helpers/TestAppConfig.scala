@@ -19,11 +19,11 @@ package helpers
 import config.AppConfig
 
 class TestAppConfig extends AppConfig {
-  def externalReportProblemUrl: String = ???
-
   def backUrlDestinationAllowList: Set[String] = ???
 
   override def sendExplicitAuditEvents: Boolean = false
 
   override def enableOlfgComplaintsEndpoints: Boolean = ???
+
+  override def urlWithPlatformHost(url: String): String = ???
 }
