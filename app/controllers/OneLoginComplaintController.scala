@@ -146,7 +146,7 @@ class OneLoginComplaintController @Inject() (
           createOneLoginComplaintTicket(
             oneLoginComplaint,
             request,
-            routes.OneLoginComplaintController.index().absoluteURL()
+            appConfig.urlWithPlatformHost(routes.OneLoginComplaintController.index().url())
           )
             .map { _ =>
               Redirect(routes.OneLoginComplaintController.thanks())

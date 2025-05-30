@@ -21,10 +21,10 @@ import play.api.Configuration
 
 trait AppConfig {
 
-  def externalReportProblemUrl: String
   def backUrlDestinationAllowList: Set[String]
   def sendExplicitAuditEvents: Boolean
   def enableOlfgComplaintsEndpoints: Boolean
+  def urlWithPlatformHost(url: String): String
 
 }
 
@@ -35,20 +35,19 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
       .getOptional[String](key)
       .getOrElse(configNotFoundError(key))
 
-  private val contactHost = configuration
-    .getOptional[String]("contact-frontend.host")
+  private val platformHost: String = configuration
+    .getOptional[String]("platform.frontend.host")
     .getOrElse("")
 
-  override lazy val externalReportProblemUrl =
-    s"$contactHost/contact/problem_reports"
+  override def urlWithPlatformHost(url: String): String = s"$platformHost/$url"
 
-  override lazy val backUrlDestinationAllowList =
+  override lazy val backUrlDestinationAllowList: Set[String] =
     loadConfigString("backUrlDestinationAllowList")
       .split(',')
       .filter(_.nonEmpty)
       .toSet
 
-  private def configNotFoundError(key: String) =
+  private def configNotFoundError(key: String): Nothing =
     throw new RuntimeException(s"Could not find config key '$key'")
 
   override def sendExplicitAuditEvents: Boolean =
