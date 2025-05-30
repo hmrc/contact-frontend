@@ -39,7 +39,7 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
     .getOptional[String]("platform.frontend.host")
     .getOrElse("")
 
-  override def urlWithPlatformHost(url: String): String = s"$platformHost/$url"
+  override def urlWithPlatformHost(url: String): String = s"$platformHost$url"
 
   override lazy val backUrlDestinationAllowList: Set[String] =
     loadConfigString("backUrlDestinationAllowList")
