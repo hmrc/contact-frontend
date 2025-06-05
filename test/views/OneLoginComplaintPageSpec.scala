@@ -225,6 +225,16 @@ class OneLoginComplaintPageSpec
       errors.first.text should include("Error: Enter a National Insurance number in the correct format")
     }
 
+    "allow lower case and punctuation in a nino" in {
+      val contentWithService = oneLoginComplaintPage(
+        oneLoginComplaintForm.fillAndValidate(
+          formValues.copy(nino = "aa-11-22-33 c")
+        )
+      )
+      val errors             = contentWithService.select("#nino-error")
+      errors should have size 0
+    }
+
     "include an error message for the incorrect nino input" in {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
