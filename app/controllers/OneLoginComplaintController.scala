@@ -60,7 +60,7 @@ object OneLoginComplaintFormBind {
           "one_login_complaint.nino.error",
           // GOV.UK Design System guidance is to let users enter upper and lower case letters, additional spaces and punctuation
           // https://design-system.service.gov.uk/patterns/national-insurance-numbers/
-          nino => Nino.isValid(nino.replaceAll("""\p{Punct}""", "").toUpperCase()) || nino.isEmpty
+          nino => Nino.isValid(nino.trim.replaceAll("""\p{Punct}""", "").toUpperCase()) || nino.isEmpty
         ),
       "sa-utr"             -> optional(
         text
