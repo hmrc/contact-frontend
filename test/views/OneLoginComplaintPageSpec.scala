@@ -19,7 +19,7 @@ package views
 import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
 import config.AppConfig
 import controllers.OneLoginComplaintFormBind
-import model.{DateOfBirth, EmailPreference, OneLoginComplaintForm}
+import model.{DateOfBirth, EmailPreference, LetterPreference, OneLoginComplaintForm, PhonePreference}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.Messages
@@ -552,14 +552,14 @@ class OneLoginComplaintPageSpec
     "include the submitted contact preference input value" in {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
-          formValues.copy(contactPreference = EmailPreference)
+          formValues.copy(contactPreference = LetterPreference)
         )
       )
       val inputs             = contentWithService.select("input[name=contact-preference]")
       inputs                 should have size 3
-      inputs.get(0).toString should include("checked")
+      inputs.get(0).toString shouldNot include("checked")
       inputs.get(1).toString shouldNot include("checked")
-      inputs.get(2).toString shouldNot include("checked")
+      inputs.get(2).toString should include("checked")
     }
 
     "include an optional complaint input" in {
