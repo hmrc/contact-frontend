@@ -26,6 +26,7 @@
     legendClasses: String = "",
     checked: Option[String] = None
 )(implicit messages: Messages)
+
 @govukRadios(Radios(
   fieldset = Some(Fieldset(
     legend = Some(Legend(
@@ -38,7 +39,7 @@
       content = Text(hint)
     )
   },
-  value = checked,
+  value = field.value.map(_.toLowerCase).orElse(checked),
   items = items map { case (value: String, label: String) =>
     RadioItem(
       content = Text(label),
