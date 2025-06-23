@@ -20,6 +20,6 @@
 @this(govukPanel: GovukPanel, mainLayout: Layout)
 @(backUrl: Option[BackUrl] = None)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
-@mainLayout(pageTitle = messages("feedback.title"), backLink = backUrl) {
+@mainLayout(pageTitle = messages("feedback.confirmation.title"), backLink = backUrl) {
   @govukPanel(Panel(title = Text(messages("feedback.confirmation.panel.title"))))
 }

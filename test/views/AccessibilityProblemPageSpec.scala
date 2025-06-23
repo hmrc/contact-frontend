@@ -93,7 +93,7 @@ class AccessibilityProblemPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").first().text shouldBe "Report an accessibility problem – GOV.UK"
+      content.select("title").first().text shouldBe "Report an accessibility problem – Contact HMRC – GOV.UK"
     }
 
     "display the correct page heading" in {
@@ -197,7 +197,7 @@ class AccessibilityProblemPageSpec
         ),
         action
       )
-      asDocument(contentWithErrors).title should be("Error: Report an accessibility problem – GOV.UK")
+      asDocument(contentWithErrors).title should be("Error: Report an accessibility problem – Contact HMRC – GOV.UK")
     }
 
     "include the problem input" in {

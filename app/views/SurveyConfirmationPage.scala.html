@@ -18,6 +18,6 @@
 
 @this(govukPanel: GovukPanel, govukBackLink: GovukBackLink, mainLayout: Layout)
 @()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
-@mainLayout(pageTitle = messages("survey.title")) {
-  @govukPanel(Panel(title = Text(messages("survey.confirmation.title"))))
+@mainLayout(pageTitle = messages("survey.confirmation.title")) {
+  @govukPanel(Panel(title = Text(messages("survey.confirmation.panel.title"))))
 }

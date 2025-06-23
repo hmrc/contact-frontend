@@ -43,7 +43,7 @@ class SurveyConfirmationPageSpec
     "include the confirmation panel" in {
       val panels = content.select("h1")
       panels            should have size 1
-      panels.first.text should be("Thank you, your feedback has been received.")
+      panels.first.text should be("Thank you, your feedback has been received")
     }
 
     "translate the title into Welsh if requested" in {
@@ -51,7 +51,7 @@ class SurveyConfirmationPageSpec
       val welshContent = feedbackConfirmationPage()
 
       val titles = welshContent.select("h1")
-      titles.first.text should be("Diolch, mae eich adborth wedi dod i law.")
+      titles.first.text should be("Diolch, mae eich adborth wedi dod i law")
     }
   }
 }
