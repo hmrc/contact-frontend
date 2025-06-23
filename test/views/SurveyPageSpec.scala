@@ -84,7 +84,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport w
     }
 
     "display the correct browser title" in {
-      content.select("title").first().text shouldBe "Survey – GOV.UK"
+      content.select("title").first().text shouldBe "Survey – Contact HMRC – GOV.UK"
     }
 
     "display the correct page heading" in {
@@ -152,7 +152,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport w
         ),
         action
       )
-      asDocument(contentWithErrors).title should be("Error: Survey – GOV.UK")
+      asDocument(contentWithErrors).title should be("Error: Survey – Contact HMRC – GOV.UK")
     }
 
     "include a legend for the helpful radios" in {

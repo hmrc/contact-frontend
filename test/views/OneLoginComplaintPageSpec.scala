@@ -82,7 +82,7 @@ class OneLoginComplaintPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").first().text shouldBe "One Login for Government complaint – GOV.UK"
+      content.select("title").first().text shouldBe "One Login for Government complaint – Contact HMRC – GOV.UK"
     }
 
     "display the correct page heading" in {
@@ -141,7 +141,7 @@ class OneLoginComplaintPageSpec
           formValues.copy(name = "", email = "", complaint = "")
         )
       )
-      asDocument(contentWithErrors).title should be("Error: One Login for Government complaint – GOV.UK")
+      asDocument(contentWithErrors).title should be("Error: One Login for Government complaint – Contact HMRC – GOV.UK")
     }
 
     "include a name input" in {

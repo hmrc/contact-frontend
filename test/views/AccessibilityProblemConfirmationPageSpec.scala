@@ -43,7 +43,7 @@ class AccessibilityProblemConfirmationPageSpec
     "include the confirmation panel" in {
       val panels = content.select("h1.govuk-panel__title")
       panels            should have size 1
-      panels.first.text should be("Your accessibility problem has been reported.")
+      panels.first.text should be("Your accessibility problem has been reported")
     }
 
     "include the what happens next section" in {

@@ -95,7 +95,7 @@ class ReportProblemPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").first().text shouldBe "Get help with a technical problem – GOV.UK"
+      content.select("title").first().text shouldBe "Get help with a technical problem – Contact HMRC – GOV.UK"
     }
 
     "display the correct page heading" in {
@@ -199,7 +199,7 @@ class ReportProblemPageSpec
         ),
         action
       )
-      asDocument(contentWithErrors).title should be("Error: Get help with a technical problem – GOV.UK")
+      asDocument(contentWithErrors).title should be("Error: Get help with a technical problem – Contact HMRC – GOV.UK")
     }
 
     "include the report action" in {

@@ -10,10 +10,11 @@ feedback.email.error.invalid=Nodwch gyfeiriad e-bost yn y fformat cywir, megis e
 feedback.email.error.length=Ni all eich e-bost fod yn hirach na 255 o gymeriadau
 feedback.comments.error.required=Rhowch eich sylwadau
 feedback.comments.error.length=Mae rhaid i’r sylw fod yn 2000 o gymeriadau neu lai
-feedback.title=Anfon eich adborth – GOV.UK
+feedback.title=Anfon eich adborth – Cysylltu â CThEF – GOV.UK
 feedback.heading=Anfon eich adborth
 feedback.send=Anfon
 feedback.confirmation.back=Yn ôl
+feedback.confirmation.title=Mae’ch adborth wedi dod i law – Cysylltu â CThEF – GOV.UK
 feedback.confirmation.panel.title=Mae’ch adborth wedi dod i law
 feedback.comments.hint=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
 
@@ -27,7 +28,7 @@ language-switcher.welsh=Cymraeg
 language-switcher.welsh.hover=Defnyddio’r cyfrif hwn yn Cymraeg
 button.back=Yn ôl
 
-problem_report.title=Cael help gyda phroblem dechnegol – GOV.UK
+problem_report.title=Cael help gyda phroblem dechnegol – Cysylltu â CThEF – GOV.UK
 problem_report.heading=Cael help gyda phroblem dechnegol
 problem_report.paragraph.1=Defnyddio’r ffurflen hon i roi gwybod am broblemau technegol yn unig.
 problem_report.paragraph.2=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. Er enghraifft, eich rhif Yswiriant Gwladol neu rif eich cerdyn credyd.
@@ -45,6 +46,7 @@ problem_report.action.error.length=Mae rhaid i’r sylw fod yn 1000 o gymeriadau
 problem_report.error.error.required=Rhowch fanylion yr hyn a aeth o’i le
 problem_report.error.error.length=Mae rhaid i’r sylw fod yn 1000 o gymeriadau neu lai
 problem_report.button=Anfon
+problem_report.confirmation.title=Mae’ch adroddiad ynghylch problem dechnegol wedi dod i law – Cysylltu â CThEF – GOV.UK
 problem_report.confirmation.panel.title=Mae’ch adroddiad ynghylch problem dechnegol wedi dod i law
 problem_report.confirmation.paragraph=Byddwn yn anfon e-bost o gadarnhad at y cyfeiriad e-bost a roddwyd gennych.
 problem_report.confirmation.next.heading=Yr hyn sy’n digwydd nesaf
@@ -52,12 +54,13 @@ problem_report.confirmation.next.paragraph=Bydd rhywun yn egluro’r camau nesaf
 
 problem_report.common.size_limit=Gallwch nodi hyd at {0} o gymeriadau
 
-survey.title=Arolwg – GOV.UK
+survey.title=Arolwg – Cysylltu â CThEF – GOV.UK
 survey.heading=Arolwg
 survey.helpful.error.required=Rhowch wybod i ni pa mor fodlon ydych gyda’r ateb a gawsoch gennym
 survey.speed.error.required=Rhowch wybod i ni pa mor fodlon ydych gyda’r amser a gymerwyd gennym i’ch ateb
 survey.improve.error.length=Mae’n rhaid i awgrymiadau o welliannau fod yn 2500 o gymeriadau neu lai
-survey.confirmation.title=Diolch, mae eich adborth wedi dod i law.
+survey.confirmation.title=Diolch, mae eich adborth wedi dod i law – Cysylltu â CThEF – GOV.UK
+survey.confirmation.panel.title=Diolch, mae eich adborth wedi dod i law
 survey.was.answer.helpful.question=Pa mor fodlon ydych gyda’r ateb a gawsoch gennym?
 survey.satisfied.with.speed.question=Pa mor fodlon ydych gyda’r amser a gymerwyd gennym i’ch ateb?
 survey.strongly.agree.response=Bodlon iawn
@@ -73,7 +76,7 @@ deskpro.error.page.heading=Mae’n ddrwg gennym – mae problem gyda’r gwasana
 deskpro.error.try.later=Rhowch gynnig arall arni yn nes ymlaen.
 deskpro.error.not.sent=Nid yw’ch neges wedi’i hanfon.
 
-contact.title=Cymorth a chysylltiadau – GOV.UK
+contact.title=Cymorth a chysylltiadau – Cysylltu â CThEF – GOV.UK
 contact.heading=Cymorth a chysylltiadau
 contact.form.specific.query=Os oes gennych ymholiad penodol ynghylch treth {0}.
 contact.button=Anfon
@@ -94,6 +97,7 @@ contact.form.para3=Peidiwch â chynnwys unrhyw wybodaeth bersonol nac ariannol. 
 contact.hmrc.link=Cysylltu â CThEF
 contact.hmrc.url=https://www.gov.uk/government/organisations/hm-revenue-customs/contact
 contact.hmrc.link.newtab=' (yn agor mewn tab newydd)'
+contact.confirmation.title=Mae’ch cais am help wedi dod i law – Cysylltu â CThEF – GOV.UK
 contact.confirmation.panel.title=Mae’ch cais am help wedi dod i law
 contact.confirmation.paragraph=Byddwn yn anfon e-bost o gadarnhad at y cyfeiriad e-bost a roddwyd gennych.
 contact.confirmation.next.heading=Yr hyn sy’n digwydd nesaf
@@ -108,7 +112,7 @@ form.online.services.bad=Gwael
 form.online.services.very_bad=Gwael iawn
 form.comments=Sylwadau
 
-accessibility.title=Rhoi gwybod am broblem hygyrchedd – GOV.UK
+accessibility.title=Rhoi gwybod am broblem hygyrchedd – Cysylltu â CThEF – GOV.UK
 accessibility.heading=Rhoi gwybod am broblem hygyrchedd
 accessibility.message.para1=Dylech dim ond defnyddio’r ffurflen hon i roi gwybod am unrhyw broblemau hygyrchedd rydych wedi dod o hyd iddynt wrth ddefnyddio’r gwasanaeth hwn. Peidiwch â chynnwys gwybodaeth bersonol nac ariannol, er enghraifft eich rhif Yswiriant Gwladol neu fanylion eich cerdyn credyd.
 accessibility.message.para2=Rydym yn adolygu ac yn ceisio mynd i’r afael ag unrhyw broblem hygyrchedd rydym y cael gwybod amdani.
@@ -126,7 +130,8 @@ accessibility.email.error.length=Ni all eich e-bost fod yn hirach na 255 o gymer
 accessibility.email.hint=Byddwn ond yn defnyddio hwn i ateb eich neges.
 accessibility.button=Anfon
 
-accessibility.confirmation.title=Mae’ch problem wedi ei nodi
+accessibility.confirmation.title=Mae’ch problem wedi ei nodi – Cysylltu â CThEF – GOV.UK
+accessibility.confirmation.panel.title=Mae’ch problem wedi ei nodi
 accessibility.confirmation.subheading=Yr hyn sy’n digwydd nesaf
 accessibility.confirmation.paragraph=Rydym yn adolygu ac yn ceisio mynd i’r afael ag unrhyw broblem hygyrchedd y rhoddir gwybod amdani. Os ydych wedi rhoi’ch manylion cyswllt i ni, rhown wybod i chi am hynt eich gwybodaeth.
 
@@ -136,12 +141,12 @@ testPage.title = Service test page – GOV.UK
 testPage.heading  = Service test page
 
 ## Not Found Page
-notFound.pageTitle=Heb ddod o hyd i’r dudalen – GOV.UK
+notFound.pageTitle=Heb ddod o hyd i’r dudalen – Cysylltu â CThEF – GOV.UK
 notFound.heading=Heb ddod o hyd i’r dudalen
 notFound.paragraph1=Os gwnaethoch deipio’r cyfeiriad gwe, dylech wirio ei fod yn gywir.
 notFound.paragraph2=Os gwnaethoch bastio’r cyfeiriad gwe, dylech wirio’ch bod wedi copïo’r cyfeiriad yn llawn.
 
-one_login_complaint.title=Cwyn One Login for Government – GOV.UK
+one_login_complaint.title=Cwyn One Login for Government – Cysylltu â CThEF – GOV.UK
 one_login_complaint.heading=Cwyn One Login for Government
 one_login_complaint.paragraph=Mae’r ffurflen hon i wneud cwyn am y broses GOV.UK One Login. Er mwyn delio â’r gŵyn, mae angen i chi roi’r holl wybodaeth orfodol.
 one_login_complaint.name.label=Enw llawn
@@ -174,7 +179,7 @@ one_login_complaint.complaint.label=Cwyn
 one_login_complaint.complaint.hint=Pa broblemau ydych yn eu profi a sut allwn eich helpu. Rhowch yr holl wybodaeth berthnasol yn y blwch isod.
 one_login_complaint.complaint.required=Nodwch eich cwyn
 one_login_complaint.complaint.error=Ni all y cwyn fod yn hirach na 1000 o gymeriadau
-one_login_complaint.confirmation.title=Mae’ch cwyn One Login for Government wedi dod i law – GOV.UK
+one_login_complaint.confirmation.title=Mae’ch cwyn One Login for Government wedi dod i law – Cysylltu â CThEF – GOV.UK
 one_login_complaint.confirmation.panel.title=Mae’ch cwyn One Login for Government wedi dod i law
 one_login_complaint.confirmation.next.paragraph=Byddwn yn ymateb i’ch cwyn drwy e-bost oni bai eich bod wedi gofyn am ymateb dros y ffôn neu drwy lythyr.
 one_login_complaint.confirmation.next.paragraph.two=Ein nod yw adolygu eich cwyn cyn pen 15 diwrnod gwaith ond efallai y bydd adegau pan all hyn gymryd mwy o amser. Arhoswch 30 diwrnod gwaith cyn cysylltu â ni os nad ydych wedi cael.

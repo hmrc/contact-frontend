@@ -10,10 +10,11 @@ feedback.email.error.invalid=Enter an email address in the correct format, like 
 feedback.email.error.length=Email address must be 255 characters or fewer
 feedback.comments.error.required=Enter your comments
 feedback.comments.error.length=Comment must be 2000 characters or less
-feedback.title=Send your feedback – GOV.UK
+feedback.title=Send your feedback – Contact HMRC – GOV.UK
 feedback.heading=Send your feedback
 feedback.send=Send
 feedback.confirmation.back=Back
+feedback.confirmation.title=We have received your feedback – Contact HMRC – GOV.UK
 feedback.confirmation.panel.title=We have received your feedback
 feedback.comments.hint=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
 
@@ -27,7 +28,7 @@ language-switcher.welsh=Cymraeg
 language-switcher.welsh.hover=Defnyddio’r cyfrif hwn yn Cymraeg
 button.back=Back
 
-problem_report.title=Get help with a technical problem – GOV.UK
+problem_report.title=Get help with a technical problem – Contact HMRC – GOV.UK
 problem_report.heading=Get help with a technical problem
 problem_report.paragraph.1=Only use this form to report technical problems.
 problem_report.paragraph.2=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
@@ -45,6 +46,7 @@ problem_report.action.error.length=Comment must be 1000 characters or less
 problem_report.error.error.required=Enter details of what went wrong
 problem_report.error.error.length=Comment must be 1000 characters or less
 problem_report.button=Send
+problem_report.confirmation.title=We have received your technical problem report – Contact HMRC – GOV.UK
 problem_report.confirmation.panel.title=We have received your technical problem report
 problem_report.confirmation.paragraph=We will send a confirmation email to the email address you provided.
 problem_report.confirmation.next.heading=What happens next
@@ -52,9 +54,10 @@ problem_report.confirmation.next.paragraph=Someone will email you back within 2 
 
 problem_report.common.size_limit=You can enter up to {0} characters
 
-survey.title=Survey – GOV.UK
+survey.title=Survey – Contact HMRC – GOV.UK
 survey.heading=Survey
-survey.confirmation.title=Thank you, your feedback has been received.
+survey.confirmation.title=Thank you, your feedback has been received – Contact HMRC – GOV.UK
+survey.confirmation.panel.title=Thank you, your feedback has been received
 survey.helpful.error.required=Tell us how satisfied you are with the answer we gave you
 survey.speed.error.required=Tell us how satisfied you are with the speed of our reply
 survey.improve.error.length=Improvement suggestions must be 2500 characters or fewer
@@ -73,7 +76,7 @@ deskpro.error.page.heading=Sorry, there is a problem with the service
 deskpro.error.try.later=Try again later.
 deskpro.error.not.sent=Your message has not been sent.
 
-contact.title=Help and contact – GOV.UK
+contact.title=Help and contact – Contact HMRC – GOV.UK
 contact.heading=Help and contact
 contact.form.specific.query=If you have a specific tax query {0}.
 contact.name.label=Full name
@@ -94,6 +97,7 @@ contact.form.para1=If you have a specific tax query
 contact.form.para2=If you need help using your tax account please fill in this form.
 contact.form.para3=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
 contact.button=Send
+contact.confirmation.title=We have received your request for help – Contact HMRC – GOV.UK
 contact.confirmation.panel.title=We have received your request for help
 contact.confirmation.paragraph=We will send a confirmation email to the email address you provided.
 contact.confirmation.next.heading=What happens next
@@ -108,7 +112,7 @@ form.online.services.bad=Bad
 form.online.services.very_bad=Very bad
 form.comments=Comments
 
-accessibility.title=Report an accessibility problem – GOV.UK
+accessibility.title=Report an accessibility problem – Contact HMRC – GOV.UK
 accessibility.heading=Report an accessibility problem
 accessibility.message.para1=Please only use this form to report any accessibility problems you have found when using this service. Do not include personal or financial information, for example your National Insurance number or credit card details.
 accessibility.message.para2=We review and try to resolve all accessibility problems reported to us.
@@ -126,7 +130,8 @@ accessibility.email.error.invalid=Enter an email address in the correct format, 
 accessibility.email.error.length=Email address must be 255 characters or fewer
 accessibility.button=Report Problem
 
-accessibility.confirmation.title=Your accessibility problem has been reported.
+accessibility.confirmation.title=Your accessibility problem has been reported – Contact HMRC – GOV.UK
+accessibility.confirmation.panel.title=Your accessibility problem has been reported
 accessibility.confirmation.subheading=What happens next
 accessibility.confirmation.paragraph=We have received your message and will reply, or let you know how we are dealing with this, within 2 working days.
 
@@ -136,12 +141,12 @@ testPage.title = Service test page – GOV.UK
 testPage.heading = Service test page
 
 ## Not Found Page
-notFound.pageTitle=Page not found – GOV.UK
+notFound.pageTitle=Page not found – Contact HMRC – GOV.UK
 notFound.heading=Page not found
 notFound.paragraph1=If you typed the web address, check it is correct.
 notFound.paragraph2=If you pasted the web address, check you copied the entire address.
 
-one_login_complaint.title=One Login for Government complaint – GOV.UK
+one_login_complaint.title=One Login for Government complaint – Contact HMRC – GOV.UK
 one_login_complaint.heading=One Login for Government complaint
 one_login_complaint.paragraph=This form is to make a complaint about the GOV.UK One Login process. To deal with the complaint we need you to provide all the mandatory information.
 one_login_complaint.name.label=Full name
@@ -174,7 +179,7 @@ one_login_complaint.complaint.label=Complaint
 one_login_complaint.complaint.hint=What problems are you experiencing and how can we help you. Please provide all the relevant information in the box below.
 one_login_complaint.complaint.required=Enter your complaint
 one_login_complaint.complaint.error=Complaint cannot be longer than 1000 characters
-one_login_complaint.confirmation.title=We have received your One Login for Government complaint – GOV.UK
+one_login_complaint.confirmation.title=We have received your One Login for Government complaint – Contact HMRC – GOV.UK
 one_login_complaint.confirmation.panel.title=We have received your One Login for Government complaint
 one_login_complaint.confirmation.next.paragraph=We will respond to your complaint by email unless you have requested a response by phone or letter.
 one_login_complaint.confirmation.next.paragraph.two=We aim to review your complaint within 15 working days but there may be times when this can take longer. Please wait 30 working days before contacting us if you have not had a reply.

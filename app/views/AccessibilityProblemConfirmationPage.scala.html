@@ -19,8 +19,8 @@
 @this(govukPanel: GovukPanel, mainLayout: Layout, h2: Heading2, p: Paragraph)
 @()(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
-@mainLayout(pageTitle = Messages("accessibility.title")) {
-    @govukPanel(Panel(title = Text(Messages("accessibility.confirmation.title"))))
+@mainLayout(pageTitle = Messages("accessibility.confirmation.title")) {
+    @govukPanel(Panel(title = Text(Messages("accessibility.confirmation.panel.title"))))
     @h2(content = Text(messages("accessibility.confirmation.subheading")))
     @p(content = Text(messages("accessibility.confirmation.paragraph")))
 }

@@ -101,7 +101,7 @@ class FeedbackPageSpec
     }
 
     "display the correct browser title" in {
-      content.select("title").first().text shouldBe "Send your feedback – GOV.UK"
+      content.select("title").first().text shouldBe "Send your feedback – Contact HMRC – GOV.UK"
     }
 
     "display the correct page heading" in {
@@ -228,7 +228,7 @@ class FeedbackPageSpec
         ),
         action
       )
-      asDocument(contentWithErrors).title should be("Error: Send your feedback – GOV.UK")
+      asDocument(contentWithErrors).title should be("Error: Send your feedback – Contact HMRC – GOV.UK")
     }
 
     "include a legend for the feedback rating radios" in {
