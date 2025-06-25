@@ -35,6 +35,7 @@ import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 @Singleton class FeedbackController @Inject() (
   val ticketQueueConnector: DeskproTicketQueueConnector,
@@ -99,7 +100,7 @@ import scala.concurrent.{ExecutionContext, Future}
               maybeEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
               _               <- createDeskproFeedback(data, maybeEnrolments)
             } yield Redirect(routes.FeedbackController.thanks(data.backUrl))
-          }.recover { case _ =>
+          }.recover { case NonFatal(_) =>
             InternalServerError(errorPage())
           }
       )

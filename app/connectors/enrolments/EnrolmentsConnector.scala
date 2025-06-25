@@ -23,6 +23,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 case class EnrolmentsConnector @Inject() (authConnector: AuthConnector)(using ExecutionContext)
     extends AuthorisedFunctions {
@@ -33,7 +34,7 @@ case class EnrolmentsConnector @Inject() (authConnector: AuthConnector)(using Ex
         .retrieve(Retrievals.allEnrolments) { enrolments =>
           Future.successful(Some(enrolments))
         }
-        .recover { case _ => None }
+        .recover { case NonFatal(_) => None }
     } else {
       Future.successful(None)
     }

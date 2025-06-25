@@ -32,6 +32,7 @@ import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 object ContactHmrcForm {
 
@@ -113,7 +114,7 @@ class ContactHmrcController @Inject() (
             } yield {
               val thanks = routes.ContactHmrcController.thanks
               Redirect(thanks)
-            }).recover { case _ =>
+            }).recover { case NonFatal(_) =>
               InternalServerError(errorPage())
             }
         )

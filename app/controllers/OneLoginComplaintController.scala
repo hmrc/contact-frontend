@@ -31,6 +31,7 @@ import uk.gov.hmrc.domain.Nino
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 object OneLoginComplaintFormBind {
   private val emailValidator = DeskproEmailValidator()
@@ -152,7 +153,7 @@ class OneLoginComplaintController @Inject() (
           )
             .map { _ =>
               Redirect(routes.OneLoginComplaintController.thanks())
-            } recover { case _ =>
+            } recover { case NonFatal(_) =>
             InternalServerError(errorPage())
           }
       )

@@ -32,6 +32,7 @@ import views.html.{InternalErrorPage, ReportProblemConfirmationPage, ReportProbl
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 object ReportProblemFormBind {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
@@ -157,7 +158,7 @@ class ReportProblemController @Inject() (
           (for {
             maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
             _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-          } yield Redirect(routes.ReportProblemController.thanks())) recover { case _ =>
+          } yield Redirect(routes.ReportProblemController.thanks())) recover { case NonFatal(_) =>
             InternalServerError(errorPage())
           }
         }

@@ -34,6 +34,7 @@ import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPag
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 object AccessibilityFormBind {
   private val emailValidator = DeskproEmailValidator()
@@ -135,7 +136,7 @@ class AccessibilityController @Inject() (
                 maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
                 _                   <- createAccessibilityTicket(data, maybeUserEnrolments)
               } yield Redirect(thanks)
-            }.recover { case _ =>
+            }.recover { case NonFatal(_) =>
               InternalServerError(errorPage())
             }
         )
