@@ -21,6 +21,7 @@ import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import model.Aliases.*
 import model.FeedbackForm
+import play.api.Logging
 import play.api.data.Forms.*
 import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, Form, FormError}
@@ -35,6 +36,7 @@ import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 @Singleton class FeedbackController @Inject() (
   val ticketQueueConnector: DeskproTicketQueueConnector,
@@ -48,7 +50,8 @@ import scala.concurrent.{ExecutionContext, Future}
 )(using AppConfig, ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   given lang(using request: Request[?]): Lang = request.lang
 
@@ -99,7 +102,8 @@ import scala.concurrent.{ExecutionContext, Future}
               maybeEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
               _               <- createDeskproFeedback(data, maybeEnrolments)
             } yield Redirect(routes.FeedbackController.thanks(data.backUrl))
-          }.recover { case _ =>
+          }.recover { case NonFatal(_) =>
+            logger.error("Creating feedback ticket failed")
             InternalServerError(errorPage())
           }
       )

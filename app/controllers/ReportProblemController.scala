@@ -21,6 +21,7 @@ import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import model.Aliases.ReferrerUrl
 import model.ReportProblemForm
+import play.api.Logging
 import play.api.data.Forms.*
 import play.api.data.*
 import play.api.i18n.{I18nSupport, Lang}
@@ -32,6 +33,7 @@ import views.html.{InternalErrorPage, ReportProblemConfirmationPage, ReportProbl
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 object ReportProblemFormBind {
   private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
@@ -110,7 +112,8 @@ class ReportProblemController @Inject() (
 )(using AppConfig, ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   given lang(using request: Request[?]): Lang = request.lang
 
@@ -157,7 +160,8 @@ class ReportProblemController @Inject() (
           (for {
             maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
             _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-          } yield Redirect(routes.ReportProblemController.thanks())) recover { case _ =>
+          } yield Redirect(routes.ReportProblemController.thanks())) recover { case NonFatal(_) =>
+            logger.error("Creating problem report ticket failed")
             InternalServerError(errorPage())
           }
         }

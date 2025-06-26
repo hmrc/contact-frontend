@@ -20,6 +20,8 @@ import config.AppConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import model.Aliases.ReferrerUrl
+import play.api.Logging
+
 import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.data.Forms.*
@@ -32,6 +34,7 @@ import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 object ContactHmrcForm {
 
@@ -75,7 +78,8 @@ class ContactHmrcController @Inject() (
 )(using val appConfig: AppConfig, val executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   given lang(using request: Request[?]): Lang = request.lang
 
@@ -113,7 +117,8 @@ class ContactHmrcController @Inject() (
             } yield {
               val thanks = routes.ContactHmrcController.thanks
               Redirect(thanks)
-            }).recover { case _ =>
+            }).recover { case NonFatal(_) =>
+              logger.error("Creating DeskPro ticket failed")
               InternalServerError(errorPage())
             }
         )

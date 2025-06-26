@@ -16,6 +16,7 @@
 
 package connectors.enrolments
 
+import play.api.Logging
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions, Enrolments}
@@ -23,9 +24,11 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 case class EnrolmentsConnector @Inject() (authConnector: AuthConnector)(using ExecutionContext)
-    extends AuthorisedFunctions {
+    extends AuthorisedFunctions
+    with Logging {
 
   def maybeAuthenticatedUserEnrolments()(using request: Request[?])(using HeaderCarrier): Future[Option[Enrolments]] =
     if (request.session.get(SessionKeys.authToken).isDefined) {
@@ -33,7 +36,10 @@ case class EnrolmentsConnector @Inject() (authConnector: AuthConnector)(using Ex
         .retrieve(Retrievals.allEnrolments) { enrolments =>
           Future.successful(Some(enrolments))
         }
-        .recover { case _ => None }
+        .recover { case NonFatal(_) =>
+          logger.error("Session has an authToken, but retrieval of enrolments failed")
+          None
+        }
     } else {
       Future.successful(None)
     }

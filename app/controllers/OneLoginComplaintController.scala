@@ -19,6 +19,7 @@ package controllers
 import config.{AppConfig, ContactFrontendErrorHandler}
 import connectors.deskpro.DeskproTicketQueueConnector
 import model.{ContactPreference, ContactPreferenceFormatter, DateOfBirth, OneLoginComplaintForm}
+import play.api.Logging
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.I18nSupport
@@ -31,6 +32,7 @@ import uk.gov.hmrc.domain.Nino
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 object OneLoginComplaintFormBind {
   private val emailValidator = DeskproEmailValidator()
@@ -118,7 +120,8 @@ class OneLoginComplaintController @Inject() (
 )(using appConfig: AppConfig, ec: ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def index(): Action[AnyContent] = checkIfEnabled {
     Action { request =>
@@ -152,7 +155,8 @@ class OneLoginComplaintController @Inject() (
           )
             .map { _ =>
               Redirect(routes.OneLoginComplaintController.thanks())
-            } recover { case _ =>
+            } recover { case NonFatal(_) =>
+            logger.error("Creating One Login Complaint ticket failed")
             InternalServerError(errorPage())
           }
       )
