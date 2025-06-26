@@ -21,6 +21,7 @@ import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import model.AccessibilityForm
 import model.Aliases.ReferrerUrl
+import play.api.Logging
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.{I18nSupport, Lang}
@@ -97,7 +98,8 @@ class AccessibilityController @Inject() (
 )(using AppConfig, ExecutionContext)
     extends FrontendController(mcc)
     with DeskproSubmission
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   given lang(using request: Request[?]): Lang = request.lang
 
@@ -137,6 +139,7 @@ class AccessibilityController @Inject() (
                 _                   <- createAccessibilityTicket(data, maybeUserEnrolments)
               } yield Redirect(thanks)
             }.recover { case NonFatal(_) =>
+              logger.error("Creating accessibility ticket failed")
               InternalServerError(errorPage())
             }
         )
