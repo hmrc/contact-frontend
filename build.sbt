@@ -29,7 +29,7 @@ lazy val microservice = Project(appName, file("."))
 lazy val sharedSettings = Seq(
   libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
   majorVersion := 4,
-  scalaVersion := "3.3.4"
+  scalaVersion := "3.3.6"
 )
 
 lazy val unitTestSettings =
