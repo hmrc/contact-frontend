@@ -16,8 +16,9 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.*
+@import uk.gov.hmrc.hmrcfrontend.extensions.GovukServiceNavigationExtensions
 
-@this(hmrcStandardPage: HmrcStandardPage)
+@this(hmrcStandardPage: HmrcStandardPage)(using GovukServiceNavigationExtensions)
 
 @(pageTitle: String, isWelshTranslationAvailable: Boolean = true, backLink: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
@@ -26,7 +27,10 @@
         banners = Banners(displayHmrcBanner = true),
         isWelshTranslationAvailable = isWelshTranslationAvailable,
         pageTitle = Some(pageTitle),
-        backLink = backLink.map(url => BackLink.withDefaultText(href = url))
+        backLink = backLink.map(url => BackLink.withDefaultText(href = url)),
+        serviceNavigation = Some(ServiceNavigation(
+          serviceName = Some("Contact frontend")
+        ).withLanguageSelect())
     )
 )(contentBlock)
 
