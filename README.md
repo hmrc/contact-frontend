@@ -192,7 +192,7 @@ Feedback survey results currently are stored as explicit audit events with the f
 
 ## Reporting an accessibility problem
 
-> :warning: This form is linked to from [accessibility-statement-frontend](https://www.github.com/accessibility-statement-frontend)
+> :warning: This form is linked to from [accessibility-statement-frontend](https://www.github.com/hmrc/accessibility-statement-frontend)
 > and is not to be used directly.
 
 ![alt tag](docs/accessibility.png)
