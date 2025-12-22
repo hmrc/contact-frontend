@@ -40,10 +40,10 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
       .build()
 
   private def reportTechnicalProblemUrl = s"http://localhost:$port/contact/report-technical-problem"
-  private def feedbackUrl             = s"http://localhost:$port/contact/beta-feedback"
-  private def contactHmrcUrl          = s"http://localhost:$port/contact/contact-hmrc"
-  private def surveyUrl               = s"http://localhost:$port/contact/survey?ticketId=GFBN-8051-KLNY&serviceId=foo"
-  private def accessibilityUrl        = s"http://localhost:$port/contact/accessibility"
+  private def feedbackUrl               = s"http://localhost:$port/contact/beta-feedback"
+  private def contactHmrcUrl            = s"http://localhost:$port/contact/contact-hmrc"
+  private def surveyUrl                 = s"http://localhost:$port/contact/survey?ticketId=GFBN-8051-KLNY&serviceId=foo"
+  private def accessibilityUrl          = s"http://localhost:$port/contact/accessibility"
 
   private val problemForm = Map(
     "report-name"   -> "Joe",
