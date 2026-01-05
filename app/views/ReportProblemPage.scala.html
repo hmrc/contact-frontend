@@ -69,13 +69,11 @@
         @inputCharacterCount(
             problemReportForm("report-action"),
             label = messages("problem_report.action.label"),
-            classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
         )
         @inputCharacterCount(
             problemReportForm("report-error"),
             label = messages("problem_report.error.label"),
-            classes = "govuk-!-width-two-thirds",
             maxLength = Some(1000)
         )
         @govukButton(Button(
