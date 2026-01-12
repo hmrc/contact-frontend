@@ -16,30 +16,16 @@
 
 package views
 
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
-import config.AppConfig
 import controllers.ContactForm
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import helpers.BaseViewSpec
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.Messages
-import play.api.mvc.{Call, RequestHeader}
-import play.api.test.CSRFTokenHelper.*
-import play.api.test.FakeRequest
+import play.api.mvc.Call
 import play.api.test.Helpers.*
 import views.html.ContactHmrcPage
 
-class ContactHmrcPageSpec
-    extends AnyWordSpec
-    with Matchers
-    with ApplicationSupport
-    with MessagesSupport
-    with JsoupHelpers {
-
-  given fakeRequest: RequestHeader = FakeRequest("GET", "/contact-hmrc").withCSRFToken
-  given Messages                   = getMessages()
-  given AppConfig                  = app.injector.instanceOf[AppConfig]
+class ContactHmrcPageSpec extends BaseViewSpec {
 
   val contactHmrcForm: Form[ContactForm] = Form[ContactForm](
     mapping(
@@ -68,7 +54,7 @@ class ContactHmrcPageSpec
   val action: Call = Call(method = "POST", url = "/contact/contact-hmrc/submit")
 
   "the Contact Hmrc standalone page" should {
-    val contactHmrcPage = app.injector.instanceOf[ContactHmrcPage]
+    val contactHmrcPage = instanceOf[ContactHmrcPage]
     val content         = contactHmrcPage(contactHmrcForm, action)
 
     "include the hmrc banner" in {
@@ -79,7 +65,7 @@ class ContactHmrcPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = contactHmrcPage(contactHmrcForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
@@ -109,7 +95,7 @@ class ContactHmrcPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = contactHmrcPage(contactHmrcForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
@@ -242,7 +228,7 @@ class ContactHmrcPageSpec
     }
 
     "translate the contact comments textarea label into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = contactHmrcPage(contactHmrcForm, action)
 
       val paragraphs = welshContent.select("label[for=contact-comments]")

@@ -16,30 +16,16 @@
 
 package views
 
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
-import config.AppConfig
+import helpers.BaseViewSpec
 import model.AccessibilityForm
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.Messages
-import play.api.mvc.{Call, RequestHeader}
-import play.api.test.CSRFTokenHelper.*
-import play.api.test.FakeRequest
+import play.api.mvc.Call
 import play.api.test.Helpers.*
 import views.html.AccessibilityProblemPage
 
-class AccessibilityProblemPageSpec
-    extends AnyWordSpec
-    with Matchers
-    with ApplicationSupport
-    with MessagesSupport
-    with JsoupHelpers {
-
-  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
-  given Messages                   = getMessages()
-  given AppConfig                  = app.injector.instanceOf[AppConfig]
+class AccessibilityProblemPageSpec extends BaseViewSpec {
 
   val accessibilityForm: Form[AccessibilityForm] = Form[AccessibilityForm](
     mapping(
@@ -68,7 +54,7 @@ class AccessibilityProblemPageSpec
   val action: Call = Call(method = "POST", url = "/contact/the-submit-url")
 
   "the report an accessibility problem page" should {
-    val accessibilityProblemPage = app.injector.instanceOf[AccessibilityProblemPage]
+    val accessibilityProblemPage = instanceOf[AccessibilityProblemPage]
     val content                  = accessibilityProblemPage(accessibilityForm, action)
 
     "include the hmrc banner" in {
@@ -79,7 +65,7 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = accessibilityProblemPage(accessibilityForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
@@ -109,7 +95,7 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = accessibilityProblemPage(accessibilityForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
@@ -240,7 +226,7 @@ class AccessibilityProblemPageSpec
     }
 
     "translate the textarea label into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = accessibilityProblemPage(accessibilityForm, action)
 
       val paragraphs = welshContent.select("label[for=problemDescription]")

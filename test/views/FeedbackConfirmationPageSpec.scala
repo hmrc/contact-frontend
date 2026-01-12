@@ -16,28 +16,14 @@
 
 package views
 
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
-import config.AppConfig
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import helpers.BaseViewSpec
 import play.api.i18n.Messages
-import play.api.mvc.RequestHeader
-import play.api.test.FakeRequest
 import views.html.FeedbackConfirmationPage
 
-class FeedbackConfirmationPageSpec
-    extends AnyWordSpec
-    with Matchers
-    with ApplicationSupport
-    with MessagesSupport
-    with JsoupHelpers {
-
-  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
-  given Messages                   = getMessages()
-  given AppConfig                  = app.injector.instanceOf[AppConfig]
+class FeedbackConfirmationPageSpec extends BaseViewSpec {
 
   "the feedback confirmation page" should {
-    val feedbackConfirmationPage = app.injector.instanceOf[FeedbackConfirmationPage]
+    val feedbackConfirmationPage = instanceOf[FeedbackConfirmationPage]
     val content                  = feedbackConfirmationPage()
 
     "include the confirmation panel" in {
@@ -54,7 +40,7 @@ class FeedbackConfirmationPageSpec
     }
 
     "translate the title into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = feedbackConfirmationPage()
 
       val titles = welshContent.select("h1")

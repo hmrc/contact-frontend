@@ -21,15 +21,11 @@ import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
+import helpers.BaseControllerSpec
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq as meq}
 import org.mockito.Mockito.*
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -40,12 +36,7 @@ import util.{BackUrlValidator, RefererHeaderRetriever}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
-
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "useRefererHeader" -> true)
-      .build()
+class FeedbackControllerSpec extends BaseControllerSpec {
 
   "feedbackForm" should {
     "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in new TestScope {

@@ -20,13 +20,11 @@ import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
-import helpers.ApplicationSupport
+import helpers.BaseControllerSpec
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq as meq}
 import org.mockito.Mockito.*
 import org.mockito.stubbing.OngoingStubbing
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.mvc.Request
@@ -39,10 +37,7 @@ import util.RefererHeaderRetriever
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport with Matchers {
-
-  given Messages =
-    app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+class ReportProblemControllerSpec extends BaseControllerSpec {
 
   "Requesting the standalone page" should {
     "return OK and valid HTML" in new TestScope {

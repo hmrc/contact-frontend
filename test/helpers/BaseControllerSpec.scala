@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package helpers
 
-import config.AppConfig
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import play.api.i18n.{Lang, Messages, MessagesApi}
 
-class TestAppConfig extends AppConfig {
-  def backUrlDestinationAllowList: Set[String] = ???
+import scala.reflect.ClassTag
 
-  override def sendExplicitAuditEvents: Boolean = false
+trait BaseControllerSpec extends AnyWordSpec with Matchers with ApplicationSupport {
 
-  override def enableOlfgComplaintsEndpoints: Boolean = ???
+  def instanceOf[A: ClassTag]: A = app.injector.instanceOf[A]
 
-  override def urlWithPlatformHost(url: String): String = ???
+  given Messages = instanceOf[MessagesApi].preferred(Seq(Lang("en")))
 }

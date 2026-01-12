@@ -17,16 +17,11 @@
 package controllers
 
 import config.*
-import helpers.JsoupHelpers
+import helpers.{BaseControllerSpec, JsoupHelpers}
 import org.jsoup.Jsoup
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.data.FormError
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import play.api.test.{FakeHeaders, FakeRequest}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -36,15 +31,7 @@ import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import scala.concurrent.duration.*
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class SurveyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with JsoupHelpers {
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"                  -> false,
-        "metrics.enabled"              -> false,
-        "enablePlayFrontendSurveyForm" -> true
-      )
-      .build()
+class SurveyControllerSpec extends BaseControllerSpec with JsoupHelpers {
 
   "SurveyController" should {
     "bind query string parameters to the form as expected" in new TestScope {

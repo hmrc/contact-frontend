@@ -16,24 +16,15 @@
 
 package views
 
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
-import config.AppConfig
+import helpers.BaseViewSpec
 import model.SurveyForm
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.Messages
-import play.api.mvc.{Call, RequestHeader}
-import play.api.test.CSRFTokenHelper.*
-import play.api.test.FakeRequest
+import play.api.mvc.Call
 import views.html.SurveyPage
 
-class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport with MessagesSupport with JsoupHelpers {
-
-  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
-  given Messages                   = getMessages()
-  given AppConfig                  = app.injector.instanceOf[AppConfig]
+class SurveyPageSpec extends BaseViewSpec {
 
   val form: Form[SurveyForm] = Form[SurveyForm](
     mapping(
@@ -59,7 +50,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport w
   val action: Call = Call(method = "POST", url = "/contact/the-submit-url")
 
   "The survey page" should {
-    val surveyPage = app.injector.instanceOf[SurveyPage]
+    val surveyPage = instanceOf[SurveyPage]
     val content    = surveyPage(form, action)
 
     "include the hmrc banner" in {
@@ -70,7 +61,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport w
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = surveyPage(form, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
@@ -327,7 +318,7 @@ class SurveyPageSpec extends AnyWordSpec with Matchers with ApplicationSupport w
     }
 
     "translate the textarea label into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = surveyPage(form, action)
 
       val paragraphs = welshContent.select("label[for=improve]")

@@ -16,30 +16,14 @@
 
 package views
 
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
-import config.AppConfig
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import play.api.i18n.Messages
-import play.api.mvc.RequestHeader
-import play.api.test.CSRFTokenHelper.*
-import play.api.test.FakeRequest
+import helpers.BaseViewSpec
 import play.api.test.Helpers.*
 import views.html.InternalErrorPage
 
-class InternalErrorPageSpec
-    extends AnyWordSpec
-    with Matchers
-    with ApplicationSupport
-    with MessagesSupport
-    with JsoupHelpers {
-
-  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo").withCSRFToken
-  given Messages                   = getMessages()
-  given AppConfig                  = app.injector.instanceOf[AppConfig]
+class InternalErrorPageSpec extends BaseViewSpec {
 
   "the error template" should {
-    val errorTemplate = app.injector.instanceOf[InternalErrorPage]
+    val errorTemplate = instanceOf[InternalErrorPage]
     val content       =
       errorTemplate()
 
