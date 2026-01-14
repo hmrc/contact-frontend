@@ -16,7 +16,6 @@
 
 package controllers
 
-import org.apache.pekko.actor.ActorSystem
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
@@ -79,8 +78,6 @@ class ContactHmrcControllerSpec extends BaseControllerSpec with GivenWhenThen {
         any[TicketConstants]
       )(using any[HeaderCarrier])
     ).thenReturn(result)
-
-  given ActorSystem = ActorSystem()
 
   val connectorTimeout: VerificationWithTimeout =
     Mockito.timeout(5000)
