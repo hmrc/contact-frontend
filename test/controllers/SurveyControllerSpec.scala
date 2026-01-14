@@ -16,10 +16,8 @@
 
 package controllers
 
-import config.*
 import helpers.{BaseControllerSpec, JsoupHelpers}
 import org.jsoup.Jsoup
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.FormError
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.test.Helpers.*
@@ -29,12 +27,24 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 
 import scala.concurrent.duration.*
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, Future}
 
 class SurveyControllerSpec extends BaseControllerSpec with JsoupHelpers {
 
+  val notFoundPage           = instanceOf[views.html.NotFoundPage]
+  val playFrontendSurveyPage = instanceOf[views.html.SurveyPage]
+  val messagesApi            = instanceOf[MessagesApi]
+
+  val controller = new SurveyController(
+    mock[AuditConnector],
+    Stubs.stubMessagesControllerComponents(messagesApi = messagesApi),
+    notFoundPage,
+    playFrontendSurveyPage,
+    mock[views.html.SurveyConfirmationPage]
+  )
+
   "SurveyController" should {
-    "bind query string parameters to the form as expected" in new TestScope {
+    "bind query string parameters to the form as expected" in {
       val ticketId  = "GFBN-8051-KLNY"
       val serviceId = "abcdefg"
 
@@ -48,7 +58,7 @@ class SurveyControllerSpec extends BaseControllerSpec with JsoupHelpers {
       document.body().select("input[name=ticket-id]").first.attr("value")  shouldBe ticketId
     }
 
-    "produce an audit result for a valid form" in new TestScope {
+    "produce an audit result for a valid form" in {
       given FakeRequest[?] = FakeRequest(
         "POST",
         "/",
@@ -78,7 +88,7 @@ class SurveyControllerSpec extends BaseControllerSpec with JsoupHelpers {
       )
     }
 
-    "produce errors for an invalid form" in new TestScope {
+    "produce errors for an invalid form" in {
       given FakeRequest[?] = FakeRequest(
         "POST",
         "/",
@@ -97,7 +107,7 @@ class SurveyControllerSpec extends BaseControllerSpec with JsoupHelpers {
       errors.headOption map { _.key } shouldBe Some("service-id")
     }
 
-    "return a page not found error page when ticketId is invalid" in new TestScope {
+    "return a page not found error page when ticketId is invalid" in {
       val ticketId  = "ABCD-EFGH-"
       val serviceId = "abcdefg"
 
@@ -109,7 +119,7 @@ class SurveyControllerSpec extends BaseControllerSpec with JsoupHelpers {
     }
   }
 
-  "display errors when form isn't filled out at all" in new TestScope {
+  "display errors when form isn't filled out at all" in {
     val ticketId  = "GFBN-8051-KLNY"
     val serviceId = "abcdefg"
     val request   = FakeRequest("POST", "/")
@@ -132,7 +142,7 @@ class SurveyControllerSpec extends BaseControllerSpec with JsoupHelpers {
     errors.get(1).text() should include(messages("survey.speed.error.required"))
   }
 
-  "display errors when comment is too long" in new TestScope {
+  "display errors when comment is too long" in {
     val ticketId  = "GFBN-8051-KLNY"
     val serviceId = "abcdefg"
     val fields    = Map(
@@ -159,22 +169,5 @@ class SurveyControllerSpec extends BaseControllerSpec with JsoupHelpers {
 
     errors               should have size 1
     errors.get(0).text() should include(messages("survey.improve.error.length"))
-  }
-
-  class TestScope extends MockitoSugar {
-    val notFoundPage           = app.injector.instanceOf[views.html.NotFoundPage]
-    val playFrontendSurveyPage = app.injector.instanceOf[views.html.SurveyPage]
-    val messagesApi            = app.injector.instanceOf[MessagesApi]
-
-    given AppConfig        = new CFConfig(app.configuration)
-    given ExecutionContext = ExecutionContext.global
-
-    val controller = new SurveyController(
-      mock[AuditConnector],
-      Stubs.stubMessagesControllerComponents(messagesApi = messagesApi),
-      notFoundPage,
-      playFrontendSurveyPage,
-      mock[views.html.SurveyConfirmationPage]
-    )
   }
 }
