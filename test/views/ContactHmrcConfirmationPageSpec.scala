@@ -16,28 +16,14 @@
 
 package views
 
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
-import config.AppConfig
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import helpers.BaseViewSpec
 import play.api.i18n.Messages
-import play.api.mvc.RequestHeader
-import play.api.test.FakeRequest
 import views.html.ContactHmrcConfirmationPage
 
-class ContactHmrcConfirmationPageSpec
-    extends AnyWordSpec
-    with Matchers
-    with ApplicationSupport
-    with MessagesSupport
-    with JsoupHelpers {
-
-  given fakeRequest: RequestHeader = FakeRequest("GET", "/submit")
-  given Messages                   = getMessages()
-  given AppConfig                  = app.injector.instanceOf[AppConfig]
+class ContactHmrcConfirmationPageSpec extends BaseViewSpec {
 
   "the Contact Hmrc standalone confirmation page" should {
-    val confirmationPage = app.injector.instanceOf[ContactHmrcConfirmationPage]
+    val confirmationPage = instanceOf[ContactHmrcConfirmationPage]
     val content          = confirmationPage()
 
     "include the H1 element with page title" in {
@@ -62,7 +48,7 @@ class ContactHmrcConfirmationPageSpec
     }
 
     "translate the title into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = confirmationPage()
 
       val titles = welshContent.select("h1")

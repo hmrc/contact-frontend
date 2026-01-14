@@ -16,22 +16,15 @@
 
 package connectors.deskpro.domain
 
+import helpers.ApplicationSupport
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import uk.gov.hmrc.http.SessionId
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
-class FieldTransformerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
-
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false)
-      .build()
+class FieldTransformerSpec extends AnyWordSpec with Matchers with ApplicationSupport {
 
   "Field Transformer" should {
 

@@ -16,31 +16,15 @@
 
 package views
 
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
-import config.AppConfig
 import controllers.OneLoginComplaintFormBind
-import model.{DateOfBirth, EmailPreference, LetterPreference, OneLoginComplaintForm, PhonePreference}
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import helpers.BaseViewSpec
+import model.{DateOfBirth, EmailPreference, LetterPreference, OneLoginComplaintForm}
 import play.api.i18n.Messages
-import play.api.mvc.RequestHeader
-import play.api.test.CSRFTokenHelper.*
-import play.api.test.FakeRequest
 import views.html.OneLoginComplaintPage
 
-import java.time.LocalDate
 import scala.util.Random
 
-class OneLoginComplaintPageSpec
-    extends AnyWordSpec
-    with Matchers
-    with ApplicationSupport
-    with MessagesSupport
-    with JsoupHelpers {
-
-  given fakeRequest: RequestHeader = FakeRequest("GET", "/problem_reports_nonjs").withCSRFToken
-  given Messages                   = getMessages()
-  given AppConfig                  = app.injector.instanceOf[AppConfig]
+class OneLoginComplaintPageSpec extends BaseViewSpec {
 
   val oneLoginComplaintForm = OneLoginComplaintFormBind.form
 
@@ -57,7 +41,7 @@ class OneLoginComplaintPageSpec
   )
 
   "the OlfG Complaint standalone page" should {
-    val oneLoginComplaintPage = app.injector.instanceOf[OneLoginComplaintPage]
+    val oneLoginComplaintPage = instanceOf[OneLoginComplaintPage]
     val content               = oneLoginComplaintPage(oneLoginComplaintForm)
 
     "include the hmrc banner" in {
@@ -68,7 +52,7 @@ class OneLoginComplaintPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = oneLoginComplaintPage(oneLoginComplaintForm)
 
       val banners = welshContent.select(".hmrc-organisation-logo")

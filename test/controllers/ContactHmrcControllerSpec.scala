@@ -16,25 +16,18 @@
 
 package controllers
 
-import org.apache.pekko.actor.ActorSystem
-import config.CFConfig
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
+import helpers.BaseControllerSpec
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq as meq}
 import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.mockito.verification.VerificationWithTimeout
 import org.scalatest.GivenWhenThen
-import org.scalatest.concurrent.Eventually
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
-import play.api.i18n.{Lang, Messages, MessagesApi}
-import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -43,31 +36,55 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.RefererHeaderRetriever
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.jdk.CollectionConverters.*
 
-class ContactHmrcControllerSpec
-    extends AnyWordSpec
-    with GivenWhenThen
-    with Matchers
-    with MockitoSugar
-    with Eventually
-    with GuiceOneAppPerSuite {
+class ContactHmrcControllerSpec extends BaseControllerSpec with GivenWhenThen {
 
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "useRefererHeader" -> true)
-      .build()
+  val messages: MessagesApi = instanceOf[MessagesApi]
 
-  given ActorSystem = ActorSystem()
-  given Messages    = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+  val ticketQueueConnector                     = mock[DeskproTicketQueueConnector]
+  val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
+  when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
+    .thenReturn(Future.successful(None))
+
+  val errorPage          = instanceOf[views.html.InternalErrorPage]
+  val pfContactPage      = instanceOf[views.html.ContactHmrcPage]
+  val pfConfirmationPage = instanceOf[views.html.ContactHmrcConfirmationPage]
+
+  val controller =
+    new ContactHmrcController(
+      ticketQueueConnector,
+      enrolmentsConnector,
+      Stubs.stubMessagesControllerComponents(messagesApi = messages),
+      errorPage,
+      pfContactPage,
+      pfConfirmationPage,
+      new RefererHeaderRetriever
+    )
+
+  def mockDeskproConnector(result: Future[TicketId]): Unit =
+    when(
+      ticketQueueConnector.createDeskProTicket(
+        any[String],
+        any[String],
+        any[String],
+        any[String],
+        any[Boolean],
+        any[Request[AnyRef]](),
+        any[Option[Enrolments]],
+        any[Option[String]],
+        any[Option[String]],
+        any[TicketConstants]
+      )(using any[HeaderCarrier])
+    ).thenReturn(result)
 
   val connectorTimeout: VerificationWithTimeout =
     Mockito.timeout(5000)
 
   "ContactHmrcController" should {
 
-    "return expected OK for index page with no URL parameters" in new TestScope {
+    "return expected OK for index page with no URL parameters" in {
       Given("a GET request")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -90,7 +107,7 @@ class ContactHmrcControllerSpec
       page.body().select("input[name=service]").attr("value")  shouldBe ""
     }
 
-    "return expected OK for index page with URL parameters" in new TestScope {
+    "return expected OK for index page with URL parameters" in {
       Given("a GET request")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -115,7 +132,7 @@ class ContactHmrcControllerSpec
       page.body().select("input[name=service]").`val`  shouldBe "my-fake-service"
     }
 
-    "use the referrerUrl parameter if supplied" in new TestScope {
+    "use the referrerUrl parameter if supplied" in {
       Given("a GET request")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -131,7 +148,7 @@ class ContactHmrcControllerSpec
       page.body().select("input[name=referrer]").`val` shouldBe "https://www.example.com/some-service"
     }
 
-    "fallback to n/a if no referrer information is available" in new TestScope {
+    "fallback to n/a if no referrer information is available" in {
       Given("a GET request")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -146,7 +163,7 @@ class ContactHmrcControllerSpec
       page.body().select("input[name=referrer]").`val` shouldBe "n/a"
     }
 
-    "return expected OK for submit page" in new TestScope {
+    "return expected OK for submit page" in {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -184,10 +201,10 @@ class ContactHmrcControllerSpec
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )
+        )(using any[HeaderCarrier])
     }
 
-    "send the referrer URL to DeskPro" in new TestScope {
+    "send the referrer URL to DeskPro" in {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -221,10 +238,10 @@ class ContactHmrcControllerSpec
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )
+        )(using any[HeaderCarrier])
     }
 
-    "send the referrer information to DeskPro with userAction replacing the path if non-empty" in new TestScope {
+    "send the referrer information to DeskPro with userAction replacing the path if non-empty" in {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.successful(TicketId(12345)))
 
@@ -258,10 +275,10 @@ class ContactHmrcControllerSpec
           any[Option[String]],
           any[Option[String]],
           any[TicketConstants]
-        )
+        )(using any[HeaderCarrier])
     }
 
-    "display errors when form isn't filled out at all" in new TestScope {
+    "display errors when form isn't filled out at all" in {
 
       val fields = Map(
         "contact-name"     -> "",
@@ -290,7 +307,7 @@ class ContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.email.error.required")))    shouldBe true
     }
 
-    "display error messages when comments size exceeds limit" in new TestScope {
+    "display error messages when comments size exceeds limit" in {
       val msg2500 = "x" * 2500
 
       val fields = Map(
@@ -317,7 +334,7 @@ class ContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.comments.error.length"))) shouldBe true
     }
 
-    "display error messages when email is invalid" in new TestScope {
+    "display error messages when email is invalid" in {
       val badEmail = "firstname'email.gov."
 
       val fields = Map(
@@ -344,7 +361,7 @@ class ContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.email.error.invalid"))) shouldBe true
     }
 
-    "display error messages when email is too long" in new TestScope {
+    "display error messages when email is too long" in {
       val tooLongEmail = ("x" * 64) + "@" + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 63) + "." + ("x" * 57) + ".com"
 
       val fields = Map(
@@ -369,7 +386,7 @@ class ContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.email.error.length"))) shouldBe true
     }
 
-    "display error messages when name is too long" in new TestScope {
+    "display error messages when name is too long" in {
       val longName = "x" * 256
 
       val fields         = Map(
@@ -393,7 +410,7 @@ class ContactHmrcControllerSpec
       errors.exists(_.text().contains(Messages("contact.name.error.length"))) shouldBe true
     }
 
-    "return expected Internal Error when backend service errors for submit page" in new TestScope {
+    "return expected Internal Error when backend service errors for submit page" in {
       Given("a POST request containing a valid form")
       mockDeskproConnector(Future.failed(new Exception("This is an expected test error")))
 
@@ -418,7 +435,7 @@ class ContactHmrcControllerSpec
       status(submitResult) shouldBe 500
     }
 
-    "return expected OK for thanks page" in new TestScope {
+    "return expected OK for thanks page" in {
       Given("a GET request")
 
       val contactRequest = FakeRequest().withSession(("ticketId", "12345"))
@@ -430,52 +447,4 @@ class ContactHmrcControllerSpec
       status(thanksResult) shouldBe 200
     }
   }
-
-  class TestScope extends MockitoSugar {
-
-    val configuration = app.configuration
-
-    given CFConfig              = new CFConfig(configuration)
-    given ExecutionContext      = ExecutionContext.global
-    given messages: MessagesApi = app.injector.instanceOf[MessagesApi]
-    given HeaderCarrier         = any[HeaderCarrier]
-
-    val ticketQueueConnector                     = mock[DeskproTicketQueueConnector]
-    val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
-    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
-      .thenReturn(Future.successful(None))
-
-    val errorPage          = app.injector.instanceOf[views.html.InternalErrorPage]
-    val pfContactPage      = app.injector.instanceOf[views.html.ContactHmrcPage]
-    val pfConfirmationPage = app.injector.instanceOf[views.html.ContactHmrcConfirmationPage]
-
-    val controller =
-      new ContactHmrcController(
-        ticketQueueConnector,
-        enrolmentsConnector,
-        Stubs.stubMessagesControllerComponents(messagesApi = messages),
-        errorPage,
-        pfContactPage,
-        pfConfirmationPage,
-        new RefererHeaderRetriever
-      )
-
-    def mockDeskproConnector(result: Future[TicketId]): Unit =
-      when(
-        ticketQueueConnector.createDeskProTicket(
-          any[String],
-          any[String],
-          any[String],
-          any[String],
-          any[Boolean],
-          any[Request[AnyRef]](),
-          any[Option[Enrolments]],
-          any[Option[String]],
-          any[Option[String]],
-          any[TicketConstants]
-        )(using any[HeaderCarrier])
-      ).thenReturn(result)
-
-  }
-
 }

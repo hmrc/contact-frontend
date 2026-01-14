@@ -17,19 +17,13 @@
 package controllers
 
 import java.net.URLEncoder
-import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
+import helpers.BaseControllerSpec
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq as meq}
 import org.mockito.Mockito.*
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -38,17 +32,123 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.tools.Stubs
 import util.{BackUrlValidator, RefererHeaderRetriever}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class FeedbackControllerSpec extends BaseControllerSpec {
 
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false, "useRefererHeader" -> true)
-      .build()
+  val ticketQueueConnector                        = mock[DeskproTicketQueueConnector]
+  def ticketQueueConnectorWillFail()              = mockQueueConnector(Future.failed(new Exception("failed")))
+  def ticketQueueConnectorWillReturnTheTicketId() = mockQueueConnector(Future.successful(TicketId(123)))
+
+  val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
+  when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
+    .thenReturn(Future.successful(None))
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(ticketQueueConnector)
+  }
+
+  val feedbackName: String     = "John Densmore"
+  val feedbackRating: String   = "2"
+  val feedbackEmail: String    = "name@mail.com"
+  val feedbackComment: String  = "Comments"
+  val feedbackReferrer: String = "/contact/problem_reports"
+
+  private def mockQueueConnector(result: Future[TicketId]) =
+    when(
+      ticketQueueConnector.createFeedback(
+        name = any[String],
+        email = any[String],
+        rating = any[String],
+        message = any[String],
+        referrer = any[String],
+        isJavascript = any[Boolean],
+        any[Request[AnyRef]](),
+        any[Option[Enrolments]],
+        any[Option[String]],
+        any[TicketConstants]
+      )(using any[HeaderCarrier])
+    ).thenReturn(result)
+
+  def verifyRequestMade(comment: String = feedbackComment): Unit =
+    verify(ticketQueueConnector).createFeedback(
+      meq(feedbackName),
+      meq(feedbackEmail),
+      meq(feedbackRating),
+      meq(comment),
+      meq(feedbackReferrer),
+      meq(true),
+      any[Request[AnyRef]](),
+      any[Option[Enrolments]],
+      any[Option[String]],
+      any[TicketConstants]
+    )(using any[HeaderCarrier])
+
+  val backUrlValidator = new BackUrlValidator() {
+    override def validate(backUrl: String) = backUrl == "http://www.valid.url"
+  }
+
+  val playFrontendFeedbackPage             = instanceOf[views.html.FeedbackPage]
+  val playFrontendFeedbackConfirmationPage = instanceOf[views.html.FeedbackConfirmationPage]
+  val errorPage                            = instanceOf[views.html.InternalErrorPage]
+
+  val controller = new FeedbackController(
+    ticketQueueConnector,
+    enrolmentsConnector,
+    backUrlValidator,
+    Stubs.stubMessagesControllerComponents(),
+    playFrontendFeedbackConfirmationPage,
+    playFrontendFeedbackPage,
+    errorPage,
+    new RefererHeaderRetriever
+  )
+
+  def generateRequest(
+    javascriptEnabled: Boolean = true,
+    name: String = feedbackName,
+    email: String = feedbackEmail,
+    comments: String = feedbackComment,
+    backUrl: Option[String] = None,
+    canOmitComments: Boolean = false
+  ) = {
+
+    val fields = Map(
+      "feedback-name"     -> name,
+      "feedback-email"    -> email,
+      "feedback-rating"   -> "2",
+      "feedback-comments" -> comments,
+      "csrfToken"         -> "token",
+      "referrer"          -> feedbackReferrer,
+      "canOmitComments"   -> canOmitComments.toString,
+      "isJavascript"      -> javascriptEnabled.toString
+    ) ++ backUrl.map("backUrl" -> _)
+
+    FakeRequest("POST", "/")
+      .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
+      .withFormUrlEncodedBody(fields.toSeq: _*)
+  }
+
+  def generateInvalidRequest() = FakeRequest("POST", "/")
+    .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
+    .withFormUrlEncodedBody("isJavascript" -> "true")
+
+  def generateInvalidRequestWithBackUrlAndService() = FakeRequest("POST", "/")
+    .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
+    .withFormUrlEncodedBody(
+      "isJavascript"    -> "true",
+      "backUrl"         -> "http://www.back.url",
+      "service"         -> "someService",
+      "canOmitComments" -> "true",
+      "referrer"        -> "http://www.referrer.url"
+    )
+
+  val request = generateRequest()
+
+  val requestWithBackLink = generateRequest(backUrl = Some("http://www.back.url"))
 
   "feedbackForm" should {
-    "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in new TestScope {
+    "include 'service', 'backUrl' and 'canOmitComments' hidden fields" in {
       val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
@@ -64,7 +164,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
   }
 
   "index" should {
-    "include 'service', 'backUrl' and 'canOmitComments' hidden fields and bind to submit URL" in new TestScope {
+    "include 'service', 'backUrl' and 'canOmitComments' hidden fields and bind to submit URL" in {
       val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
@@ -87,7 +187,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       page.body().select("input[name=canOmitComments]").attr("value") shouldBe "true"
     }
 
-    "include 'referrer' hidden field from query string when passed as both parameter and headers" in new TestScope {
+    "include 'referrer' hidden field from query string when passed as both parameter and headers" in {
       val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
@@ -100,7 +200,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       page.body().select("input[name=referrer]").first.attr("value") shouldBe "any-referring-parameter"
     }
 
-    "include 'referrer' hidden field from header when passed in request headers only" in new TestScope {
+    "include 'referrer' hidden field from header when passed in request headers only" in {
       val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
@@ -113,7 +213,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       page.body().select("input[name=referrer]").first.attr("value") shouldBe "any-referring-header"
     }
 
-    "set 'referrer' hidden field to n/a if not passed in query string or request headers" in new TestScope {
+    "set 'referrer' hidden field to n/a if not passed in query string or request headers" in {
       val result = controller.index(
         service = Some("any-service"),
         backUrl = Some("/any-service"),
@@ -130,7 +230,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
   "Submitting the feedback" should {
 
-    "redirect to confirmation page without 'back' button if 'back' link not provided" in new TestScope {
+    "redirect to confirmation page without 'back' button if 'back' link not provided" in {
 
       ticketQueueConnectorWillReturnTheTicketId()
 
@@ -142,7 +242,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       verifyRequestMade()
     }
 
-    "show errors if some form not filled in correctly" in new TestScope {
+    "show errors if some form not filled in correctly" in {
 
       ticketQueueConnectorWillReturnTheTicketId()
 
@@ -155,7 +255,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       verifyNoInteractions(ticketQueueConnector)
     }
 
-    "succeed with comment if 'canOmitComments' flag is true" in new TestScope {
+    "succeed with comment if 'canOmitComments' flag is true" in {
       ticketQueueConnectorWillReturnTheTicketId()
 
       val result =
@@ -167,7 +267,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       verifyRequestMade(comment = "Some comment")
     }
 
-    "succeed without comment if 'canOmitComments' flag is true" in new TestScope {
+    "succeed without comment if 'canOmitComments' flag is true" in {
       ticketQueueConnectorWillReturnTheTicketId()
 
       val result = controller.submit()(generateRequest(comments = "", canOmitComments = true))
@@ -178,7 +278,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       verifyRequestMade(comment = "No comment given")
     }
 
-    "fail without comment if 'canOmitComments' flag is false" in new TestScope {
+    "fail without comment if 'canOmitComments' flag is false" in {
       ticketQueueConnectorWillReturnTheTicketId()
 
       val result = controller.submit()(generateRequest(comments = "", canOmitComments = false))
@@ -190,7 +290,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       verifyNoInteractions(ticketQueueConnector)
     }
 
-    "include 'service', 'backUrl', 'canOmitComments' and 'referrer' fields in the returned page if form not filled in correctly" in new TestScope {
+    "include 'service', 'backUrl', 'canOmitComments' and 'referrer' fields in the returned page if form not filled in correctly" in {
 
       ticketQueueConnectorWillReturnTheTicketId()
 
@@ -215,7 +315,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       page.body().select("input[name=referrer]").attr("value")          shouldBe referrerUrl
     }
 
-    "return service error page if call to backend service failed" in new TestScope {
+    "return service error page if call to backend service failed" in {
 
       ticketQueueConnectorWillFail()
 
@@ -225,7 +325,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       page.body().select("h1").first.text() shouldBe "deskpro.error.page.heading"
     }
 
-    "redirect to confirmation page with 'back' button if 'back' link provided" in new TestScope {
+    "redirect to confirmation page with 'back' button if 'back' link provided" in {
 
       ticketQueueConnectorWillReturnTheTicketId()
 
@@ -242,7 +342,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
   }
 
   "Feedback confirmation page " should {
-    "not contain back button if not requested" in new TestScope {
+    "not contain back button if not requested" in {
 
       val submit = controller.thanks()(request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID"))
       val page   = Jsoup.parse(contentAsString(submit))
@@ -250,7 +350,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       page.body().select(".govuk-link") should have size 1
     }
 
-    "contain back button if requested and the back url is valid" in new TestScope {
+    "contain back button if requested and the back url is valid" in {
 
       val submit = controller.thanks(backUrl = Some("http://www.valid.url"))(
         request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
@@ -262,7 +362,7 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
       page.body().select(".govuk-back-link").get(0).attr("href") shouldBe "http://www.valid.url"
     }
 
-    "not contain back link if requested and the back url is invalid" in new TestScope {
+    "not contain back link if requested and the back url is invalid" in {
 
       val submit = controller.thanks(backUrl = Some("http://www.invalid.url"))(
         request.withSession(SessionKeys.authToken -> "authToken", "ticketId" -> "TID")
@@ -273,121 +373,4 @@ class FeedbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
     }
   }
-
-  class TestScope extends MockitoSugar {
-
-    val ticketQueueConnector = mock[DeskproTicketQueueConnector]
-
-    def ticketQueueConnectorWillFail() = mockQueueConnector(Future.failed(new Exception("failed")))
-
-    def ticketQueueConnectorWillReturnTheTicketId() = mockQueueConnector(Future.successful(TicketId(123)))
-
-    val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
-    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
-      .thenReturn(Future.successful(None))
-
-    val feedbackName: String     = "John Densmore"
-    val feedbackRating: String   = "2"
-    val feedbackEmail: String    = "name@mail.com"
-    val feedbackComment: String  = "Comments"
-    val feedbackReferrer: String = "/contact/problem_reports"
-
-    private def mockQueueConnector(result: Future[TicketId]) =
-      when(
-        ticketQueueConnector.createFeedback(
-          name = any[String],
-          email = any[String],
-          rating = any[String],
-          message = any[String],
-          referrer = any[String],
-          isJavascript = any[Boolean],
-          any[Request[AnyRef]](),
-          any[Option[Enrolments]],
-          any[Option[String]],
-          any[TicketConstants]
-        )(using any[HeaderCarrier])
-      ).thenReturn(result)
-
-    def verifyRequestMade(comment: String = feedbackComment): Unit =
-      verify(ticketQueueConnector).createFeedback(
-        meq(feedbackName),
-        meq(feedbackEmail),
-        meq(feedbackRating),
-        meq(comment),
-        meq(feedbackReferrer),
-        meq(true),
-        any[Request[AnyRef]](),
-        any[Option[Enrolments]],
-        any[Option[String]],
-        any[TicketConstants]
-      )(using any[HeaderCarrier])
-
-    val backUrlValidator = new BackUrlValidator() {
-      override def validate(backUrl: String) = backUrl == "http://www.valid.url"
-    }
-
-    val playFrontendFeedbackPage             = app.injector.instanceOf[views.html.FeedbackPage]
-    val playFrontendFeedbackConfirmationPage =
-      app.injector.instanceOf[views.html.FeedbackConfirmationPage]
-    val errorPage                            = app.injector.instanceOf[views.html.InternalErrorPage]
-
-    given AppConfig        = CFConfig(app.configuration)
-    given ExecutionContext = ExecutionContext.global
-    given HeaderCarrier    = any[HeaderCarrier]
-
-    val controller = new FeedbackController(
-      ticketQueueConnector,
-      enrolmentsConnector,
-      backUrlValidator,
-      Stubs.stubMessagesControllerComponents(),
-      playFrontendFeedbackConfirmationPage,
-      playFrontendFeedbackPage,
-      errorPage,
-      new RefererHeaderRetriever
-    )
-
-    def generateRequest(
-      javascriptEnabled: Boolean = true,
-      name: String = feedbackName,
-      email: String = feedbackEmail,
-      comments: String = feedbackComment,
-      backUrl: Option[String] = None,
-      canOmitComments: Boolean = false
-    ) = {
-
-      val fields = Map(
-        "feedback-name"     -> name,
-        "feedback-email"    -> email,
-        "feedback-rating"   -> "2",
-        "feedback-comments" -> comments,
-        "csrfToken"         -> "token",
-        "referrer"          -> feedbackReferrer,
-        "canOmitComments"   -> canOmitComments.toString,
-        "isJavascript"      -> javascriptEnabled.toString
-      ) ++ backUrl.map("backUrl" -> _)
-
-      FakeRequest("POST", "/")
-        .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
-        .withFormUrlEncodedBody(fields.toSeq: _*)
-    }
-
-    def generateInvalidRequest() = FakeRequest("POST", "/")
-      .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
-      .withFormUrlEncodedBody("isJavascript" -> "true")
-
-    def generateInvalidRequestWithBackUrlAndService() = FakeRequest("POST", "/")
-      .withHeaders((REFERER, feedbackReferrer), ("User-Agent", "iAmAUserAgent"))
-      .withFormUrlEncodedBody(
-        "isJavascript"    -> "true",
-        "backUrl"         -> "http://www.back.url",
-        "service"         -> "someService",
-        "canOmitComments" -> "true",
-        "referrer"        -> "http://www.referrer.url"
-      )
-
-    val request = generateRequest()
-
-    val requestWithBackLink = generateRequest(backUrl = Some("http://www.back.url"))
-  }
-
 }

@@ -16,19 +16,15 @@
 
 package controllers
 
-import config.*
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.{TicketConstants, TicketId}
 import connectors.enrolments.EnrolmentsConnector
-import helpers.ApplicationSupport
+import helpers.BaseControllerSpec
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq as meq}
 import org.mockito.Mockito.*
 import org.mockito.stubbing.OngoingStubbing
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.{Lang, Messages, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -39,13 +35,98 @@ import util.RefererHeaderRetriever
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport with Matchers {
+class ReportProblemControllerSpec extends BaseControllerSpec {
 
-  given Messages =
-    app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+  val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
+  when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
+    .thenReturn(Future.successful(None))
+
+  val hmrcDeskproConnector: DeskproTicketQueueConnector = mock[DeskproTicketQueueConnector]
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(hmrcDeskproConnector)
+  }
+
+  val reportProblemPage = instanceOf[views.html.ReportProblemPage]
+  val confirmationPage  = instanceOf[views.html.ReportProblemConfirmationPage]
+  val errorPage         = instanceOf[views.html.InternalErrorPage]
+
+  val controller = new ReportProblemController(
+    hmrcDeskproConnector,
+    enrolmentsConnector,
+    Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
+    reportProblemPage,
+    confirmationPage,
+    errorPage,
+    new RefererHeaderRetriever
+  )
+
+  val deskproName: String           = "John Densmore"
+  val deskproEmail: String          = "name@mail.com"
+  val deskproSubject: String        = "Support Request"
+  val deskproProblemMessage: String = controller.problemMessage("Some Action", "Some Error")
+  val deskproReferrer: String       = "/contact/problem_reports"
+
+  val enrolments = Some(Enrolments(Set()))
+
+  def generateRequest(
+    isAjaxRequest: Boolean,
+    name: String = deskproName,
+    email: String = deskproEmail
+  ) = {
+
+    val headers = Seq(
+      (REFERER, deskproReferrer),
+      ("User-Agent", "iAmAUserAgent")
+    ) ++ Seq(
+      ("X-Requested-With", "XMLHttpRequest")
+    ).filter(_ => isAjaxRequest)
+
+    FakeRequest("POST", "/")
+      .withHeaders(headers: _*)
+      .withFormUrlEncodedBody(
+        "report-name"   -> name,
+        "report-email"  -> email,
+        "report-action" -> "Some Action",
+        "report-error"  -> "Some Error",
+        "csrfToken"     -> "token",
+        "isJavascript"  -> isAjaxRequest.toString
+      )
+  }
+
+  def generateInvalidRequest(isAjaxRequest: Boolean) = {
+
+    val headers = Seq(
+      (REFERER, deskproReferrer),
+      ("User-Agent", "iAmAUserAgent")
+    ) ++ Seq(
+      ("X-Requested-With", "XMLHttpRequest")
+    ).filter(_ => isAjaxRequest)
+
+    FakeRequest("POST", "/")
+      .withHeaders(headers: _*)
+      .withFormUrlEncodedBody("isJavascript" -> isAjaxRequest.toString)
+  }
+
+  def setHmrcConnectorResponse(result: Future[TicketId]): OngoingStubbing[Future[TicketId]] =
+    when(
+      hmrcDeskproConnector.createDeskProTicket(
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any
+      )(using any[HeaderCarrier])
+    ).thenReturn(result)
 
   "Requesting the standalone page" should {
-    "return OK and valid HTML" in new TestScope {
+    "return OK and valid HTML" in {
       val result = controller.index(Some("my-test-service"), Some("my-referrer-url"))(FakeRequest())
 
       status(result) should be(OK)
@@ -62,7 +143,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       document.getElementsByClass("govuk-error-summary").size() should be(0)
     }
 
-    "bind the referrer from the URL rather than headers if both provided" in new TestScope {
+    "bind the referrer from the URL rather than headers if both provided" in {
       val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
       val result             = controller.index(Some("my-test-service"), Some("referrer-from-url"))(requestWithHeaders)
 
@@ -72,7 +153,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       document.select("input[name=referrer]").`val` should be("referrer-from-url")
     }
 
-    "bind the referrer from the header if no URL parameter passed in" in new TestScope {
+    "bind the referrer from the header if no URL parameter passed in" in {
       val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
       val result             = controller.index(Some("my-test-service"), None)(requestWithHeaders)
 
@@ -84,7 +165,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
   }
 
   "Requesting the deprecated standalone page" should {
-    "redirect to the non-deprecated page with the REFERER passed via the URL" in new TestScope {
+    "redirect to the non-deprecated page with the REFERER passed via the URL" in {
       val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
       val result             = controller.indexDeprecated(Some("my-test-service"), Some("referrer-from-url"))(requestWithHeaders)
 
@@ -93,7 +174,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       redirectLocation(result) should be(Some(s"/contact/report-technical-problem?$queryString"))
     }
 
-    "redirect to the non-deprecated page with the REFERER passed via the header" in new TestScope {
+    "redirect to the non-deprecated page with the REFERER passed via the header" in {
       val requestWithHeaders = FakeRequest().withHeaders((REFERER, "referrer-from-header"))
       val result             = controller.indexDeprecated(Some("my-test-service"), None)(requestWithHeaders)
 
@@ -104,7 +185,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
   }
 
   "Reporting a problem via the standalone page" should {
-    "redirect to a Thank You html page for a valid request" in new TestScope {
+    "redirect to a Thank You html page for a valid request" in {
       setHmrcConnectorResponse(Future.successful(TicketId(123)))
 
       val request = generateRequest(isAjaxRequest = false)
@@ -114,7 +195,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
     }
 
-    "bind the referrerUrl parameter if provided in the URL" in new TestScope {
+    "bind the referrerUrl parameter if provided in the URL" in {
       when(
         hmrcDeskproConnector.createDeskProTicket(
           meq("John Densmore"),
@@ -127,7 +208,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
           meq(None),
           meq(None),
           any[TicketConstants]
-        )
+        )(using any[HeaderCarrier])
       ).thenReturn(Future.successful(TicketId(123)))
 
       val request           = generateRequest(isAjaxRequest = true)
@@ -138,7 +219,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       redirectLocation(result) shouldBe Some("/contact/report-technical-problem/thanks")
     }
 
-    "return Bad Request and page with validation error for invalid input" in new TestScope {
+    "return Bad Request and page with validation error for invalid input" in {
       val result = controller.submit(None, None)(generateInvalidRequest(isAjaxRequest = false))
 
       status(result) should be(BAD_REQUEST)
@@ -148,7 +229,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       document.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
-    "return Bad Request, page with validation error, and correct submit URL if no service URL param for invalid input" in new TestScope {
+    "return Bad Request, page with validation error, and correct submit URL if no service URL param for invalid input" in {
       val headers = Seq((REFERER, deskproReferrer), ("User-Agent", "iAmAUserAgent"))
       val request = FakeRequest("POST", "/")
         .withHeaders(headers: _*)
@@ -175,7 +256,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
         .attr("action")                                       shouldBe s"/contact/report-technical-problem"
     }
 
-    "return Bad Request and page with validation error if the name has invalid characters" in new TestScope {
+    "return Bad Request and page with validation error if the name has invalid characters" in {
       val request = generateRequest(
         isAjaxRequest = false,
         name = """<a href="blah.com">something</a>"""
@@ -190,7 +271,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
-    "return Bad Request and page with validation error if the email has invalid syntax (for Deskpro)" in new TestScope {
+    "return Bad Request and page with validation error if the email has invalid syntax (for Deskpro)" in {
       val request = generateRequest(isAjaxRequest = false, email = "a.a.a")
       val submit  = controller.submit(None, None)(request)
       val page    = Jsoup.parse(contentAsString(submit))
@@ -201,7 +282,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       page.getElementsByClass("govuk-error-summary").size() should be > 0
     }
 
-    "return Internal Server Error and error page if the Deskpro ticket creation fails" in new TestScope {
+    "return Internal Server Error and error page if the Deskpro ticket creation fails" in {
       setHmrcConnectorResponse(Future.failed(new Exception("failed")))
 
       val request = generateRequest(isAjaxRequest = false)
@@ -214,7 +295,7 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
   }
 
   "Requesting the standalone thanks page" should {
-    "return OK and valid html" in new TestScope {
+    "return OK and valid html" in {
       val result = controller.thanks()(FakeRequest())
 
       status(result) should be(OK)
@@ -226,97 +307,4 @@ class ReportProblemControllerSpec extends AnyWordSpec with ApplicationSupport wi
       )
     }
   }
-
-  class TestScope extends MockitoSugar {
-
-    val enrolmentsConnector: EnrolmentsConnector = mock[EnrolmentsConnector]
-    when(enrolmentsConnector.maybeAuthenticatedUserEnrolments()(using any())(using any()))
-      .thenReturn(Future.successful(None))
-
-    val reportProblemPage = app.injector.instanceOf[views.html.ReportProblemPage]
-    val confirmationPage  = app.injector.instanceOf[views.html.ReportProblemConfirmationPage]
-    val errorPage         = app.injector.instanceOf[views.html.InternalErrorPage]
-
-    given cfconfig: AppConfig = new CFConfig(app.configuration)
-    given ExecutionContext    = ExecutionContext.global
-    given HeaderCarrier       = any[HeaderCarrier]
-
-    val controller = new ReportProblemController(
-      mock[DeskproTicketQueueConnector],
-      enrolmentsConnector,
-      Stubs.stubMessagesControllerComponents(messagesApi = app.injector.instanceOf[MessagesApi]),
-      reportProblemPage,
-      confirmationPage,
-      errorPage,
-      new RefererHeaderRetriever
-    )
-
-    val deskproName: String           = "John Densmore"
-    val deskproEmail: String          = "name@mail.com"
-    val deskproSubject: String        = "Support Request"
-    given Messages                    = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
-    val deskproProblemMessage: String =
-      controller.problemMessage("Some Action", "Some Error")
-    val deskproReferrer: String       = "/contact/problem_reports"
-
-    val hmrcDeskproConnector = controller.ticketQueueConnector
-
-    val enrolments = Some(Enrolments(Set()))
-
-    def generateRequest(
-      isAjaxRequest: Boolean,
-      name: String = deskproName,
-      email: String = deskproEmail
-    ) = {
-
-      val headers = Seq(
-        (REFERER, deskproReferrer),
-        ("User-Agent", "iAmAUserAgent")
-      ) ++ Seq(
-        ("X-Requested-With", "XMLHttpRequest")
-      ).filter(_ => isAjaxRequest)
-
-      FakeRequest("POST", "/")
-        .withHeaders(headers: _*)
-        .withFormUrlEncodedBody(
-          "report-name"   -> name,
-          "report-email"  -> email,
-          "report-action" -> "Some Action",
-          "report-error"  -> "Some Error",
-          "csrfToken"     -> "token",
-          "isJavascript"  -> isAjaxRequest.toString
-        )
-    }
-
-    def generateInvalidRequest(isAjaxRequest: Boolean) = {
-
-      val headers = Seq(
-        (REFERER, deskproReferrer),
-        ("User-Agent", "iAmAUserAgent")
-      ) ++ Seq(
-        ("X-Requested-With", "XMLHttpRequest")
-      ).filter(_ => isAjaxRequest)
-
-      FakeRequest("POST", "/")
-        .withHeaders(headers: _*)
-        .withFormUrlEncodedBody("isJavascript" -> isAjaxRequest.toString)
-    }
-
-    def setHmrcConnectorResponse(result: Future[TicketId]): OngoingStubbing[Future[TicketId]] =
-      when(
-        hmrcDeskproConnector.createDeskProTicket(
-          any,
-          any,
-          any,
-          any,
-          any,
-          any,
-          any,
-          any,
-          any,
-          any
-        )
-      ).thenReturn(result)
-  }
-
 }

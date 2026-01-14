@@ -16,28 +16,14 @@
 
 package views
 
-import config.AppConfig
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import helpers.BaseViewSpec
 import play.api.i18n.Messages
-import play.api.mvc.RequestHeader
-import play.api.test.FakeRequest
 import views.html.AccessibilityProblemConfirmationPage
 
-class AccessibilityProblemConfirmationPageSpec
-    extends AnyWordSpec
-    with Matchers
-    with ApplicationSupport
-    with MessagesSupport
-    with JsoupHelpers {
-
-  given fakeRequest: RequestHeader = FakeRequest("GET", "/foo")
-  given Messages                   = getMessages()
-  given AppConfig                  = app.injector.instanceOf[AppConfig]
+class AccessibilityProblemConfirmationPageSpec extends BaseViewSpec {
 
   "the report an accessibility problem confirmation page" should {
-    val accessibilityProblemConfirmationPage = app.injector.instanceOf[AccessibilityProblemConfirmationPage]
+    val accessibilityProblemConfirmationPage = instanceOf[AccessibilityProblemConfirmationPage]
     val content                              = accessibilityProblemConfirmationPage()
 
     "include the confirmation panel" in {
@@ -53,7 +39,7 @@ class AccessibilityProblemConfirmationPageSpec
     }
 
     "translate the title into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = accessibilityProblemConfirmationPage()
 
       val titles = welshContent.select("h1.govuk-panel__title")

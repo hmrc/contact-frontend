@@ -16,30 +16,16 @@
 
 package views
 
-import _root_.helpers.{ApplicationSupport, JsoupHelpers, MessagesSupport}
-import config.AppConfig
+import helpers.BaseViewSpec
 import model.ReportProblemForm
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.i18n.Messages
-import play.api.mvc.{Call, RequestHeader}
-import play.api.test.CSRFTokenHelper.*
-import play.api.test.FakeRequest
+import play.api.mvc.Call
 import play.api.test.Helpers.*
 import views.html.ReportProblemPage
 
-class ReportProblemPageSpec
-    extends AnyWordSpec
-    with Matchers
-    with ApplicationSupport
-    with MessagesSupport
-    with JsoupHelpers {
-
-  given fakeRequest: RequestHeader = FakeRequest("GET", "/problem_reports_nonjs").withCSRFToken
-  given Messages                   = getMessages()
-  given AppConfig                  = app.injector.instanceOf[AppConfig]
+class ReportProblemPageSpec extends BaseViewSpec {
 
   val problemReportsForm: Form[ReportProblemForm] = Form[ReportProblemForm](
     mapping(
@@ -70,7 +56,7 @@ class ReportProblemPageSpec
   val action: Call = Call(method = "POST", url = "/contact/submit-error-feedback")
 
   "the Problem Reports standalone page" should {
-    val reportProblemPage = app.injector.instanceOf[ReportProblemPage]
+    val reportProblemPage = instanceOf[ReportProblemPage]
     val content           = reportProblemPage(problemReportsForm, action)
 
     "include the hmrc banner" in {
@@ -81,7 +67,7 @@ class ReportProblemPageSpec
     }
 
     "translate the hmrc banner into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = reportProblemPage(problemReportsForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
@@ -111,7 +97,7 @@ class ReportProblemPageSpec
     }
 
     "translate the help text into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("p.govuk-body")
@@ -242,7 +228,7 @@ class ReportProblemPageSpec
     }
 
     "translate the report action textarea label into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("label[for=report-action]")
@@ -285,7 +271,7 @@ class ReportProblemPageSpec
     }
 
     "translate the report an error textarea label into Welsh if requested" in {
-      given Messages   = getWelshMessages()
+      given Messages   = getWelshMessages
       val welshContent = reportProblemPage(problemReportsForm, action)
 
       val paragraphs = welshContent.select("label[for=report-error]")
