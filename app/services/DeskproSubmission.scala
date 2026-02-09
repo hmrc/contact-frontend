@@ -146,6 +146,7 @@ trait DeskproSubmission {
       isJavascript = false,
       request = request,
       enrolmentsOption = None,
+      // This service of `one-login-complaint` should not be made dynamic or changed, as it is linked to Deskpro triggers
       service = Some("one-login-complaint"),
       userAction = None,
       ticketConstants = OneLoginComplaintTicketConstants

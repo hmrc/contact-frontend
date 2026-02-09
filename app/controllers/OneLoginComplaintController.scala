@@ -151,6 +151,7 @@ class OneLoginComplaintController @Inject() (
           createOneLoginComplaintTicket(
             oneLoginComplaint,
             request,
+            // This referrer of the OLfG form URL should not be made dynamic or changed, as it is linked to Deskpro triggers
             appConfig.urlWithPlatformHost(routes.OneLoginComplaintController.index().url())
           )
             .map { _ =>
