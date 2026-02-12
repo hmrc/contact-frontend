@@ -3,7 +3,6 @@
 GET         /beta-feedback                               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
 POST        /beta-feedback                               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
 GET         /beta-feedback-unauthenticated               @controllers.FeedbackController.index(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
-POST        /beta-feedback-unauthenticated               @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
 POST        /beta-feedback/submit                        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
 POST        /beta-feedback/submit-unauthenticated        @controllers.FeedbackController.submit(service: Option[String], backUrl: Option[BackUrl], canOmitComments: Boolean ?= false, referrerUrl: Option[ReferrerUrl])
 GET         /beta-feedback/thanks                        @controllers.FeedbackController.thanks(backUrl: Option[BackUrl])
@@ -14,7 +13,6 @@ POST        /contact-hmrc                                @controllers.ContactHmr
 GET         /contact-hmrc/thanks                         @controllers.ContactHmrcController.thanks
 
 GET         /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl])
-POST        /contact-hmrc-unauthenticated                @controllers.ContactHmrcController.submit(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl])
 GET         /contact-hmrc/thanks-unauthenticated         @controllers.ContactHmrcController.thanks
 
 GET         /report-technical-problem                    @controllers.ReportProblemController.index(service: Option[String], referrerUrl: Option[ReferrerUrl])
@@ -25,16 +23,12 @@ POST        /problem_reports_nonjs                       @controllers.ReportProb
 
 GET         /survey                                      @controllers.SurveyController.survey(ticketId: String, serviceId: String)
 POST        /survey                                      @controllers.SurveyController.submit(ticketId: String, serviceId: String)
-POST        /submitSurvey                                @controllers.SurveyController.submitDeprecated()
 GET         /survey/confirmation                         @controllers.SurveyController.confirmation()
 
 GET         /accessibility                               @controllers.AccessibilityController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl])
 POST        /accessibility                               @controllers.AccessibilityController.submit(service: Option[String], userAction: Option[String])
 GET         /accessibility/thanks                        @controllers.AccessibilityController.thanks()
-
 GET         /accessibility-unauthenticated               @controllers.AccessibilityController.index(service: Option[String], userAction: Option[String], referrerUrl: Option[ReferrerUrl])
-POST        /accessibility-unauthenticated               @controllers.AccessibilityController.submit(service: Option[String], userAction: Option[String])
-GET         /accessibility-unauthenticated/thanks        @controllers.AccessibilityController.thanks()
 
 GET         /report-one-login-complaint                  @controllers.OneLoginComplaintController.index()
 POST        /report-one-login-complaint                  @controllers.OneLoginComplaintController.submit()

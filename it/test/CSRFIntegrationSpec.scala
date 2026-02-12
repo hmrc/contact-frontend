@@ -39,12 +39,12 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
       )
       .build()
 
-  private def problemReportsSecureUrl = s"http://localhost:$port/contact/problem_reports_secure"
+  private def problemReportsSecureUrl = s"http://localhost:$port/contact/report-technical-problem"
   private def problemReportsNonjsUrl  = s"http://localhost:$port/contact/problem_reports_nonjs"
-  private def feedbackUrl             = s"http://localhost:$port/contact/beta-feedback-unauthenticated"
-  private def contactHmrcUrl          = s"http://localhost:$port/contact/contact-hmrc-unauthenticated"
+  private def feedbackUrl             = s"http://localhost:$port/contact/beta-feedback"
+  private def contactHmrcUrl          = s"http://localhost:$port/contact/contact-hmrc"
   private def surveyUrl               = s"http://localhost:$port/contact/survey?ticketId=GFBN-8051-KLNY&serviceId=foo"
-  private def accessibilityUrl        = s"http://localhost:$port/contact/accessibility-unauthenticated"
+  private def accessibilityUrl        = s"http://localhost:$port/contact/accessibility"
 
   private val problemForm = Map(
     "report-name"   -> "Joe",
@@ -160,13 +160,13 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
       postResponse.status should be(FORBIDDEN)
     }
 
-    "respond with 403 for contact-hmrc-unauthenticated when no CSRF token is present" in {
+    "respond with 403 for contact-hmrc when no CSRF token is present" in {
       val response = postWithAnyCookie(contactHmrcUrl, contactForm)
 
       response.status should be(FORBIDDEN)
     }
 
-    "respond with 200 for contact-hmrc-unauthenticated if a CSRF token is present" in {
+    "respond with 200 for contact-hmrc if a CSRF token is present" in {
       val getResponse = get(contactHmrcUrl)
       getResponse.status should be(OK)
 
@@ -175,13 +175,13 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
       postResponse.status should be(OK)
     }
 
-    "respond with 403 for feedback-unauthenticated if no CSRF token is present" in {
+    "respond with 403 for feedback if no CSRF token is present" in {
       val response = postWithAnyCookie(feedbackUrl, feedbackForm)
 
       response.status should be(FORBIDDEN)
     }
 
-    "respond with 200 for feedback-unauthenticated if a CSRF token is provided" in {
+    "respond with 200 for feedback if a CSRF token is provided" in {
       val getResponse = get(feedbackUrl)
       getResponse.status should be(OK)
 
@@ -190,13 +190,13 @@ class CSRFIntegrationSpec extends AnyWordSpec with Matchers with WireMockEndpoin
       postResponse.status should be(OK)
     }
 
-    "respond with 403 for accessibility-unauthenticated if no CSRF token is present" in {
+    "respond with 403 for accessibility if no CSRF token is present" in {
       val response = postWithAnyCookie(accessibilityUrl, accessibilityForm)
 
       response.status should be(FORBIDDEN)
     }
 
-    "respond with 200 for accessibility-unauthenticated if a CSRF token is provided" in {
+    "respond with 200 for accessibility if a CSRF token is provided" in {
       val getResponse = get(accessibilityUrl)
       getResponse.status should be(OK)
 
