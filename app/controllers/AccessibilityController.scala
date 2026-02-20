@@ -29,6 +29,7 @@ import play.api.mvc.*
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission
+import uk.gov.hmrc.hmrcfrontend.config.ServiceNavCanBeControlledByRequestAttr.UseServiceNav
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
 import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, InternalErrorPage}
@@ -109,7 +110,7 @@ class AccessibilityController @Inject() (
     referrerUrl: Option[ReferrerUrl]
   ): Action[AnyContent] =
     Action.async { request =>
-      given Request[AnyContent] = request
+      given Request[AnyContent] = request.addAttr(UseServiceNav, true)
       Future.successful {
         val submit    = routes.AccessibilityController.submit(service, userAction)
         val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders()
@@ -121,7 +122,7 @@ class AccessibilityController @Inject() (
 
   def submit(service: Option[String], userAction: Option[String]): Action[AnyContent] =
     Action.async { request =>
-      given Request[AnyContent] = request
+      given Request[AnyContent] = request.addAttr(UseServiceNav, true)
       AccessibilityFormBind.form
         .bindFromRequest()
         .fold(
@@ -146,7 +147,7 @@ class AccessibilityController @Inject() (
     }
 
   def thanks(): Action[AnyContent] = Action.async { request =>
-    given Request[AnyContent] = request
+    given Request[AnyContent] = request.addAttr(UseServiceNav, true)
     Future.successful(Ok(accessibilityProblemConfirmationPage()))
   }
 
