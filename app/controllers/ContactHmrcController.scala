@@ -29,8 +29,10 @@ import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.*
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
+import uk.gov.hmrc.hmrcfrontend.config.ServiceNavigationConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.ServiceNavigationParamBinder.bindServiceNavigationParam
 import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPage}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -75,8 +77,11 @@ class ContactHmrcController @Inject() (
   contactHmrcPage: ContactHmrcPage,
   contactHmrcConfirmationPage: ContactHmrcConfirmationPage,
   headerRetriever: RefererHeaderRetriever
-)(using val appConfig: AppConfig, val executionContext: ExecutionContext)
-    extends FrontendController(mcc)
+)(using
+  val appConfig: AppConfig,
+  val executionContext: ExecutionContext,
+  val serviceNavigationConfig: ServiceNavigationConfig
+) extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport
     with Logging {
@@ -90,7 +95,7 @@ class ContactHmrcController @Inject() (
         val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders() getOrElse "n/a"
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
         val form      = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, userAction))
-        val submit    = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
+        val submit    = routes.ContactHmrcController.submit(service, userAction, referrerUrl).bindServiceNavigationParam
         val view      = contactHmrcPage(form, submit)
         Ok(view)
       }
@@ -107,7 +112,8 @@ class ContactHmrcController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            val submit = routes.ContactHmrcController.submit(service, userAction, referrerUrl)
+            val submit =
+              routes.ContactHmrcController.submit(service, userAction, referrerUrl).bindServiceNavigationParam
             Future.successful(BadRequest(contactHmrcPage(formWithErrors, submit)))
           },
           data =>
@@ -115,7 +121,7 @@ class ContactHmrcController @Inject() (
               maybeEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
               _               <- createDeskproTicket(data, maybeEnrolments)
             } yield {
-              val thanks = routes.ContactHmrcController.thanks
+              val thanks = routes.ContactHmrcController.thanks.bindServiceNavigationParam
               Redirect(thanks)
             }).recover { case NonFatal(_) =>
               logger.error("Creating DeskPro ticket failed")

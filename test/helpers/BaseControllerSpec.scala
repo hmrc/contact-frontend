@@ -23,6 +23,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.{Lang, Messages, MessagesApi}
+import uk.gov.hmrc.hmrcfrontend.config.ServiceNavigationConfig
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
@@ -37,8 +38,9 @@ trait BaseControllerSpec
 
   def instanceOf[A: ClassTag]: A = app.injector.instanceOf[A]
 
-  given Messages         = instanceOf[MessagesApi].preferred(Seq(Lang("en")))
-  given AppConfig        = new CFConfig(app.configuration)
-  given ExecutionContext = ExecutionContext.global
-  given HeaderCarrier    = any[HeaderCarrier]
+  given Messages                = instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+  given AppConfig               = new CFConfig(app.configuration)
+  given ServiceNavigationConfig = instanceOf[ServiceNavigationConfig]
+  given ExecutionContext        = ExecutionContext.global
+  given HeaderCarrier           = any[HeaderCarrier]
 }

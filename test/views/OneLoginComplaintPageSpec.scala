@@ -20,6 +20,7 @@ import controllers.OneLoginComplaintFormBind
 import helpers.BaseViewSpec
 import model.{DateOfBirth, EmailPreference, LetterPreference, OneLoginComplaintForm}
 import play.api.i18n.Messages
+import play.api.mvc.Call
 import views.html.OneLoginComplaintPage
 
 import scala.util.Random
@@ -40,9 +41,11 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
     complaint = "Testing complaint"
   )
 
+  val action: Call = Call(method = "POST", url = "/contact/the-submit-url")
+
   "the OlfG Complaint standalone page" should {
     val oneLoginComplaintPage = instanceOf[OneLoginComplaintPage]
-    val content               = oneLoginComplaintPage(oneLoginComplaintForm)
+    val content               = oneLoginComplaintPage(oneLoginComplaintForm, action)
 
     "include the hmrc banner" in {
       val banners = content.select(".hmrc-organisation-logo")
@@ -53,7 +56,7 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
 
     "translate the hmrc banner into Welsh if requested" in {
       given Messages   = getWelshMessages
-      val welshContent = oneLoginComplaintPage(oneLoginComplaintForm)
+      val welshContent = oneLoginComplaintPage(oneLoginComplaintForm, action)
 
       val banners = welshContent.select(".hmrc-organisation-logo")
       banners            should have size 1
@@ -90,11 +93,11 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
     }
 
     "include the correct form action attribute" in {
-      val content = oneLoginComplaintPage(oneLoginComplaintForm)
+      val content = oneLoginComplaintPage(oneLoginComplaintForm, action)
 
       val forms = content.select("form[id=one-login-complaint-form]")
       forms                      should have size 1
-      forms.first.attr("action") should be("/contact/report-one-login-complaint")
+      forms.first.attr("action") should be("/contact/the-submit-url")
     }
 
     "include a CSRF token as a hidden input" in {
@@ -112,7 +115,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithErrors = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(name = "", email = "", complaint = "")
-        )
+        ),
+        action
       )
       val errorSummaries    = contentWithErrors.select(".govuk-error-summary")
       errorSummaries                         should have size 1
@@ -123,7 +127,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithErrors = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(name = "", email = "", complaint = "")
-        )
+        ),
+        action
       )
       asDocument(contentWithErrors).title should be("Error: One Login for Government complaint – Contact HMRC – GOV.UK")
     }
@@ -153,7 +158,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(name = "")
-        )
+        ),
+        action
       )
       val errors             = contentWithService.select("#name-error")
       errors            should have size 1
@@ -164,7 +170,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
           formValues.copy(name = "AN Other")
-        )
+        ),
+        action
       )
       val inputs             = contentWithService.select("input[name=name]")
       inputs                     should have size 1
@@ -202,7 +209,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(nino = "")
-        )
+        ),
+        action
       )
       val errors             = contentWithService.select("#nino-error")
       errors            should have size 1
@@ -213,7 +221,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(nino = "   aa-11-22-33 c")
-        )
+        ),
+        action
       )
       val errors             = contentWithService.select("#nino-error")
       errors should have size 0
@@ -223,7 +232,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(nino = "incorrect nino")
-        )
+        ),
+        action
       )
       val errors             = contentWithService.select("#nino-error")
       errors            should have size 1
@@ -234,7 +244,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
           formValues.copy(nino = "AN Other")
-        )
+        ),
+        action
       )
       val inputs             = contentWithService.select("input[name=nino]")
       inputs                     should have size 1
@@ -272,7 +283,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(saUtr = Some("this is a very long sa utr, far too long"))
-        )
+        ),
+        action
       )
       val errors             = contentWithService.select("#sa-utr-error")
       errors            should have size 1
@@ -285,7 +297,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
           formValues.copy(saUtr = Some("AN Other"))
-        )
+        ),
+        action
       )
       val inputs             = contentWithService.select("input[name=sa-utr]")
       inputs                     should have size 1
@@ -319,7 +332,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(dateOfBirth = DateOfBirth("", "", ""))
-        )
+        ),
+        action
       )
       val errors             = contentWithService.select("#date-of-birth-error")
       errors            should have size 1
@@ -333,7 +347,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithError = oneLoginComplaintPage(
         oneLoginComplaintForm.bind(
           incorrectForm.data
-        )
+        ),
+        action
       )
 
       val errors = contentWithError.select("#date-of-birth-error")
@@ -348,7 +363,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithError = oneLoginComplaintPage(
         oneLoginComplaintForm.bind(
           incorrectForm.data
-        )
+        ),
+        action
       )
 
       val errors = contentWithError.select("#date-of-birth-error")
@@ -360,7 +376,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
           formValues.copy(dateOfBirth = DateOfBirth("10", "11", "1990"))
-        )
+        ),
+        action
       )
       val dayInput           = contentWithService.select("input[name=date-of-birth.day]")
       val monthInput         = contentWithService.select("input[name=date-of-birth.month]")
@@ -404,7 +421,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(email = "")
-        )
+        ),
+        action
       )
       val errors             = contentWithService.select("#email-error")
       errors            should have size 1
@@ -415,7 +433,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
           formValues.copy(email = "bloggs@example.com")
-        )
+        ),
+        action
       )
       val inputs             = contentWithService.select("input[name=email]")
       inputs                     should have size 1
@@ -447,7 +466,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
           formValues.copy(phoneNumber = Some("01234123123"))
-        )
+        ),
+        action
       )
       val inputs             = contentWithService.select("input[name=phone-number]")
       inputs                     should have size 1
@@ -459,7 +479,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(phoneNumber = Some(tooLongPhoneNumber))
-        )
+        ),
+        action
       )
       val errors             = contentWithService.select("#phone-number-error")
       errors              should have size 1
@@ -485,7 +506,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(address = "")
-        )
+        ),
+        action
       )
       val errors             = contentWithService.select("#address-error")
       errors            should have size 1
@@ -496,7 +518,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
           formValues.copy(address = "address")
-        )
+        ),
+        action
       )
       val inputs             = contentWithService.select("textarea[name=address]")
       inputs              should have size 1
@@ -537,7 +560,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
           formValues.copy(contactPreference = LetterPreference)
-        )
+        ),
+        action
       )
       val inputs             = contentWithService.select("input[name=contact-preference]")
       inputs                 should have size 3
@@ -571,7 +595,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fill(
           formValues.copy(complaint = "complaint text")
-        )
+        ),
+        action
       )
       val inputs             = contentWithService.select("textarea[name=complaint]")
       inputs              should have size 1
@@ -582,7 +607,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(complaint = "")
-        )
+        ),
+        action
       )
 
       val errors = contentWithService.select("#complaint-error")
@@ -595,7 +621,8 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       val contentWithService = oneLoginComplaintPage(
         oneLoginComplaintForm.fillAndValidate(
           formValues.copy(complaint = tooLongComplaint)
-        )
+        ),
+        action
       )
       val errors             = contentWithService.select("#complaint-error")
       errors              should have size 1

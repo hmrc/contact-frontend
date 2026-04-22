@@ -29,8 +29,10 @@ import play.api.mvc.*
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission
+import uk.gov.hmrc.hmrcfrontend.config.ServiceNavigationConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.ServiceNavigationParamBinder.bindServiceNavigationParam
 import views.html.{AccessibilityProblemConfirmationPage, AccessibilityProblemPage, InternalErrorPage}
 
 import javax.inject.Inject
@@ -95,7 +97,7 @@ class AccessibilityController @Inject() (
   accessibilityProblemConfirmationPage: AccessibilityProblemConfirmationPage,
   errorPage: InternalErrorPage,
   headerRetriever: RefererHeaderRetriever
-)(using AppConfig, ExecutionContext)
+)(using AppConfig, ExecutionContext, ServiceNavigationConfig)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport
@@ -111,7 +113,7 @@ class AccessibilityController @Inject() (
     Action.async { request =>
       given Request[AnyContent] = request
       Future.successful {
-        val submit    = routes.AccessibilityController.submit(service, userAction)
+        val submit    = routes.AccessibilityController.submit(service, userAction).bindServiceNavigationParam
         val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders()
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
         val form      = AccessibilityFormBind.emptyForm(csrfToken, referrer, service, userAction)
@@ -126,14 +128,14 @@ class AccessibilityController @Inject() (
         .bindFromRequest()
         .fold(
           (error: Form[AccessibilityForm]) => {
-            val submit = routes.AccessibilityController.submit(service, userAction)
+            val submit = routes.AccessibilityController.submit(service, userAction).bindServiceNavigationParam
             Future.successful(
               BadRequest(accessibilityPage(error, submit))
             )
           },
           data =>
             {
-              val thanks = routes.AccessibilityController.thanks()
+              val thanks = routes.AccessibilityController.thanks().bindServiceNavigationParam
               for {
                 maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
                 _                   <- createAccessibilityTicket(data, maybeUserEnrolments)

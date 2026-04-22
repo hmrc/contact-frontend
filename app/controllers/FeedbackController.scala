@@ -30,8 +30,10 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
 import services.DeskproSubmission
+import uk.gov.hmrc.hmrcfrontend.config.ServiceNavigationConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{BackUrlValidator, DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.ServiceNavigationParamBinder.bindServiceNavigationParam
 import views.html.{FeedbackConfirmationPage, FeedbackPage, InternalErrorPage}
 
 import javax.inject.{Inject, Singleton}
@@ -47,7 +49,7 @@ import scala.util.control.NonFatal
   feedbackPage: FeedbackPage,
   errorPage: InternalErrorPage,
   headerRetriever: RefererHeaderRetriever
-)(using AppConfig, ExecutionContext)
+)(using AppConfig, ExecutionContext, ServiceNavigationConfig)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport
@@ -101,7 +103,7 @@ import scala.util.control.NonFatal
             for {
               maybeEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
               _               <- createDeskproFeedback(data, maybeEnrolments)
-            } yield Redirect(routes.FeedbackController.thanks(data.backUrl))
+            } yield Redirect(routes.FeedbackController.thanks(data.backUrl).bindServiceNavigationParam)
           }.recover { case NonFatal(_) =>
             logger.error("Creating feedback ticket failed")
             InternalServerError(errorPage())
@@ -131,7 +133,8 @@ import scala.util.control.NonFatal
     canOmitComments: Boolean,
     referrerUrl: Option[String]
   )(using Request[?]): Html = {
-    val action = routes.FeedbackController.submit(service, backUrl, canOmitComments, referrerUrl)
+    val action =
+      routes.FeedbackController.submit(service, backUrl, canOmitComments, referrerUrl).bindServiceNavigationParam
     feedbackPage(form, action)
   }
 }

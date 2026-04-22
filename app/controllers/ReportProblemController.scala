@@ -27,8 +27,10 @@ import play.api.data.*
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{AnyContent, *}
 import services.DeskproSubmission
+import uk.gov.hmrc.hmrcfrontend.config.ServiceNavigationConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator, RefererHeaderRetriever}
+import util.ServiceNavigationParamBinder.bindServiceNavigationParam
 import views.html.{InternalErrorPage, ReportProblemConfirmationPage, ReportProblemPage}
 
 import javax.inject.{Inject, Singleton}
@@ -109,7 +111,7 @@ class ReportProblemController @Inject() (
   confirmationPage: ReportProblemConfirmationPage,
   errorPage: InternalErrorPage,
   headerRetriever: RefererHeaderRetriever
-)(using AppConfig, ExecutionContext)
+)(using AppConfig, ExecutionContext, ServiceNavigationConfig)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport
@@ -128,7 +130,7 @@ class ReportProblemController @Inject() (
     (request: MessagesRequest[AnyContent]) =>
       given MessagesRequest[AnyContent] = request
       val referrer                      = referrerUrl orElse headerRetriever.refererFromHeaders()
-      Redirect(routes.ReportProblemController.index(service, referrer))
+      Redirect(routes.ReportProblemController.index(service, referrer).bindServiceNavigationParam)
   }
 
   def submit(service: Option[String], referrerUrl: Option[ReferrerUrl]): Action[AnyContent] =
@@ -160,16 +162,17 @@ class ReportProblemController @Inject() (
           (for {
             maybeUserEnrolments <- enrolmentsConnector.maybeAuthenticatedUserEnrolments()
             _                   <- createProblemReportsTicket(problemReport, request, maybeUserEnrolments, referrer)
-          } yield Redirect(routes.ReportProblemController.thanks())) recover { case NonFatal(_) =>
-            logger.error("Creating problem report ticket failed")
-            InternalServerError(errorPage())
+          } yield Redirect(routes.ReportProblemController.thanks().bindServiceNavigationParam)) recover {
+            case NonFatal(_) =>
+              logger.error("Creating problem report ticket failed")
+              InternalServerError(errorPage())
           }
         }
       )
 
   private def page(form: Form[ReportProblemForm], service: Option[String], referrerUrl: Option[String])(using
     Request[?]
-  ) = reportProblemPage(form, routes.ReportProblemController.submit(service, referrerUrl))
+  ) = reportProblemPage(form, routes.ReportProblemController.submit(service, referrerUrl).bindServiceNavigationParam)
 
   private def fromForm(key: String, form: Form[ReportProblemForm]): Option[String] =
     form.data.get(key).flatMap(r => if (r.isEmpty) None else Some(r))

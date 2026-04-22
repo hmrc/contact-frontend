@@ -25,11 +25,13 @@ import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request, Result}
 import play.twirl.api.Html
+import uk.gov.hmrc.hmrcfrontend.config.ServiceNavigationConfig
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.{NotFoundPage, SurveyConfirmationPage, SurveyPage}
+import util.ServiceNavigationParamBinder.bindServiceNavigationParam
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -41,7 +43,7 @@ class SurveyController @Inject() (
   notFoundPage: NotFoundPage,
   playFrontendSurveyPage: SurveyPage,
   playFrontendSurveyConfirmationPage: SurveyConfirmationPage
-)(using AppConfig, ExecutionContext)
+)(using AppConfig, ExecutionContext, ServiceNavigationConfig)
     extends FrontendController(mcc)
     with I18nSupport
     with Logging {
@@ -76,7 +78,7 @@ class SurveyController @Inject() (
     Future.successful(
       if (validateTicketId(ticketId)) {
         val form   = emptyForm(serviceId = Some(serviceId), ticketId = Some(ticketId))
-        val action = routes.SurveyController.submit(ticketId, serviceId)
+        val action = routes.SurveyController.submit(ticketId, serviceId).bindServiceNavigationParam
         Ok(surveyPage(form, action))
       } else {
         logger.error(s"Invalid ticket id $ticketId when requesting survey form")
@@ -102,7 +104,7 @@ class SurveyController @Inject() (
             BadRequest(
               playFrontendSurveyPage(
                 formWithErrors,
-                routes.SurveyController.submit(ticketId, serviceId)
+                routes.SurveyController.submit(ticketId, serviceId).bindServiceNavigationParam
               )
             ),
           _ => submitSurveyAction
@@ -140,7 +142,7 @@ class SurveyController @Inject() (
           )
         }
     }
-    Redirect(routes.SurveyController.confirmation())
+    Redirect(routes.SurveyController.confirmation().bindServiceNavigationParam)
   }
 
   private[controllers] def buildAuditEvent(formData: SurveyForm)(using hc: HeaderCarrier): Future[DataEvent] =

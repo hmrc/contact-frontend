@@ -1,5 +1,5 @@
-@*
- * Copyright 2023 HM Revenue & Customs
+/*
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,14 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(hmrcReportTechnicalIssue: HmrcReportTechnicalIssue)
+package util
 
-@(serviceId: Option[String])(implicit appConfig: AppConfig, messages: Messages, request: RequestHeader)
-@serviceId.map { s =>
- @hmrcReportTechnicalIssue(ReportTechnicalIssue.apply(
-  serviceId = s,
-  language = if (messages.lang.code == "cy") Cy else En
- ))
+import play.api.mvc.{Call, RequestHeader}
+import uk.gov.hmrc.hmrcfrontend.config.ServiceNavigationConfig
+
+object ServiceNavigationParamBinder {
+  extension (call: Call)
+    def bindServiceNavigationParam(implicit
+      request: RequestHeader,
+      serviceNavigationConfig: ServiceNavigationConfig
+    ): Call =
+      Call(
+        method = call.method,
+        url = serviceNavigationConfig.propagateViaQueryParam(call.url)
+      )
 }

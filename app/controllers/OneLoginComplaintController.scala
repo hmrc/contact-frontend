@@ -27,8 +27,10 @@ import play.api.mvc.*
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import util.{DeskproEmailValidator, NameValidator}
+import util.ServiceNavigationParamBinder.bindServiceNavigationParam
 import views.html.{InternalErrorPage, OneLoginComplaintConfirmationPage, OneLoginComplaintPage}
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.hmrcfrontend.config.ServiceNavigationConfig
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -117,7 +119,7 @@ class OneLoginComplaintController @Inject() (
   oneLoginComplaintConfirmationPage: OneLoginComplaintConfirmationPage,
   errorPage: InternalErrorPage,
   errorHandler: ContactFrontendErrorHandler
-)(using appConfig: AppConfig, ec: ExecutionContext)
+)(using appConfig: AppConfig, ec: ExecutionContext, serviceNavigationConfig: ServiceNavigationConfig)
     extends FrontendController(mcc)
     with DeskproSubmission
     with I18nSupport
@@ -127,7 +129,12 @@ class OneLoginComplaintController @Inject() (
     Action { request =>
       given Request[AnyContent] = request
 
-      Ok(oneLoginComplaintPage(OneLoginComplaintFormBind.form))
+      Ok(
+        oneLoginComplaintPage(
+          OneLoginComplaintFormBind.form,
+          routes.OneLoginComplaintController.submit().bindServiceNavigationParam
+        )
+      )
     }
   }
 
@@ -145,7 +152,12 @@ class OneLoginComplaintController @Inject() (
       .fold(
         formWithError =>
           Future.successful(
-            BadRequest(oneLoginComplaintPage(formWithError))
+            BadRequest(
+              oneLoginComplaintPage(
+                formWithError,
+                routes.OneLoginComplaintController.submit().bindServiceNavigationParam
+              )
+            )
           ),
         oneLoginComplaint =>
           createOneLoginComplaintTicket(
@@ -155,7 +167,7 @@ class OneLoginComplaintController @Inject() (
             appConfig.urlWithPlatformHost(routes.OneLoginComplaintController.index().url())
           )
             .map { _ =>
-              Redirect(routes.OneLoginComplaintController.thanks())
+              Redirect(routes.OneLoginComplaintController.thanks().bindServiceNavigationParam)
             } recover { case NonFatal(_) =>
             logger.error("Creating One Login Complaint ticket failed")
             InternalServerError(errorPage())
