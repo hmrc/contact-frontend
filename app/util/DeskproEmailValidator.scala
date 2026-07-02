@@ -21,6 +21,7 @@ import scala.util.matching.Regex
 case class DeskproEmailValidator() {
 
   // The regexes used in this validator are based on PCRE regexes provided by Deskpro via DDC Ops in December 2020
+  // They have been updated in July 2026 as Deskpro have confirmed via Slack that domains without a "." are not considered valid
 
   def validate(email: String): Boolean =
     !email.endsWith("@") && {
@@ -37,7 +38,7 @@ case class DeskproEmailValidator() {
 
   def validateDomain(domain: String): Boolean = {
     val validDomainPattern =
-      """(?i)^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[\\.])*(?:[a-zA-Z][-a-zA-Z0-9]*[a-zA-Z0-9]|[a-zA-Z]))$""".r
+      """(?i)^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[\\.])+(?:[a-zA-Z][-a-zA-Z0-9]*[a-zA-Z0-9]|[a-zA-Z]))$""".r
     validDomainPattern.findFirstIn(domain).isDefined
   }
 

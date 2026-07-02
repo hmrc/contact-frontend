@@ -25,22 +25,22 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
 
   "Given a valid email address, an email validator" should {
     "return true" in {
-      emailValidator.validate("some.name@foo.com")     shouldBe true
-      emailValidator.validate("some.name@foo.co.uk")   shouldBe true
-      emailValidator.validate("some_name@foo.biz")     shouldBe true
-      emailValidator.validate("somename@foo.com")      shouldBe true
-      emailValidator.validate("s@f.c")                 shouldBe true
-      emailValidator.validate("SOMENAME@foo.com")      shouldBe true
-      emailValidator.validate("SOMENAME@FOO.COM")      shouldBe true
-      emailValidator.validate("some.name@mailserver1") shouldBe true
+      emailValidator.validate("some.name@foo.com")   shouldBe true
+      emailValidator.validate("some.name@foo.co.uk") shouldBe true
+      emailValidator.validate("some_name@foo.biz")   shouldBe true
+      emailValidator.validate("somename@foo.com")    shouldBe true
+      emailValidator.validate("s@f.c")               shouldBe true
+      emailValidator.validate("SOMENAME@foo.com")    shouldBe true
+      emailValidator.validate("SOMENAME@FOO.COM")    shouldBe true
     }
   }
 
   "Given a string that is not an email address, an email validator" should {
     "return false" in {
-      emailValidator.validate("n/a")            shouldBe false
-      emailValidator.validate("hello.world")    shouldBe false
-      emailValidator.validate("Not applicable") shouldBe false
+      emailValidator.validate("n/a")                   shouldBe false
+      emailValidator.validate("hello.world")           shouldBe false
+      emailValidator.validate("Not applicable")        shouldBe false
+      emailValidator.validate("some.name@mailserver1") shouldBe false
     }
   }
 
@@ -72,7 +72,6 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
       "fabien@symfony.com",
       "example@example.co.uk",
       "fabien_potencier@example.fr",
-      "example@localhost",
       "fab\'ien@symfony.com",
       "fabien+@symfony.com",
       "test@email.com.au"
@@ -201,18 +200,9 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
     )
 
     // these feel contrived and unlikely to occur in the wild
-    val invalidButAcceptedEmails = List(
-      "ex\\ample@localhost",
-      "example@local\\host"
-    )
-
-    // these feel contrived and unlikely to occur in the wild
     val invalidWithWarningsButAcceptedEmails = List(
       "too_long_localpart_too_long_localpart_too_long_localpart_too_long_localpart@invalid.example.com",
-      "example@toolonglocalparttoolonglocalparttoolonglocalparttoolonglocalpart.co.uk",
-      "example@toolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalpart",
-      "example@toolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalparttoolonglocalpar",
-      "test@test"
+      "example@toolonglocalparttoolonglocalparttoolonglocalparttoolonglocalpart.co.uk"
     )
   }
 
@@ -231,12 +221,6 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
 
     AgreeingWithDeskproValidation.invalidEmails.foreach { email =>
       s"reject invalid email address: $email" in {
-        emailValidator.validate(email) shouldBe false
-      }
-    }
-
-    DisagreeingWithDeskproValidation.invalidButAcceptedEmails.foreach { email =>
-      s"reject invalid email address: $email" in pendingUntilFixed {
         emailValidator.validate(email) shouldBe false
       }
     }

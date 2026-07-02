@@ -35,7 +35,7 @@ lazy val sharedSettings = Seq(
 lazy val unitTestSettings =
   inConfig(Test)(Defaults.testTasks) ++
     Seq(
-      Test / testOptions := Seq(
+      Test / test / testOptions := Seq(
         Tests.Filters(
           Seq(
             _ startsWith "connectors",
