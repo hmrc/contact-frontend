@@ -36,13 +36,13 @@ case class DeskproEmailValidator() {
     validNamePattern.findFirstIn(name).isDefined
   }
 
-  def validateDomain(domain: String): Boolean = {
+  private def validateDomain(domain: String): Boolean = {
     val validDomainPattern =
       """(?i)^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[\\.])+(?:[a-zA-Z][-a-zA-Z0-9]*[a-zA-Z0-9]|[a-zA-Z]))$""".r
     validDomainPattern.findFirstIn(domain).isDefined
   }
 
-  def validateIp(domain: String): Boolean = {
+  private def validateIp(domain: String): Boolean = {
     val validIpPattern =
       """^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)[\\.]){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$""".r
     validIpPattern.findFirstIn(domain).isDefined
