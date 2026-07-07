@@ -38,7 +38,7 @@ class XRobotsTagFilterSpec extends AnyWordSpec with Matchers with OptionValues w
 
   "XRobotsTagFilter" should {
 
-    "add header to response when explicitly enabled in configuration" in {
+    "add the expected header to the response" in {
       val request = FakeRequest("GET", "/some-contact-frontend")
       val result  = filter.apply(okAction)(request)
 
