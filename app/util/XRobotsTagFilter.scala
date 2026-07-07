@@ -27,10 +27,10 @@ import play.api.mvc.*
 class XRobotsTagFilter @Inject() (appConfig: AppConfig)(implicit val mat: Materializer, ec: ExecutionContext)
     extends Filter {
 
-  // This filter adds the ("x-robots-tag" -> "noindex, nofollow") header to all responses. This is to prevent indexing by
+  // This filter adds the ("X-Robots-Tag" -> "noindex, nofollow") header to all responses. This is to prevent indexing by
   // search engines, in particular when the contact forms are served on domains other than the tax domain via URL masking
   def apply(nextFilter: RequestHeader => Future[Result])(requestHeader: RequestHeader): Future[Result] =
     nextFilter(requestHeader).map { result =>
-      if (appConfig.addXRobotsTagHeaderToResponse) result.withHeaders("x-robots-tag" -> "noindex, nofollow") else result
+      if (appConfig.addXRobotsTagHeaderToResponse) result.withHeaders("X-Robots-Tag" -> "noindex, nofollow") else result
     }
 }

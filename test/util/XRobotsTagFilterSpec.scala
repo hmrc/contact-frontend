@@ -36,19 +36,19 @@ class XRobotsTagFilterSpec extends AnyWordSpec with Matchers with OptionValues {
       val result = route(app, FakeRequest("GET", "some-contact-form")).value
 
       app.configuration.keys should not(contain("addXRobotsTagHeaderToResponse"))
-      headers(result)        should not(contain("x-robots-tag" -> "noindex, nofollow"))
+      headers(result)        should not(contain("X-Robots-Tag" -> "noindex, nofollow"))
     }
 
     "add header to response when explicitly enabled in configuration" in {
       val app    = appWithAdditionalConfiguration(Map("addXRobotsTagHeaderToResponse" -> "true"))
       val result = route(app, FakeRequest("GET", "some-contact-form")).value
-      headers(result) should contain("x-robots-tag" -> "noindex, nofollow")
+      headers(result) should contain("X-Robots-Tag" -> "noindex, nofollow")
     }
 
     "not add header to response when explicitly disabled in configuration" in {
       val app    = appWithAdditionalConfiguration(Map("addXRobotsTagHeaderToResponse" -> "false"))
       val result = route(app, FakeRequest("GET", "some-contact-form")).value
-      headers(result) should not(contain("x-robots-tag" -> "noindex, nofollow"))
+      headers(result) should not(contain("X-Robots-Tag" -> "noindex, nofollow"))
     }
   }
 
