@@ -16,21 +16,19 @@
 
 package util
 
-import config.AppConfig
-
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import org.apache.pekko.stream.Materializer
 import play.api.mvc.*
 
-class XRobotsTagFilter @Inject() (appConfig: AppConfig)(implicit val mat: Materializer, ec: ExecutionContext)
-    extends Filter {
+class XRobotsTagFilter @Inject() ()(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
 
   // This filter adds the ("X-Robots-Tag" -> "noindex, nofollow") header to all responses. This is to prevent indexing by
   // search engines, in particular when the contact forms are served on domains other than the tax domain via URL masking
+  // It can be enabled in config using `play.filters.enabled += util.XRobotsTagFilter`
   def apply(nextFilter: RequestHeader => Future[Result])(requestHeader: RequestHeader): Future[Result] =
     nextFilter(requestHeader).map { result =>
-      if (appConfig.addXRobotsTagHeaderToResponse) result.withHeaders("X-Robots-Tag" -> "noindex, nofollow") else result
+      result.withHeaders("X-Robots-Tag" -> "noindex, nofollow")
     }
 }

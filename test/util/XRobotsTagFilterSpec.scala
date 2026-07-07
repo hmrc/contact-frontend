@@ -16,53 +16,35 @@
 
 package util
 
+import org.apache.pekko.stream.Materializer
 import org.scalatest.OptionValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.Application
-import play.api.inject.*
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.Results
-import play.api.routing.Router
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.libs.streams.Accumulator
+import play.api.mvc.{EssentialAction, Results}
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 
-class XRobotsTagFilterSpec extends AnyWordSpec with Matchers with OptionValues {
+import scala.concurrent.ExecutionContext
+
+class XRobotsTagFilterSpec extends AnyWordSpec with Matchers with OptionValues with GuiceOneAppPerSuite {
+
+  implicit val materializer: Materializer = app.materializer
+  implicit val ec: ExecutionContext       = ExecutionContext.global
+
+  val filter                    = new XRobotsTagFilter()
+  val okAction: EssentialAction = _ => Accumulator.done(Results.Ok)
 
   "XRobotsTagFilter" should {
 
-    "not add header to response when no explicit configuration found" in {
-      val app    = appWithAdditionalConfiguration()
-      val result = route(app, FakeRequest("GET", "some-contact-form")).value
-
-      app.configuration.keys should not(contain("addXRobotsTagHeaderToResponse"))
-      headers(result)        should not(contain("X-Robots-Tag" -> "noindex, nofollow"))
-    }
-
     "add header to response when explicitly enabled in configuration" in {
-      val app    = appWithAdditionalConfiguration(Map("addXRobotsTagHeaderToResponse" -> "true"))
-      val result = route(app, FakeRequest("GET", "some-contact-form")).value
-      headers(result) should contain("X-Robots-Tag" -> "noindex, nofollow")
-    }
+      val request = FakeRequest("GET", "/some-contact-frontend")
+      val result  = filter.apply(okAction)(request)
 
-    "not add header to response when explicitly disabled in configuration" in {
-      val app    = appWithAdditionalConfiguration(Map("addXRobotsTagHeaderToResponse" -> "false"))
-      val result = route(app, FakeRequest("GET", "some-contact-form")).value
-      headers(result) should not(contain("X-Robots-Tag" -> "noindex, nofollow"))
+      status(result) shouldBe OK
+      headers(result)  should contain("X-Robots-Tag" -> "noindex, nofollow")
     }
   }
 
-  def appWithAdditionalConfiguration(additionalConfiguration: Map[String, String] = Map.empty): Application = {
-
-    import play.api.routing.sird.*
-
-    val Action = stubControllerComponents().actionBuilder
-
-    new GuiceApplicationBuilder()
-      .router(Router.from { case GET(p"/some-contact-form") =>
-        Action(Results.Ok)
-      })
-      .configure(additionalConfiguration ++ Map("metrics.jvm" -> false, "metrics.enabled" -> false))
-      .build()
-  }
 }

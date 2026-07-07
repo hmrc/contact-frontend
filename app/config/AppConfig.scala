@@ -25,7 +25,6 @@ trait AppConfig {
   def sendExplicitAuditEvents: Boolean
   def enableOlfgComplaintsEndpoints: Boolean
   def urlWithPlatformHost(url: String): String
-  def addXRobotsTagHeaderToResponse: Boolean
 
 }
 
@@ -57,6 +56,4 @@ class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
   override def enableOlfgComplaintsEndpoints: Boolean =
     configuration.getOptional[Boolean]("enableOlfgComplaintsEndpoints").getOrElse(false)
 
-  override def addXRobotsTagHeaderToResponse: Boolean =
-    configuration.getOptional[Boolean]("addXRobotsTagHeaderToResponse").getOrElse(false)
 }
