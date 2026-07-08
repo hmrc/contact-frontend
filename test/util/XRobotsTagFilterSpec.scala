@@ -33,17 +33,44 @@ class XRobotsTagFilterSpec extends AnyWordSpec with Matchers with OptionValues w
   implicit val materializer: Materializer = app.materializer
   implicit val ec: ExecutionContext       = ExecutionContext.global
 
-  val filter                    = new XRobotsTagFilter()
-  val okAction: EssentialAction = _ => Accumulator.done(Results.Ok)
+  val filter = new XRobotsTagFilter()
 
   "XRobotsTagFilter" should {
 
-    "add the expected header to the response" in {
+    "add the expected header to the response when there are no other headers" in {
+      val okAction: EssentialAction = _ => Accumulator.done(Results.Ok)
+      val request                   = FakeRequest("GET", "/some-contact-frontend")
+      val result                    = filter.apply(okAction)(request)
+
+      status(result)     shouldBe OK
+      headers(result)      should contain("X-Robots-Tag" -> "noindex, nofollow")
+      headers(result).size should be(1)
+    }
+
+    "add the expected header to the response when there are already headers set" in {
+      val originalHeader            = ("service-name", "some-service")
+      val okAction: EssentialAction = _ => Accumulator.done(Results.Ok.withHeaders(originalHeader))
+
       val request = FakeRequest("GET", "/some-contact-frontend")
       val result  = filter.apply(okAction)(request)
 
-      status(result) shouldBe OK
-      headers(result)  should contain("X-Robots-Tag" -> "noindex, nofollow")
+      status(result)     shouldBe OK
+      headers(result)      should contain("X-Robots-Tag" -> "noindex, nofollow")
+      headers(result)      should contain(originalHeader)
+      headers(result).size should be(2)
+    }
+
+    "not overwrite when there is already X-Robots-Tag header set" in {
+      val originalHeader            = ("X-Robots-Tag", "some-other-value")
+      val okAction: EssentialAction = _ => Accumulator.done(Results.Ok.withHeaders(originalHeader))
+
+      val request = FakeRequest("GET", "/some-contact-frontend")
+      val result  = filter.apply(okAction)(request)
+
+      status(result)     shouldBe OK
+      headers(result)      should not(contain("X-Robots-Tag" -> "noindex, nofollow"))
+      headers(result)      should contain(originalHeader)
+      headers(result).size should be(1)
     }
   }
 
