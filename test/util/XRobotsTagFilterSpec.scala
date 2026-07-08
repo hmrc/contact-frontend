@@ -60,7 +60,8 @@ class XRobotsTagFilterSpec extends AnyWordSpec with Matchers with OptionValues w
       headers(result).size should be(2)
     }
 
-    "not overwrite when there is already X-Robots-Tag header set" in {
+    "overwrite when there is already X-Robots-Tag header set" in {
+      // This test to document what happens when we set a header with the same name as an existing header
       val originalHeader            = ("X-Robots-Tag", "some-other-value")
       val okAction: EssentialAction = _ => Accumulator.done(Results.Ok.withHeaders(originalHeader))
 
@@ -68,8 +69,8 @@ class XRobotsTagFilterSpec extends AnyWordSpec with Matchers with OptionValues w
       val result  = filter.apply(okAction)(request)
 
       status(result)     shouldBe OK
-      headers(result)      should not(contain("X-Robots-Tag" -> "noindex, nofollow"))
-      headers(result)      should contain(originalHeader)
+      headers(result)      should contain("X-Robots-Tag" -> "noindex, nofollow")
+      headers(result)      should not(contain(originalHeader))
       headers(result).size should be(1)
     }
   }
