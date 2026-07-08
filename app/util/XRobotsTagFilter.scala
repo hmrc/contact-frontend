@@ -27,10 +27,14 @@ class XRobotsTagFilter @Inject() ()(implicit val mat: Materializer, ec: Executio
   // This filter adds the ("X-Robots-Tag" -> "noindex, nofollow") header to all responses IF they do not already have an
   // X-Robots-Tag header. This is to prevent indexing by search engines, in particular when the contact forms are served
   // on domains other than the tax domain via URL masking
-  // It can be enabled in config using `play.filters.enabled += util.XRobotsTagFilter`
+  // Note that with the current site configuration, if X-Robots-Tag is added via mdtp-frontend-routes, mdtp-frontend-routes
+  // will overwrite headers set by the service, i.e. by this filter.
+  // This filter can be enabled in config using `play.filters.enabled += util.XRobotsTagFilter`
   def apply(nextFilter: RequestHeader => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
     val headerName = "X-Robots-Tag"
     nextFilter(requestHeader).map { result =>
+      // Note that the mdtp-frontend-routes will add X-Robots-Tag AFTER this, so this check comes BEFORE  domain level
+      // rules in mdtp-frontend-routes
       if (result.header.headers.keys.exists(_ == headerName)) result
       else result.withHeaders(headerName -> "noindex, nofollow")
     }
