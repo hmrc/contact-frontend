@@ -20,76 +20,87 @@ import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.deskpro.domain.*
 import controllers.ContactForm
 import model.{AccessibilityForm, FeedbackForm, OneLoginComplaintForm, ReportProblemForm}
+import play.api.Logging
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import uk.gov.hmrc.mdc.Mdc.*
 
 import java.net.URI
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-trait DeskproSubmission {
+trait DeskproSubmission extends Logging {
 
   import DeskproSubmission.replaceReferrerPath
 
   protected def ticketQueueConnector: DeskproTicketQueueConnector
 
   def createDeskproTicket(data: ContactForm, enrolments: Option[Enrolments])(using request: Request[AnyContent])(using
-    HeaderCarrier
+    HeaderCarrier,
+    ExecutionContext
   ): Future[TicketId] =
-    ticketQueueConnector.createDeskProTicket(
-      name = data.contactName,
-      email = data.contactEmail,
-      message = data.contactComments,
-      referrer = replaceReferrerPath(data.referrer, data.userAction),
-      isJavascript = data.isJavascript,
-      request = request,
-      enrolmentsOption = enrolments,
-      service = data.service,
-      userAction = data.userAction,
-      ticketConstants = ContactHmrcTicketConstants
-    )
+    ticketQueueConnector
+      .createDeskProTicket(
+        name = data.contactName,
+        email = data.contactEmail,
+        message = data.contactComments,
+        referrer = replaceReferrerPath(data.referrer, data.userAction),
+        isJavascript = data.isJavascript,
+        request = request,
+        enrolmentsOption = enrolments,
+        service = data.service,
+        userAction = data.userAction,
+        ticketConstants = ContactHmrcTicketConstants
+      )
+      .map(ticketId => logTicketCreation(ticketId, data.service))
 
   def createDeskproFeedback(data: FeedbackForm, enrolments: Option[Enrolments])(using request: Request[AnyContent])(
-    using HeaderCarrier
+    using
+    HeaderCarrier,
+    ExecutionContext
   ): Future[TicketId] =
-    ticketQueueConnector.createFeedback(
-      name = data.name,
-      email = data.email,
-      rating = data.experienceRating.getOrElse(""),
-      message = data.comments match {
-        case ""      => "No comment given"
-        case comment => comment
-      },
-      referrer = data.referrer,
-      isJavascript = data.javascriptEnabled,
-      request = request,
-      enrolmentsOption = enrolments,
-      service = data.service,
-      ticketConstants = BetaFeedbackTicketConstants
-    )
+    ticketQueueConnector
+      .createFeedback(
+        name = data.name,
+        email = data.email,
+        rating = data.experienceRating.getOrElse(""),
+        message = data.comments match {
+          case ""      => "No comment given"
+          case comment => comment
+        },
+        referrer = data.referrer,
+        isJavascript = data.javascriptEnabled,
+        request = request,
+        enrolmentsOption = enrolments,
+        service = data.service,
+        ticketConstants = BetaFeedbackTicketConstants
+      )
+      .map(ticketId => logTicketCreation(ticketId, data.service))
 
   def createProblemReportsTicket(
-    problemReport: ReportProblemForm,
+    data: ReportProblemForm,
     request: Request[AnyRef],
     enrolmentsOption: Option[Enrolments],
     referrer: Option[String]
-  )(using Messages): Future[TicketId] = {
+  )(using Messages, ExecutionContext): Future[TicketId] = {
     given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    ticketQueueConnector.createDeskProTicket(
-      name = problemReport.reportName,
-      email = problemReport.reportEmail,
-      message = problemMessage(problemReport.reportAction, problemReport.reportError),
-      referrer = replaceReferrerPath(referrer.getOrElse(""), problemReport.userAction),
-      isJavascript = problemReport.isJavascript,
-      request = request,
-      enrolmentsOption = enrolmentsOption,
-      service = problemReport.service,
-      userAction = problemReport.userAction,
-      ticketConstants = ReportTechnicalProblemTicketConstants
-    )
+    ticketQueueConnector
+      .createDeskProTicket(
+        name = data.reportName,
+        email = data.reportEmail,
+        message = problemMessage(data.reportAction, data.reportError),
+        referrer = replaceReferrerPath(referrer.getOrElse(""), data.userAction),
+        isJavascript = data.isJavascript,
+        request = request,
+        enrolmentsOption = enrolmentsOption,
+        service = data.service,
+        userAction = data.userAction,
+        ticketConstants = ReportTechnicalProblemTicketConstants
+      )
+      .map(ticketId => logTicketCreation(ticketId, data.service))
   }
 
   def problemMessage(action: String, error: String)(using Messages): String =
@@ -101,56 +112,73 @@ trait DeskproSubmission {
     $error
     """
 
-  def createAccessibilityTicket(accessibilityForm: AccessibilityForm, enrolments: Option[Enrolments])(using
+  def createAccessibilityTicket(data: AccessibilityForm, enrolments: Option[Enrolments])(using
     req: Request[AnyContent]
-  )(using HeaderCarrier): Future[TicketId] =
-    ticketQueueConnector.createDeskProTicket(
-      name = accessibilityForm.name,
-      email = accessibilityForm.email,
-      message = accessibilityForm.problemDescription,
-      referrer = replaceReferrerPath(accessibilityForm.referrer, accessibilityForm.userAction),
-      isJavascript = accessibilityForm.isJavascript,
-      request = req,
-      enrolmentsOption = enrolments,
-      service = accessibilityForm.service,
-      userAction = accessibilityForm.userAction,
-      ticketConstants = AccessibilityProblemTicketConstants
-    )
+  )(using HeaderCarrier, ExecutionContext): Future[TicketId] =
+    ticketQueueConnector
+      .createDeskProTicket(
+        name = data.name,
+        email = data.email,
+        message = data.problemDescription,
+        referrer = replaceReferrerPath(data.referrer, data.userAction),
+        isJavascript = data.isJavascript,
+        request = req,
+        enrolmentsOption = enrolments,
+        service = data.service,
+        userAction = data.userAction,
+        ticketConstants = AccessibilityProblemTicketConstants
+      )
+      .map(ticketId => logTicketCreation(ticketId, data.service))
 
   def createOneLoginComplaintTicket(
-    oneLoginComplaint: OneLoginComplaintForm,
+    data: OneLoginComplaintForm,
     request: Request[AnyRef],
     referrer: String
-  )(using messages: Messages): Future[TicketId] = {
+  )(using messages: Messages, ec: ExecutionContext): Future[TicketId] = {
     given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     def oneLoginComplaintMessage(): String = {
       val optionalNoneProvided: String = "None provided"
 
-      s"${messages("one_login_complaint.nino.label")}: ${oneLoginComplaint.nino}\n\n" +
-        s"${messages("one_login_complaint.sa-utr.label")}: ${oneLoginComplaint.saUtr.getOrElse(optionalNoneProvided)}\n\n" +
-        s"${messages("one_login_complaint.date-of-birth.label")}: ${oneLoginComplaint.dateOfBirth.asFormattedDate()}\n\n" +
-        s"${messages("one_login_complaint.phone-number.label")}: ${oneLoginComplaint.phoneNumber.getOrElse(optionalNoneProvided)}\n\n" +
+      s"${messages("one_login_complaint.nino.label")}: ${data.nino}\n\n" +
+        s"${messages("one_login_complaint.sa-utr.label")}: ${data.saUtr.getOrElse(optionalNoneProvided)}\n\n" +
+        s"${messages("one_login_complaint.date-of-birth.label")}: ${data.dateOfBirth.asFormattedDate()}\n\n" +
+        s"${messages("one_login_complaint.phone-number.label")}: ${data.phoneNumber.getOrElse(optionalNoneProvided)}\n\n" +
         s"${messages("one_login_complaint.address.label")}:\n" +
-        s"${oneLoginComplaint.address}\n\n" +
-        s"${messages("one_login_complaint.contact-preference.label")}: ${oneLoginComplaint.contactPreference}\n\n" +
+        s"${data.address}\n\n" +
+        s"${messages("one_login_complaint.contact-preference.label")}: ${data.contactPreference}\n\n" +
         s"${messages("one_login_complaint.complaint.label")}\n" +
-        s"${oneLoginComplaint.complaint}"
+        s"${data.complaint}"
     }
 
-    ticketQueueConnector.createDeskProTicket(
-      name = oneLoginComplaint.name,
-      email = oneLoginComplaint.email,
-      message = oneLoginComplaintMessage(),
-      referrer = referrer,
-      isJavascript = false,
-      request = request,
-      enrolmentsOption = None,
-      // This service of `one-login-complaint` should not be made dynamic or changed, as it is linked to Deskpro triggers
-      service = Some("one-login-complaint"),
-      userAction = None,
-      ticketConstants = OneLoginComplaintTicketConstants
+    ticketQueueConnector
+      .createDeskProTicket(
+        name = data.name,
+        email = data.email,
+        message = oneLoginComplaintMessage(),
+        referrer = referrer,
+        isJavascript = false,
+        request = request,
+        enrolmentsOption = None,
+        // This service of `one-login-complaint` should not be made dynamic or changed, as it is linked to Deskpro triggers
+        service = Some("one-login-complaint"),
+        userAction = None,
+        ticketConstants = OneLoginComplaintTicketConstants
+      )
+      .map(ticketId => logTicketCreation(ticketId, Some("one-login-complaint")))
+  }
+
+  private def logTicketCreation(ticketId: TicketId, serviceName: Option[String]): TicketId = {
+    putMdc(
+      Map(
+        "upstream_service_name" -> serviceName.getOrElse("-"),
+        "ccs_ticket_id"         -> ticketId.ticket_id.toString
+      )
     )
+    logger.info(
+      s"deskpro-ticket-queue ticket created successfully css_ticket_id=${ticketId.ticket_id}"
+    )
+    ticketId
   }
 }
 
