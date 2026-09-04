@@ -168,11 +168,11 @@ trait DeskproSubmission extends Logging {
       .map(ticketId => logTicketCreation(ticketId, Some("one-login-complaint")))
   }
 
-  private def logTicketCreation(ticketId: TicketId, serviceName: Option[String]): TicketId = {
+  private def logTicketCreation(ticketId: TicketId, serviceId: Option[String]): TicketId = {
     putMdc(
       Map(
-        "upstream_service_name" -> serviceName.getOrElse("-"),
-        "ccs_ticket_id"         -> ticketId.ticket_id.toString
+        "service_id"    -> serviceId.getOrElse("-"),
+        "ccs_ticket_id" -> ticketId.ticket_id.toString
       )
     )
     logger.info(
