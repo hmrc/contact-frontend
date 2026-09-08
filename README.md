@@ -38,15 +38,13 @@ If these don't meet your specific needs, please contact the PlatUI team via [#te
 
 #### Enabling users to report technical issues with the service
 You should use the
-[HmrcReportTechnicalIssueHelper](https://github.com/hmrc/play-frontend-hmrc?tab=readme-ov-file#helping-users-report-technical-issues)
-to add a link to your service's main layout template, to enable users to report technical issues from any page in the service.
+[HmrcReportTechnicalIssueHelper](https://github.com/hmrc/play-frontend-hmrc/blob/main/docs/using-components.md#helping-users-report-technical-issues) to add a link to your service's main layout template, to enable users to report technical issues from any page in the service.
 
 For an example of the resulting form, please see the [Appendix](#contacting-hmrc---is-this-page-not-working-properly).
 
 #### Enabling users to provide feedback on a service in beta
 When your new service is in beta, you should use the
-[Beta Feedback banner](https://github.com/hmrc/play-frontend-hmrc?tab=readme-ov-file#adding-a-beta-feedback-banner)
-to add a banner that tells the user the service is in beta, and includes a link for them to provide feedback.
+[Beta Feedback banner](https://github.com/hmrc/play-frontend-hmrc/blob/main/docs/using-components.md#adding-a-beta-feedback-banner) to add a banner that tells the user the service is in beta, and includes a link for them to provide feedback.
 
 For an example of the resulting form, please see the [Appendix](#providing-beta-feedback-about-services).
 
@@ -103,7 +101,7 @@ Form submissions are forwarded to *Deskpro* with the subject *"Support Request"*
 The contents of the *action* and *error* fields are concatenated and stored in the ticket body.
 
 To link to this form, it is recommended that services follow the integration steps detailed in
-[play-frontend-hmrc](https://github.com/hmrc/play-frontend-hmrc#helping-users-report-technical-issues). By using the
+[play-frontend-hmrc](https://github.com/hmrc/play-frontend-hmrc/blob/main/docs/using-components.md#helping-users-report-technical-issues). By using the
 `play-frontend-hmrc` helper, the required query string parameters `service` and `referrerUrl` will be bound correctly to 
 the link. 
 
