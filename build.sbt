@@ -1,4 +1,5 @@
 import play.sbt.routes.RoutesKeys
+import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings
 
 val appName = "contact-frontend"
@@ -24,6 +25,13 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     scalacOptions += "-Wconf:src=routes/.*:s",
     scalacOptions += "-Wconf:src=views/.*:s"
+  )
+  .settings(
+    ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
+      ".*Routes.*;.*viewmodels.govuk.*;",
+    ScoverageKeys.coverageMinimumStmtTotal := 75,
+    ScoverageKeys.coverageFailOnMinimum := true,
+    ScoverageKeys.coverageHighlighting := true
   )
 
 lazy val sharedSettings = Seq(

@@ -38,6 +38,11 @@ To run the Scala unit and integration tests,
 sbt test it/test
 ```
 
+To run unit and integration tests with coverage:
+```shell script
+sbt clean coverage test it/test coverageReport
+```
+
 ## Running UI acceptance tests and accessibility tests
 
 To execute the UI acceptance tests on your local machine, follow the guidance in the [contact-frontend-ui-tests](https://github.com/hmrc/contact-frontend-ui-tests)
