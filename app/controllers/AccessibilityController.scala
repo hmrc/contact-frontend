@@ -83,7 +83,7 @@ object AccessibilityFormBind {
           "accessibility.email.error.invalid",
           email =>
             // Do not display the regex validation error if already displayed a length error
-            email.length > 255 || email.isEmpty || emailValidator.validate(email)
+            email.length > 255 || email.trim.isEmpty || emailValidator.validate(email)
         ),
       "isJavascript"       -> boolean,
       "referrer"           -> text,

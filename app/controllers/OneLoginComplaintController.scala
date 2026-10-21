@@ -90,7 +90,7 @@ object OneLoginComplaintFormBind {
         )
         .verifying(
           s"problem_report.email.error.valid",
-          email => emailValidator.validate(email) || email.isEmpty
+          email => emailValidator.validate(email) || email.trim.isEmpty
         ),
       "phone-number"       -> optional(
         text.verifying("one_login_complaint.phone-number.error", phoneNumber => phoneNumber.length <= 50)
