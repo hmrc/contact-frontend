@@ -16,10 +16,18 @@
 
 package util
 
+import config.AppConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
+
+  implicit private val appConfig: AppConfig = new AppConfig {
+    override def backUrlDestinationAllowList: Set[String] = Set.empty
+    override def sendExplicitAuditEvents: Boolean         = false
+    override def enableOlfgComplaintsEndpoints: Boolean   = false
+    override def urlWithPlatformHost(url: String): String = ""
+  }
 
   private val emailValidator = DeskproEmailValidator()
 

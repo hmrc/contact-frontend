@@ -16,6 +16,7 @@
 
 package util
 
+import config.AppConfig
 import scala.util.matching.Regex
 
 case class DeskproEmailValidator() {
@@ -24,11 +25,6 @@ case class DeskproEmailValidator() {
   // They have been updated in July 2026 as Deskpro have confirmed via Slack that domains without a "." are not considered valid
   // Updated in October 2026 following manual testing to ensure that emails with newline characters are not accepted
 
-  // These values are as defined by RCF 5321 and RFC 3696
-  private val maxEmailLength: Int       = 254 // This was accepted by the IETF following the submitted erratum for RFC 3696
-  private val maxNameLength: Int        = 64
-  private val maxDomainLabelLength: Int = 63 // Each part of a domain must be 63 characters or less
-
   private val validNamePattern: Regex   =
     """(?i)^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:[\\.][a-z0-9!#$%&'*+/=?^_`{|}~-]+)*$""".r
   private val validDomainPattern: Regex =
@@ -36,16 +32,23 @@ case class DeskproEmailValidator() {
   private val validIpPattern: Regex     =
     """^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)[\\.]){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$""".r
 
-  def validate(email: String): Boolean =
-    !email.endsWith("@") && !email.contains('\n') && !email.contains("\\") && email.length <= maxEmailLength && {
-      email.split("@").toList match {
-        case name :: domain :: Nil => validateName(name) && (validateDomain(domain) || validIpPattern.matches(domain))
-        case _                     => false
+  def validate(email: String)(using appConfig: AppConfig): Boolean =
+    !email.endsWith("@") &&
+      !email.contains('\n') &&
+      !email.contains("\\") &&
+      email.length <= appConfig.maxEmailLength && {
+        email.split("@").toList match {
+          case name :: domain :: Nil =>
+            validateName(name) && (validateDomain(domain) || validIpPattern.matches(domain))
+          case _                     => false
+        }
       }
-    }
 
-  private def validateName(name: String): Boolean = name.length <= maxNameLength && validNamePattern.matches(name)
+  private def validateName(name: String)(using appConfig: AppConfig): Boolean = {
+    import appConfig._
+    name.length <= maxEmailNameLength && validNamePattern.matches(name)
+  }
 
-  private def validateDomain(domain: String): Boolean =
-    validDomainPattern.matches(domain) && domain.split('.').forall(_.length <= maxDomainLabelLength)
+  private def validateDomain(domain: String)(using appConfig: AppConfig): Boolean =
+    validDomainPattern.matches(domain) && domain.split('.').forall(_.length <= appConfig.maxEmailDomainLabelLength)
 }

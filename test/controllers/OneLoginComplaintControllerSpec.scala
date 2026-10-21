@@ -43,6 +43,7 @@ class OneLoginComplaintControllerSpec extends BaseControllerSpec {
     val confirmationPage = instanceOf[views.html.OneLoginComplaintConfirmationPage]
     val errorPage        = instanceOf[views.html.InternalErrorPage]
     val errorHandler     = instanceOf[ContactFrontendErrorHandler]
+    val formBind         = instanceOf[OneLoginComplaintFormBind]
 
     given cfconfig: AppConfig = new CFConfig(app.configuration) {
       override def enableOlfgComplaintsEndpoints: Boolean = enableEndpoints
@@ -70,7 +71,8 @@ class OneLoginComplaintControllerSpec extends BaseControllerSpec {
       complaintPage,
       confirmationPage,
       errorPage,
-      errorHandler
+      errorHandler,
+      formBind
     )
   }
 

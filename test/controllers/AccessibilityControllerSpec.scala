@@ -51,6 +51,7 @@ class AccessibilityControllerSpec extends BaseControllerSpec {
   val playFrontendAccessibilityPage             = instanceOf[views.html.AccessibilityProblemPage]
   val playFrontendAccessibilityConfirmationPage = instanceOf[views.html.AccessibilityProblemConfirmationPage]
   val errorPage                                 = instanceOf[views.html.InternalErrorPage]
+  val formBind                                  = instanceOf[AccessibilityFormBind]
 
   val controller = new AccessibilityController(
     ticketQueueConnector,
@@ -59,7 +60,8 @@ class AccessibilityControllerSpec extends BaseControllerSpec {
     playFrontendAccessibilityPage,
     playFrontendAccessibilityConfirmationPage,
     errorPage,
-    new RefererHeaderRetriever
+    new RefererHeaderRetriever,
+    formBind
   )
 
   def generateRequest(desc: String, formName: String, email: String, isJavascript: Boolean, referrer: String) = {
@@ -168,7 +170,7 @@ class AccessibilityControllerSpec extends BaseControllerSpec {
       val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().contains(Messages("accessibility.problem.error.length"))) shouldBe true
+      errors.exists(_.text().contains(Messages("Problem description must be 2000 characters or less"))) shouldBe true
     }
 
     "display error messages when email is invalid" in {
@@ -208,7 +210,7 @@ class AccessibilityControllerSpec extends BaseControllerSpec {
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
-      errors.exists(_.text().contains(Messages("accessibility.email.error.length"))) shouldBe true
+      errors.exists(_.text().contains("Email address must be 254 characters or fewer")) shouldBe true
     }
 
     "display error messages when name is too long" in {
@@ -228,7 +230,7 @@ class AccessibilityControllerSpec extends BaseControllerSpec {
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("accessibility.title"))
       val errors = document.select(".govuk-error-message").asScala
-      errors.exists(_.text().contains(Messages("accessibility.name.error.length"))) shouldBe true
+      errors.exists(_.text().contains("Full name must be 70 characters or fewer")) shouldBe true
     }
 
     "redirect to thankyou page when completed" in {

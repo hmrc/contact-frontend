@@ -25,7 +25,7 @@ import play.api.Logging
 import play.api.data.Forms.*
 import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, Form, FormError}
-import play.api.i18n.{I18nSupport, Lang}
+import play.api.i18n.{I18nSupport, Lang, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
@@ -48,7 +48,8 @@ import scala.util.control.NonFatal
   feedbackConfirmationPage: FeedbackConfirmationPage,
   feedbackPage: FeedbackPage,
   errorPage: InternalErrorPage,
-  headerRetriever: RefererHeaderRetriever
+  headerRetriever: RefererHeaderRetriever,
+  feedbackFormBind: FeedbackFormBind
 )(using AppConfig, ExecutionContext, ServiceNavigationConfig)
     extends FrontendController(mcc)
     with DeskproSubmission
@@ -71,7 +72,7 @@ import scala.util.control.NonFatal
       Future.successful(
         Ok(
           renderFeedbackPage(
-            FeedbackFormBind.emptyForm(
+            feedbackFormBind.emptyForm(
               CSRF.getToken(request).map(_.value).getOrElse(""),
               referrer = referrer,
               backUrl = backUrl,
@@ -94,7 +95,7 @@ import scala.util.control.NonFatal
     referrerUrl: Option[ReferrerUrl] = None
   ): Action[AnyContent] = Action.async { request =>
     given Request[AnyContent] = request
-    FeedbackFormBind.form
+    feedbackFormBind.form
       .bindFromRequest()
       .fold(
         formWithError => Future.successful(BadRequest(feedbackView(formWithError))),
@@ -139,12 +140,11 @@ import scala.util.control.NonFatal
   }
 }
 
-object FeedbackFormBind {
-
+class FeedbackFormBind @Inject() (implicit
+  emailValidator: DeskproEmailValidator,
+  nameValidator: NameValidator
+) {
   import model.FeedbackFormConfig.*
-
-  private val emailValidator = DeskproEmailValidator()
-  private val nameValidator  = NameValidator()
 
   def emptyForm(
     csrfToken: String,
@@ -152,8 +152,8 @@ object FeedbackFormBind {
     backUrl: Option[BackUrl],
     canOmitComments: Boolean,
     service: Option[String]
-  ): Form[FeedbackForm] =
-    FeedbackFormBind.form.fill(
+  )(using Messages, AppConfig): Form[FeedbackForm] =
+    form.fill(
       FeedbackForm(
         experienceRating = None,
         name = "",
@@ -168,7 +168,9 @@ object FeedbackFormBind {
       )
     )
 
-  def form: Form[FeedbackForm] =
+  def form(using messages: Messages, appConfig: AppConfig): Form[FeedbackForm] = {
+    import appConfig._
+
     Form[FeedbackForm](
       mapping(
         "feedback-rating"   -> optional(text)
@@ -180,14 +182,20 @@ object FeedbackFormBind {
         "feedback-name"     -> text
           .verifying("feedback.name.error.required", name => name.trim.nonEmpty)
           .verifying("forms.name.error.invalid", name => nameValidator.validate(name))
-          .verifying("feedback.name.error.length", name => name.length <= 70),
+          .verifying(
+            messages("feedback.name.error.length", maxNameLength.toString),
+            name => name.length <= maxNameLength
+          ),
         "feedback-email"    -> text
-          .verifying("feedback.email.error.length", email => email.length <= 255)
+          .verifying(
+            messages("feedback.email.error.length", maxEmailLength.toString),
+            email => email.length <= maxEmailLength
+          )
           .verifying(
             "feedback.email.error.invalid",
             email =>
               // Do not display the regex validation error if already displayed a length error
-              email.length > 255 || email.trim.isEmpty || emailValidator.validate(email)
+              email.length > maxEmailLength || email.trim.isEmpty || emailValidator.validate(email)
           ),
         "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
 
@@ -203,9 +211,9 @@ object FeedbackFormBind {
           override def unbind(key: String, value: String): Map[String, String] = Map(key -> value)
 
         }).verifying(
-          "feedback.comments.error.length",
+          messages("feedback.comments.error.length", maxSingleTextboxLength.toString),
           comment => {
-            val result = comment.size <= 2000
+            val result = comment.size <= maxSingleTextboxLength
             result
           }
         ),
@@ -217,4 +225,5 @@ object FeedbackFormBind {
         "canOmitComments" -> boolean
       )(FeedbackForm.apply)(o => Some(Tuple.fromProductTyped(o)))
     )
+  }
 }
