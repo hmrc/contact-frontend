@@ -63,7 +63,8 @@ object ReportProblemFormBind {
         )
         .verifying(
           s"problem_report.email.error.valid",
-          email => emailValidator.validate(email) || email.isEmpty
+          // Do not display the regex validation error if already displayed a length error
+          email => email.length > 255 || email.isEmpty || emailValidator.validate(email)
         )
         .verifying("problem_report.email.error.length", email => email.length <= 255),
       "report-action" -> text

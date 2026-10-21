@@ -30,6 +30,7 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
       emailValidator.validate("some_name@foo.biz")   shouldBe true
       emailValidator.validate("somename@foo.com")    shouldBe true
       emailValidator.validate("s@f.c")               shouldBe true
+      emailValidator.validate("sn+@foo.com")         shouldBe true
       emailValidator.validate("SOMENAME@foo.com")    shouldBe true
       emailValidator.validate("SOMENAME@FOO.COM")    shouldBe true
     }
@@ -44,12 +45,20 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
     }
   }
 
+  "Given a string that contains non-Latin alphabet characters, an email validator" should {
+    "return false" in {
+      emailValidator.validate("1500111@профи-инвест.рф") shouldBe false
+      emailValidator.validate("инфо@письмо.рф")          shouldBe false
+    }
+  }
+
   "Given an email address with an invalid domain, an email validator" should {
     "return false" in {
       emailValidator.validate("some.name@foo.")        shouldBe false
       emailValidator.validate("some.name@.com")        shouldBe false
       emailValidator.validate("some_name@foo_bar.com") shouldBe false
       emailValidator.validate("some.name@foo.com@")    shouldBe false
+      emailValidator.validate("some.name@foo")         shouldBe false
     }
   }
 
@@ -67,17 +76,43 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
     }
   }
 
-  object AgreeingWithDeskproValidation {
-    val validEmails = List(
-      "fabien@symfony.com",
-      "example@example.co.uk",
-      "fabien_potencier@example.fr",
-      "fab\'ien@symfony.com",
-      "fabien+@symfony.com",
-      "test@email.com.au"
-    )
+  "Given an email which exceeds the maximum overall length, an email validator" should {
+    "return false" in {
+      val fiftyChars: String = "aBcDeFgHiJkLmNoPqRsTuVwXyZaBcDeFgHiJkLmNoPqRsTuVwX"
 
-    val invalidEmails = List(
+      val acceptableEmail: String = s"$fiftyChars@$fiftyChars.$fiftyChars.$fiftyChars.example.co.uk"
+      val tooLongEmail: String    = s"$fiftyChars@$fiftyChars.$fiftyChars.$fiftyChars.$fiftyChars.example.co.uk"
+
+      emailValidator.validate(acceptableEmail) shouldBe true
+      emailValidator.validate(tooLongEmail)    shouldBe false
+    }
+  }
+
+  "Given an email with a long name or domain, an email validator" should {
+    "return false" in {
+      emailValidator.validate(
+        "this_is_a_long_string_this_is_a_long_string_this_is_a_long_string@example.com"
+      ) shouldBe false
+
+      emailValidator.validate(
+        "example@thisisalongstringthisisalongstring.thisisalongstringthisisalongstring.co.uk"
+      ) shouldBe true
+      emailValidator.validate(
+        "example@thisisalongstringthisisalongstringthisisalongstringthisisalongstring.co.uk"
+      ) shouldBe false
+    }
+  }
+
+  DeskproEmailValidation.invalidEmails foreach { emailAddress =>
+    s"Given an email address that will be rejected by the Deskpro API [$emailAddress], an email validator" should {
+      "return false" in {
+        emailValidator.validate(emailAddress) shouldBe false
+      }
+    }
+  }
+
+  object DeskproEmailValidation {
+    val invalidEmails: List[String] = List(
       "test@example.com test",
       "user name@example.com",
       "example.@example.co.uk",
@@ -122,8 +157,7 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
       "test@email<",
       "test@email{",
       "test@email.com]",
-      "test@ema[il.com"
-    ) ++ List(
+      "test@ema[il.com",
       "@example.co.uk",
       "example@",
       "example@example-.co.uk",
@@ -146,10 +180,7 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
       "exampl\te@example.co.uk",
       "example@exa\rmple.co.uk",
       "example@[\r]",
-      "exam\rple@example.co.uk"
-    )
-
-    val invalidWithWarningsEmails = List(
+      "exam\rple@example.co.uk",
       "example @invalid.example.com",
       "example@ invalid.example.com",
       "example@invalid.example(examplecomment).com",
@@ -167,20 +198,11 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
       "example@[IPv6::2001:0db8:85a3:0000:0000:8a2e:0370:7334]",
       "example@[IPv6:z001:0db8:85a3:0000:0000:8a2e:0370:7334]",
       "example@[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:]",
-      "\"example\"@invalid.example.com"
-    )
-  }
-
-  object DisagreeingWithDeskproValidation {
-    // feels fairly trivial to change regex to accept unicode characters
-    // examples containing spaces, quotes and brackets are also fixable
-    // examples with special characters *!&^%$ at the end seem unlikely, so not worth fixing
-    val validButRejectedEmails = List(
+      "\"example\"@invalid.example.com",
       "â@iana.org",
       "fab\\ ien@symfony.com",
       "example((example))@fakedfake.co.uk",
       "example@faked(fake).co.uk",
-      "инфо@письмо.рф",
       "username\"@example.com",
       "\"user,name\"@example.com",
       "\"user name\"@example.com",
@@ -195,47 +217,8 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
       "test@email&",
       "test@email^",
       "test@email%",
-      "test@email$",
-      "1500111@профи-инвест.рф"
+      "test@email$"
     )
-
-    // these feel contrived and unlikely to occur in the wild
-    val invalidWithWarningsButAcceptedEmails = List(
-      "too_long_localpart_too_long_localpart_too_long_localpart_too_long_localpart@invalid.example.com",
-      "example@toolonglocalparttoolonglocalparttoolonglocalparttoolonglocalpart.co.uk"
-    )
-  }
-
-  "DeskproEmailValidator" should {
-    AgreeingWithDeskproValidation.validEmails.foreach { email =>
-      s"accept valid email address: $email" in {
-        emailValidator.validate(email) shouldBe true
-      }
-    }
-
-    DisagreeingWithDeskproValidation.validButRejectedEmails.foreach { email =>
-      s"accept valid email address: $email" in pendingUntilFixed {
-        emailValidator.validate(email) shouldBe true
-      }
-    }
-
-    AgreeingWithDeskproValidation.invalidEmails.foreach { email =>
-      s"reject invalid email address: $email" in {
-        emailValidator.validate(email) shouldBe false
-      }
-    }
-
-    AgreeingWithDeskproValidation.invalidWithWarningsEmails.foreach { email =>
-      s"reject invalid email address: $email" in {
-        emailValidator.validate(email) shouldBe false
-      }
-    }
-
-    DisagreeingWithDeskproValidation.invalidWithWarningsButAcceptedEmails.foreach { email =>
-      s"reject invalid email address: $email" in pendingUntilFixed {
-        emailValidator.validate(email) shouldBe false
-      }
-    }
   }
 
 }

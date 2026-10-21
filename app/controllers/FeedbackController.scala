@@ -182,8 +182,13 @@ object FeedbackFormBind {
           .verifying("forms.name.error.invalid", name => nameValidator.validate(name))
           .verifying("feedback.name.error.length", name => name.length <= 70),
         "feedback-email"    -> text
-          .verifying("feedback.email.error.invalid", email => emailValidator.validate(email))
-          .verifying("feedback.email.error.length", email => email.length <= 255),
+          .verifying("feedback.email.error.length", email => email.length <= 255)
+          .verifying(
+            "feedback.email.error.invalid",
+            email =>
+              // Do not display the regex validation error if already displayed a length error
+              email.length > 255 || email.isEmpty || emailValidator.validate(email)
+          ),
         "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
 
           override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {

@@ -72,13 +72,18 @@ object AccessibilityFormBind {
         .verifying("forms.name.error.invalid", name => nameValidator.validate(name))
         .verifying("accessibility.name.error.length", name => name.length <= 70),
       "email"              -> text
-        .verifying("accessibility.email.error.required", name => name.trim.nonEmpty)
+        .verifying("accessibility.email.error.required", email => email.trim.nonEmpty)
         // the logic below ensures that two or more errors will not fire at the same time. This prevents
         // multiple error messages appearing in the error summary for the same field
-        .verifying("accessibility.email.error.invalid", email => email.trim.isEmpty || emailValidator.validate(email))
         .verifying(
           "accessibility.email.error.length",
-          email => !(email.trim.isEmpty || emailValidator.validate(email)) || email.length <= 255
+          email => email.trim.isEmpty || email.length <= 255
+        )
+        .verifying(
+          "accessibility.email.error.invalid",
+          email =>
+            // Do not display the regex validation error if already displayed a length error
+            email.length > 255 || email.isEmpty || emailValidator.validate(email)
         ),
       "isJavascript"       -> boolean,
       "referrer"           -> text,

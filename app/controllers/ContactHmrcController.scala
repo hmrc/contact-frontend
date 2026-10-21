@@ -51,10 +51,15 @@ object ContactHmrcForm {
         .verifying("contact.name.error.length", name => name.length <= 70),
       "contact-email"    -> text
         .verifying("contact.email.error.required", email => email.trim.nonEmpty)
-        .verifying("contact.email.error.invalid", email => email.trim.isEmpty || emailValidator.validate(email))
         .verifying(
           "contact.email.error.length",
-          email => !(email.trim.isEmpty || emailValidator.validate(email)) || email.length <= 255
+          email => email.trim.isEmpty || email.length <= 255
+        )
+        .verifying(
+          "contact.email.error.invalid",
+          email =>
+            // Do not display the regex validation error if already displayed a length error
+            email.length > 255 || email.isEmpty || emailValidator.validate(email)
         ),
       "contact-comments" -> text
         .verifying("contact.comments.error.required", comment => comment.trim.nonEmpty)
