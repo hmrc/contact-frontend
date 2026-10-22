@@ -25,6 +25,7 @@ trait AppConfig {
   def sendExplicitAuditEvents: Boolean
   def enableOlfgComplaintsEndpoints: Boolean
   def urlWithPlatformHost(url: String): String
+
 }
 
 class CFConfig @Inject() (configuration: Configuration) extends AppConfig {
