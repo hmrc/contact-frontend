@@ -25,16 +25,6 @@ trait AppConfig {
   def sendExplicitAuditEvents: Boolean
   def enableOlfgComplaintsEndpoints: Boolean
   def urlWithPlatformHost(url: String): String
-
-  // These values are as defined by RCF 5321 and RFC 3696
-  val maxEmailLength: Int            = 254 // This was accepted by the IETF following the submitted erratum for RFC 3696
-  val maxEmailNameLength: Int        = 64
-  val maxEmailDomainLabelLength: Int = 63 // Each part of a domain must be 63 characters or less
-
-  // These are based on Deskpro API values
-  val maxNameLength: Int             = 70
-  val maxSingleTextboxLength: Int    = 2000
-  val maxMultipartTextboxLength: Int = 1000
 }
 
 class CFConfig @Inject() (configuration: Configuration) extends AppConfig {

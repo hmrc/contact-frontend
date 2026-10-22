@@ -16,10 +16,10 @@
 
 package views
 
-import config.AppConfig
-import controllers.OneLoginComplaintFormBind
+import controllers.OneLoginComplaintFormProvider
 import helpers.BaseViewSpec
 import model.{DateOfBirth, EmailPreference, LetterPreference, OneLoginComplaintForm}
+import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import util.{DeskproEmailValidator, NameValidator}
@@ -29,11 +29,7 @@ import scala.util.Random
 
 class OneLoginComplaintPageSpec extends BaseViewSpec {
 
-  val formBinder            = OneLoginComplaintFormBind()(
-    emailValidator = DeskproEmailValidator(),
-    nameValidator = NameValidator()
-  )
-  val oneLoginComplaintForm = formBinder.form
+  val oneLoginComplaintForm = OneLoginComplaintFormProvider.apply()
 
   val formValues: OneLoginComplaintForm = OneLoginComplaintForm(
     name = "Test Person",

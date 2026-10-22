@@ -51,7 +51,6 @@ class ReportProblemControllerSpec extends BaseControllerSpec {
   val reportProblemPage = instanceOf[views.html.ReportProblemPage]
   val confirmationPage  = instanceOf[views.html.ReportProblemConfirmationPage]
   val errorPage         = instanceOf[views.html.InternalErrorPage]
-  val formBind          = instanceOf[ReportProblemFormBind]
 
   val controller = new ReportProblemController(
     hmrcDeskproConnector,
@@ -60,8 +59,7 @@ class ReportProblemControllerSpec extends BaseControllerSpec {
     reportProblemPage,
     confirmationPage,
     errorPage,
-    new RefererHeaderRetriever,
-    formBind
+    new RefererHeaderRetriever
   )
 
   val deskproName: String           = "John Densmore"

@@ -16,10 +16,11 @@
 
 package util
 
-import config.AppConfig
+import config.ValidationConstants
 import scala.util.matching.Regex
 
-case class DeskproEmailValidator() {
+object DeskproEmailValidator {
+  import ValidationConstants._
 
   // The regexes used in this validator are based on PCRE regexes provided by Deskpro via DDC Ops in December 2020
   // They have been updated in July 2026 as Deskpro have confirmed via Slack that domains without a "." are not considered valid
@@ -32,11 +33,11 @@ case class DeskproEmailValidator() {
   private val validIpPattern: Regex     =
     """^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)[\\.]){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$""".r
 
-  def validate(email: String)(using appConfig: AppConfig): Boolean =
+  def validate(email: String): Boolean =
     !email.endsWith("@") &&
       !email.contains('\n') &&
       !email.contains("\\") &&
-      email.length <= appConfig.maxEmailLength && {
+      email.length <= maxEmailLength && {
         email.split("@").toList match {
           case name :: domain :: Nil =>
             validateName(name) && (validateDomain(domain) || validIpPattern.matches(domain))
@@ -44,11 +45,9 @@ case class DeskproEmailValidator() {
         }
       }
 
-  private def validateName(name: String)(using appConfig: AppConfig): Boolean = {
-    import appConfig._
+  private def validateName(name: String): Boolean =
     name.length <= maxEmailNameLength && validNamePattern.matches(name)
-  }
 
-  private def validateDomain(domain: String)(using appConfig: AppConfig): Boolean =
-    validDomainPattern.matches(domain) && domain.split('.').forall(_.length <= appConfig.maxEmailDomainLabelLength)
+  private def validateDomain(domain: String): Boolean =
+    validDomainPattern.matches(domain) && domain.split('.').forall(_.length <= maxEmailDomainLabelLength)
 }

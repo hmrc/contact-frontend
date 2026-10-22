@@ -16,71 +16,62 @@
 
 package util
 
-import config.AppConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
-
-  implicit private val appConfig: AppConfig = new AppConfig {
-    override def backUrlDestinationAllowList: Set[String] = Set.empty
-    override def sendExplicitAuditEvents: Boolean         = false
-    override def enableOlfgComplaintsEndpoints: Boolean   = false
-    override def urlWithPlatformHost(url: String): String = ""
-  }
-
-  private val emailValidator = DeskproEmailValidator()
+  import DeskproEmailValidator._
 
   "Given a valid email address, an email validator" should {
     "return true" in {
-      emailValidator.validate("some.name@foo.com")   shouldBe true
-      emailValidator.validate("some.name@foo.co.uk") shouldBe true
-      emailValidator.validate("some_name@foo.biz")   shouldBe true
-      emailValidator.validate("somename@foo.com")    shouldBe true
-      emailValidator.validate("s@f.c")               shouldBe true
-      emailValidator.validate("sn+@foo.com")         shouldBe true
-      emailValidator.validate("SOMENAME@foo.com")    shouldBe true
-      emailValidator.validate("SOMENAME@FOO.COM")    shouldBe true
+      validate("some.name@foo.com")   shouldBe true
+      validate("some.name@foo.co.uk") shouldBe true
+      validate("some_name@foo.biz")   shouldBe true
+      validate("somename@foo.com")    shouldBe true
+      validate("s@f.c")               shouldBe true
+      validate("sn+@foo.com")         shouldBe true
+      validate("SOMENAME@foo.com")    shouldBe true
+      validate("SOMENAME@FOO.COM")    shouldBe true
     }
   }
 
   "Given a string that is not an email address, an email validator" should {
     "return false" in {
-      emailValidator.validate("n/a")                   shouldBe false
-      emailValidator.validate("hello.world")           shouldBe false
-      emailValidator.validate("Not applicable")        shouldBe false
-      emailValidator.validate("some.name@mailserver1") shouldBe false
+      validate("n/a")                   shouldBe false
+      validate("hello.world")           shouldBe false
+      validate("Not applicable")        shouldBe false
+      validate("some.name@mailserver1") shouldBe false
     }
   }
 
   "Given a string that contains non-Latin alphabet characters, an email validator" should {
     "return false" in {
-      emailValidator.validate("1500111@профи-инвест.рф") shouldBe false
-      emailValidator.validate("инфо@письмо.рф")          shouldBe false
+      validate("1500111@профи-инвест.рф") shouldBe false
+      validate("инфо@письмо.рф")          shouldBe false
     }
   }
 
   "Given an email address with an invalid domain, an email validator" should {
     "return false" in {
-      emailValidator.validate("some.name@foo.")        shouldBe false
-      emailValidator.validate("some.name@.com")        shouldBe false
-      emailValidator.validate("some_name@foo_bar.com") shouldBe false
-      emailValidator.validate("some.name@foo.com@")    shouldBe false
-      emailValidator.validate("some.name@foo")         shouldBe false
+      validate("some.name@foo.")        shouldBe false
+      validate("some.name@.com")        shouldBe false
+      validate("some_name@foo_bar.com") shouldBe false
+      validate("some.name@foo.com@")    shouldBe false
+      validate("some.name@foo")         shouldBe false
     }
   }
 
   "Given an email address with a valid IP address, an email validator" should {
     "return true" in {
-      emailValidator.validate("some.name@01.01.01.01")   shouldBe true
-      emailValidator.validate("some.name@251.12.19.223") shouldBe true
+      validate("some.name@01.01.01.01")   shouldBe true
+      validate("some.name@251.12.19.223") shouldBe true
     }
   }
 
   "Given an email address with an invalid IP address, an email validator" should {
     "return true" in {
-      emailValidator.validate("some.name@111.222.333.444") shouldBe false
-      emailValidator.validate("some.name@251.12.19")       shouldBe false
+      validate("some.name@111.222.333.444") shouldBe false
+      validate("some.name@251.12.19")       shouldBe false
     }
   }
 
@@ -91,21 +82,21 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
       val acceptableEmail: String = s"$fiftyChars@$fiftyChars.$fiftyChars.$fiftyChars.example.co.uk"
       val tooLongEmail: String    = s"$fiftyChars@$fiftyChars.$fiftyChars.$fiftyChars.$fiftyChars.example.co.uk"
 
-      emailValidator.validate(acceptableEmail) shouldBe true
-      emailValidator.validate(tooLongEmail)    shouldBe false
+      validate(acceptableEmail) shouldBe true
+      validate(tooLongEmail)    shouldBe false
     }
   }
 
   "Given an email with a long name or domain, an email validator" should {
     "return false" in {
-      emailValidator.validate(
+      validate(
         "this_is_a_long_string_this_is_a_long_string_this_is_a_long_string@example.com"
       ) shouldBe false
 
-      emailValidator.validate(
+      validate(
         "example@thisisalongstringthisisalongstring.thisisalongstringthisisalongstring.co.uk"
       ) shouldBe true
-      emailValidator.validate(
+      validate(
         "example@thisisalongstringthisisalongstringthisisalongstringthisisalongstring.co.uk"
       ) shouldBe false
     }
@@ -114,7 +105,7 @@ class DeskproEmailValidatorSpec extends AnyWordSpec with Matchers {
   DeskproEmailValidation.invalidEmails foreach { emailAddress =>
     s"Given an email address that will be rejected by the Deskpro API [$emailAddress], an email validator" should {
       "return false" in {
-        emailValidator.validate(emailAddress) shouldBe false
+        validate(emailAddress) shouldBe false
       }
     }
   }

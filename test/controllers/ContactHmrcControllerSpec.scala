@@ -51,7 +51,6 @@ class ContactHmrcControllerSpec extends BaseControllerSpec with GivenWhenThen {
   val errorPage          = instanceOf[views.html.InternalErrorPage]
   val pfContactPage      = instanceOf[views.html.ContactHmrcPage]
   val pfConfirmationPage = instanceOf[views.html.ContactHmrcConfirmationPage]
-  val formBind           = instanceOf[ContactHmrcForm]
 
   val controller =
     new ContactHmrcController(
@@ -61,8 +60,7 @@ class ContactHmrcControllerSpec extends BaseControllerSpec with GivenWhenThen {
       errorPage,
       pfContactPage,
       pfConfirmationPage,
-      new RefererHeaderRetriever,
-      formBind
+      new RefererHeaderRetriever
     )
 
   def mockDeskproConnector(result: Future[TicketId]): Unit =

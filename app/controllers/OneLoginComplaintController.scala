@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.{AppConfig, ContactFrontendErrorHandler}
+import config.{AppConfig, ContactFrontendErrorHandler, ValidationConstants}
 import connectors.deskpro.DeskproTicketQueueConnector
 import model.{ContactPreference, ContactPreferenceFormatter, DateOfBirth, OneLoginComplaintForm}
 import play.api.Logging
@@ -36,87 +36,81 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class OneLoginComplaintFormBind @Inject() (implicit
-  emailValidator: DeskproEmailValidator,
-  nameValidator: NameValidator
-) {
+object OneLoginComplaintFormProvider {
+  import ValidationConstants._
 
-  def form(using messages: Messages, appConfig: AppConfig): Form[OneLoginComplaintForm] = {
-    import appConfig._
-
-    Form[OneLoginComplaintForm](
-      mapping(
-        "name"               -> text
-          .verifying(
-            "problem_report.name.error.required",
-            name => name.nonEmpty
-          )
-          .verifying(
-            messages("problem_report.name.error.length", maxNameLength.toString),
-            name => name.length <= maxNameLength
-          )
-          .verifying(
-            "forms.name.error.invalid",
-            name => nameValidator.validate(name) || name.isEmpty
-          ),
-        "nino"               -> text
-          .verifying(
-            "one_login_complaint.nino.error",
-            nino => nino.nonEmpty
-          )
-          .verifying(
-            "one_login_complaint.nino.error",
-            // GOV.UK Design System guidance is to let users enter upper and lower case letters, additional spaces and punctuation
-            // https://design-system.service.gov.uk/patterns/national-insurance-numbers/
-            nino => Nino.isValid(nino.trim.replaceAll("""\p{Punct}""", "").toUpperCase()) || nino.isEmpty
-          ),
-        "sa-utr"             -> optional(
-          text
-            .verifying(
-              "one_login_complaint.sa-utr.error",
-              saUtr => saUtr.length <= 20
-            )
+  def apply()(using messages: Messages): Form[OneLoginComplaintForm] = Form[OneLoginComplaintForm](
+    mapping(
+      "name"               -> text
+        .verifying(
+          "problem_report.name.error.required",
+          name => name.nonEmpty
+        )
+        .verifying(
+          messages("problem_report.name.error.length", maxNameLength.toString),
+          name => name.length <= maxNameLength
+        )
+        .verifying(
+          "forms.name.error.invalid",
+          name => NameValidator.validate(name) || name.isEmpty
         ),
-        "date-of-birth"      -> mapping(
-          "day"   -> text.verifying("one_login_complaint.date-of-birth.error.day", day => day.nonEmpty),
-          "month" -> text.verifying("one_login_complaint.date-of-birth.error.month", month => month.nonEmpty),
-          "year"  -> text.verifying("one_login_complaint.date-of-birth.error.year", year => year.nonEmpty)
-        )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d)))
-          .verifying("one_login_complaint.date-of-birth.error.invalid", _.isValidDate())
-          .verifying(
-            "one_login_complaint.date-of-birth.error.future",
-            dob => dob.isNotFutureDate() || !dob.isValidDate()
-          ),
-        "email"              -> text
-          .verifying(
-            s"problem_report.email.error.required",
-            email => email.nonEmpty
-          )
-          .verifying(
-            s"problem_report.email.error.valid",
-            email => emailValidator.validate(email) || email.trim.isEmpty
-          ),
-        "phone-number"       -> optional(
-          text.verifying("one_login_complaint.phone-number.error", phoneNumber => phoneNumber.length <= 50)
+      "nino"               -> text
+        .verifying(
+          "one_login_complaint.nino.error",
+          nino => nino.nonEmpty
+        )
+        .verifying(
+          "one_login_complaint.nino.error",
+          // GOV.UK Design System guidance is to let users enter upper and lower case letters, additional spaces and punctuation
+          // https://design-system.service.gov.uk/patterns/national-insurance-numbers/
+          nino => Nino.isValid(nino.trim.replaceAll("""\p{Punct}""", "").toUpperCase()) || nino.isEmpty
         ),
-        "address"            -> text
+      "sa-utr"             -> optional(
+        text
           .verifying(
-            s"one_login_complaint.address.error",
-            address => address.nonEmpty
-          ),
-        "contact-preference" -> of[ContactPreference],
-        "complaint"          -> text
-          .verifying(
-            "one_login_complaint.complaint.required",
-            complaint => complaint.nonEmpty
+            "one_login_complaint.sa-utr.error",
+            saUtr => saUtr.length <= 20
           )
-          .verifying(
-            messages("one_login_complaint.complaint.error", maxSingleTextboxLength.toString),
-            complaint => complaint.length <= maxSingleTextboxLength
-          )
-      )(OneLoginComplaintForm.apply)(o => Some(Tuple.fromProductTyped(o)))
-    )
-  }
+      ),
+      "date-of-birth"      -> mapping(
+        "day"   -> text.verifying("one_login_complaint.date-of-birth.error.day", day => day.nonEmpty),
+        "month" -> text.verifying("one_login_complaint.date-of-birth.error.month", month => month.nonEmpty),
+        "year"  -> text.verifying("one_login_complaint.date-of-birth.error.year", year => year.nonEmpty)
+      )(DateOfBirth.apply)(d => Some(Tuple.fromProductTyped(d)))
+        .verifying("one_login_complaint.date-of-birth.error.invalid", _.isValidDate())
+        .verifying(
+          "one_login_complaint.date-of-birth.error.future",
+          dob => dob.isNotFutureDate() || !dob.isValidDate()
+        ),
+      "email"              -> text
+        .verifying(
+          s"problem_report.email.error.required",
+          email => email.nonEmpty
+        )
+        .verifying(
+          s"problem_report.email.error.valid",
+          email => DeskproEmailValidator.validate(email) || email.trim.isEmpty
+        ),
+      "phone-number"       -> optional(
+        text.verifying("one_login_complaint.phone-number.error", phoneNumber => phoneNumber.length <= 50)
+      ),
+      "address"            -> text
+        .verifying(
+          s"one_login_complaint.address.error",
+          address => address.nonEmpty
+        ),
+      "contact-preference" -> of[ContactPreference],
+      "complaint"          -> text
+        .verifying(
+          "one_login_complaint.complaint.required",
+          complaint => complaint.nonEmpty
+        )
+        .verifying(
+          messages("one_login_complaint.complaint.error", maxSingleTextboxLength.toString),
+          complaint => complaint.length <= maxSingleTextboxLength
+        )
+    )(OneLoginComplaintForm.apply)(o => Some(Tuple.fromProductTyped(o)))
+  )
 }
 
 @Singleton
@@ -126,8 +120,7 @@ class OneLoginComplaintController @Inject() (
   oneLoginComplaintPage: OneLoginComplaintPage,
   oneLoginComplaintConfirmationPage: OneLoginComplaintConfirmationPage,
   errorPage: InternalErrorPage,
-  errorHandler: ContactFrontendErrorHandler,
-  oneLoginComplaintFormBind: OneLoginComplaintFormBind
+  errorHandler: ContactFrontendErrorHandler
 )(using appConfig: AppConfig, ec: ExecutionContext, serviceNavigationConfig: ServiceNavigationConfig)
     extends FrontendController(mcc)
     with DeskproSubmission
@@ -140,7 +133,7 @@ class OneLoginComplaintController @Inject() (
 
       Ok(
         oneLoginComplaintPage(
-          oneLoginComplaintFormBind.form,
+          OneLoginComplaintFormProvider(),
           routes.OneLoginComplaintController.submit().bindServiceNavigationParam
         )
       )
@@ -156,7 +149,7 @@ class OneLoginComplaintController @Inject() (
   }
 
   private def doSubmit()(using request: MessagesRequest[AnyContent]): Future[Result] =
-    oneLoginComplaintFormBind.form
+    OneLoginComplaintFormProvider()
       .bindFromRequest()
       .fold(
         formWithError =>

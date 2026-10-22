@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.AppConfig
+import config.{AppConfig, ValidationConstants}
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import model.Aliases.ReferrerUrl
@@ -38,49 +38,43 @@ import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPa
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class ContactHmrcForm @Inject() (implicit
-  emailValidator: DeskproEmailValidator,
-  nameValidator: NameValidator
-) {
+object ContactHmrcFormProvider {
+  import ValidationConstants._
 
-  def form(using messages: Messages, appConfig: AppConfig): Form[ContactForm] = {
-    import appConfig._
-
-    Form[ContactForm](
-      mapping(
-        "contact-name"     -> text
-          .verifying("contact.name.error.required", name => name.trim.nonEmpty)
-          .verifying("forms.name.error.invalid", name => nameValidator.validate(name))
-          .verifying(
-            messages("contact.name.error.length", maxNameLength.toString),
-            name => name.length <= maxNameLength
-          ),
-        "contact-email"    -> text
-          .verifying("contact.email.error.required", email => email.trim.nonEmpty)
-          .verifying(
-            messages("contact.email.error.length", maxEmailLength.toString),
-            email => email.trim.isEmpty || email.length <= maxEmailLength
-          )
-          .verifying(
-            "contact.email.error.invalid",
-            email =>
-              // Do not display the regex validation error if already displayed a length error
-              email.length > maxEmailLength || email.trim.isEmpty || emailValidator.validate(email)
-          ),
-        "contact-comments" -> text
-          .verifying("contact.comments.error.required", comment => comment.trim.nonEmpty)
-          .verifying(
-            messages("contact.comments.error.length", maxSingleTextboxLength.toString),
-            comment => comment.length <= maxSingleTextboxLength
-          ),
-        "isJavascript"     -> boolean,
-        "referrer"         -> text,
-        "csrfToken"        -> text,
-        "service"          -> optional(text),
-        "userAction"       -> optional(text)
-      )(ContactForm.apply)(o => Some(Tuple.fromProductTyped(o)))
-    )
-  }
+  def apply()(using messages: Messages): Form[ContactForm] = Form[ContactForm](
+    mapping(
+      "contact-name"     -> text
+        .verifying("contact.name.error.required", name => name.trim.nonEmpty)
+        .verifying("forms.name.error.invalid", name => NameValidator.validate(name))
+        .verifying(
+          messages("contact.name.error.length", maxNameLength.toString),
+          name => name.length <= maxNameLength
+        ),
+      "contact-email"    -> text
+        .verifying("contact.email.error.required", email => email.trim.nonEmpty)
+        .verifying(
+          messages("contact.email.error.length", maxEmailLength.toString),
+          email => email.trim.isEmpty || email.length <= maxEmailLength
+        )
+        .verifying(
+          "contact.email.error.invalid",
+          email =>
+            // Do not display the regex validation error if already displayed a length error
+            email.length > maxEmailLength || email.trim.isEmpty || DeskproEmailValidator.validate(email)
+        ),
+      "contact-comments" -> text
+        .verifying("contact.comments.error.required", comment => comment.trim.nonEmpty)
+        .verifying(
+          messages("contact.comments.error.length", maxSingleTextboxLength.toString),
+          comment => comment.length <= maxSingleTextboxLength
+        ),
+      "isJavascript"     -> boolean,
+      "referrer"         -> text,
+      "csrfToken"        -> text,
+      "service"          -> optional(text),
+      "userAction"       -> optional(text)
+    )(ContactForm.apply)(o => Some(Tuple.fromProductTyped(o)))
+  )
 }
 
 @Singleton
@@ -91,8 +85,7 @@ class ContactHmrcController @Inject() (
   errorPage: InternalErrorPage,
   contactHmrcPage: ContactHmrcPage,
   contactHmrcConfirmationPage: ContactHmrcConfirmationPage,
-  headerRetriever: RefererHeaderRetriever,
-  contactHmrcForm: ContactHmrcForm
+  headerRetriever: RefererHeaderRetriever
 )(using
   val appConfig: AppConfig,
   val executionContext: ExecutionContext,
@@ -110,7 +103,7 @@ class ContactHmrcController @Inject() (
       Future.successful {
         val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders() getOrElse "n/a"
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-        val form      = contactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, userAction))
+        val form      = ContactHmrcFormProvider().fill(ContactForm(referrer, csrfToken, service, userAction))
         val submit    = routes.ContactHmrcController.submit(service, userAction, referrerUrl).bindServiceNavigationParam
         val view      = contactHmrcPage(form, submit)
         Ok(view)
@@ -124,7 +117,7 @@ class ContactHmrcController @Inject() (
   ): Action[AnyContent] =
     Action.async { request =>
       given Request[AnyContent] = request
-      contactHmrcForm.form
+      ContactHmrcFormProvider()
         .bindFromRequest()
         .fold(
           formWithErrors => {

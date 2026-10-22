@@ -92,7 +92,6 @@ class FeedbackControllerSpec extends BaseControllerSpec {
   val playFrontendFeedbackPage             = instanceOf[views.html.FeedbackPage]
   val playFrontendFeedbackConfirmationPage = instanceOf[views.html.FeedbackConfirmationPage]
   val errorPage                            = instanceOf[views.html.InternalErrorPage]
-  val formBind                             = instanceOf[FeedbackFormBind]
 
   val controller = new FeedbackController(
     ticketQueueConnector,
@@ -102,8 +101,7 @@ class FeedbackControllerSpec extends BaseControllerSpec {
     playFrontendFeedbackConfirmationPage,
     playFrontendFeedbackPage,
     errorPage,
-    new RefererHeaderRetriever,
-    formBind
+    new RefererHeaderRetriever
   )
 
   def generateRequest(

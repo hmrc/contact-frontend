@@ -51,7 +51,6 @@ class AccessibilityControllerSpec extends BaseControllerSpec {
   val playFrontendAccessibilityPage             = instanceOf[views.html.AccessibilityProblemPage]
   val playFrontendAccessibilityConfirmationPage = instanceOf[views.html.AccessibilityProblemConfirmationPage]
   val errorPage                                 = instanceOf[views.html.InternalErrorPage]
-  val formBind                                  = instanceOf[AccessibilityFormBind]
 
   val controller = new AccessibilityController(
     ticketQueueConnector,
@@ -60,8 +59,7 @@ class AccessibilityControllerSpec extends BaseControllerSpec {
     playFrontendAccessibilityPage,
     playFrontendAccessibilityConfirmationPage,
     errorPage,
-    new RefererHeaderRetriever,
-    formBind
+    new RefererHeaderRetriever
   )
 
   def generateRequest(desc: String, formName: String, email: String, isJavascript: Boolean, referrer: String) = {
