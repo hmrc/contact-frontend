@@ -331,7 +331,7 @@ class ContactHmrcControllerSpec extends BaseControllerSpec with GivenWhenThen {
       val errors = document.select(".govuk-error-message").asScala
       errors.length should be(1)
 
-      errors.exists(_.text().contains(Messages("contact.comments.error.length"))) shouldBe true
+      errors.exists(_.text().contains(Messages("Comment must be 2000 characters or less"))) shouldBe true
     }
 
     "display error messages when email is invalid" in {
@@ -383,7 +383,7 @@ class ContactHmrcControllerSpec extends BaseControllerSpec with GivenWhenThen {
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("contact.title"))
       val errors = document.select(".govuk-error-message").asScala
-      errors.exists(_.text().contains(Messages("contact.email.error.length"))) shouldBe true
+      errors.exists(_.text().contains("Email address must be 254 characters or fewer")) shouldBe true
     }
 
     "display error messages when name is too long" in {
@@ -407,7 +407,7 @@ class ContactHmrcControllerSpec extends BaseControllerSpec with GivenWhenThen {
       val document = Jsoup.parse(contentAsString(result))
       document.title() should be("Error: " + Messages("contact.title"))
       val errors = document.select(".govuk-error-message").asScala
-      errors.exists(_.text().contains(Messages("contact.name.error.length"))) shouldBe true
+      errors.exists(_.text().contains("Full name must be 70 characters or fewer")) shouldBe true
     }
 
     "return expected Internal Error when backend service errors for submit page" in {

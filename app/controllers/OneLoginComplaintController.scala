@@ -16,13 +16,13 @@
 
 package controllers
 
-import config.{AppConfig, ContactFrontendErrorHandler}
+import config.{AppConfig, ContactFrontendErrorHandler, ValidationConstants}
 import connectors.deskpro.DeskproTicketQueueConnector
 import model.{ContactPreference, ContactPreferenceFormatter, DateOfBirth, OneLoginComplaintForm}
 import play.api.Logging
 import play.api.data.Form
 import play.api.data.Forms.*
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
 import services.DeskproSubmission
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -36,11 +36,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-object OneLoginComplaintFormBind {
-  private val emailValidator = DeskproEmailValidator()
-  private val nameValidator  = NameValidator()
+object OneLoginComplaintFormProvider {
+  import ValidationConstants._
 
-  def form: Form[OneLoginComplaintForm] = Form[OneLoginComplaintForm](
+  def apply()(using messages: Messages): Form[OneLoginComplaintForm] = Form[OneLoginComplaintForm](
     mapping(
       "name"               -> text
         .verifying(
@@ -48,12 +47,12 @@ object OneLoginComplaintFormBind {
           name => name.nonEmpty
         )
         .verifying(
-          "problem_report.name.error.length",
-          name => name.length <= 70
+          messages("problem_report.name.error.length", maxNameLength.toString),
+          name => name.length <= maxNameLength
         )
         .verifying(
           "forms.name.error.invalid",
-          name => nameValidator.validate(name) || name.isEmpty
+          name => NameValidator.validate(name) || name.isEmpty
         ),
       "nino"               -> text
         .verifying(
@@ -90,7 +89,7 @@ object OneLoginComplaintFormBind {
         )
         .verifying(
           s"problem_report.email.error.valid",
-          email => emailValidator.validate(email) || email.isEmpty
+          email => DeskproEmailValidator.validate(email) || email.trim.isEmpty
         ),
       "phone-number"       -> optional(
         text.verifying("one_login_complaint.phone-number.error", phoneNumber => phoneNumber.length <= 50)
@@ -106,7 +105,10 @@ object OneLoginComplaintFormBind {
           "one_login_complaint.complaint.required",
           complaint => complaint.nonEmpty
         )
-        .verifying("one_login_complaint.complaint.error", complaint => complaint.length <= 2000)
+        .verifying(
+          messages("one_login_complaint.complaint.error", maxSingleTextboxLength.toString),
+          complaint => complaint.length <= maxSingleTextboxLength
+        )
     )(OneLoginComplaintForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 }
@@ -131,7 +133,7 @@ class OneLoginComplaintController @Inject() (
 
       Ok(
         oneLoginComplaintPage(
-          OneLoginComplaintFormBind.form,
+          OneLoginComplaintFormProvider(),
           routes.OneLoginComplaintController.submit().bindServiceNavigationParam
         )
       )
@@ -147,7 +149,7 @@ class OneLoginComplaintController @Inject() (
   }
 
   private def doSubmit()(using request: MessagesRequest[AnyContent]): Future[Result] =
-    OneLoginComplaintFormBind.form
+    OneLoginComplaintFormProvider()
       .bindFromRequest()
       .fold(
         formWithError =>

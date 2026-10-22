@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.AppConfig
+import config.{AppConfig, ValidationConstants}
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import model.Aliases.*
@@ -25,7 +25,7 @@ import play.api.Logging
 import play.api.data.Forms.*
 import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, Form, FormError}
-import play.api.i18n.{I18nSupport, Lang}
+import play.api.i18n.{I18nSupport, Lang, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
@@ -71,7 +71,7 @@ import scala.util.control.NonFatal
       Future.successful(
         Ok(
           renderFeedbackPage(
-            FeedbackFormBind.emptyForm(
+            FeedbackFormProvider.emptyForm(
               CSRF.getToken(request).map(_.value).getOrElse(""),
               referrer = referrer,
               backUrl = backUrl,
@@ -94,7 +94,7 @@ import scala.util.control.NonFatal
     referrerUrl: Option[ReferrerUrl] = None
   ): Action[AnyContent] = Action.async { request =>
     given Request[AnyContent] = request
-    FeedbackFormBind.form
+    FeedbackFormProvider()
       .bindFromRequest()
       .fold(
         formWithError => Future.successful(BadRequest(feedbackView(formWithError))),
@@ -139,12 +139,64 @@ import scala.util.control.NonFatal
   }
 }
 
-object FeedbackFormBind {
-
+object FeedbackFormProvider {
   import model.FeedbackFormConfig.*
+  import ValidationConstants._
 
-  private val emailValidator = DeskproEmailValidator()
-  private val nameValidator  = NameValidator()
+  def apply()(using messages: Messages): Form[FeedbackForm] = Form[FeedbackForm](
+    mapping(
+      "feedback-rating"   -> optional(text)
+        .verifying("feedback.rating.error.required", rating => rating.isDefined && !rating.get.trim.isEmpty)
+        .verifying(
+          "feedback.rating.error.invalid",
+          rating => rating.forall(validExperiences.contains(_))
+        ),
+      "feedback-name"     -> text
+        .verifying("feedback.name.error.required", name => name.trim.nonEmpty)
+        .verifying("forms.name.error.invalid", name => NameValidator.validate(name))
+        .verifying(
+          messages("feedback.name.error.length", maxNameLength.toString),
+          name => name.length <= maxNameLength
+        ),
+      "feedback-email"    -> text
+        .verifying(
+          messages("feedback.email.error.length", maxEmailLength.toString),
+          email => email.length <= maxEmailLength
+        )
+        .verifying(
+          "feedback.email.error.invalid",
+          email =>
+            // Do not display the regex validation error if already displayed a length error
+            email.length > maxEmailLength || email.trim.isEmpty || DeskproEmailValidator.validate(email)
+        ),
+      "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
+
+        override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
+          val commentsCanBeOmitted = data.get("canOmitComments").contains("true")
+          data.get(key) match {
+            case Some(value) if value.trim.nonEmpty || commentsCanBeOmitted => Right(value.trim)
+            case Some(_)                                                    => Left(Seq(FormError(key, "feedback.comments.error.required", Nil)))
+            case None                                                       => Left(Seq(FormError(key, "error.required", Nil)))
+          }
+        }
+
+        override def unbind(key: String, value: String): Map[String, String] = Map(key -> value)
+
+      }).verifying(
+        messages("feedback.comments.error.length", maxSingleTextboxLength.toString),
+        comment => {
+          val result = comment.size <= maxSingleTextboxLength
+          result
+        }
+      ),
+      "isJavascript"    -> boolean,
+      "referrer"        -> text,
+      "csrfToken"       -> text,
+      "service"         -> optional(text),
+      "backUrl"         -> optional(text),
+      "canOmitComments" -> boolean
+    )(FeedbackForm.apply)(o => Some(Tuple.fromProductTyped(o)))
+  )
 
   def emptyForm(
     csrfToken: String,
@@ -152,8 +204,8 @@ object FeedbackFormBind {
     backUrl: Option[BackUrl],
     canOmitComments: Boolean,
     service: Option[String]
-  ): Form[FeedbackForm] =
-    FeedbackFormBind.form.fill(
+  )(using Messages): Form[FeedbackForm] =
+    apply().fill(
       FeedbackForm(
         experienceRating = None,
         name = "",
@@ -166,50 +218,5 @@ object FeedbackFormBind {
         backUrl,
         canOmitComments
       )
-    )
-
-  def form: Form[FeedbackForm] =
-    Form[FeedbackForm](
-      mapping(
-        "feedback-rating"   -> optional(text)
-          .verifying("feedback.rating.error.required", rating => rating.isDefined && !rating.get.trim.isEmpty)
-          .verifying(
-            "feedback.rating.error.invalid",
-            rating => rating.forall(validExperiences.contains(_))
-          ),
-        "feedback-name"     -> text
-          .verifying("feedback.name.error.required", name => name.trim.nonEmpty)
-          .verifying("forms.name.error.invalid", name => nameValidator.validate(name))
-          .verifying("feedback.name.error.length", name => name.length <= 70),
-        "feedback-email"    -> text
-          .verifying("feedback.email.error.invalid", email => emailValidator.validate(email))
-          .verifying("feedback.email.error.length", email => email.length <= 255),
-        "feedback-comments" -> FieldMapping[String]()(new Formatter[String] {
-
-          override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
-            val commentsCanBeOmitted = data.get("canOmitComments").contains("true")
-            data.get(key) match {
-              case Some(value) if value.trim.nonEmpty || commentsCanBeOmitted => Right(value.trim)
-              case Some(_)                                                    => Left(Seq(FormError(key, "feedback.comments.error.required", Nil)))
-              case None                                                       => Left(Seq(FormError(key, "error.required", Nil)))
-            }
-          }
-
-          override def unbind(key: String, value: String): Map[String, String] = Map(key -> value)
-
-        }).verifying(
-          "feedback.comments.error.length",
-          comment => {
-            val result = comment.size <= 2000
-            result
-          }
-        ),
-        "isJavascript"    -> boolean,
-        "referrer"        -> text,
-        "csrfToken"       -> text,
-        "service"         -> optional(text),
-        "backUrl"         -> optional(text),
-        "canOmitComments" -> boolean
-      )(FeedbackForm.apply)(o => Some(Tuple.fromProductTyped(o)))
     )
 }

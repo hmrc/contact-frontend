@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.AppConfig
+import config.{AppConfig, ValidationConstants}
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import model.Aliases.ReferrerUrl
@@ -24,7 +24,7 @@ import model.ReportProblemForm
 import play.api.Logging
 import play.api.data.Forms.*
 import play.api.data.*
-import play.api.i18n.{I18nSupport, Lang}
+import play.api.i18n.{I18nSupport, Lang, Messages}
 import play.api.mvc.{AnyContent, *}
 import services.DeskproSubmission
 import uk.gov.hmrc.hmrcfrontend.config.ServiceNavigationConfig
@@ -37,11 +37,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-object ReportProblemFormBind {
-  private val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
-  private val nameValidator                         = NameValidator()
+object ReportProblemFormProvider {
+  import ValidationConstants._
 
-  def form: Form[ReportProblemForm] = Form[ReportProblemForm](
+  def apply()(using messages: Messages): Form[ReportProblemForm] = Form[ReportProblemForm](
     mapping(
       "report-name"   -> text
         .verifying(
@@ -49,12 +48,12 @@ object ReportProblemFormBind {
           name => name.nonEmpty
         )
         .verifying(
-          "problem_report.name.error.length",
-          name => name.length <= 70
+          messages("problem_report.name.error.length", maxNameLength.toString),
+          name => name.length <= maxNameLength
         )
         .verifying(
           "forms.name.error.invalid",
-          name => nameValidator.validate(name) || name.isEmpty
+          name => NameValidator.validate(name) || name.isEmpty
         ),
       "report-email"  -> text
         .verifying(
@@ -63,21 +62,31 @@ object ReportProblemFormBind {
         )
         .verifying(
           s"problem_report.email.error.valid",
-          email => emailValidator.validate(email) || email.isEmpty
+          // Do not display the regex validation error if already displayed a length error
+          email => email.length > maxEmailLength || email.trim.isEmpty || DeskproEmailValidator.validate(email)
         )
-        .verifying("problem_report.email.error.length", email => email.length <= 255),
+        .verifying(
+          messages("problem_report.email.error.length", maxEmailLength),
+          email => email.length <= maxEmailLength
+        ),
       "report-action" -> text
         .verifying(
           s"problem_report.action.error.required",
           action => action.nonEmpty
         )
-        .verifying("problem_report.action.error.length", action => action.length <= 1000),
+        .verifying(
+          messages("problem_report.action.error.length", maxMultipartTextboxLength.toString),
+          action => action.length <= maxMultipartTextboxLength
+        ),
       "report-error"  -> text
         .verifying(
           s"problem_report.error.error.required",
           error => error.nonEmpty
         )
-        .verifying("problem_report.error.error.length", error => error.length <= 1000),
+        .verifying(
+          messages("problem_report.error.error.length", maxMultipartTextboxLength.toString),
+          error => error.length <= maxMultipartTextboxLength
+        ),
       "isJavascript"  -> boolean,
       "service"       -> optional(text),
       "referrer"      -> optional(text),
@@ -86,8 +95,10 @@ object ReportProblemFormBind {
     )(ReportProblemForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
-  def emptyForm(csrfToken: String, service: Option[String], referrer: Option[String]): Form[ReportProblemForm] =
-    ReportProblemFormBind.form.fill(
+  def emptyForm(csrfToken: String, service: Option[String], referrer: Option[String])(using
+    Messages
+  ): Form[ReportProblemForm] =
+    apply().fill(
       ReportProblemForm(
         reportName = "",
         reportEmail = "",
@@ -123,7 +134,7 @@ class ReportProblemController @Inject() (
     given Request[AnyContent] = request
     val csrfToken             = play.filters.csrf.CSRF.getToken(request).map(_.value).getOrElse("")
     val referrer              = referrerUrl orElse headerRetriever.refererFromHeaders()
-    Ok(page(ReportProblemFormBind.emptyForm(csrfToken, service, referrer), service, referrerUrl))
+    Ok(page(ReportProblemFormProvider.emptyForm(csrfToken, service, referrer), service, referrerUrl))
   }
 
   def indexDeprecated(service: Option[String], referrerUrl: Option[ReferrerUrl]): Action[AnyContent] = Action {
@@ -142,7 +153,7 @@ class ReportProblemController @Inject() (
   private def doSubmit(service: Option[String], referrerUrl: Option[String])(using
     request: MessagesRequest[AnyContent]
   ) =
-    ReportProblemFormBind.form
+    ReportProblemFormProvider()
       .bindFromRequest()
       .fold(
         formWithError =>

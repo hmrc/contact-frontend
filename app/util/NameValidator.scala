@@ -16,7 +16,7 @@
 
 package util
 
-case class NameValidator() {
+object NameValidator {
 
   val nameRegex: String = """^[A-Za-z\-.,()'"\s]+$"""
 
