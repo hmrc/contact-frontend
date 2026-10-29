@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.AppConfig
+import config.{AppConfig, ValidationConstants}
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import model.Aliases.ReferrerUrl
@@ -25,7 +25,7 @@ import play.api.Logging
 import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.data.Forms.*
-import play.api.i18n.{I18nSupport, Lang}
+import play.api.i18n.{I18nSupport, Lang, Messages}
 import play.api.mvc.*
 import play.filters.csrf.CSRF
 import services.DeskproSubmission
@@ -38,27 +38,36 @@ import views.html.{ContactHmrcConfirmationPage, ContactHmrcPage, InternalErrorPa
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-object ContactHmrcForm {
+object ContactHmrcFormProvider {
+  import ValidationConstants._
 
-  private val emailValidator = DeskproEmailValidator()
-  private val nameValidator  = NameValidator()
-
-  val form = Form[ContactForm](
+  def apply()(using messages: Messages): Form[ContactForm] = Form[ContactForm](
     mapping(
       "contact-name"     -> text
         .verifying("contact.name.error.required", name => name.trim.nonEmpty)
-        .verifying("forms.name.error.invalid", name => nameValidator.validate(name))
-        .verifying("contact.name.error.length", name => name.length <= 70),
+        .verifying("forms.name.error.invalid", name => NameValidator.validate(name))
+        .verifying(
+          messages("contact.name.error.length", maxNameLength.toString),
+          name => name.length <= maxNameLength
+        ),
       "contact-email"    -> text
         .verifying("contact.email.error.required", email => email.trim.nonEmpty)
-        .verifying("contact.email.error.invalid", email => email.trim.isEmpty || emailValidator.validate(email))
         .verifying(
-          "contact.email.error.length",
-          email => !(email.trim.isEmpty || emailValidator.validate(email)) || email.length <= 255
+          messages("contact.email.error.length", maxEmailLength.toString),
+          email => email.trim.isEmpty || email.length <= maxEmailLength
+        )
+        .verifying(
+          "contact.email.error.invalid",
+          email =>
+            // Do not display the regex validation error if already displayed a length error
+            email.length > maxEmailLength || email.trim.isEmpty || DeskproEmailValidator.validate(email)
         ),
       "contact-comments" -> text
         .verifying("contact.comments.error.required", comment => comment.trim.nonEmpty)
-        .verifying("contact.comments.error.length", comment => comment.length <= 2000),
+        .verifying(
+          messages("contact.comments.error.length", maxSingleTextboxLength.toString),
+          comment => comment.length <= maxSingleTextboxLength
+        ),
       "isJavascript"     -> boolean,
       "referrer"         -> text,
       "csrfToken"        -> text,
@@ -94,7 +103,7 @@ class ContactHmrcController @Inject() (
       Future.successful {
         val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders() getOrElse "n/a"
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-        val form      = ContactHmrcForm.form.fill(ContactForm(referrer, csrfToken, service, userAction))
+        val form      = ContactHmrcFormProvider().fill(ContactForm(referrer, csrfToken, service, userAction))
         val submit    = routes.ContactHmrcController.submit(service, userAction, referrerUrl).bindServiceNavigationParam
         val view      = contactHmrcPage(form, submit)
         Ok(view)
@@ -108,7 +117,7 @@ class ContactHmrcController @Inject() (
   ): Action[AnyContent] =
     Action.async { request =>
       given Request[AnyContent] = request
-      ContactHmrcForm.form
+      ContactHmrcFormProvider()
         .bindFromRequest()
         .fold(
           formWithErrors => {

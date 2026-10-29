@@ -16,18 +16,20 @@
 
 package views
 
-import controllers.OneLoginComplaintFormBind
+import controllers.OneLoginComplaintFormProvider
 import helpers.BaseViewSpec
 import model.{DateOfBirth, EmailPreference, LetterPreference, OneLoginComplaintForm}
+import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.mvc.Call
+import util.{DeskproEmailValidator, NameValidator}
 import views.html.OneLoginComplaintPage
 
 import scala.util.Random
 
 class OneLoginComplaintPageSpec extends BaseViewSpec {
 
-  val oneLoginComplaintForm = OneLoginComplaintFormBind.form
+  val oneLoginComplaintForm = OneLoginComplaintFormProvider.apply()
 
   val formValues: OneLoginComplaintForm = OneLoginComplaintForm(
     name = "Test Person",
@@ -626,7 +628,7 @@ class OneLoginComplaintPageSpec extends BaseViewSpec {
       )
       val errors             = contentWithService.select("#complaint-error")
       errors              should have size 1
-      errors.first.text() should be("Error: Complaint cannot be longer than 1000 characters")
+      errors.first.text() should be("Error: Complaint cannot be longer than 2000 characters")
     }
 
     "include a submit button" in {

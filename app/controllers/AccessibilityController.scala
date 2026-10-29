@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.AppConfig
+import config.{AppConfig, ValidationConstants}
 import connectors.deskpro.DeskproTicketQueueConnector
 import connectors.enrolments.EnrolmentsConnector
 import model.AccessibilityForm
@@ -24,7 +24,7 @@ import model.Aliases.ReferrerUrl
 import play.api.Logging
 import play.api.data.Form
 import play.api.data.Forms.*
-import play.api.i18n.{I18nSupport, Lang}
+import play.api.i18n.{I18nSupport, Lang, Messages}
 import play.api.mvc.*
 import play.filters.csrf.CSRF
 import play.twirl.api.Html
@@ -39,17 +39,53 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-object AccessibilityFormBind {
-  private val emailValidator = DeskproEmailValidator()
-  private val nameValidator  = NameValidator()
+object AccessibilityFormProvider {
+  import config.ValidationConstants._
+
+  def apply()(using messages: Messages): Form[AccessibilityForm] = Form[AccessibilityForm](
+    mapping(
+      "problemDescription" -> text
+        .verifying("accessibility.problem.error.required", msg => msg.trim.nonEmpty)
+        .verifying(
+          messages("accessibility.problem.error.length", maxSingleTextboxLength.toString),
+          msg => msg.length <= maxSingleTextboxLength
+        ),
+      "name"               -> text
+        .verifying("accessibility.name.error.required", name => name.trim.nonEmpty)
+        .verifying("forms.name.error.invalid", name => NameValidator.validate(name))
+        .verifying(
+          messages("accessibility.name.error.length", maxNameLength.toString),
+          name => name.length <= maxNameLength
+        ),
+      "email"              -> text
+        .verifying("accessibility.email.error.required", email => email.trim.nonEmpty)
+        // the logic below ensures that two or more errors will not fire at the same time. This prevents
+        // multiple error messages appearing in the error summary for the same field
+        .verifying(
+          messages("accessibility.email.error.length", maxEmailLength.toString),
+          email => email.trim.isEmpty || email.length <= maxEmailLength
+        )
+        .verifying(
+          "accessibility.email.error.invalid",
+          email =>
+            // Do not display the regex validation error if already displayed a length error
+            email.length > maxEmailLength || email.trim.isEmpty || DeskproEmailValidator.validate(email)
+        ),
+      "isJavascript"       -> boolean,
+      "referrer"           -> text,
+      "csrfToken"          -> text,
+      "service"            -> optional(text),
+      "userAction"         -> optional(text)
+    )(AccessibilityForm.apply)(o => Some(Tuple.fromProductTyped(o)))
+  )
 
   def emptyForm(
     csrfToken: String,
     referrer: Option[String] = None,
     service: Option[String] = None,
     userAction: Option[String] = None
-  ): Form[AccessibilityForm] =
-    AccessibilityFormBind.form.fill(
+  )(using Messages): Form[AccessibilityForm] =
+    apply().fill(
       AccessibilityForm(
         problemDescription = "",
         name = "",
@@ -61,32 +97,6 @@ object AccessibilityFormBind {
         userAction = userAction
       )
     )
-
-  def form: Form[AccessibilityForm] = Form[AccessibilityForm](
-    mapping(
-      "problemDescription" -> text
-        .verifying("accessibility.problem.error.required", msg => msg.trim.nonEmpty)
-        .verifying("accessibility.problem.error.length", msg => msg.length <= 2000),
-      "name"               -> text
-        .verifying("accessibility.name.error.required", name => name.trim.nonEmpty)
-        .verifying("forms.name.error.invalid", name => nameValidator.validate(name))
-        .verifying("accessibility.name.error.length", name => name.length <= 70),
-      "email"              -> text
-        .verifying("accessibility.email.error.required", name => name.trim.nonEmpty)
-        // the logic below ensures that two or more errors will not fire at the same time. This prevents
-        // multiple error messages appearing in the error summary for the same field
-        .verifying("accessibility.email.error.invalid", email => email.trim.isEmpty || emailValidator.validate(email))
-        .verifying(
-          "accessibility.email.error.length",
-          email => !(email.trim.isEmpty || emailValidator.validate(email)) || email.length <= 255
-        ),
-      "isJavascript"       -> boolean,
-      "referrer"           -> text,
-      "csrfToken"          -> text,
-      "service"            -> optional(text),
-      "userAction"         -> optional(text)
-    )(AccessibilityForm.apply)(o => Some(Tuple.fromProductTyped(o)))
-  )
 }
 
 class AccessibilityController @Inject() (
@@ -116,7 +126,7 @@ class AccessibilityController @Inject() (
         val submit    = routes.AccessibilityController.submit(service, userAction).bindServiceNavigationParam
         val referrer  = referrerUrl orElse headerRetriever.refererFromHeaders()
         val csrfToken = CSRF.getToken(request).map(_.value).getOrElse("")
-        val form      = AccessibilityFormBind.emptyForm(csrfToken, referrer, service, userAction)
+        val form      = AccessibilityFormProvider.emptyForm(csrfToken, referrer, service, userAction)
         Ok(accessibilityPage(form, submit))
       }
     }
@@ -124,7 +134,7 @@ class AccessibilityController @Inject() (
   def submit(service: Option[String], userAction: Option[String]): Action[AnyContent] =
     Action.async { request =>
       given Request[AnyContent] = request
-      AccessibilityFormBind.form
+      AccessibilityFormProvider()
         .bindFromRequest()
         .fold(
           (error: Form[AccessibilityForm]) => {
