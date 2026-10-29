@@ -160,6 +160,10 @@ object FeedbackFormProvider {
         ),
       "feedback-email"    -> text
         .verifying(
+          s"feedback.email.error.required",
+          email => email.nonEmpty
+        )
+        .verifying(
           messages("feedback.email.error.length", maxEmailLength.toString),
           email => email.length <= maxEmailLength
         )

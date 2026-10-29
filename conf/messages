@@ -8,6 +8,7 @@ feedback.rating.error.invalid=Please select a valid experience rating
 feedback.email.label=Email address
 feedback.email.error.invalid=Enter an email address in the correct format, like name@example.com
 feedback.email.error.length=Email address must be {0} characters or fewer
+feedback.email.error.required=Enter your email address
 feedback.comments.error.required=Enter your comments
 feedback.comments.error.length=Comment must be {0} characters or less
 feedback.title=Send your feedback – Contact HMRC – GOV.UK
