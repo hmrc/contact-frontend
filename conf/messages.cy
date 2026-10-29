@@ -8,6 +8,7 @@ feedback.rating.error.invalid=Dewiswch opsiwn dilys i fesur eich profiad
 feedback.email.label=Cyfeiriad e-bost
 feedback.email.error.invalid=Nodwch gyfeiriad e-bost yn y fformat cywir, megis enw@enghraifft.com
 feedback.email.error.length=Ni all eich e-bost fod yn hirach na {0} o gymeriadau
+feedback.email.error.required=Nodwch eich cyfeiriad e-bost
 feedback.comments.error.required=Rhowch eich sylwadau
 feedback.comments.error.length=Mae rhaid i’r sylw fod yn {0} o gymeriadau neu lai
 feedback.title=Anfon eich adborth – Cysylltu â CThEF – GOV.UK
